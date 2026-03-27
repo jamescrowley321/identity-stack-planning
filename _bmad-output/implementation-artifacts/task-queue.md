@@ -30,7 +30,7 @@ Statuses: pending | in_progress | done | blocked
 
 | ID | Issue | Status | Description | Branch | Iterations |
 |----|-------|--------|-------------|--------|------------|
-| T85 | 96 | pending | Fix PR #80 review findings — SSO Application (silent no-op in Update, no oidc/saml mutual exclusivity, type switching) | feat/sso-application-resource | medium |
+| T85 | 96 | in_progress | Fix PR #80 review findings — SSO Application (silent no-op in Update, no oidc/saml mutual exclusivity, type switching) | feat/sso-application-resource | medium |
 | T86 | 97 | pending | Fix PR #86 review findings — Third-party Application (orphaned resource on Create, Update wipes unmanaged fields) | feat/third-party-app-resource | medium |
 | T87 | 98 | pending | Fix PR #88 review findings — Project Export (nil pointer dereference, Sensitive flag) | feat/project-export-datasource | small |
 | T88 | 99 | pending | Fix PR #90 review findings — Snyk CI (unsupported flag, unpinned npm install) | ci/snyk-workflow | small |
@@ -120,6 +120,27 @@ Statuses: pending | in_progress | done | blocked
 | T45 | 97 | done | FAPI 2.0 Security Profile Compliance | feat/fapi2 | large |
 | T46 | 109 | done | Architecture Improvements: Policy-Based Config | feat/policy-config | large |
 | T47 | 112 | done | Add Performance Benchmarking Tests | test/performance-benchmarks | medium |
+### Review Fix Tasks
+
+| ID | Issue | Status | Description | Branch | PR | Iterations | Depends On |
+|----|-------|--------|-------------|--------|----|------------|------------|
+| T101 | | in_progress | Fix PR #211 review findings — OAuth Callback State (TypeError on None state/URL) | feat/oauth-callback-state | 211 | small | — |
+| T102 | | pending | Fix PR #222 review findings — HTTP Client DI (use-after-close, ignored params) | feat/http-client-di | 222 | small | T101 |
+| T103 | | pending | Fix PR #223 review findings — Enhanced Token Validation (leeway dropped, empty issuer fails open) | feat/enhanced-token-validation | 223 | medium | T102 |
+| T104 | | pending | Fix PR #224 review findings — Base Request/Response (use-after-close, error leaks, CI overlap) | feat/base-request-response | 224 | small | T103 |
+| T105 | | pending | Fix PR #225 review findings — Auth Code PKCE (param injection, empty callback success) | feat/auth-code-pkce | 225 | medium | T104 |
+| T106 | | pending | Fix PR #226 review findings — Introspection (missing __all__ exports, no async tests) | feat/introspection | 226 | small | T105 |
+| T107 | | pending | Fix PR #227 review findings — Revocation (missing __all__, dead try/except, no async tests) | feat/revocation | 227 | small | T106 |
+| T108 | | pending | Fix PR #228 review findings — Refresh (no async tests, weak test assertions) | feat/refresh | 228 | small | T107 |
+| T109 | | pending | Fix PR #229 review findings — DPoP (htu query/fragment violation RFC 9449, no sig verify tests) | feat/dpop | 229 | medium | T108 |
+| T110 | | pending | Fix PR #230 review findings — PAR (client_id double-sent, missing required field validation) | feat/par | 230 | medium | T109 |
+| T111 | | pending | Fix PR #232 review findings — JAR (extra_claims override, missing kid header) | feat/jar | 232 | medium | T110 |
+| T112 | | pending | Fix PR #233 review findings — Device Auth (no async tests, missing required field validation) | feat/device-auth-grant | 233 | small | T111 |
+| T113 | | pending | Fix PR #234 review findings — Token Exchange (client_id double-sent, actor_token_type validation) | feat/token-exchange | 234 | medium | T112 |
+| T114 | | pending | Fix PR #235 review findings — FAPI 2.0 (crash on failed discovery, empty code_challenge bypass) | feat/fapi2 | 235 | medium | T113 |
+| T115 | | pending | Fix PR #236 review findings — Policy Config (unenforced policy flags, no URL scheme pre-flight) | feat/policy-config | 236 | medium | T114 |
+| T116 | | pending | Fix PR #237 review findings — Perf Benchmarks (expiring fixture, wrong benchmark layer, no assertions) | test/performance-benchmarks | 237 | small | T115 |
+
 | T48 | 83 | pending | Create Comprehensive API Documentation | docs/api-docs | large |
 | T49 | 39 | pending | Okta Example | feat/okta-example | small |
 | T50 | 38 | pending | Auth0 Example | feat/auth0-example | small |

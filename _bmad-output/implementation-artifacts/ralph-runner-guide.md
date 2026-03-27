@@ -37,6 +37,10 @@ cd ~/repos/auth/terraform-provider-descope
 # Fix SaaS starter PRs (phased first, then cross-cutting)
 cd ~/repos/auth/descope-saas-starter
 /ralph-loop "$(cat ~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/fix-review-findings.md)" --completion-promise 'TASK COMPLETE' --max-iterations 15
+
+# Fix py-identity-model PRs (chained — 16 PRs)
+cd ~/repos/auth/py-identity-model
+/ralph-loop "$(cat ~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/fix-review-findings.md)" --completion-promise 'TASK COMPLETE' --max-iterations 50
 ```
 
 Fix tasks are in the "Review Fix Tasks" sections of `task-queue.md`. Phase order: checkout → fix → test → ci → complete.

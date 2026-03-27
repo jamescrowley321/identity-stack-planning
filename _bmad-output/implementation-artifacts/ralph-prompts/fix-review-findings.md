@@ -26,10 +26,10 @@ Find your repo's **"Review Fix Tasks"** section(s). Take first `pending` row who
   2. Create `.claude/task-state.md`:
      ```
      task_id: <ID>
-     issue: <number>
+     issue: <number or empty>
      repo: <name>
      branch: <branch>
-     pr: <PR number from issue body>
+     pr: <PR number>
      description: <desc>
      phase: checkout
      ```
@@ -45,7 +45,9 @@ Phase order: checkout → fix → test → ci → complete
 
 ### checkout
 
-1. Read the issue: `gh issue view <number> --repo jamescrowley321/<repo>`
+1. Read the review findings:
+   - If `issue` is set: `gh issue view <number> --repo jamescrowley321/<repo>`
+   - If `issue` is empty: read the "Adversarial Code Review" comment from the PR: `gh pr view <pr> --repo jamescrowley321/<repo> --comments`
 2. Record the MUST FIX and SHOULD FIX items in `.claude/task-state.md` under `## Findings`
 3. Fetch and checkout the existing branch:
    ```

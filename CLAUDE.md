@@ -53,8 +53,12 @@ When BMAD workflows reference implementation details, architecture, or existing 
 2. **Never modify sibling repos from this context** — Planning artifacts live here; code changes happen in the target repos.
 3. **Reference by repo name** — In planning docs, refer to repos by name (e.g., "py-identity-model") rather than absolute paths.
 
+## Workspace Root CLAUDE.md
+
+The parent directory `~/repos/auth/CLAUDE.md` contains consolidated commands, git conventions, and cross-repo relationships for all four repos. Always reference it for build/test/lint commands and git workflows — it is the single source of truth for workspace-wide instructions.
+
 ## Git Conventions
 
 - Standard commit messages (no conventional commits required)
 - Planning artifacts are committed to this repo
-- Each sibling repo has its own git history and remote — see the root `~/repos/auth/CLAUDE.md` for per-repo conventions
+- Each sibling repo has its own git history and remote — see `~/repos/auth/CLAUDE.md` for per-repo conventions
