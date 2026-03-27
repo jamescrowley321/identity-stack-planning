@@ -35,6 +35,8 @@ Statuses: pending | in_progress | done | blocked
 | T87 | 98 | pending | Fix PR #88 review findings — Project Export (nil pointer dereference, Sensitive flag) | feat/project-export-datasource | small |
 | T88 | 99 | pending | Fix PR #90 review findings — Snyk CI (unsupported flag, unpinned npm install) | ci/snyk-workflow | small |
 | T89 | 100 | pending | Fix PR #89 review findings — SonarCloud config (tools/ source scope) | chore/sonarcloud-findings | small |
+| T99 | 101 | pending | Fix PR #87 review findings — FGA resources (Delete docs lie, schema drift, nil pointer) | feat/fga-resources | medium |
+| T100 | 102 | pending | Fix PR #94 review findings — List resource (silent data drop, missing Update/Import tests) | feat/list-resource | small |
 
 ## descope-saas-starter
 
