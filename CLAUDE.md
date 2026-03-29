@@ -32,7 +32,8 @@ This repo uses [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) v6 fo
 - `_bmad/` — BMAD core + BMM module (agents, workflows, config)
 - `_bmad-output/planning-artifacts/` — PRDs, architecture docs, product briefs
 - `_bmad-output/implementation-artifacts/` — Epics, stories, sprint plans
-- `docs/` — Project knowledge base
+- `docs/` — Project knowledge base (see `docs/index.md` for full index)
+- `docs/ralph-planning/` — Ralph Orchestrator analysis and BMAD integration plans
 - `.claude/skills/` — BMAD skills invocable via `/bmad-*` commands
 
 ### Getting Started with BMAD
@@ -52,6 +53,13 @@ When BMAD workflows reference implementation details, architecture, or existing 
 1. **Read sibling repos directly** — You have full access to `~/repos/auth/py-identity-model/`, `~/repos/auth/terraform-provider-descope/`, and `~/repos/auth/descope-saas-starter/`. Read their code, tests, configs, and CLAUDE.md files to inform planning.
 2. **Never modify sibling repos from this context** — Planning artifacts live here; code changes happen in the target repos.
 3. **Reference by repo name** — In planning docs, refer to repos by name (e.g., "py-identity-model") rather than absolute paths.
+
+## Ralph Orchestrator Integration
+
+Ralph Orchestrator v2.8.1 is installed and used for autonomous task execution across the workspace. Configuration lives in `descope-saas-starter/ralph.yml`. See:
+
+- `docs/ralph-planning/orchestrator-comparison.md` — Chief Wiggum vs Ralph Orchestrator analysis
+- `docs/ralph-planning/ralph-bmad-integration-plan.md` — Custom security agents and Ralph hat topology proposal
 
 ## Workspace Root CLAUDE.md
 

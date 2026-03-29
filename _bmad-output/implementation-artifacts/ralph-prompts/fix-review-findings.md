@@ -18,9 +18,10 @@ Read `.claude/task-state.md` in the repo root.
 
 Read queue: `~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/task-queue.md`
 
-Find your repo's **"Review Fix Tasks"** section(s). Take first `pending` row whose dependencies are all `done`.
+Find your repo's **"Review Fix Tasks"** section(s). ONLY look at sections whose heading contains "Review Fix Tasks" — do NOT pick tasks from any other section. Take first `pending` row whose dependencies are all `done`.
 
-- If none eligible → output: <promise>ALL FIX TASKS COMPLETE</promise>
+- If none eligible (all done, blocked, or deps not met) → output: <promise>ALL FIX TASKS COMPLETE</promise>
+- CRITICAL: Never pick up tasks outside "Review Fix Tasks" sections. If you cannot find an eligible task, output the promise — do NOT fall back to other sections.
 - Otherwise:
   1. Set status to `in_progress` in queue
   2. Create `.claude/task-state.md`:
@@ -47,7 +48,8 @@ Phase order: checkout → fix → test → ci → complete
 
 1. Read the review findings:
    - If `issue` is set: `gh issue view <number> --repo jamescrowley321/<repo>`
-   - If `issue` is empty: read the "Adversarial Code Review" comment from the PR: `gh pr view <pr> --repo jamescrowley321/<repo> --comments`
+   - If `issue` is empty: read the **most recent** "Adversarial Code Review" comment from the PR: `gh pr view <pr> --repo jamescrowley321/<repo> --comments`
+   - Look for the comment titled "Adversarial Code Review — PR #XX (Re-run ...)" — use the LATEST such comment if multiple exist
 2. Record the MUST FIX and SHOULD FIX items in `.claude/task-state.md` under `## Findings`
 3. Fetch and checkout the existing branch:
    ```
@@ -55,7 +57,7 @@ Phase order: checkout → fix → test → ci → complete
    git checkout <branch>
    git pull origin <branch>
    ```
-4. **For descope-saas-starter cross-cutting fix tasks (T95-T98):** These branches are cumulative builds. After checkout, check if the base phased branches have been updated:
+4. **For descope-saas-starter cross-cutting fix tasks (T96-T119):** These branches are cumulative builds. After checkout, check if the base phased branches have been updated:
    - Find the most recent completed phased fix task's branch from the queue (T90-T94 section)
    - Rebase onto it: `git rebase origin/<latest-fixed-phased-branch>`
    - If conflicts arise, resolve them — the phased branch's version takes precedence for systemic fixes

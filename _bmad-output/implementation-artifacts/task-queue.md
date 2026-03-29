@@ -30,13 +30,13 @@ Statuses: pending | in_progress | done | blocked
 
 | ID | Issue | Status | Description | Branch | Iterations |
 |----|-------|--------|-------------|--------|------------|
-| T85 | 96 | in_progress | Fix PR #80 review findings — SSO Application (silent no-op in Update, no oidc/saml mutual exclusivity, type switching) | feat/sso-application-resource | medium |
-| T86 | 97 | pending | Fix PR #86 review findings — Third-party Application (orphaned resource on Create, Update wipes unmanaged fields) | feat/third-party-app-resource | medium |
-| T87 | 98 | pending | Fix PR #88 review findings — Project Export (nil pointer dereference, Sensitive flag) | feat/project-export-datasource | small |
-| T88 | 99 | pending | Fix PR #90 review findings — Snyk CI (unsupported flag, unpinned npm install) | ci/snyk-workflow | small |
-| T89 | 100 | pending | Fix PR #89 review findings — SonarCloud config (tools/ source scope) | chore/sonarcloud-findings | small |
-| T99 | 101 | pending | Fix PR #87 review findings — FGA resources (Delete docs lie, schema drift, nil pointer) | feat/fga-resources | medium |
-| T100 | 102 | pending | Fix PR #94 review findings — List resource (silent data drop, missing Update/Import tests) | feat/list-resource | small |
+| T85 | 96 | done | Fix PR #80 review findings — SSO Application (silent no-op in Update, no oidc/saml mutual exclusivity, type switching) | feat/sso-application-resource | medium |
+| T86 | 97 | done | Fix PR #86 review findings — Third-party Application (orphaned resource on Create, Update wipes unmanaged fields) | feat/third-party-app-resource | medium |
+| T87 | 98 | done | Fix PR #88 review findings — Project Export (nil pointer dereference, Sensitive flag) | feat/project-export-datasource | small |
+| T88 | 99 | done | Fix PR #90 review findings — Snyk CI (unsupported flag, unpinned npm install) | ci/snyk-workflow | small |
+| T89 | 100 | done | Fix PR #89 review findings — SonarCloud config (tools/ source scope) | chore/sonarcloud-findings | small |
+| T99 | 101 | done | Fix PR #87 review findings — FGA resources (Delete docs lie, schema drift, nil pointer) | feat/fga-resources | medium |
+| T100 | 102 | done | Fix PR #94 review findings — List resource (silent data drop, missing Update/Import tests) | feat/list-resource | small |
 
 ## descope-saas-starter
 
@@ -66,37 +66,45 @@ Statuses: pending | in_progress | done | blocked
 | T70 | 34 | blocked | E2E testing framework (Playwright) — superseded by T84/issue #55 | test/e2e-framework | large | — |
 | T71 | 35 | pending | CI/CD pipeline with automated deployment | ci/deployment-pipeline | medium | T70 |
 | T72 | 38 | done | Document-Level Authorization with FGA (ReBAC) — PR #61 | feat/fga-rebac | large | T12, T16 |
-| T73 | 39 | in_progress | RBAC Enhancement — Hierarchical Roles and Permission Inheritance | feat/rbac-hierarchy | medium | T16 |
-| T74 | 40 | pending | Social Login Integration (Google, GitHub) | feat/social-login | medium | — |
-| T75 | 41 | pending | Passkey / WebAuthn Authentication | feat/passkeys | medium | — |
+| T73 | 39 | done | RBAC Enhancement — Hierarchical Roles and Permission Inheritance — PR #71 | feat/rbac-hierarchy | medium | T16 |
+| T74 | 40 | done | Social Login Integration (Google, GitHub) — PR #72 | feat/social-login | medium | — |
+| T75 | 41 | done | Passkey / WebAuthn Authentication — PR #73 | feat/passkeys | medium | — |
+| T80 | 51 | done | Tailwind CSS v4 + shadcn/ui Foundation | feat/shadcn-ui | medium | — |
+| T81 | 52 | done | App Shell — Sidebar, Header, Navigation, Dark Mode | feat/app-shell | medium | T80 |
+| T82 | 53 | done | Migrate Dashboard Page to shadcn/ui | feat/migrate-dashboard | medium | T81 |
+| T83 | 54 | done | Migrate Remaining Pages to shadcn/ui | feat/migrate-pages | large | T82 |
+| T84 | 55 | pending | Playwright E2E Tests (Python) for UI and API | test/playwright-e2e | large | T81 |
 | T76 | 42 | pending | Magic Link Authentication for User Invitations | feat/magic-links | medium | — |
 | T77 | 43 | pending | Step-Up Authentication for Sensitive Operations | feat/step-up-auth | medium | T34 |
 | T78 | 44 | pending | Descope Audit Trail Integration | feat/audit-trail | medium | T67 |
 | T79 | 45 | pending | JWT Template Customization Demo | feat/jwt-templates | medium | — |
-| T80 | 51 | pending | Tailwind CSS v4 + shadcn/ui Foundation | feat/shadcn-ui | medium | — |
-| T81 | 52 | pending | App Shell — Sidebar, Header, Navigation, Dark Mode | feat/app-shell | medium | T80 |
-| T82 | 53 | pending | Migrate Dashboard Page to shadcn/ui | feat/migrate-dashboard | medium | T81 |
-| T83 | 54 | pending | Migrate Remaining Pages to shadcn/ui | feat/migrate-pages | large | T82 |
-| T84 | 55 | pending | Playwright E2E Tests (Python) for UI and API | test/playwright-e2e | large | T81 |
 
-### Review Fix Tasks — Phased PRs
+### Review Fix Tasks — Phased PRs (re-reviewed 2026-03-27)
 
-| ID | Issue | Status | Description | Branch | Iterations | Depends On |
-|----|-------|--------|-------------|--------|------------|------------|
-| T90 | 62 | pending | Fix PR #24 review findings — systemic issues (unauth'd tenant creation, httpx pooling, error swallowing, management key, orphaned tenants) | feat/tenant-management | medium | — |
-| T91 | 63 | pending | Fix PR #25 review findings — RBAC (missing backend permission enforcement, role_names validation) | feat/rbac | medium | T90 |
-| T92 | 64 | pending | Fix PR #26 review findings — Custom Attributes (tenant attribute allowlist) | feat/custom-attributes | small | T91 |
-| T93 | 65 | pending | Fix PR #27 review findings — Access Keys (TOCTOU race, role validation, expire_time) | feat/access-key-mgmt | medium | T92 |
-| T94 | 66 | pending | Fix PR #36 review findings — Admin Portal (cross-tenant member ops, tenant_id from JWT) | feat/admin-portal | medium | T91 |
+| ID | Issue | Status | Description | Branch | PR | Iterations | Depends On |
+|----|-------|--------|-------------|--------|----|------------|------------|
+| T90 | | done | Fix PR #24 review findings — Tenant Mgmt (unauth'd creation, empty mgmt key, bare except, no tenant membership check, httpx per-call) | feat/tenant-management | 24 | medium | — |
+| T91 | | done | Fix PR #25 review findings — RBAC (admin role escalation, leaked API errors, unvalidated role_names) | feat/rbac | 25 | medium | T90 |
+| T92 | | done | Fix PR #26 review findings — Custom Attrs (no tenant attr allowlist, silent error swallowing, unhandled API errors, sub/loginId mapping) | feat/custom-attributes | 26 | medium | T91 |
+| T93 | | done | Fix PR #27 review findings — Access Keys (TOCTOU, no name validation, negative expire_time, role escalation via keys, leaked API errors) | feat/access-key-mgmt | 27 | medium | T92 |
+| T94 | | done | Fix PR #36 review findings — Admin Portal (cross-tenant IDOR on deactivate/remove, no email validation, admin→owner escalation, global delete_user) | feat/admin-portal | 36 | medium | T93 |
 
-### Review Fix Tasks — Cross-Cutting PRs
+### Review Fix Tasks — Standalone PRs
 
-| ID | Issue | Status | Description | Branch | Iterations | Depends On |
-|----|-------|--------|-------------|--------|------------|------------|
-| T95 | 67 | pending | Fix middleware issues — rate limit ordering, health check cache, Retry-After | feat/rate-limiting | medium | T94 |
-| T96 | 68 | pending | Fix PR #58 review findings — Audit Logging (audit on failure, X-Forwarded-For spoofing) | feat/audit-logging | medium | T95 |
-| T97 | 69 | pending | Fix PR #60 review findings — Retry Logic (httpx per retry attempt, status validation) | feat/retry-logic | medium | T95 |
-| T98 | 70 | pending | Fix PR #61 review findings — FGA/ReBAC (FGA relation orphan, revoke_share skips owner) | feat/fga-rebac | medium | T94 |
+| ID | Issue | Status | Description | Branch | PR | Iterations | Depends On |
+|----|-------|--------|-------------|--------|----|------------|------------|
+| T95 | | done | Fix PR #37 review findings — Security Headers (case-sensitive env check, CSP bypass via env var) | feat/security-headers | 82 | small | — |
+
+### Review Fix Tasks — Cross-Cutting PRs (re-reviewed 2026-03-27)
+
+| ID | Issue | Status | Description | Branch | PR | Iterations | Depends On |
+|----|-------|--------|-------------|--------|----|------------|------------|
+| T96 | | done | Fix PR #56 review findings — Rate Limiting (proxy IP keying, middleware ordering, hardcoded Retry-After) | feat/rate-limiting | 56 | medium | T94 |
+| T97 | | done | Fix PR #57 review findings — Structured Logging (health check info leak, stale degraded cache, race condition, import-time env vars) | feat/structured-logging | 57 | medium | T96 |
+| T98 | | done | Fix PR #58 review findings — Audit Logging (X-Forwarded-For spoofing, no failure audit, PII in logs) | feat/audit-logging | 58 | medium | T97 |
+| T117 | | done | Fix PR #59 review findings — Health Checks (SSRF via DESCOPE_BASE_URL, cache race condition, degraded cache TTL) | feat/health-checks | 59 | medium | T97 |
+| T118 | | done | Fix PR #60 review findings — Retry Logic (httpx per retry attempt, non-idempotent retries, env var crash) | feat/retry-logic | 60 | medium | T97 |
+| T119 | | done | Fix PR #61 review findings — FGA/ReBAC (orphaned FGA relation, cross-tenant FGA bypass, partial cleanup failure, cross-tenant sharing) | feat/fga-rebac | 61 | medium | T118 |
 
 ## py-identity-model
 
