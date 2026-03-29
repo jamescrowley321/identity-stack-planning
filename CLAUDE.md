@@ -56,7 +56,7 @@ When BMAD workflows reference implementation details, architecture, or existing 
 
 ## Ralph Orchestrator Integration
 
-Ralph Orchestrator v2.8.1 is installed and used for autonomous task execution across the workspace. Configuration lives in `descope-saas-starter/ralph.yml`. See:
+[Ralph Orchestrator](https://github.com/mikeyobrien/ralph-orchestrator) is used for autonomous task execution across the workspace. Each application repo has its own `ralph.yml` configuration. See:
 
 - `docs/ralph-planning/orchestrator-comparison.md` — Chief Wiggum vs Ralph Orchestrator analysis
 - `docs/ralph-planning/ralph-bmad-integration-plan.md` — Custom security agents and Ralph hat topology proposal

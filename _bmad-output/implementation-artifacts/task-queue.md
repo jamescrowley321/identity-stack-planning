@@ -132,22 +132,34 @@ Statuses: pending | in_progress | done | blocked
 
 | ID | Issue | Status | Description | Branch | PR | Iterations | Depends On |
 |----|-------|--------|-------------|--------|----|------------|------------|
-| T101 | | in_progress | Fix PR #211 review findings — OAuth Callback State (TypeError on None state/URL) | feat/oauth-callback-state | 211 | small | — |
-| T102 | | pending | Fix PR #222 review findings — HTTP Client DI (use-after-close, ignored params) | feat/http-client-di | 222 | small | T101 |
-| T103 | | pending | Fix PR #223 review findings — Enhanced Token Validation (leeway dropped, empty issuer fails open) | feat/enhanced-token-validation | 223 | medium | T102 |
-| T104 | | pending | Fix PR #224 review findings — Base Request/Response (use-after-close, error leaks, CI overlap) | feat/base-request-response | 224 | small | T103 |
-| T105 | | pending | Fix PR #225 review findings — Auth Code PKCE (param injection, empty callback success) | feat/auth-code-pkce | 225 | medium | T104 |
-| T106 | | pending | Fix PR #226 review findings — Introspection (missing __all__ exports, no async tests) | feat/introspection | 226 | small | T105 |
-| T107 | | pending | Fix PR #227 review findings — Revocation (missing __all__, dead try/except, no async tests) | feat/revocation | 227 | small | T106 |
-| T108 | | pending | Fix PR #228 review findings — Refresh (no async tests, weak test assertions) | feat/refresh | 228 | small | T107 |
-| T109 | | pending | Fix PR #229 review findings — DPoP (htu query/fragment violation RFC 9449, no sig verify tests) | feat/dpop | 229 | medium | T108 |
-| T110 | | pending | Fix PR #230 review findings — PAR (client_id double-sent, missing required field validation) | feat/par | 230 | medium | T109 |
+| T101 | | done | Fix PR #211 review findings — OAuth Callback State (TypeError on None state/URL) | feat/oauth-callback-state | 211 | small | — |
+| T102 | | done | Fix PR #222 review findings — HTTP Client DI (use-after-close, ignored params) | feat/http-client-di | 222 | small | T101 |
+| T103 | | done | Fix PR #223 review findings — Enhanced Token Validation (leeway dropped, empty issuer fails open) | feat/enhanced-token-validation | 223 | medium | T102 |
+| T104 | | done | Fix PR #224 review findings — Base Request/Response (use-after-close, error leaks, CI overlap) | feat/base-request-response | 224 | small | T103 |
+| T105 | | done | Fix PR #225 review findings — Auth Code PKCE (param injection, empty callback success) | feat/auth-code-pkce | 225 | medium | T104 |
+| T106 | | done | Fix PR #226 review findings — Introspection (missing __all__ exports, no async tests) | feat/introspection | 226 | small | T105 |
+| T107 | | done | Fix PR #227 review findings — Revocation (missing __all__, dead try/except, no async tests) | feat/revocation | 227 | small | T106 |
+| T108 | | done | Fix PR #228 review findings — Refresh (no async tests, weak test assertions) | feat/refresh | 228 | small | T107 |
+| T109 | | done | Fix PR #229 review findings — DPoP (htu query/fragment violation RFC 9449, no sig verify tests) | feat/dpop | 229 | medium | T108 |
+| T110 | | done | Fix PR #230 review findings — PAR (client_id double-sent, missing required field validation) | feat/par | 230 | medium | T109 |
 | T111 | | pending | Fix PR #232 review findings — JAR (extra_claims override, missing kid header) | feat/jar | 232 | medium | T110 |
 | T112 | | pending | Fix PR #233 review findings — Device Auth (no async tests, missing required field validation) | feat/device-auth-grant | 233 | small | T111 |
 | T113 | | pending | Fix PR #234 review findings — Token Exchange (client_id double-sent, actor_token_type validation) | feat/token-exchange | 234 | medium | T112 |
 | T114 | | pending | Fix PR #235 review findings — FAPI 2.0 (crash on failed discovery, empty code_challenge bypass) | feat/fapi2 | 235 | medium | T113 |
 | T115 | | pending | Fix PR #236 review findings — Policy Config (unenforced policy flags, no URL scheme pre-flight) | feat/policy-config | 236 | medium | T114 |
 | T116 | | pending | Fix PR #237 review findings — Perf Benchmarks (expiring fixture, wrong benchmark layer, no assertions) | test/performance-benchmarks | 237 | small | T115 |
+
+### Integration Test Chain (post-review-fixes — proves RFC features work against live OIDC server)
+
+| ID | Issue | Status | Description | Branch | PR | Size | Depends |
+|----|-------|--------|-------------|--------|-----|------|---------|
+| T120 | | pending | Build node-oidc-provider test fixture (provider.js, Dockerfile, docker-compose.test.yml, static clients, in-memory adapter, devInteractions, all RFC features enabled) | test/node-oidc-fixture | | medium | T116 |
+| T121 | | pending | Integration tests: Core flows (Auth Code + PKCE, Enhanced Token Validation, Refresh Token Grant) against node-oidc-provider | test/integration-core-flows | | medium | T120 |
+| T122 | | pending | Integration tests: Token management (Introspection RFC 7662, Revocation RFC 7009) against node-oidc-provider | test/integration-token-mgmt | | medium | T120 |
+| T123 | | pending | Integration tests: Advanced request patterns (DPoP RFC 9449, PAR RFC 9126, JAR RFC 9101) against node-oidc-provider | test/integration-advanced-requests | | large | T120 |
+| T124 | | pending | Integration tests: Alternative grants (Device Authorization RFC 8628, Token Exchange RFC 8693) against node-oidc-provider | test/integration-alt-grants | | medium | T120 |
+| T125 | | pending | Integration tests: FAPI 2.0 Security Profile against node-oidc-provider | test/integration-fapi2 | | medium | T120 |
+| T126 | | pending | Document Duende IdentityServer integration test gaps — which RFC features the existing .NET fixture cannot test, feature comparison matrix vs node-oidc-provider, migration/deprecation recommendation | docs/identityserver-gaps | | small | T120 |
 
 | T48 | 83 | pending | Create Comprehensive API Documentation | docs/api-docs | large |
 | T49 | 39 | pending | Okta Example | feat/okta-example | small |

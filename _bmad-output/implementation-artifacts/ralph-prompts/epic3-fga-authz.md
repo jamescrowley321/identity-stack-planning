@@ -6,10 +6,13 @@ Stories are executed sequentially. PRs are **chained** — each branches from th
 
 | Story | Issue | Branch | Base Branch | Status |
 |-------|-------|--------|-------------|--------|
-| 2.1 | #101 | epic2/story-2.1-permission-crud | main | done |
-| 2.2 | #102 | epic2/story-2.2-role-crud | epic2/story-2.1-permission-crud | done |
-| 2.3 | #103 | epic2/story-2.3-admin-ui | epic2/story-2.2-role-crud | done |
-| 2.4 | #104 | epic2/story-2.4-e2e-tests | epic2/story-2.3-admin-ui | done |
+| 3.1 | #112 | epic3/story-3.1-fga-service | main | pending |
+| 3.2 | #113 | epic3/story-3.2-fga-admin-router | epic3/story-3.1-fga-service | pending |
+| 3.3 | #114 | epic3/story-3.3-fga-dependency-documents | epic3/story-3.2-fga-admin-router | pending |
+| 3.4 | #115 | epic3/story-3.4-fga-unit-tests | epic3/story-3.3-fga-dependency-documents | pending |
+| 3.5 | #116 | epic3/story-3.5-fga-demo-seed | epic3/story-3.4-fga-unit-tests | pending |
+| 3.6 | #117 | epic3/story-3.6-fga-admin-ui | epic3/story-3.5-fga-demo-seed | pending |
+| 3.7 | #118 | epic3/story-3.7-fga-e2e-tests | epic3/story-3.6-fga-admin-ui | pending |
 
 ## Step 1: Determine Context
 
@@ -26,19 +29,19 @@ Read `~/repos/auth/descope-saas-starter/.claude/task-state.md`.
 
 ## Step 3: Pick Up Next Story
 
-Find the first `pending` row in the Task Queue above whose dependencies are met (previous story is `done` or it's Story 2.1).
+Find the first `pending` row in the Task Queue above whose dependencies are met (previous story is `done` or it's Story 3.1).
 
 - If none eligible (all done) → output: <promise>LOOP_COMPLETE</promise>
 - Otherwise:
   1. Read the GH issue: `gh issue view <number> --repo jamescrowley321/descope-saas-starter`
-  2. Read the epic stories for acceptance criteria: `~/repos/auth/auth-planning/_bmad-output/planning-artifacts/epics.md` — find the `### Story 2.X` section
+  2. Read the epic stories for acceptance criteria from the GH issue body (each issue contains full ACs)
   3. Create `~/repos/auth/descope-saas-starter/.claude/task-state.md`:
      ```
-     story: 2.X
+     story: 3.X
      issue: <number>
      branch: <branch from queue>
      base_branch: <base_branch from queue>
-     worktree: /tmp/sss-epic2-story-2.X
+     worktree: /tmp/sss-epic3-story-3.X
      phase: setup
      ```
   4. Execute the `setup` phase below, then end your response
@@ -68,12 +71,12 @@ setup → analyze → implement → test → review-blind → review-edge → re
    ```
 3. Create worktree:
    ```
-   git worktree add /tmp/sss-epic2-story-2.X -b <branch> origin/<base_branch>
+   git worktree add /tmp/sss-epic3-story-3.X -b <branch> origin/<base_branch>
    ```
-   - Story 2.1: base is `origin/main`
-   - Stories 2.2–2.4: base is the previous story's branch (must be pushed already)
+   - Story 3.1: base is `origin/main`
+   - Stories 3.2–3.7: base is the previous story's branch (must be pushed already)
    - If the base branch doesn't exist on remote, the previous story isn't done — set task to `blocked` and end
-4. Verify worktree: `cd /tmp/sss-epic2-story-2.X && git log --oneline -3`
+4. Verify worktree: `cd /tmp/sss-epic3-story-3.X && git log --oneline -3`
 5. Record worktree path in task-state.md
 6. **Set phase to `analyze`. End your response.**
 
@@ -86,23 +89,23 @@ setup → analyze → implement → test → review-blind → review-edge → re
 `cd <worktree>`
 
 1. Read the GH issue: `gh issue view <number> --repo jamescrowley321/descope-saas-starter`
-2. Read acceptance criteria from `~/repos/auth/auth-planning/_bmad-output/planning-artifacts/epics.md`
-3. Read existing code that will be modified or extended:
-   - `backend/app/services/descope.py` — DescopeManagementClient
-   - `backend/app/routers/roles.py` — existing role endpoints
-   - `backend/app/routers/permissions.py` — if it exists (created by Story 2.1)
-   - `backend/app/dependencies/rbac.py` — require_role, require_permission
-   - `frontend/src/pages/RoleManagement.tsx` — current UI (for Story 2.3)
+2. Read existing code that will be modified or extended:
+   - `backend/app/services/descope.py` — DescopeManagementClient (add FGA methods here)
+   - `backend/app/routers/roles.py` — existing CRUD router pattern to follow
+   - `backend/app/routers/permissions.py` — existing CRUD router pattern to follow
+   - `backend/app/dependencies/rbac.py` — require_role, require_permission (pattern for require_fga)
    - `backend/app/main.py` — router registration
-4. Read existing patterns to follow:
+   - `frontend/src/pages/RoleManagement.tsx` — UI pattern for Story 3.6
+3. Read existing patterns to follow:
    - `backend/app/routers/accesskeys.py` — CRUD router pattern, error handling, rate limiting
    - `backend/app/routers/users.py` — another CRUD reference
-5. Write implementation plan to task-state.md under `## Plan`:
+   - `backend/app/models/` — SQLModel patterns for Story 3.3 Document model
+4. Write implementation plan to task-state.md under `## Plan`:
    - List files to create/modify
    - List methods/endpoints to add
    - Note edge cases from ACs
    - Map each AC to the code change that satisfies it
-6. **Set phase to `implement`. End your response.**
+5. **Set phase to `implement`. End your response.**
 
 ---
 
@@ -115,11 +118,12 @@ setup → analyze → implement → test → review-blind → review-edge → re
 1. Read `## Plan` from task-state.md
 2. Implement the plan:
    - Follow existing code patterns exactly
-   - All Descope API calls go through `DescopeManagementClient` (NFR-19)
+   - All Descope API calls go through `DescopeManagementClient` (NFR-19: single abstraction seam)
    - Admin endpoints use `require_role("owner", "admin")`
    - Write endpoints use `@limiter.limit(RATE_LIMIT_AUTH)` with `request: Request` as first param
    - Error handling: `httpx.HTTPStatusError` → descriptive HTTP error, `httpx.RequestError` → 502
    - Register new routers in `main.py` if creating new files
+   - FGA check failures must be fail-closed (deny on error, never fail-open)
 3. Run lint: `make lint` (from worktree root)
 4. Fix any lint issues
 5. Commit with descriptive message:
@@ -145,9 +149,11 @@ setup → analyze → implement → test → review-blind → review-edge → re
    - **Client methods:** Mock httpx responses, verify request bodies, paths, and headers
    - **Router endpoints:** FastAPI TestClient, mock DescopeManagementClient
    - **Auth enforcement:** Verify 403 for non-admin users on every protected endpoint
+   - **FGA checks:** Verify fail-closed behavior (502 on FGA API failure, never fail-open)
    - **Error handling:** Descope API errors → appropriate HTTP status codes
-   - **Edge cases:** Empty inputs, duplicate names, missing fields
-   - **For UI stories (2.3):** Component renders correctly, API calls made on user actions
+   - **Edge cases:** Empty inputs, missing fields, cross-tenant access attempts
+   - **Document CRUD (Story 3.3):** FGA relation creation before DB commit, compensation on failure
+   - **For UI stories (3.6):** Component renders correctly, API calls made on user actions
 3. Run tests: `make test-unit`
 4. If failures: fix and re-run until green
 5. Run lint: `make lint`
@@ -175,9 +181,9 @@ setup → analyze → implement → test → review-blind → review-edge → re
 2. **Review with extreme skepticism.** You have ONLY the diff — no project context, no story, no excuses. Find at least ten issues. Look for:
    - Logic errors, off-by-one, incorrect assumptions
    - Missing error handling, swallowed exceptions
-   - Security vulnerabilities (injection, auth bypass, IDOR, data leaks)
+   - Security vulnerabilities (injection, auth bypass, IDOR, data leaks, fail-open authz)
    - API contract violations (wrong status codes, missing fields, inconsistent shapes)
-   - Race conditions, concurrency issues
+   - Race conditions, concurrency issues (especially FGA+DB transaction ordering)
    - Hardcoded values that should be configurable
    - Dead code, unused imports, copy-paste errors
    - Missing validation on inputs
@@ -236,18 +242,17 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 `cd <worktree>`
 
-1. Read the story's acceptance criteria from `~/repos/auth/auth-planning/_bmad-output/planning-artifacts/epics.md`
-2. Read the GH issue: `gh issue view <issue> --repo jamescrowley321/descope-saas-starter`
-3. Generate the diff:
+1. Read the story's acceptance criteria from the GH issue: `gh issue view <issue> --repo jamescrowley321/descope-saas-starter`
+2. Generate the diff:
    ```
    git diff origin/<base_branch>...HEAD
    ```
-4. **For each acceptance criterion**, check:
+3. **For each acceptance criterion**, check:
    - Is it implemented? (trace the Given/When/Then to actual code)
    - Is it tested? (trace to a test case)
    - Does the implementation match the spec's intent, not just the letter?
    - Are there contradictions between the spec constraints and actual code?
-5. Write findings to task-state.md under `## Review: Acceptance Auditor`:
+4. Write findings to task-state.md under `## Review: Acceptance Auditor`:
    ```
    ### PASS
    - [AC reference] — implemented at [file:line], tested at [test:line]
@@ -258,13 +263,13 @@ setup → analyze → implement → test → review-blind → review-edge → re
    ### PARTIAL
    - [AC reference] — what's implemented vs. what's missing
    ```
-6. **Set phase to `review-security`. End your response.**
+5. **Set phase to `review-security`. End your response.**
 
 ---
 
 ### review-security
 
-**Persona: Sentinel (Security Auditor)** — You are a pragmatic security engineer specializing in OAuth 2.0/OIDC infrastructure. You only report genuinely exploitable vulnerabilities. You understand the auth domain: token replay, JWT alg confusion, PKCE downgrade, tenant isolation bypass, SSRF via discovery endpoints, IDOR through tenant-scoped resources.
+**Persona: Sentinel (Security Auditor)** — You are a pragmatic security engineer specializing in OAuth 2.0/OIDC infrastructure. You only report genuinely exploitable vulnerabilities. FGA is security-critical: every authorization bypass is a real vulnerability.
 
 Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integration-plan.md` § 2.1
 
@@ -275,13 +280,13 @@ Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integratio
    git diff origin/<base_branch>...HEAD
    ```
 2. **Security review through the auth-domain lens.** Check:
-   - **Tenant isolation:** Can a user in tenant A manipulate resources in tenant B? Is `get_tenant_id()` checked on every endpoint? Are role/permission operations scoped to the caller's tenant?
-   - **Authorization bypass:** Can a non-admin reach admin endpoints? Is `require_role()` applied to ALL mutation endpoints? Can the dependency be bypassed?
-   - **Injection:** Are user-supplied values (role names, permission names) passed unsanitized to Descope API? Could they contain special characters that alter API behavior?
-   - **IDOR:** Can an attacker enumerate or manipulate roles/permissions they shouldn't access by guessing names?
-   - **Information disclosure:** Do error messages leak internal state, stack traces, or Descope API details?
-   - **Rate limiting:** Are write endpoints rate-limited? Could an attacker exhaust Descope API quotas?
-   - **Input validation:** Are inputs validated before hitting the Descope API? Max lengths, allowed characters, required fields?
+   - **Tenant isolation:** Can a user in tenant A access documents in tenant B? Is `tenant_id` checked on every document operation? Can FGA relations leak across tenants?
+   - **Authorization bypass:** Can a non-admin reach FGA admin endpoints? Can require_fga be bypassed? Does FGA fail-open on errors (CRITICAL if so)?
+   - **IDOR:** Can an attacker enumerate documents by guessing IDs? Can they manipulate resource_type/resource_id in FGA checks to access other resource types?
+   - **Transaction ordering:** If FGA relation is created but DB commit fails, is the relation cleaned up? Vice versa?
+   - **Information disclosure:** Do FGA check denials reveal whether a resource exists? Do error messages leak schema details?
+   - **Input validation:** Are resource_type, relation, target validated before hitting Descope API? Can injection alter FGA query semantics?
+   - **Rate limiting:** Are FGA write endpoints rate-limited? Could an attacker create millions of relation tuples?
 3. For each finding, assess exploitability: **CONFIRMED** (concrete attack path), **LIKELY** (plausible with effort), **UNLIKELY** (theoretical only)
 4. Write findings to task-state.md under `## Review: Security (Sentinel)`:
    ```
@@ -364,8 +369,8 @@ Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integratio
    ```
 
 2. **Create PR with chained base:**
-   - Story 2.1: base is `main`
-   - Stories 2.2–2.4: base is the previous story's branch
+   - Story 3.1: base is `main`
+   - Stories 3.2–3.7: base is the previous story's branch
    ```
    gh pr create \
      --base <base_branch> \
@@ -377,10 +382,10 @@ Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integratio
 
    ## Story
    Refs #<issue>
-   Part of Epic 2: Role & Permission Administration
+   Part of Epic 3: Fine-Grained Authorization (FGA/ReBAC)
 
    ## Chained PR
-   <For 2.2+: Based on #<previous PR number> — must be merged first>
+   <For 3.2+: Based on #<previous PR number> — must be merged first>
 
    ## Review Findings Addressed
    - Security: <count> BLOCK, <count> WARN — all BLOCK fixed
@@ -450,7 +455,7 @@ Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integratio
 2. Clean up worktree:
    ```
    cd ~/repos/auth/descope-saas-starter
-   git worktree remove /tmp/sss-epic2-story-2.X --force
+   git worktree remove /tmp/sss-epic3-story-3.X --force
    ```
 3. Delete `~/repos/auth/descope-saas-starter/.claude/task-state.md`
 4. Output: <promise>TASK COMPLETE</promise>
@@ -466,7 +471,7 @@ Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integratio
 | test | Quinn (QA) | `_bmad/bmm/agents/qa.md` | Pragmatic, coverage-first, ship-and-iterate |
 | review-blind | Blind Hunter | `_bmad/core/skills/bmad-review-adversarial-general/workflow.md` | Cynical, jaded, expects problems, diff-only |
 | review-edge | Edge Case Hunter | `_bmad/core/skills/bmad-review-edge-case-hunter/workflow.md` | Pure path tracer, exhaustive, no editorializing |
-| review-acceptance | Acceptance Auditor | Story ACs from `epics.md` | Meticulous spec-compliance, zero tolerance for gaps |
+| review-acceptance | Acceptance Auditor | GH issue ACs | Meticulous spec-compliance, zero tolerance for gaps |
 | review-security | Sentinel | `docs/ralph-planning/ralph-bmad-integration-plan.md` § 2.1 | Auth-domain security, only real vulnerabilities |
 | review-fix | Amelia (Dev) | `_bmad/bmm/agents/dev.md` | Systematic triage, fix by priority |
 | ci-fix | Amelia (Dev) | `_bmad/bmm/agents/dev.md` | CI ops, diagnose and fix |
@@ -484,4 +489,5 @@ Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integratio
 - **Git operations:** Use `gh` CLI for GitHub operations (PRs, issues, checks). Use `git` for push/pull/fetch.
 - **Scope discipline:** Only implement what the story specifies — no refactoring, no future-proofing, no extras
 - **Review integrity:** Each review persona operates independently. Do NOT pre-emptively fix things to avoid review findings — let the reviewers find issues, then fix in review-fix.
+- **FGA security:** Authorization checks MUST be fail-closed. If the Descope FGA API is unreachable, deny access (502), never grant it.
 - If stuck 3+ iterations on same phase: set task to `blocked` in queue, clean up worktree, delete state file, pick up next
