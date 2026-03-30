@@ -8,3 +8,9 @@ Thumbs.db
 
 # Node (from npx)
 node_modules/
+
+# Claude Code runtime state
+.claude/task-state.md
+
+# Ralph orchestrator runtime state
+.ralph/
