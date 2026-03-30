@@ -244,5 +244,5 @@ The long-term trajectory: complete Descope-specific features, document the three
 ### Architecture
 
 - NFR-18: **[SSS]** Each feature wave independently implementable — no cross-wave dependencies within the repo
-- NFR-19: **[SSS]** Descope-specific code concentrated in `DescopeManagementClient` — clean seam for future interface extraction
+- NFR-19: **[SSS]** Descope-specific code concentrated in `DescopeManagementClient` — clean seam for future interface extraction. All new API routes MUST use `IdentityService` dependency injection (not `DescopeManagementClient` directly). `IdentityService` is a pass-through class in Phase 0 (Descope feature waves); PRD 5 fills it with Postgres-backed implementations. (Decision D21, brainstorming-session-2026-03-29-02.md)
 - NFR-20: **[CROSS]** Provider abstraction follows three-tier model: Tier 1 (abstract: user CRUD, ReBAC, SSO, access keys), Tier 2 (translate: RBAC, password policy), Tier 3 (provider-specific: multi-tenancy, flows, connectors)

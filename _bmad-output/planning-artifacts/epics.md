@@ -158,7 +158,7 @@ This document provides the complete epic and story breakdown for auth-planning, 
 **Architecture**
 
 - NFR-18: [SSS] Each feature wave independently implementable — no cross-wave dependencies within the repo
-- NFR-19: [SSS] Descope-specific code concentrated in `DescopeManagementClient` — clean seam for future interface extraction
+- NFR-19: [SSS] Descope-specific code concentrated in `DescopeManagementClient` — clean seam for future interface extraction. All new API routes MUST use `IdentityService` dependency injection (not `DescopeManagementClient` directly). `IdentityService` is a pass-through class in Phase 0 (Descope feature waves); PRD 5 fills it with Postgres-backed implementations. (Decision D21, brainstorming-session-2026-03-29-02.md)
 - NFR-20: [CROSS] Provider abstraction follows three-tier model: Tier 1 (abstract: user CRUD, ReBAC, SSO, access keys), Tier 2 (translate: RBAC, password policy), Tier 3 (provider-specific: multi-tenancy, flows, connectors)
 
 ### Additional Requirements
@@ -171,7 +171,8 @@ This document provides the complete epic and story breakdown for auth-planning, 
 - **ADR-6 (Quality tiers):** py-identity-model=production-grade, descope-saas-starter=demo/POC (ReBAC exception: production-quality testing), terraform-provider-descope=functional
 - **Enterprise license blocker (E074106):** Blocks `descope_sso_application` TF resource, cascading to SSO config (T18), step-up auth (T21), MFA enforcement (T22), OIDC/SAML app registration (T25)
 - **Cross-repo interface contracts:** `validate_token()`, `get_discovery_document()`, `to_principal()` must remain backwards-compatible across py-identity-model versions
-- **`DescopeManagementClient` is the single abstraction seam:** All Descope Management API calls route through this class — new wave features must extend it, not bypass it
+- **`IdentityService` is the router-facing abstraction seam (D21):** All new API routes inject `IdentityService`, not `DescopeManagementClient` directly. In Phase 0, `IdentityService` is a pass-through class delegating to `DescopeManagementClient`. When PRD 5 (Canonical Identity Domain Model) arrives, `IdentityService` methods gain Postgres writes and `DescopeManagementClient` becomes a sync adapter — router layer and API contracts stay unchanged. Cost: ~20 lines per wave. (Decision D21, brainstorming-session-2026-03-29-02.md)
+- **`DescopeManagementClient` remains the Descope API wrapper:** All Descope Management API calls route through this class — new wave features must extend it, not bypass it
 - **Frontend role hardcoding:** `RoleManagement.tsx` has hardcoded `AVAILABLE_ROLES` — must be updated to fetch dynamically from `GET /api/roles` when Wave 1 lands
 
 ### UX Design Requirements
@@ -639,6 +640,7 @@ Admins can define, edit, and assign roles and permissions through both API and U
 - ADR-1: Terraform seeds default roles (owner, admin, member, viewer) and 12 permissions. Runtime API manages the full CRUD lifecycle.
 - ADR-4: Wave 1 is independently implementable with no cross-wave dependencies.
 - NFR-19: All Descope Management API calls route through `DescopeManagementClient` — new methods must be added there, not bypassed.
+- **D21 (IdentityService seam):** All new API routes MUST inject `IdentityService`, not `DescopeManagementClient` directly. `IdentityService` is a pass-through class delegating to `DescopeManagementClient` in Phase 0. This creates the seam that PRD 5 (Canonical Identity Domain Model) will later fill with Postgres-backed implementations. Router layer and API contracts stay unchanged.
 - Existing `roles.py` has user-to-role assignment endpoints (`GET /roles/me`, `POST /roles/assign`, `POST /roles/remove`). Role definition CRUD is added alongside these — paths do not conflict.
 - `RoleManagement.tsx` has hardcoded `AVAILABLE_ROLES = ["owner", "admin", "member", "viewer"]` — must be replaced with dynamic fetch.
 - No `permissions.py` router exists yet — must be created.
@@ -850,6 +852,7 @@ Admins can model and enforce fine-grained, document-level access control using F
 - NFR-7: ReBAC authorization decisions must be consistent — no race conditions between relation updates and checks.
 - NFR-16: Tighter test coverage than other waves.
 - NFR-19: All FGA operations go through `DescopeManagementClient`.
+- **D21 (IdentityService seam):** All new FGA API routes MUST inject `IdentityService`, not `DescopeManagementClient` directly. `IdentityService` is a pass-through class in Phase 0; PRD 5 fills it with Postgres-backed implementations.
 - FGA uses action-oriented endpoints, not standard CRUD: `/api/fga/schema`, `/api/fga/relations`, `/api/fga/check`.
 - Existing `backend/app/routers/protected.py` has document endpoints — FGA middleware integrates here.
 - Existing FGA TF resources from `terraform-provider-descope` seed initial schema.
@@ -1264,6 +1267,7 @@ Tenant admins can configure OIDC/SAML SSO for their organization with domain rou
 - ADR-4: Wave 3 depends only on the existing tenant model, not on Waves 1-2.
 - Enterprise license blocker (E074106): Blocks `descope_sso_application` TF resource → SSO config → step-up auth → MFA → OIDC/SAML apps.
 - NFR-19: SSO operations go through `DescopeManagementClient`.
+- **D21 (IdentityService seam):** All new SSO API routes MUST inject `IdentityService`, not `DescopeManagementClient` directly. `IdentityService` is a pass-through class in Phase 0; PRD 5 fills it with Postgres-backed implementations.
 - SSO supports both OIDC and SAML providers per tenant.
 - Domain routing maps email domains to SSO configurations.
 
@@ -1387,6 +1391,7 @@ Admins can fully manage the tenant lifecycle — update settings, delete tenants
 - ADR-4: Wave 4 depends only on the existing tenant model and CRUD.
 - Existing `tenants.py` router has `GET /api/tenants`, `POST /api/tenants`, `GET /api/tenants/{id}/members`.
 - NFR-19: All operations via `DescopeManagementClient`.
+- **D21 (IdentityService seam):** All new tenant API routes MUST inject `IdentityService`, not `DescopeManagementClient` directly. `IdentityService` is a pass-through class in Phase 0; PRD 5 fills it with Postgres-backed implementations.
 - Tenant deletion must handle cascading cleanup (members, roles, settings).
 
 ### Story 5.1: Tenant Update API
@@ -1525,6 +1530,7 @@ Admins can manage access keys with IP restrictions and custom claims, configure 
 - ADR-4: Wave 5+6 combined — depends only on existing access key and tenant models.
 - Existing `accesskeys.py` router has full CRUD.
 - NFR-19: All operations via `DescopeManagementClient`.
+- **D21 (IdentityService seam):** All new API routes (access key enhancement, lists, password settings) MUST inject `IdentityService`, not `DescopeManagementClient` directly. `IdentityService` is a pass-through class in Phase 0; PRD 5 fills it with Postgres-backed implementations.
 - `descope_list` TF resource manages IP/text lists at infrastructure level; runtime API manages full lifecycle.
 - Password settings managed by `descope_password_settings` TF resource at infra level.
 

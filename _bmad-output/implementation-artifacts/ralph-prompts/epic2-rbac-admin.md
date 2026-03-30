@@ -115,7 +115,7 @@ setup → analyze → implement → test → review-blind → review-edge → re
 1. Read `## Plan` from task-state.md
 2. Implement the plan:
    - Follow existing code patterns exactly
-   - All Descope API calls go through `DescopeManagementClient` (NFR-19)
+   - All Descope API calls go through `DescopeManagementClient` (NFR-19), but routers MUST inject `IdentityService` (not `DescopeManagementClient` directly). `IdentityService` is a pass-through class delegating to `DescopeManagementClient` in Phase 0. This creates the seam for PRD 5 (Canonical Identity Domain Model). (Decision D21, brainstorming-session-2026-03-29-02.md)
    - Admin endpoints use `require_role("owner", "admin")`
    - Write endpoints use `@limiter.limit(RATE_LIMIT_AUTH)` with `request: Request` as first param
    - Error handling: `httpx.HTTPStatusError` → descriptive HTTP error, `httpx.RequestError` → 502
@@ -148,17 +148,23 @@ setup → analyze → implement → test → review-blind → review-edge → re
    - **Error handling:** Descope API errors → appropriate HTTP status codes
    - **Edge cases:** Empty inputs, duplicate names, missing fields
    - **For UI stories (2.3):** Component renders correctly, API calls made on user actions
-3. Run tests: `make test-unit`
-4. If failures: fix and re-run until green
-5. Run lint: `make lint`
-6. Commit tests:
+3. Write Playwright E2E tests in `backend/tests/e2e/` for the story's feature. Follow existing patterns from PR #94:
+   - **3-tier auth:** Unauthenticated (401 enforcement), OIDC client credentials (`auth_api_context`), admin session token (`admin_api_context`)
+   - **UI tests:** Use `auth_page` fixture with sessionStorage token injection for authenticated browser tests
+   - **API tests:** Cover new/modified endpoints at all 3 auth tiers
+   - Reference: `backend/tests/e2e/conftest.py` (fixtures), `backend/tests/e2e/helpers/auth.py` (auth helpers), `backend/tests/e2e/test_rbac_api.py` (RBAC pattern)
+4. Run tests: `make test-unit`
+5. Run E2E tests: `make test-e2e` — all existing E2E tests MUST pass as regression
+6. If failures: fix and re-run until green
+7. Run lint: `make lint`
+8. Commit tests:
    ```
    git add <test files>
    git commit -m "test: add tests for <description>
 
    Refs #<issue>"
    ```
-7. **Set phase to `review-blind`. End your response.**
+9. **Set phase to `review-blind`. End your response.**
 
 ---
 
@@ -244,13 +250,18 @@ setup → analyze → implement → test → review-blind → review-edge → re
    ```
 4. **For each acceptance criterion**, check:
    - Is it implemented? (trace the Given/When/Then to actual code)
-   - Is it tested? (trace to a test case)
+   - Is it tested? (trace to a unit test AND an E2E test)
    - Does the implementation match the spec's intent, not just the letter?
    - Are there contradictions between the spec constraints and actual code?
-5. Write findings to task-state.md under `## Review: Acceptance Auditor`:
+5. **Verify E2E coverage:** Every story MUST have Playwright E2E tests in `backend/tests/e2e/`. Mark as FAIL if:
+   - No E2E test file exists for the feature
+   - New API endpoints lack E2E auth enforcement tests (401 for unauthenticated, 403 for wrong role)
+   - New UI components lack authenticated browser tests
+   - Existing E2E regression was not verified (`make test-e2e`)
+6. Write findings to task-state.md under `## Review: Acceptance Auditor`:
    ```
    ### PASS
-   - [AC reference] — implemented at [file:line], tested at [test:line]
+   - [AC reference] — implemented at [file:line], unit test at [test:line], e2e test at [test:line]
 
    ### FAIL
    - [AC reference] — what's missing or wrong
@@ -258,7 +269,7 @@ setup → analyze → implement → test → review-blind → review-edge → re
    ### PARTIAL
    - [AC reference] — what's implemented vs. what's missing
    ```
-6. **Set phase to `review-security`. End your response.**
+7. **Set phase to `review-security`. End your response.**
 
 ---
 
@@ -390,6 +401,7 @@ Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integratio
 
    ## Test plan
    - [x] Unit tests pass (`make test-unit`)
+   - [x] E2E tests pass (`make test-e2e`)
    - [x] Lint passes (`make lint`)
    - [ ] CI passes
    - [ ] Manual verification against Descope sandbox
@@ -481,6 +493,7 @@ Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integratio
 - PRs are chained: each story branches from the previous story's branch
 - Always read `~/repos/auth/CLAUDE.md` for repo commands
 - Follow existing code patterns — do not invent new conventions
+- **IdentityService seam (D21):** All new API routes inject `IdentityService`, not `DescopeManagementClient` directly. Pass-through in Phase 0; PRD 5 fills with Postgres-backed implementations.
 - **Git operations:** Use `gh` CLI for GitHub operations (PRs, issues, checks). Use `git` for push/pull/fetch.
 - **Scope discipline:** Only implement what the story specifies — no refactoring, no future-proofing, no extras
 - **Review integrity:** Each review persona operates independently. Do NOT pre-emptively fix things to avoid review findings — let the reviewers find issues, then fix in review-fix.

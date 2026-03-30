@@ -40,7 +40,7 @@ Find your repo's **"Review Fix Tasks"** section(s). ONLY look at sections whose 
 
 Read phase from `.claude/task-state.md`. Execute ONLY that phase. When done, update the phase field to the next phase and end your response.
 
-Phase order: checkout → fix → test → ci → complete
+Phase order: checkout → fix → test → review-blind → review-edge → review-security → review-fix → ci → complete
 
 ---
 
@@ -91,8 +91,97 @@ Phase order: checkout → fix → test → ci → complete
 3. Verify that the fixes are actually tested:
    - MUST FIX items should have corresponding test coverage
    - If a MUST FIX item (e.g., authorization bypass, nil pointer) has no test, add one
-4. Commit any new tests
-5. When all green: **set phase to `ci`. End your response.**
+4. **For descope-saas-starter:** Also run `make test-e2e` to verify Playwright E2E tests pass as regression. If a MUST FIX item (e.g., auth bypass, IDOR, tenant isolation) is not covered by an E2E test, add one following patterns in `backend/tests/e2e/`.
+5. Commit any new tests
+6. When all green: **set phase to `review-blind`. End your response.**
+
+---
+
+### review-blind
+
+**Persona: Blind Hunter (Adversarial Reviewer)** — Read `~/repos/auth/auth-planning/_bmad/core/skills/bmad-review-adversarial-general/workflow.md`. Cynical, jaded reviewer. The fixes may have introduced new problems.
+
+1. Generate the diff — scope to ONLY the fix commits (not the entire PR history):
+   ```
+   git log --oneline --since="$(git log -1 --format=%ci HEAD~$(git rev-list --count HEAD ^origin/<branch>))" | head -5
+   git diff HEAD~<fix_commit_count>...HEAD
+   ```
+   If unsure of commit count, diff against the state before your fixes.
+2. **Review the fixes only.** Look for:
+   - Regressions introduced by the fix
+   - Incomplete fixes (partially addressed but still exploitable)
+   - New edge cases created by the fix
+   - Test gaps (fix applied but no test proving it works)
+3. Write findings to `.claude/task-state.md` under `## Review: Blind Hunter`:
+   ```
+   ### MUST FIX
+   - [location] finding description
+
+   ### SHOULD FIX
+   - [location] finding description
+   ```
+4. **Set phase to `review-edge`. End your response.**
+
+---
+
+### review-edge
+
+**Persona: Edge Case Hunter** — Read `~/repos/auth/auth-planning/_bmad/core/skills/bmad-review-edge-case-hunter/workflow.md`. Pure path tracer on the fix diff only.
+
+1. Generate the fix diff (same scope as review-blind)
+2. Walk ALL branching paths in the changed code. Collect ONLY unhandled paths.
+3. Write findings to `.claude/task-state.md` under `## Review: Edge Case Hunter` as JSON:
+   ```json
+   [
+     {
+       "location": "file:line",
+       "trigger_condition": "description (max 15 words)",
+       "guard_snippet": "minimal code sketch to close gap",
+       "potential_consequence": "what goes wrong (max 15 words)"
+     }
+   ]
+   ```
+4. **Set phase to `review-security`. End your response.**
+
+---
+
+### review-security
+
+**Persona: Sentinel (Security Auditor)** — Read `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integration-plan.md` § 2.1. Pragmatic auth-domain security review of the fixes.
+
+1. Generate the fix diff
+2. **Security review through the auth-domain lens.** Focus on:
+   - Did the fix close the vulnerability completely? (no partial mitigations)
+   - Did the fix introduce new attack surface?
+   - Tenant isolation, authorization bypass, injection, IDOR, information disclosure
+3. Write findings to `.claude/task-state.md` under `## Review: Security (Sentinel)`:
+   ```
+   ### BLOCK (must fix before merge)
+   - [CONFIRMED/LIKELY] [location] — finding + attack scenario
+
+   ### WARN (should fix)
+   - [location] — finding + mitigation suggestion
+
+   ### INFO
+   - [location] — observation
+   ```
+4. If no issues: write `PASS`.
+5. **Set phase to `review-fix`. End your response.**
+
+---
+
+### review-fix
+
+**Persona:** Amelia (dev.md) — fix mode.
+
+1. Read ALL review sections from `.claude/task-state.md`:
+   - `## Review: Blind Hunter` — MUST FIX and SHOULD FIX
+   - `## Review: Edge Case Hunter` — unhandled paths
+   - `## Review: Security (Sentinel)` — BLOCK and WARN
+2. **Priority order:** Security BLOCK → Blind Hunter MUST FIX → Edge Case (security/crash consequences) → WARN/SHOULD FIX
+3. Fix each item, run lint/tests, commit
+4. If no findings to fix (all PASS/INFO): skip to next phase.
+5. **Set phase to `ci`. End your response.**
 
 ---
 
@@ -147,7 +236,8 @@ Phase order: checkout → fix → test → ci → complete
 
 - Execute ONE phase per iteration, then end — do NOT chain phases
 - NEVER output a promise unless a task just completed or no tasks remain
-- NEVER skip phases
+- NEVER skip phases — every fix task goes through all review layers
+- **Review integrity:** Each review persona operates independently. Do NOT pre-emptively fix things to avoid review findings.
 - NEVER commit to main
 - NEVER modify other repos
 - Always read ~/repos/auth/CLAUDE.md for repo commands

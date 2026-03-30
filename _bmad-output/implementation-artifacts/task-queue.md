@@ -22,7 +22,7 @@ Statuses: pending | in_progress | done | blocked
 | T13 | 20 | done | Add descope_project_export data source | feat/project-export-datasource | medium |
 | T29 | 26 | done | Resolve pre-existing SonarCloud code quality findings | chore/sonarcloud-findings | medium |
 | T30 | 24 | done | Add Snyk CLI workflow job | ci/snyk-workflow | small |
-| T31 | 22 | blocked | Publish fork to Terraform Registry — requires manual registry signup, GPG key setup, and secrets configuration | feat/registry-publish | medium |
+| T31 | 22 | done | Publish fork to Terraform Registry — issue #22 closed, v1.1.0-v1.1.4 released | feat/registry-publish | medium |
 | T80 | 92 | done | Add descope_list resource for IP/text allow/deny lists | feat/list-resource | medium |
 | T81 | 93 | done | Descope model docs — OAuth2/OIDC spec mapping and architecture diagrams | docs/descope-model | large |
 
@@ -39,6 +39,10 @@ Statuses: pending | in_progress | done | blocked
 | T100 | 102 | done | Fix PR #94 review findings — List resource (silent data drop, missing Update/Import tests) | feat/list-resource | small |
 
 ## descope-saas-starter
+
+**Requirements:** Every feature task MUST include Playwright E2E tests (in `backend/tests/e2e/`) covering the feature's happy path and auth enforcement. Existing E2E tests MUST pass as regression. Unit tests alone are not sufficient. See PR #94 for test patterns (3-tier auth: unauthenticated, OIDC client credentials, admin session token).
+
+**Architectural constraint (D21 — IdentityService seam):** All new API routes MUST use `IdentityService` dependency injection, not `DescopeManagementClient` directly. `IdentityService` is a pass-through class in Phase 0 (Descope feature waves) that delegates to `DescopeManagementClient`. This creates the seam that PRD 5 (Canonical Identity Domain Model) will later fill with Postgres-backed implementations. Router layer and API contracts stay unchanged. Reference: Decision D21, brainstorming-session-2026-03-29-02.md.
 
 | ID | Issue | Status | Description | Branch | Iterations | Depends On |
 |----|-------|--------|-------------|--------|------------|------------|
@@ -64,7 +68,7 @@ Statuses: pending | in_progress | done | blocked
 | T68 | 32 | done | Enhanced health checks (Descope API, database) — PR #59 | feat/health-checks | small | — |
 | T69 | 33 | done | Descope API retry logic with exponential backoff — PR #60 | feat/retry-logic | medium | — |
 | T70 | 34 | blocked | E2E testing framework (Playwright) — superseded by T84/issue #55 | test/e2e-framework | large | — |
-| T71 | 35 | pending | CI/CD pipeline with automated deployment | ci/deployment-pipeline | medium | T70 |
+| T71 | 35 | pending | CI/CD pipeline with automated deployment | ci/deployment-pipeline | medium | T84 |
 | T72 | 38 | done | Document-Level Authorization with FGA (ReBAC) — PR #61 | feat/fga-rebac | large | T12, T16 |
 | T73 | 39 | done | RBAC Enhancement — Hierarchical Roles and Permission Inheritance — PR #71 | feat/rbac-hierarchy | medium | T16 |
 | T74 | 40 | done | Social Login Integration (Google, GitHub) — PR #72 | feat/social-login | medium | — |
@@ -73,11 +77,11 @@ Statuses: pending | in_progress | done | blocked
 | T81 | 52 | done | App Shell — Sidebar, Header, Navigation, Dark Mode | feat/app-shell | medium | T80 |
 | T82 | 53 | done | Migrate Dashboard Page to shadcn/ui | feat/migrate-dashboard | medium | T81 |
 | T83 | 54 | done | Migrate Remaining Pages to shadcn/ui | feat/migrate-pages | large | T82 |
-| T84 | 55 | pending | Playwright E2E Tests (Python) for UI and API | test/playwright-e2e | large | T81 |
-| T76 | 42 | pending | Magic Link Authentication for User Invitations | feat/magic-links | medium | — |
-| T77 | 43 | pending | Step-Up Authentication for Sensitive Operations | feat/step-up-auth | medium | T34 |
-| T78 | 44 | pending | Descope Audit Trail Integration | feat/audit-trail | medium | T67 |
-| T79 | 45 | pending | JWT Template Customization Demo | feat/jwt-templates | medium | — |
+| T84 | 55 | done | Playwright E2E Tests (Python) for UI and API — PR #94 merged, PR #122 fixed session bugs | test/playwright-e2e | large | T81 |
+| T76 | 42 | deprioritized | Magic Link Authentication for User Invitations | feat/magic-links | medium | — |
+| T77 | 43 | deprioritized | Step-Up Authentication for Sensitive Operations | feat/step-up-auth | medium | T34 |
+| T78 | 44 | deprioritized | Descope Audit Trail Integration | feat/audit-trail | medium | T67 |
+| T79 | 45 | deprioritized | JWT Template Customization Demo | feat/jwt-templates | medium | — |
 
 ### Review Fix Tasks — Phased PRs (re-reviewed 2026-03-27)
 
@@ -142,24 +146,28 @@ Statuses: pending | in_progress | done | blocked
 | T108 | | done | Fix PR #228 review findings — Refresh (no async tests, weak test assertions) | feat/refresh | 228 | small | T107 |
 | T109 | | done | Fix PR #229 review findings — DPoP (htu query/fragment violation RFC 9449, no sig verify tests) | feat/dpop | 229 | medium | T108 |
 | T110 | | done | Fix PR #230 review findings — PAR (client_id double-sent, missing required field validation) | feat/par | 230 | medium | T109 |
-| T111 | | pending | Fix PR #232 review findings — JAR (extra_claims override, missing kid header) | feat/jar | 232 | medium | T110 |
-| T112 | | pending | Fix PR #233 review findings — Device Auth (no async tests, missing required field validation) | feat/device-auth-grant | 233 | small | T111 |
-| T113 | | pending | Fix PR #234 review findings — Token Exchange (client_id double-sent, actor_token_type validation) | feat/token-exchange | 234 | medium | T112 |
-| T114 | | pending | Fix PR #235 review findings — FAPI 2.0 (crash on failed discovery, empty code_challenge bypass) | feat/fapi2 | 235 | medium | T113 |
-| T115 | | pending | Fix PR #236 review findings — Policy Config (unenforced policy flags, no URL scheme pre-flight) | feat/policy-config | 236 | medium | T114 |
-| T116 | | pending | Fix PR #237 review findings — Perf Benchmarks (expiring fixture, wrong benchmark layer, no assertions) | test/performance-benchmarks | 237 | small | T115 |
+| T111 | | done | Fix PR #232 review findings — JAR (extra_claims override, missing kid header) | feat/jar | 232 | medium | T110 |
+| T112 | | done | Fix PR #233 review findings — Device Auth (no async tests, missing required field validation) | feat/device-auth-grant | 233 | small | T111 |
+| T113 | | done | Fix PR #234 review findings — Token Exchange (client_id double-sent, actor_token_type validation) | feat/token-exchange | 234 | medium | T112 |
+| T114 | | done | Fix PR #235 review findings — FAPI 2.0 (crash on failed discovery, empty code_challenge bypass) | feat/fapi2 | 235 | medium | T113 |
+| T115 | | done | Fix PR #236 review findings — Policy Config (unenforced policy flags, no URL scheme pre-flight) | feat/policy-config | 236 | medium | T114 |
+| T116 | | done | Fix PR #237 review findings — Perf Benchmarks (expiring fixture, wrong benchmark layer, no assertions) | test/performance-benchmarks | 237 | small | T115 |
 
-### Integration Test Chain (post-review-fixes — proves RFC features work against live OIDC server)
+### Integration Test Chain (proves RFC features work against live OIDC server)
+
+All 16 feature PRs (#211-#237) merged to main 2026-03-30. Node-oidc-provider fixture merged (PR #274).
 
 | ID | Issue | Status | Description | Branch | PR | Size | Depends |
 |----|-------|--------|-------------|--------|-----|------|---------|
-| T120 | | pending | Build node-oidc-provider test fixture (provider.js, Dockerfile, docker-compose.test.yml, static clients, in-memory adapter, devInteractions, all RFC features enabled) | test/node-oidc-fixture | | medium | T116 |
-| T121 | | pending | Integration tests: Core flows (Auth Code + PKCE, Enhanced Token Validation, Refresh Token Grant) against node-oidc-provider | test/integration-core-flows | | medium | T120 |
-| T122 | | pending | Integration tests: Token management (Introspection RFC 7662, Revocation RFC 7009) against node-oidc-provider | test/integration-token-mgmt | | medium | T120 |
+| T120 | | done | Build node-oidc-provider test fixture (provider.js, Dockerfile, docker-compose.test.yml, static clients, in-memory adapter, devInteractions, all RFC features enabled) | test/node-oidc-fixture | 274 | medium | T116 |
+| T121 | | in_progress | Integration tests: Core flows (Auth Code + PKCE, Enhanced Token Validation, Refresh Token Grant) against node-oidc-provider | test/integration-core-flows-v2 | 281 | medium | T120 |
+| T122 | | in_progress | Integration tests: Token management (Introspection RFC 7662, Revocation RFC 7009) against node-oidc-provider | test/integration-token-mgmt | | medium | T120 |
 | T123 | | pending | Integration tests: Advanced request patterns (DPoP RFC 9449, PAR RFC 9126, JAR RFC 9101) against node-oidc-provider | test/integration-advanced-requests | | large | T120 |
 | T124 | | pending | Integration tests: Alternative grants (Device Authorization RFC 8628, Token Exchange RFC 8693) against node-oidc-provider | test/integration-alt-grants | | medium | T120 |
 | T125 | | pending | Integration tests: FAPI 2.0 Security Profile against node-oidc-provider | test/integration-fapi2 | | medium | T120 |
 | T126 | | pending | Document Duende IdentityServer integration test gaps — which RFC features the existing .NET fixture cannot test, feature comparison matrix vs node-oidc-provider, migration/deprecation recommendation | docs/identityserver-gaps | | small | T120 |
+| T128 | | pending | Wire existing integration tests to run against node-oidc-provider: create .env.node-oidc config file, add conftest parameterization (--provider=ory\|node-oidc\|local), update docker-compose.test.yml to include node-oidc-provider service, add Makefile target `test-integration-node-oidc`, verify all existing integration tests (discovery, JWKS, token_client, token_validation, userinfo) pass against the fixture | test/existing-integration-node-oidc | | medium | T120 |
+| T127 | | pending | Codebase cleanup: eliminate TYPE_CHECKING guards (direct import DiscoveryPolicy — no circular dep), move lazy stdlib imports to top-level (Any in models.py:257, base64 in models.py:327, inspect in token_validation_logic.py:162, redact_token in token_validation_logic.py:191), fix inconsistent `from ..core.` imports in token_validation_logic.py, refactor validate_url_scheme cascade into single boolean, extract duplicate _log_retry/_get_retry_params from sync+async http_client to core/http_utils.py, replace fragile string-matching in handle_discovery_error with exception subclasses | refactor/codebase-cleanup | | medium | T126 |
 
 | T48 | 83 | pending | Create Comprehensive API Documentation | docs/api-docs | large |
 | T49 | 39 | pending | Okta Example | feat/okta-example | small |

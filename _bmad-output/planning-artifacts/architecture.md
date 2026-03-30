@@ -89,10 +89,10 @@ terraform-provider-descope
 - Avoids premature abstraction based on assumed provider equivalence
 
 **Sequence:**
-1. Complete all Descope features (Waves 1-6)
+1. Complete all Descope features (Waves 1-6) — all waves route through `IdentityService` class (D21 seam for PRD 5)
 2. Document reference architecture patterns
 3. Domain modeling — map each concept to Ory/IdentityServer
-4. Extract `IdentityProvider` interface from `DescopeManagementClient` seams
+4. Extract `IdentityProvider` interface from `IdentityService`/`DescopeManagementClient` seams
 5. Ory as second provider — Keto (ReBAC), Kratos (users), Hydra (OIDC)
 6. If Tier 2/3 breaks, decide: translation layer, capability flags, or stays provider-specific
 
@@ -124,6 +124,17 @@ terraform-provider-descope
 | Wave 4: Tenant Enhancement | Update, delete, self-provisioning | Existing tenant CRUD |
 | Wave 5: Access Keys + Lists | Key update, IPs, lists | Existing access key CRUD |
 | Wave 6: Password Settings | Policy management, per-tenant overrides | Existing tenant model |
+
+**IdentityService seam requirement (D21):** All waves route through an `IdentityService` class instead of calling `DescopeManagementClient` directly from routers. In Phase 0 (Descope feature waves), `IdentityService` is a pass-through class delegating to `DescopeManagementClient`. When PRD 5 (Canonical Identity Domain Model) arrives, `IdentityService` methods gain Postgres writes and `DescopeManagementClient` becomes a sync adapter. Router layer and API contracts stay unchanged. Cost: ~20 lines per wave. (Decision D21, brainstorming-session-2026-03-29-02.md)
+
+```python
+# Pattern: Router → IdentityService → DescopeManagementClient
+class IdentityService:
+    def __init__(self, descope: DescopeManagementClient):
+        self.descope = descope
+    async def create_role(self, name, description, permission_names):
+        await self.descope.create_role(name, description, permission_names)
+```
 
 ### ADR-5: Conformance Test Harness as Quality Gate
 
@@ -167,7 +178,7 @@ All new endpoints follow the existing FastAPI patterns in descope-saas-starter/b
 - **Authorization:** Admin endpoints check `require_role("admin")` or `require_permission("manage:roles")`
 - **Tenant scoping:** Operations scoped to current tenant from `dct` JWT claim
 - **Error handling:** Standard HTTP status codes, structured error responses
-- **Descope Management API:** All CRUD operations delegate to `DescopeManagementClient`
+- **Descope Management API:** All CRUD operations delegate to `DescopeManagementClient` via `IdentityService` (D21 seam — routers inject `IdentityService`, not `DescopeManagementClient` directly)
 
 ### Endpoint Pattern
 
