@@ -153,6 +153,23 @@ Statuses: pending | in_progress | done | blocked
 | T115 | | done | Fix PR #236 review findings — Policy Config (unenforced policy flags, no URL scheme pre-flight) | feat/policy-config | 236 | medium | T114 |
 | T116 | | done | Fix PR #237 review findings — Perf Benchmarks (expiring fixture, wrong benchmark layer, no assertions) | test/performance-benchmarks | 237 | small | T115 |
 
+### Quality Gates (code quality audit findings — no new features)
+
+Chained PRs: each task branches from the previous task's branch. Run via `ralph-prompts/pim-quality-gates.md`.
+
+| ID | Issue | Status | Description | Branch | Base Branch | Size |
+|----|-------|--------|-------------|--------|-------------|------|
+| Q1 | 289 | pending | Remove dead code: `_current_env_file` global, empty `setup_test_environment` fixture | chore/remove-dead-code | chore/code-quality-audit | trivial |
+| Q2 | 285 | pending | Delete 10 redundant import smoke tests across 5 files | chore/delete-import-smoke-tests | chore/remove-dead-code | small |
+| Q3 | 288 | pending | Extract `DEFAULT_OPTIONS` to shared frozen fixture, fix `cache_info[0]` → `.hits` | chore/fix-mutable-test-state | chore/delete-import-smoke-tests | small |
+| Q4 | 287 | pending | Consolidate cross-file test duplicates (test_jwks → test_json_web_key, expired/benchmark dedup) | chore/consolidate-test-duplicates | chore/fix-mutable-test-state | small |
+| Q5 | 284 | pending | Move ~30 constructor/model tests from integration to unit directory | refactor/reclassify-integration-tests | chore/consolidate-test-duplicates | medium |
+| Q6 | 286 | pending | Fix 3 no-op claims validator tests to prove invocation | fix/noop-validator-tests | refactor/reclassify-integration-tests | small |
+| Q7 | 290 | pending | Fix 3×3 retry cascade in integration conftest | fix/retry-cascade | fix/noop-validator-tests | small |
+| Q8 | 291 | pending | Add config validation with clear missing .env error, create .env.example | chore/config-validation | fix/retry-cascade | small |
+| Q9 | 292 | pending | Strengthen ~15 truthy-only assertions to check specific values | chore/strengthen-assertions | chore/config-validation | medium |
+| Q10 | 293 | pending | Add async integration tests for aio discovery/JWKS, extract cleanup fixture | test/async-integration | chore/strengthen-assertions | medium |
+
 ### Integration Test Chain (proves RFC features work against live OIDC server)
 
 All 16 feature PRs (#211-#237) merged to main 2026-03-30. Node-oidc-provider fixture merged (PR #274).
