@@ -63,7 +63,7 @@ Read phase from task-state.md. Execute ONLY that phase. When done, update the ph
 Phase order:
 
 ```
-setup → analyze → implement → test → review-blind → review-edge → review-fix → pr → ci → ci-fix (loop) → complete
+setup → analyze → implement → test → review-blind → review-edge → review-acceptance → review-security → review-fix → pr → ci → ci-fix (loop) → complete
 ```
 
 ---
@@ -188,7 +188,58 @@ setup → analyze → implement → test → review-blind → review-edge → re
    ]
    ```
    Or `[]` if none found.
-4. **Set phase to `review-fix`. End your response.**
+4. **Set phase to `review-acceptance`. End your response.**
+
+---
+
+### review-acceptance
+
+**Persona: Acceptance Auditor** — Read `~/repos/auth/auth-planning/_bmad/bmm/agents/qa.md` — adopt Quinn's mindset as QA gatekeeper.
+
+1. Generate the diff (same scope as review-blind)
+2. For each change, verify:
+   - Does the change match what the GitHub issue requested?
+   - Are there tests covering the change? If tests were moved, do they still run and pass?
+   - Does the commit message accurately describe the change?
+   - Is the change complete or was something left half-done?
+3. Write findings to task-state.md under `## Review: Acceptance Auditor`:
+   ```
+   ### PASS
+   - [item] verified
+
+   ### PARTIAL
+   - [item] what's missing
+
+   ### FAIL
+   - [item] what's wrong
+   ```
+4. **Set phase to `review-security`. End your response.**
+
+---
+
+### review-security
+
+**Persona: Sentinel (Security Auditor)** — Read `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integration-plan.md` § 2.1. Pragmatic auth-domain security review.
+
+1. Generate the diff (same scope)
+2. **Security review through the auth-domain lens.** Focus on:
+   - Did the change introduce new attack surface?
+   - Any hardcoded secrets, credentials, or tokens in test code that could leak?
+   - Tenant isolation, authorization bypass, injection, IDOR, information disclosure
+   - For test changes: could the test change mask a real vulnerability?
+3. Write findings to task-state.md under `## Review: Security (Sentinel)`:
+   ```
+   ### BLOCK (must fix before merge)
+   - [CONFIRMED/LIKELY] [location] — finding + attack scenario
+
+   ### WARN (should fix)
+   - [location] — finding + mitigation suggestion
+
+   ### INFO
+   - [location] — observation
+   ```
+4. If no issues: write `PASS`.
+5. **Set phase to `review-fix`. End your response.**
 
 ---
 
@@ -196,12 +247,15 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 **Persona:** Amelia (dev.md) — fix mode.
 
-1. Read ALL review sections from task-state.md
-2. Fix ALL **MUST FIX** items
-3. Fix **SHOULD FIX** and edge cases where the fix is straightforward
-4. Run lint and tests after fixes. Commit.
-5. If no findings to fix (all PASS): skip to next phase.
-6. **Set phase to `pr`. End your response.**
+1. Read ALL review sections from task-state.md:
+   - `## Review: Blind Hunter` — MUST FIX and SHOULD FIX
+   - `## Review: Edge Case Hunter` — unhandled paths
+   - `## Review: Acceptance Auditor` — PARTIAL and FAIL items
+   - `## Review: Security (Sentinel)` — BLOCK and WARN
+2. **Priority order:** Security BLOCK → Acceptance FAIL → Blind Hunter MUST FIX → Edge Case (security/crash consequences) → WARN/SHOULD FIX/PARTIAL
+3. Fix each item, run lint/tests, commit
+4. If no findings to fix (all PASS): skip to next phase.
+5. **Set phase to `pr`. End your response.**
 
 ---
 
