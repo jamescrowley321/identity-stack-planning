@@ -223,6 +223,23 @@ The capability detection, auth code helpers, and redirect-following functions me
 
 ---
 
+## GitHub Issues
+
+| Issue | Title | Priority |
+|-------|-------|----------|
+| [#284](https://github.com/jamescrowley321/py-identity-model/issues/284) | Move ~30 constructor/model tests from integration to unit | P2 |
+| [#285](https://github.com/jamescrowley321/py-identity-model/issues/285) | Delete 10 redundant import smoke tests | P2 |
+| [#286](https://github.com/jamescrowley321/py-identity-model/issues/286) | Fix 3 no-op claims validator tests to prove invocation | P2 |
+| [#287](https://github.com/jamescrowley321/py-identity-model/issues/287) | Consolidate cross-file test duplicates | P2 |
+| [#288](https://github.com/jamescrowley321/py-identity-model/issues/288) | Extract DEFAULT_OPTIONS to shared frozen fixture | P2 |
+| [#289](https://github.com/jamescrowley321/py-identity-model/issues/289) | Remove dead code: _current_env_file and empty fixture | P2 |
+| [#290](https://github.com/jamescrowley321/py-identity-model/issues/290) | Fix 3×3 retry cascade in integration test conftest | P3 |
+| [#291](https://github.com/jamescrowley321/py-identity-model/issues/291) | Add config validation with clear missing .env error | P3 |
+| [#292](https://github.com/jamescrowley321/py-identity-model/issues/292) | Strengthen ~15 truthy-only assertions | P3 |
+| [#293](https://github.com/jamescrowley321/py-identity-model/issues/293) | Add async integration tests for aio discovery/JWKS | P3 |
+
+---
+
 ## Verification Checklist
 
 - [x] Global ruff ignore list reduced: 28 → 14 (50% reduction)
