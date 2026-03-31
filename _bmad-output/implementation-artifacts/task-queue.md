@@ -83,32 +83,105 @@ Statuses: pending | in_progress | done | blocked
 | T78 | 44 | deprioritized | Descope Audit Trail Integration | feat/audit-trail | medium | T67 |
 | T79 | 45 | deprioritized | JWT Template Customization Demo | feat/jwt-templates | medium | — |
 
-### Review Fix Tasks — Phased PRs (re-reviewed 2026-03-27)
+### Epic 2: Role & Permission Administration (chained PRs, review inline — COMPLETE)
+
+Run via `ralph-prompts/epic2-rbac-admin.md`. Each story branched from the previous. Review cycle (blind → edge → acceptance → security → fix) ran inline per story.
+
+| Story | Issue | Status | Branch | Base Branch | PR |
+|-------|-------|--------|--------|-------------|-----|
+| 2.1 | #101 | done | epic2/story-2.1-permission-crud | main | #105 |
+| 2.2 | #102 | done | epic2/story-2.2-role-crud | epic2/story-2.1-permission-crud | #106 |
+| 2.3 | #103 | done | epic2/story-2.3-admin-ui | epic2/story-2.2-role-crud | #107 |
+| 2.4 | #104 | done | epic2/story-2.4-e2e-tests | epic2/story-2.3-admin-ui | #108 |
+
+Merged to main via #109 (rebased), #110 (TF migration), #111 (remaining stories bundled).
+
+### Epic 3: Relationship-Based Access Control (chained PRs, review inline — COMPLETE)
+
+Run via `ralph-prompts/epic3-fga-authz.md`. Each story branched from the previous. Review cycle ran inline per story. All PRs merged to main individually.
+
+| Story | Issue | Status | Branch | Base Branch | PR |
+|-------|-------|--------|--------|-------------|-----|
+| 3.1 | #112 | done | epic3/story-3.1-fga-service | main | #121 |
+| 3.2 | #113 | done | epic3/story-3.2-fga-admin-router | epic3/story-3.1-fga-service | #131 |
+| 3.3 | #114 | done | epic3/story-3.3-fga-dependency-documents | epic3/story-3.2-fga-admin-router | #132 |
+| 3.4 | #115 | done | epic3/story-3.4-fga-unit-tests | epic3/story-3.3-fga-dependency-documents | #125 |
+| 3.5 | #116 | done | epic3/story-3.5-fga-demo-seed | epic3/story-3.4-fga-unit-tests | #133 (merged into 3.6) |
+| 3.6 | #117 | done | epic3/story-3.6-fga-admin-ui | epic3/story-3.5-fga-demo-seed | #133 |
+| 3.7 | #118 | done | epic3/story-3.7-fga-e2e-tests | epic3/story-3.6-fga-admin-ui | #135 |
+
+### Ad-Hoc Fixes (merged to main, not in original task queue)
+
+| PR | Status | Description |
+|----|--------|-------------|
+| #128 | done | Scalar API docs (replaces Swagger UI) — closes #126 |
+| #129 | done | Fix logout 401 (use local logout instead of RP-Initiated) — closes #127 |
+| #136 | done | Fix Descope API endpoint paths and error handling |
+| #137 | done | Remove ralph/claude runtime state from git, add to gitignore |
+
+### PRD 5: Canonical Identity Domain Model (chained PRs, review inline)
+
+Run via `ralph-prompts/canonical-identity.md`. Each story branches from the previous. Review cycle (blind → edge → acceptance → security → fix) runs inline per story.
+
+**Epic 1: Canonical Identity Foundation**
+
+| Story | Issue | Status | Branch | Base Branch | PR |
+|-------|-------|--------|--------|-------------|-----|
+| 1.1 | #138 | pending | canonical/story-1.1-docker-postgres-engine | main | |
+| 1.2 | #139 | pending | canonical/story-1.2-alembic-schema | canonical/story-1.1-docker-postgres-engine | |
+| 1.3 | #140 | pending | canonical/story-1.3-error-model-result-types | canonical/story-1.2-alembic-schema | |
+| 1.4 | #141 | pending | canonical/story-1.4-otel-aspire | canonical/story-1.3-error-model-result-types | |
+| 1.5 | #142 | pending | canonical/story-1.5-service-interfaces-test-infra | canonical/story-1.4-otel-aspire | |
+| 1.6 | #143 | pending | canonical/story-1.6-seed-migration | canonical/story-1.5-service-interfaces-test-infra | |
+
+**Epic 2: Identity & Access Administration**
+
+| Story | Issue | Status | Branch | Base Branch | PR |
+|-------|-------|--------|--------|-------------|-----|
+| 2.1 | #144 | pending | canonical/story-2.1-user-service-sync | canonical/story-1.6-seed-migration | |
+| 2.2 | #145 | pending | canonical/story-2.2-role-permission-tenant-service | canonical/story-2.1-user-service-sync | |
+| 2.3 | #146 | pending | canonical/story-2.3-router-rewire | canonical/story-2.2-role-permission-tenant-service | |
+| 2.4 | #147 | pending | canonical/story-2.4-unit-integration-tests | canonical/story-2.3-router-rewire | |
+| 2.5 | #148 | pending | canonical/story-2.5-e2e-tests-regression | canonical/story-2.4-unit-integration-tests | |
+
+**Epic 3: Inbound Sync & Reconciliation**
+
+| Story | Issue | Status | Branch | Base Branch | PR |
+|-------|-------|--------|--------|-------------|-----|
+| 3.1 | #149 | pending | canonical/story-3.1-flow-connector-webhook | canonical/story-2.5-e2e-tests-regression | |
+| 3.2 | #150 | pending | canonical/story-3.2-reconciliation-job | canonical/story-3.1-flow-connector-webhook | |
+| 3.3 | #151 | pending | canonical/story-3.3-redis-pubsub | canonical/story-3.2-reconciliation-job | |
+| 3.4 | #152 | pending | canonical/story-3.4-inbound-sync-tests | canonical/story-3.3-redis-pubsub | |
+
+**Epic 4: Multi-IdP Identity Linking**
+
+| Story | Issue | Status | Branch | Base Branch | PR |
+|-------|-------|--------|--------|-------------|-----|
+| 4.1 | #153 | pending | canonical/story-4.1-idp-link-provider-service | canonical/story-3.4-inbound-sync-tests | |
+| 4.2 | #154 | pending | canonical/story-4.2-link-provider-routers | canonical/story-4.1-idp-link-provider-service | |
+| 4.3 | #155 | pending | canonical/story-4.3-identity-resolution-redis-cache | canonical/story-4.2-link-provider-routers | |
+| 4.4 | #156 | pending | canonical/story-4.4-multi-idp-tests | canonical/story-4.3-identity-resolution-redis-cache | |
+
+### Remaining Descope Feature Waves (deprioritized — will be addressed in stride)
+
+Epics 5 (Multi-Tenant Lifecycle) and 6 (M2M Security & Access Controls) are deprioritized in favor of the Canonical Identity Domain Model (PRD 5). Missing Descope-specific features will be added as needed during canonical model implementation.
+
+### Review Fix Tasks — Phase 1 PRs (re-reviewed 2026-03-27, ALL COMPLETE)
 
 | ID | Issue | Status | Description | Branch | PR | Iterations | Depends On |
 |----|-------|--------|-------------|--------|----|------------|------------|
-| T90 | | done | Fix PR #24 review findings — Tenant Mgmt (unauth'd creation, empty mgmt key, bare except, no tenant membership check, httpx per-call) | feat/tenant-management | 24 | medium | — |
-| T91 | | done | Fix PR #25 review findings — RBAC (admin role escalation, leaked API errors, unvalidated role_names) | feat/rbac | 25 | medium | T90 |
-| T92 | | done | Fix PR #26 review findings — Custom Attrs (no tenant attr allowlist, silent error swallowing, unhandled API errors, sub/loginId mapping) | feat/custom-attributes | 26 | medium | T91 |
-| T93 | | done | Fix PR #27 review findings — Access Keys (TOCTOU, no name validation, negative expire_time, role escalation via keys, leaked API errors) | feat/access-key-mgmt | 27 | medium | T92 |
-| T94 | | done | Fix PR #36 review findings — Admin Portal (cross-tenant IDOR on deactivate/remove, no email validation, admin→owner escalation, global delete_user) | feat/admin-portal | 36 | medium | T93 |
-
-### Review Fix Tasks — Standalone PRs
-
-| ID | Issue | Status | Description | Branch | PR | Iterations | Depends On |
-|----|-------|--------|-------------|--------|----|------------|------------|
-| T95 | | done | Fix PR #37 review findings — Security Headers (case-sensitive env check, CSP bypass via env var) | feat/security-headers | 82 | small | — |
-
-### Review Fix Tasks — Cross-Cutting PRs (re-reviewed 2026-03-27)
-
-| ID | Issue | Status | Description | Branch | PR | Iterations | Depends On |
-|----|-------|--------|-------------|--------|----|------------|------------|
-| T96 | | done | Fix PR #56 review findings — Rate Limiting (proxy IP keying, middleware ordering, hardcoded Retry-After) | feat/rate-limiting | 56 | medium | T94 |
-| T97 | | done | Fix PR #57 review findings — Structured Logging (health check info leak, stale degraded cache, race condition, import-time env vars) | feat/structured-logging | 57 | medium | T96 |
-| T98 | | done | Fix PR #58 review findings — Audit Logging (X-Forwarded-For spoofing, no failure audit, PII in logs) | feat/audit-logging | 58 | medium | T97 |
-| T117 | | done | Fix PR #59 review findings — Health Checks (SSRF via DESCOPE_BASE_URL, cache race condition, degraded cache TTL) | feat/health-checks | 59 | medium | T97 |
-| T118 | | done | Fix PR #60 review findings — Retry Logic (httpx per retry attempt, non-idempotent retries, env var crash) | feat/retry-logic | 60 | medium | T97 |
-| T119 | | done | Fix PR #61 review findings — FGA/ReBAC (orphaned FGA relation, cross-tenant FGA bypass, partial cleanup failure, cross-tenant sharing) | feat/fga-rebac | 61 | medium | T118 |
+| T90 | | done | Fix PR #24 review findings — Tenant Mgmt | feat/tenant-management | 24 | medium | — |
+| T91 | | done | Fix PR #25 review findings — RBAC | feat/rbac | 25 | medium | T90 |
+| T92 | | done | Fix PR #26 review findings — Custom Attrs | feat/custom-attributes | 26 | medium | T91 |
+| T93 | | done | Fix PR #27 review findings — Access Keys | feat/access-key-mgmt | 27 | medium | T92 |
+| T94 | | done | Fix PR #36 review findings — Admin Portal | feat/admin-portal | 36 | medium | T93 |
+| T95 | | done | Fix PR #37 review findings — Security Headers | feat/security-headers | 82 | small | — |
+| T96 | | done | Fix PR #56 review findings — Rate Limiting | feat/rate-limiting | 56 | medium | T94 |
+| T97 | | done | Fix PR #57 review findings — Structured Logging | feat/structured-logging | 57 | medium | T96 |
+| T98 | | done | Fix PR #58 review findings — Audit Logging | feat/audit-logging | 58 | medium | T97 |
+| T117 | | done | Fix PR #59 review findings — Health Checks | feat/health-checks | 59 | medium | T97 |
+| T118 | | done | Fix PR #60 review findings — Retry Logic | feat/retry-logic | 60 | medium | T97 |
+| T119 | | done | Fix PR #61 review findings — FGA/ReBAC | feat/fga-rebac | 61 | medium | T118 |
 
 ## py-identity-model
 
@@ -159,8 +232,8 @@ Chained PRs: each task branches from the previous task's branch. Run via `ralph-
 
 | ID | Issue | Status | Description | Branch | Base Branch | Size |
 |----|-------|--------|-------------|--------|-------------|------|
-| Q1 | 289 | pending | Remove dead code: `_current_env_file` global, empty `setup_test_environment` fixture | chore/remove-dead-code | chore/code-quality-audit | trivial |
-| Q2 | 285 | pending | Delete 10 redundant import smoke tests across 5 files | chore/delete-import-smoke-tests | chore/remove-dead-code | small |
+| Q1 | 289 | done | Remove dead code: `_current_env_file` global, empty `setup_test_environment` fixture | chore/remove-dead-code | chore/code-quality-audit | trivial |
+| Q2 | 285 | done | Delete 10 redundant import smoke tests across 5 files | chore/delete-import-smoke-tests | chore/remove-dead-code | small |
 | Q3 | 288 | pending | Extract `DEFAULT_OPTIONS` to shared frozen fixture, fix `cache_info[0]` → `.hits` | chore/fix-mutable-test-state | chore/delete-import-smoke-tests | small |
 | Q4 | 287 | pending | Consolidate cross-file test duplicates (test_jwks → test_json_web_key, expired/benchmark dedup) | chore/consolidate-test-duplicates | chore/fix-mutable-test-state | small |
 | Q5 | 284 | pending | Move ~30 constructor/model tests from integration to unit directory | refactor/reclassify-integration-tests | chore/consolidate-test-duplicates | medium |

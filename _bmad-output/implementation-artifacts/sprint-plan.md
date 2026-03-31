@@ -22,12 +22,14 @@ This sprint plan prioritizes work across three repos. The **terraform-provider-d
 - **Releases:** v1.1.0-v1.1.4 published to Terraform Registry
 
 ### descope-saas-starter
-- **Done:** T14-T17, T19, T26 (core phases), T64-T69 (all hardening), T72-T75 (FGA/ReBAC, RBAC hierarchy, social login, passkeys), T80-T84 (shadcn/ui migration complete, Playwright E2E done — PR #94 merged, PR #122 fixed session bugs)
-- **In progress:** Epic 3 Stories 3.1-3.5 (FGA/ReBAC epic — PRs #121-#125 open, Story 3.5 in test phase)
-- **Ad-hoc:** PR #128 (Scalar API docs, closes #126), PR #129 (logout 401 fix, closes #127) — both open, not in task queue
-- **Blocked:** T18, T20-T25 (cascading blocks from TF provider), T70 (superseded by T84)
-- **Pending:** T27-T28 (TF config, docs), T71 (CI/CD), T76-T79 (magic links, step-up, audit trail, JWT demo)
-- **Review fixes:** T90-T98, T117-T119 — ALL done
+- **Done (Phase 1 features):** T14-T17, T19, T26 (core phases), T64-T69 (all hardening), T72-T75 (FGA/ReBAC, RBAC hierarchy, social login, passkeys), T80-T84 (shadcn/ui migration, Playwright E2E)
+- **Done (Epic 2 — RBAC Admin):** Stories 2.1-2.4 — Permission CRUD, Role CRUD, Admin UI, E2E Tests. PRs #105-#111 merged. Chained branches, review inline.
+- **Done (Epic 3 — FGA/ReBAC):** Stories 3.1-3.7 — FGA service, admin router, dependency/documents, unit tests, demo seed, admin UI, E2E tests. PRs #121-#135 merged. Chained branches, review inline.
+- **Done (Ad-hoc):** PR #128 (Scalar API docs), #129 (logout fix), #136 (Descope API endpoints), #137 (gitignore)
+- **Done (Phase 1 review fixes):** T90-T98, T117-T119 — ALL done
+- **Next: Canonical Identity Domain Model (PRD 5)** — Postgres-backed identity layer beneath existing API. IdentityService seam (D21) filled with real implementations. DescopeManagementClient becomes sync adapter. 4 epics, 19 stories created (issues #138-#156). Ralph prompt at `ralph-prompts/canonical-identity.md`.
+- **Deprioritized (in stride):** Epics 5-6 (tenant lifecycle, M2M security), T27-T28 (TF config, docs), T71 (CI/CD), T76-T79. Missing Descope features added as needed during canonical model work.
+- **Blocked:** T18, T20-T25 (cascading from enterprise license), Epic 4 (SSO — enterprise license)
 
 ### py-identity-model
 - **Done:** T32-T47 (ALL feature tasks complete — Sprint A through Sprint F benchmarks)
@@ -275,6 +277,49 @@ T76-T79 deprioritized in favor of bigger-picture items (toolchain expansion, mul
 | T78 | descope-saas-starter | [#44](https://github.com/jamescrowley321/descope-saas-starter/issues/44) | Descope Audit Trail Integration | Medium | deprioritized | T67 (structured logging) |
 | T79 | descope-saas-starter | [#45](https://github.com/jamescrowley321/descope-saas-starter/issues/45) | JWT Template Customization Demo | Medium | deprioritized | — |
 
+### Tier 8: SaaS Starter — Canonical Identity Domain Model (PRD 5)
+
+Run via `ralph-prompts/canonical-identity.md`. 4 epics, 19 stories, chained PRs with inline review cycle.
+
+#### Epic 1: Canonical Identity Foundation (6 stories)
+
+| Story | Issue | Description | Status | Depends On |
+|-------|-------|-------------|--------|------------|
+| 1.1 | [#138](https://github.com/jamescrowley321/descope-saas-starter/issues/138) | Docker Compose + Postgres Async Engine | pending | — |
+| 1.2 | [#139](https://github.com/jamescrowley321/descope-saas-starter/issues/139) | Alembic Setup + Canonical Schema Migration | pending | 1.1 |
+| 1.3 | [#140](https://github.com/jamescrowley321/descope-saas-starter/issues/140) | Error Model, Result Types + RFC 9457 | pending | 1.2 |
+| 1.4 | [#141](https://github.com/jamescrowley321/descope-saas-starter/issues/141) | OTel Instrumentation + Aspire Dashboard | pending | 1.3 |
+| 1.5 | [#142](https://github.com/jamescrowley321/descope-saas-starter/issues/142) | Service Interfaces + Test Infrastructure | pending | 1.4 |
+| 1.6 | [#143](https://github.com/jamescrowley321/descope-saas-starter/issues/143) | Seed Migration from Descope | pending | 1.5 |
+
+#### Epic 2: Identity & Access Administration (5 stories)
+
+| Story | Issue | Description | Status | Depends On |
+|-------|-------|-------------|--------|------------|
+| 2.1 | [#144](https://github.com/jamescrowley321/descope-saas-starter/issues/144) | User Service + Descope Sync Adapter | pending | 1.6 |
+| 2.2 | [#145](https://github.com/jamescrowley321/descope-saas-starter/issues/145) | Role, Permission + Tenant Service | pending | 2.1 |
+| 2.3 | [#146](https://github.com/jamescrowley321/descope-saas-starter/issues/146) | Router Rewire — Identity Routers | pending | 2.2 |
+| 2.4 | [#147](https://github.com/jamescrowley321/descope-saas-starter/issues/147) | Unit + Integration Tests | pending | 2.3 |
+| 2.5 | [#148](https://github.com/jamescrowley321/descope-saas-starter/issues/148) | E2E Tests + Regression | pending | 2.4 |
+
+#### Epic 3: Inbound Sync & Reconciliation (4 stories)
+
+| Story | Issue | Description | Status | Depends On |
+|-------|-------|-------------|--------|------------|
+| 3.1 | [#149](https://github.com/jamescrowley321/descope-saas-starter/issues/149) | Flow HTTP Connector + Webhook Handler | pending | 2.5 |
+| 3.2 | [#150](https://github.com/jamescrowley321/descope-saas-starter/issues/150) | Periodic Reconciliation Job | pending | 3.1 |
+| 3.3 | [#151](https://github.com/jamescrowley321/descope-saas-starter/issues/151) | Redis Pub/Sub + Cache Invalidation | pending | 3.2 |
+| 3.4 | [#152](https://github.com/jamescrowley321/descope-saas-starter/issues/152) | Inbound Sync Tests | pending | 3.3 |
+
+#### Epic 4: Multi-IdP Identity Linking (4 stories)
+
+| Story | Issue | Description | Status | Depends On |
+|-------|-------|-------------|--------|------------|
+| 4.1 | [#153](https://github.com/jamescrowley321/descope-saas-starter/issues/153) | IdP Link + Provider Config Service | pending | 3.4 |
+| 4.2 | [#154](https://github.com/jamescrowley321/descope-saas-starter/issues/154) | Link Management + Provider Config Routers | pending | 4.1 |
+| 4.3 | [#155](https://github.com/jamescrowley321/descope-saas-starter/issues/155) | Internal Identity Resolution API + Redis Cache | pending | 4.2 |
+| 4.4 | [#156](https://github.com/jamescrowley321/descope-saas-starter/issues/156) | Multi-IdP Tests | pending | 4.3 |
+
 ### Tier 9: SaaS Starter Hardening (COMPLETE)
 
 #### Sprint G: Security Hardening (COMPLETE)
@@ -384,9 +429,8 @@ T55 (#219 Discovery Cache) [pending]> Production reliability
 
 | Track | Tasks | Notes |
 |-------|-------|-------|
+| **saas-starter PRD 5 (Canonical Identity)** | Stories 1.1-1.6 (Epic 1 Foundation) → 2.1-2.5 (Epic 2 Service Layer) → 3.1-3.4 (Epic 3 Inbound Sync) → 4.1-4.4 (Epic 4 Multi-IdP) | 19 stories, issues #138-#156, ralph prompt ready at `canonical-identity.md` |
 | **py-identity-model integration tests** | T121 (CI-fix), T122 (PR phase) → T123-T125 → T126 → T128 → T127 | Node-oidc fixture merged. Core flows PR #281 has CI failures. Token mgmt reviewed, ready for PR. |
-| **saas-starter Epic 3** | Story 3.5 (in test phase) → 3.6 → 3.7 | FGA/ReBAC epic — PRs #121-#125 open (3.1-3.4), Story 3.5 in progress |
-| **saas-starter ad-hoc** | PR #128 (Scalar API docs), PR #129 (logout fix) | Both open, worktrees active, not in task queue |
 
 ### Next wave (after integration tests complete)
 
