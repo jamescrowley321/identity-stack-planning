@@ -12,7 +12,7 @@ terraform {
     organization = "your-org-name"
 
     workspaces {
-      name = "descope-saas-starter"
+      name = "identity-stack"
     }
   }
 
@@ -34,7 +34,7 @@ terraform {
     organization = "your-org-name"
 
     workspaces {
-      name = "descope-saas-starter"
+      name = "identity-stack"
     }
   }
 }
@@ -78,7 +78,7 @@ HCP Terraform's free tier (as of current offerings) includes:
 | **SSO** | No (requires Plus/Enterprise) |
 | **Concurrent runs** | 1 concurrent run (Plus allows more) |
 
-**For the descope-saas-starter use case**: The free tier is more than sufficient. A single Descope project config with roles, permissions, tenants, FGA schema, and SSO provisioning will consume minimal runs (likely a handful per week at most) and trivial state storage.
+**For the identity-stack use case**: The free tier is more than sufficient. A single Descope project config with roles, permissions, tenants, FGA schema, and SSO provisioning will consume minimal runs (likely a handful per week at most) and trivial state storage.
 
 ---
 
@@ -100,7 +100,7 @@ terraform {
   cloud {
     organization = "your-org"
     workspaces {
-      name = "descope-saas-starter"
+      name = "identity-stack"
     }
   }
 }
@@ -178,7 +178,7 @@ For a single Descope project config (roles, permissions, tenants, FGA schema, SS
 
 ```
 Organization: your-org
-  └── Workspace: descope-saas-starter
+  └── Workspace: identity-stack
         └── Manages: roles, permissions, tenants, FGA, SSO, access keys
 ```
 
@@ -260,7 +260,7 @@ jobs:
     env:
       TF_CLOUD_ORGANIZATION: "your-org"
       TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
-      TF_WORKSPACE: "descope-saas-starter"
+      TF_WORKSPACE: "identity-stack"
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
@@ -434,7 +434,7 @@ Infisical → (provider data source) → Terraform → (CI post-apply) → Infis
 
 ## Step-by-Step Migration Plan: Local State to HCP Terraform
 
-For the `descope-saas-starter` infrastructure config:
+For the `identity-stack` infrastructure config:
 
 ### Phase 1: HCP Terraform Account Setup
 
@@ -450,7 +450,7 @@ terraform login
 
 ```bash
 # In HCP Terraform UI:
-# 1. Create workspace "descope-saas-starter" (CLI-driven workflow)
+# 1. Create workspace "identity-stack" (CLI-driven workflow)
 # 2. Set Execution Mode to "Local" (Settings > General)
 #    - This ensures runs happen on your machine / CI runner
 #    - State is stored in HCP Terraform
@@ -463,7 +463,7 @@ terraform login
 ### Phase 3: Back Up Current State
 
 ```bash
-cd /home/james/repos/auth/descope-saas-starter/infra  # or wherever your tf config lives
+cd /home/james/repos/auth/identity-stack/infra  # or wherever your tf config lives
 cp terraform.tfstate terraform.tfstate.backup-pre-migration-$(date +%Y%m%d)
 ```
 
@@ -477,7 +477,7 @@ terraform {
     organization = "your-org-name"
 
     workspaces {
-      name = "descope-saas-starter"
+      name = "identity-stack"
     }
   }
 
@@ -557,4 +557,4 @@ gh secret set TF_API_TOKEN --body "your-hcp-terraform-token"
 | Backup/recovery | Manual | Automatic state versioning |
 | Variable management | `.tfvars` files, env vars | Variable sets, sensitive vars |
 
-**Bottom line**: For the descope-saas-starter project, HCP Terraform free tier is the right choice. It eliminates the risks of local state (no encryption, no locking, no versioning) with zero cost. The migration is a single `terraform init -migrate-state` command after adding the `cloud` block. Use local execution mode to maintain compatibility with the custom `terraform-provider-descope` fork, and CLI-driven GitHub Actions for CI/CD.
+**Bottom line**: For the identity-stack project, HCP Terraform free tier is the right choice. It eliminates the risks of local state (no encryption, no locking, no versioning) with zero cost. The migration is a single `terraform init -migrate-state` command after adding the `cloud` block. Use local execution mode to maintain compatibility with the custom `terraform-provider-descope` fork, and CLI-driven GitHub Actions for CI/CD.

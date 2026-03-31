@@ -69,7 +69,7 @@ context_file: ''
 
 ---
 
-## 3. descope-saas-starter — GitHub State Audit
+## 3. identity-stack — GitHub State Audit
 
 ### Open PRs: 4
 - **#99** — fix: Handle missing tenant context + add page content E2E tests
@@ -321,7 +321,7 @@ A6. Target Basic RP + Config RP certification
 A7. Expand: Implicit RP, Hybrid RP, then FAPI 2.0
 ```
 
-**Track B: descope-saas-starter (Descope feature completion)**
+**Track B: identity-stack (Descope feature completion)**
 ```
 B0. Triage & cleanup
     ├── Close ~10 stale issues (#5, #10, #28, #30-#34, #46, #48-#50)

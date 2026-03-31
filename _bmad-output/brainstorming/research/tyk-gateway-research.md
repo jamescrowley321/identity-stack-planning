@@ -128,7 +128,7 @@ When `use_db_app_configs` is `false`, the gateway reads API definitions from JSO
 
 ## 3. Auth Offloading: JWT, OAuth2, OIDC
 
-This is the most relevant section for the descope-saas-starter architecture.
+This is the most relevant section for the identity-stack architecture.
 
 ### JWT Validation
 
@@ -226,7 +226,7 @@ This means the FastAPI backend could receive pre-validated claims as headers, re
 
 ## 4. Features That Can Move from App to Gateway
 
-Mapping the current descope-saas-starter middleware stack to Tyk capabilities:
+Mapping the current identity-stack middleware stack to Tyk capabilities:
 
 | Current Middleware | Can Move to Tyk? | How |
 |---|---|---|
@@ -721,7 +721,7 @@ This would let FastAPI read flat headers instead of decoding the JWT again, but 
 
 ### Getting Started Path
 
-1. Add `tyk/` directory to descope-saas-starter with `tyk.conf`, `apps/`, `policies/`
+1. Add `tyk/` directory to identity-stack with `tyk.conf`, `apps/`, `policies/`
 2. Add Tyk Gateway + Redis to Docker Compose
 3. Create API definition for the backend with JWT validation pointing at Descope's JWKS
 4. Update React frontend to call Tyk's port instead of FastAPI directly

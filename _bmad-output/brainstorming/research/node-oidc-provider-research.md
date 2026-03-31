@@ -31,7 +31,7 @@ panva (Filip Skokan) is the sole maintainer with 2,627 of ~2,700 total contribut
 
 ---
 
-## Use Case 1: Integration Target for py-identity-model and descope-saas-starter
+## Use Case 1: Integration Target for py-identity-model and identity-stack
 
 ### 1. OIDC Feature Support
 

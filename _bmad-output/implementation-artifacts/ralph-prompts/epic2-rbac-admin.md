@@ -14,11 +14,11 @@ Stories are executed sequentially. PRs are **chained** — each branches from th
 ## Step 1: Determine Context
 
 1. Read `~/repos/auth/CLAUDE.md` for repo commands and git conventions
-2. The target repo is `descope-saas-starter` at `~/repos/auth/descope-saas-starter`
+2. The target repo is `identity-stack` at `~/repos/auth/identity-stack`
 
 ## Step 2: Determine What To Do
 
-Read `~/repos/auth/descope-saas-starter/.claude/task-state.md`.
+Read `~/repos/auth/identity-stack/.claude/task-state.md`.
 
 - **Does not exist** → Pick up next story (Step 3)
 - **phase is `complete`** → Update queue status in THIS prompt file (replace `pending` with `done` for that row), clean up worktree, delete task-state.md, pick up next story (Step 3)
@@ -30,9 +30,9 @@ Find the first `pending` row in the Task Queue above whose dependencies are met 
 
 - If none eligible (all done) → output: <promise>LOOP_COMPLETE</promise>
 - Otherwise:
-  1. Read the GH issue: `gh issue view <number> --repo jamescrowley321/descope-saas-starter`
+  1. Read the GH issue: `gh issue view <number> --repo jamescrowley321/identity-stack`
   2. Read the epic stories for acceptance criteria: `~/repos/auth/auth-planning/_bmad-output/planning-artifacts/epics.md` — find the `### Story 2.X` section
-  3. Create `~/repos/auth/descope-saas-starter/.claude/task-state.md`:
+  3. Create `~/repos/auth/identity-stack/.claude/task-state.md`:
      ```
      story: 2.X
      issue: <number>
@@ -61,7 +61,7 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 **Create an isolated git worktree for this story.**
 
-1. `cd ~/repos/auth/descope-saas-starter`
+1. `cd ~/repos/auth/identity-stack`
 2. Fetch latest:
    ```
    git fetch origin
@@ -85,7 +85,7 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 `cd <worktree>`
 
-1. Read the GH issue: `gh issue view <number> --repo jamescrowley321/descope-saas-starter`
+1. Read the GH issue: `gh issue view <number> --repo jamescrowley321/identity-stack`
 2. Read acceptance criteria from `~/repos/auth/auth-planning/_bmad-output/planning-artifacts/epics.md`
 3. Read existing code that will be modified or extended:
    - `backend/app/services/descope.py` — DescopeManagementClient
@@ -237,7 +237,7 @@ setup → analyze → implement → test → review-blind → review-edge → re
 `cd <worktree>`
 
 1. Read the story's acceptance criteria from `~/repos/auth/auth-planning/_bmad-output/planning-artifacts/epics.md`
-2. Read the GH issue: `gh issue view <issue> --repo jamescrowley321/descope-saas-starter`
+2. Read the GH issue: `gh issue view <issue> --repo jamescrowley321/identity-stack`
 3. Generate the diff:
    ```
    git diff origin/<base_branch>...HEAD
@@ -397,7 +397,7 @@ Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integratio
    🤖 Generated with [Claude Code](https://claude.com/claude-code)
    PREOF
    )" \
-     --repo jamescrowley321/descope-saas-starter
+     --repo jamescrowley321/identity-stack
    ```
 
 3. Record PR number and URL in task-state.md under `## PR`
@@ -410,14 +410,14 @@ Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integratio
 `cd <worktree>`
 
 1. **Wait for CI:**
-   - `gh pr checks <pr_number> --repo jamescrowley321/descope-saas-starter --watch --fail-fast`
+   - `gh pr checks <pr_number> --repo jamescrowley321/identity-stack --watch --fail-fast`
    - If timeout, poll up to 3 times with 30s sleep
 
 2. **Evaluate:**
    - **All pass** → **set phase to `complete`. End your response.**
    - **Fail** → read failure details:
-     - `gh run list --branch <branch> --repo jamescrowley321/descope-saas-starter --limit 1`
-     - `gh run view <run_id> --repo jamescrowley321/descope-saas-starter --log-failed`
+     - `gh run list --branch <branch> --repo jamescrowley321/identity-stack --limit 1`
+     - `gh run view <run_id> --repo jamescrowley321/identity-stack --log-failed`
    - Write details to `## CI` in task-state.md
    - **Set phase to `ci-fix`. End your response.**
 
@@ -449,10 +449,10 @@ Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integratio
 1. Update task queue in THIS prompt file: replace `pending` with `done` for this story's row
 2. Clean up worktree:
    ```
-   cd ~/repos/auth/descope-saas-starter
+   cd ~/repos/auth/identity-stack
    git worktree remove /tmp/sss-epic2-story-2.X --force
    ```
-3. Delete `~/repos/auth/descope-saas-starter/.claude/task-state.md`
+3. Delete `~/repos/auth/identity-stack/.claude/task-state.md`
 4. Output: <promise>TASK COMPLETE</promise>
 
 ---

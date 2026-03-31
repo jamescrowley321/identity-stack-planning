@@ -21,11 +21,11 @@ This repo lives at `~/repos/auth/auth-planning/` alongside three sibling reposit
 | **auth-planning** (this repo) | BMAD planning artifacts and project knowledge |
 | **py-identity-model** | Production OIDC/OAuth2.0 Python library — JWT decoding, token validation, discovery. Dual sync/async API |
 | **terraform-provider-descope** | Terraform provider for Descope (Go). Fork of `descope/terraform-provider-descope` |
-| **descope-saas-starter** | SaaS starter kit — FastAPI backend + Vite/React frontend + Terraform infra |
+| **identity-stack** | SaaS starter kit — FastAPI backend + Vite/React frontend + Terraform infra |
 
 ### Cross-Repo Dependencies
 
-- `descope-saas-starter/backend` depends on `py-identity-model` (>= 2.1.0) for token validation
+- `identity-stack/backend` depends on `py-identity-model` (>= 2.1.0) for token validation
 - `terraform-provider-descope` manages Descope project infrastructure the SaaS starter connects to
 - `py-identity-model/examples/descope/` contains Descope-specific integration examples
 
@@ -56,7 +56,7 @@ Each agent is a full persona with activation protocol, interactive menu, and Cla
 [Ralph Orchestrator](https://github.com/mikeyobrien/ralph-orchestrator) provides autonomous AI agent orchestration with a hat-based pub/sub architecture. Each application repo has a `ralph.yml` (configuring the Claude backend, iteration limits, and completion promise) and a `PROMPT.md` that drives the loop.
 
 **Current setup:**
-- `ralph.yml` in `py-identity-model` and `descope-saas-starter` (Claude backend, 15 min timeout per iteration)
+- `ralph.yml` in `py-identity-model` and `identity-stack` (Claude backend, 15 min timeout per iteration)
 - Task queue in this repo at `_bmad-output/implementation-artifacts/task-queue.md` with cross-repo dependencies and priority
 - Ralph loop prompts in `_bmad-output/implementation-artifacts/ralph-prompts/` for different execution modes (new tasks, review fixes, epic-specific work)
 - Each iteration completes one phase of one task, persisting state to `.claude/task-state.md` in the target repo
@@ -98,7 +98,7 @@ Bridging BMAD agents with Ralph hats to create security-focused development pipe
 |----------|-------------|
 | `task-queue.md` | Cross-repo task tracker with dependencies and priority |
 | `sprint-plan.md` | Prioritized sprint plan |
-| `review-findings-saas-starter.md` | Adversarial code review findings |
+| `review-findings-identity-stack.md` | Adversarial code review findings |
 | `ralph-runner-guide.md` | Guide for running ralph loops |
 | `ralph-prompts/` | Loop prompt files for different execution modes |
 

@@ -38,7 +38,7 @@ Statuses: pending | in_progress | done | blocked
 | T99 | 101 | done | Fix PR #87 review findings — FGA resources (Delete docs lie, schema drift, nil pointer) | feat/fga-resources | medium |
 | T100 | 102 | done | Fix PR #94 review findings — List resource (silent data drop, missing Update/Import tests) | feat/list-resource | small |
 
-## descope-saas-starter
+## identity-stack
 
 | ID | Issue | Status | Description | Branch | Iterations | Depends On |
 |----|-------|--------|-------------|--------|------------|------------|

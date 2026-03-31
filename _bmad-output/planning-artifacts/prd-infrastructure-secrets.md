@@ -16,7 +16,7 @@ classification:
   domain: 'infrastructure-devops'
   complexity: 'moderate'
   projectContext: 'brownfield'
-  repoTagging: '[IS] identity-stack (née descope-saas-starter), [TFP] terraform-provider-descope'
+  repoTagging: '[IS] identity-stack (née identity-stack), [TFP] terraform-provider-descope'
   qualityTiers:
     is: 'demo-poc-quality'
     tfp: 'functional'
@@ -50,7 +50,7 @@ The bootstrap problem reduces to exactly 2 secrets: the Infisical Machine Identi
 - **Domain:** Infrastructure & DevOps
 - **Complexity:** Moderate — well-documented migration paths, free-tier services, no custom development
 - **Project Context:** Brownfield — HCP Terraform cloud block already exists in `infra/main.tf`; `.env` files in active use
-- **Repo Tagging:** `[IS]` identity-stack (née descope-saas-starter), `[TFP]` terraform-provider-descope
+- **Repo Tagging:** `[IS]` identity-stack (née identity-stack), `[TFP]` terraform-provider-descope
 - **Quality Tier:** Demo/POC — infrastructure supporting a portfolio project, not production SaaS
 - **Target Audience:** James (solo developer), consulting clients evaluating the reference architecture
 
@@ -105,8 +105,8 @@ The bootstrap problem reduces to exactly 2 secrets: the Infisical Machine Identi
 ### Epic 1 — HCP Terraform Remote State Migration
 
 - FR-1: Authenticate the Terraform CLI with HCP Terraform via `terraform login`, storing the API token in `~/.terraform.d/credentials.tfrc.json`
-- FR-2: Configure the HCP Terraform workspace `descope-saas-starter-dev` with execution mode set to **local** — runs execute on the developer's machine, state is stored remotely (note: the `cloud` block already exists in `infra/main.tf`)
-- FR-3: Configure a variable set named "Descope Credentials" containing `DESCOPE_MANAGEMENT_KEY` as a sensitive environment variable, applied to the `descope-saas-starter-dev` workspace
+- FR-2: Configure the HCP Terraform workspace `identity-stack-dev` with execution mode set to **local** — runs execute on the developer's machine, state is stored remotely (note: the `cloud` block already exists in `infra/main.tf`)
+- FR-3: Configure a variable set named "Descope Credentials" containing `DESCOPE_MANAGEMENT_KEY` as a sensitive environment variable, applied to the `identity-stack-dev` workspace
 - FR-4: Migrate existing local state to HCP Terraform via `terraform init -migrate-state`, confirming the state copy prompt
 - FR-5: Verify migration by running `terraform state list` (resources match pre-migration) and `terraform plan` (no drift detected — output: "No changes")
 - FR-6: Back up the local `terraform.tfstate` file before migration, then remove local state files (`terraform.tfstate`, `terraform.tfstate.backup`) after successful verification
@@ -114,7 +114,7 @@ The bootstrap problem reduces to exactly 2 secrets: the Infisical Machine Identi
 
 ### Epic 2 — Infisical Secrets Management Setup
 
-- FR-8: Create an Infisical Cloud account and project for the identity-stack (née descope-saas-starter) application
+- FR-8: Create an Infisical Cloud account and project for the identity-stack (née identity-stack) application
 - FR-9: Create three environments in the Infisical project: `dev`, `staging`, `prod`
 - FR-10: Create folder structure within each environment: `/backend`, `/frontend`, `/infra` — secrets scoped by consuming service
 - FR-11: Import existing secrets from `.env` files into the appropriate Infisical folders and environments:

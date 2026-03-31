@@ -9,7 +9,7 @@ inputDocuments:
 
 ## Overview
 
-This document provides the complete epic and story breakdown for auth-planning, decomposing the requirements from the PRD and Architecture into implementable stories across the three-repo vertically integrated identity platform (py-identity-model, descope-saas-starter, terraform-provider-descope).
+This document provides the complete epic and story breakdown for auth-planning, decomposing the requirements from the PRD and Architecture into implementable stories across the three-repo vertically integrated identity platform (py-identity-model, identity-stack, terraform-provider-descope).
 
 ## Requirements Inventory
 
@@ -59,7 +59,7 @@ This document provides the complete epic and story breakdown for auth-planning, 
 - FR-PIM-21: Discovery Cache TTL (issue #219)
 - FR-PIM-22: AS Issuer Identification
 
-**[SSS] descope-saas-starter**
+**[SSS] identity-stack**
 
 *Wave 1 — RBAC CRUD*
 
@@ -168,7 +168,7 @@ This document provides the complete epic and story breakdown for auth-planning, 
 - **ADR-2 (Iterative abstraction):** Build everything Descope-specific first; do not design `IdentityProvider` interface up front. Extract from working code after all waves complete.
 - **ADR-4 (Wave independence):** Each SaaS starter feature wave independently implementable with no cross-wave dependencies
 - **ADR-5 (Conformance harness as quality gate):** First-class architectural component — validates malformed response rejection, not just happy path
-- **ADR-6 (Quality tiers):** py-identity-model=production-grade, descope-saas-starter=demo/POC (ReBAC exception: production-quality testing), terraform-provider-descope=functional
+- **ADR-6 (Quality tiers):** py-identity-model=production-grade, identity-stack=demo/POC (ReBAC exception: production-quality testing), terraform-provider-descope=functional
 - **Enterprise license blocker (E074106):** Blocks `descope_sso_application` TF resource, cascading to SSO config (T18), step-up auth (T21), MFA enforcement (T22), OIDC/SAML app registration (T25)
 - **Cross-repo interface contracts:** `validate_token()`, `get_discovery_document()`, `to_principal()` must remain backwards-compatible across py-identity-model versions
 - **`DescopeManagementClient` is the single abstraction seam:** All Descope Management API calls route through this class — new wave features must extend it, not bypass it
@@ -293,7 +293,7 @@ Developers can validate py-identity-model against AWS Cognito, Microsoft Entra I
 **FRs covered:** FR-PIM-23, FR-PIM-24, FR-PIM-25, FR-PIM-26, FR-PIM-27
 
 ### Deliverable: GitHub Issues
-After all stories are finalized, create GitHub issues for each story in the appropriate repository (py-identity-model, descope-saas-starter, terraform-provider-descope).
+After all stories are finalized, create GitHub issues for each story in the appropriate repository (py-identity-model, identity-stack, terraform-provider-descope).
 
 ---
 
@@ -1119,7 +1119,7 @@ So that I can see FGA/ReBAC working end-to-end.
 **Acceptance Criteria:**
 
 **Given** Terraform FGA resources exist in `terraform-provider-descope` (feat/fga-resources branch)
-**When** `infra/fga.tf` is created in descope-saas-starter
+**When** `infra/fga.tf` is created in identity-stack
 **Then** it defines a `descope_fga_schema` resource with the document authorization schema:
 ```
 type user

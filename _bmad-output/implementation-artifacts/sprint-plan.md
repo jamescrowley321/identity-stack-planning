@@ -8,37 +8,44 @@ This sprint plan prioritizes work across three repos. The **terraform-provider-d
 
 **py-identity-model requirement:** Every feature task MUST include integration tests (in `src/tests/integration/`) and usage examples (in `examples/`). Unit tests alone are not sufficient.
 
+**identity-stack requirement:** Every feature task MUST include Playwright E2E tests (in `backend/tests/e2e/`) covering the feature's happy path and auth enforcement. Existing E2E tests MUST pass as regression. Unit tests alone are not sufficient. See PR #94 for test patterns (3-tier auth: unauthenticated, OIDC client credentials, admin session token).
+
 ---
 
-## Current Status (as of 2026-03-29)
+## Current Status (as of 2026-03-31)
+
+**Project renamed:** `descope-saas-starter` → `identity-stack` (GitHub repo, local directory, all references updated).
+
+**Issue cleanup (2026-03-31):** Closed 34 stale/completed/superseded issues. Only PRD 5 stories (#138-#156) remain open. All old phase-based issues, multi-provider brainstorming issues (#74-#81), and completed Epic 2/3 issues (#112-#118) closed.
 
 ### terraform-provider-descope
-- **Done:** T1-T5, T9-T13, T29-T30 (all resources except blocked/wontfix, CI tasks), T80 (list resource), T81 (model docs)
+- **Done:** T1-T5, T9-T13, T29-T31 (all resources except blocked/wontfix, CI tasks, registry published), T80 (list resource), T81 (model docs)
 - **Wontfix:** T7 (JWT — dual-ownership risk with project resource), T8 (Flow — visual artifacts, SDK format bugs)
-- **Blocked:** T6 (SSO app — enterprise license), T31 (registry — manual setup needed)
+- **Blocked:** T6 (SSO app — enterprise license)
 - **Review fixes:** T85-T89, T99-T100 — ALL done
+- **Releases:** v1.1.0-v1.1.4 published to Terraform Registry
 
-### descope-saas-starter
-- **Done:** T14-T17, T19, T26 (core phases), T64-T69 (all hardening), T72-T75 (FGA/ReBAC, RBAC hierarchy, social login, passkeys), T80-T83 (shadcn/ui migration complete)
-- **Blocked:** T18, T20-T25 (cascading blocks from TF provider), T70 (superseded by T84)
-- **Pending:** T27-T28 (TF config, docs), T71 (CI/CD), T76-T79 (magic links, step-up, audit trail, JWT demo), T84 (Playwright E2E)
-- **Review fixes:** T90-T98, T117-T119 — ALL done
+### identity-stack (formerly descope-saas-starter)
+- **All prior work complete:** Phase 1 features, Epic 2 (RBAC Admin), Epic 3 (FGA/ReBAC), ad-hoc fixes, review fixes — all merged to main.
+- **Next: Canonical Identity Domain Model (PRD 5)** — Postgres-backed identity layer beneath existing API. IdentityService seam (D21) filled with real implementations. DescopeManagementClient becomes sync adapter. 4 epics, 19 stories (issues #138-#156). Ralph prompt at `ralph-prompts/canonical-identity.md`.
+- **Closed (superseded by PRD 5):** All old phase-based issues (#7-#17, #35, #42-#45), multi-provider issues (#74-#81), completed feature issues (#38-#41, #47, #112-#118).
 
 ### py-identity-model
 - **Done:** T32-T47 (ALL feature tasks complete — Sprint A through Sprint F benchmarks)
-- **In progress:** T110 (PR #230 review fix — PAR client_id double-sent, missing required field validation)
-- **Pending:** T111-T116 (remaining review fixes), T48-T63 (docs, examples, advanced protocol features)
-- **Review fixes:** T101-T109 done, T110 in_progress, T111-T116 pending
+- **Done:** T101-T116 (ALL review fixes complete — all 16 feature PRs #211-#237 merged to main 2026-03-30)
+- **In progress:** T121 (core flow integration tests — PR #281 open, CI failing), T122 (token mgmt integration tests — review done, PR phase)
+- **Done (integration chain):** T120 (node-oidc-provider fixture — PR #274 merged)
+- **Pending:** T123-T128 (remaining integration tests, docs, cleanup), T48-T63 (docs, examples, advanced protocol features)
 
 ---
 
 ## Review Fix Chains (Active Work)
 
-All three repos have completed code review on feature PRs. Ralph fix loops are processing review findings.
+All three repos have completed code review on feature PRs. All review fix chains are complete.
 
-### py-identity-model Review Fixes
+### py-identity-model Review Fixes (COMPLETE — all PRs merged 2026-03-30)
 
-Sequential chain — each fix task depends on the previous (PRs stack on each other).
+Sequential chain — each fix task depends on the previous (PRs stack on each other). All 16 PRs merged.
 
 | Task | Status | PR | Description |
 |------|--------|----|-------------|
@@ -51,15 +58,15 @@ Sequential chain — each fix task depends on the previous (PRs stack on each ot
 | T107 | done | #227 | Revocation — missing __all__, dead try/except, no async tests |
 | T108 | done | #228 | Refresh — no async tests, weak test assertions |
 | T109 | done | #229 | DPoP — htu query/fragment violation RFC 9449, no sig verify tests |
-| T110 | in_progress | #230 | PAR — client_id double-sent, missing required field validation |
-| T111 | pending | #232 | JAR — extra_claims override, missing kid header |
-| T112 | pending | #233 | Device Auth — no async tests, missing required field validation |
-| T113 | pending | #234 | Token Exchange — client_id double-sent, actor_token_type validation |
-| T114 | pending | #235 | FAPI 2.0 — crash on failed discovery, empty code_challenge bypass |
-| T115 | pending | #236 | Policy Config — unenforced policy flags, no URL scheme pre-flight |
-| T116 | pending | #237 | Perf Benchmarks — expiring fixture, wrong benchmark layer, no assertions |
+| T110 | done | #230 | PAR — client_id double-sent, missing required field validation |
+| T111 | done | #232 | JAR — extra_claims override, missing kid header |
+| T112 | done | #233 | Device Auth — no async tests, missing required field validation |
+| T113 | done | #234 | Token Exchange — client_id double-sent, actor_token_type validation |
+| T114 | done | #235 | FAPI 2.0 — crash on failed discovery, empty code_challenge bypass |
+| T115 | done | #236 | Policy Config — unenforced policy flags, no URL scheme pre-flight |
+| T116 | done | #237 | Perf Benchmarks — expiring fixture, wrong benchmark layer, no assertions |
 
-### descope-saas-starter Review Fixes (COMPLETE)
+### identity-stack Review Fixes (COMPLETE)
 
 #### Phased PRs (re-reviewed 2026-03-27)
 
@@ -133,21 +140,13 @@ Sequential chain — each fix task depends on the previous (PRs stack on each ot
 
 | Task | Status | Issue | Description | Complexity | Depends On |
 |------|--------|-------|-------------|------------|------------|
-| T14 | done | [#3](https://github.com/jamescrowley321/descope-saas-starter/issues/3) | Phase 1c: Session Management | Medium | — |
-| T15 | done | [#4](https://github.com/jamescrowley321/descope-saas-starter/issues/4) | Phase 2a: Tenant Management | Medium | T14 |
-| T16 | done | [#5](https://github.com/jamescrowley321/descope-saas-starter/issues/5) | Phase 2b: Roles & Permissions (RBAC) | Medium | T4, T15 |
-| T17 | done | [#6](https://github.com/jamescrowley321/descope-saas-starter/issues/6) | Phase 2c: Custom Attributes | Medium | T15, T16 |
-| T18 | blocked | [#7](https://github.com/jamescrowley321/descope-saas-starter/issues/7) | Phase 3a: SSO Configuration | Large | T5, T6, T16 |
-| T19 | done | [#10](https://github.com/jamescrowley321/descope-saas-starter/issues/10) | Phase 4a: Access Key Management | Medium | T16 |
-| T20 | blocked | [#11](https://github.com/jamescrowley321/descope-saas-starter/issues/11) | Phase 4b: JWT Templates & Custom Claims | Medium | T7, T17, T19 |
-| T21 | blocked | [#8](https://github.com/jamescrowley321/descope-saas-starter/issues/8) | Phase 3b: Step-Up Authentication | Medium | T18 |
-| T22 | blocked | [#9](https://github.com/jamescrowley321/descope-saas-starter/issues/9) | Phase 3c: MFA Enforcement | Medium | T18 |
-| T23 | blocked | [#12](https://github.com/jamescrowley321/descope-saas-starter/issues/12) | Phase 5a: Custom Flows | Large | T8 |
-| T24 | blocked | [#13](https://github.com/jamescrowley321/descope-saas-starter/issues/13) | Phase 5b: Connector Integrations | Large | T23 |
-| T25 | blocked | [#15](https://github.com/jamescrowley321/descope-saas-starter/issues/15) | Phase 5d: OIDC/SAML Application Registration | Large | T6 |
-| T26 | done | [#14](https://github.com/jamescrowley321/descope-saas-starter/issues/14) | Phase 5c: Admin Portal & User Management | Large | T16 |
-| T27 | pending | [#16](https://github.com/jamescrowley321/descope-saas-starter/issues/16) | Phase 6: Full Terraform Configuration | Large | All TF resources |
-| T28 | pending | [#17](https://github.com/jamescrowley321/descope-saas-starter/issues/17) | Phase 7: Documentation & Developer Experience | Medium | T27 |
+| T14 | done | [#3](https://github.com/jamescrowley321/identity-stack/issues/3) | Phase 1c: Session Management | Medium | — |
+| T15 | done | [#4](https://github.com/jamescrowley321/identity-stack/issues/4) | Phase 2a: Tenant Management | Medium | T14 |
+| T16 | done | [#5](https://github.com/jamescrowley321/identity-stack/issues/5) | Phase 2b: Roles & Permissions (RBAC) | Medium | T4, T15 |
+| T17 | done | [#6](https://github.com/jamescrowley321/identity-stack/issues/6) | Phase 2c: Custom Attributes | Medium | T15, T16 |
+| T18-T25 | closed | — | Phases 3-5 (SSO, MFA, JWT, Flows, Connectors, OIDC/SAML) | — | Issues closed 2026-03-31 (superseded by PRD 5) |
+| T26 | done | [#14](https://github.com/jamescrowley321/identity-stack/issues/14) | Phase 5c: Admin Portal & User Management | Large | T16 |
+| T27-T28 | closed | — | TF Config + Docs | — | Issues closed 2026-03-31 (superseded by PRD 5) |
 
 ### Tier 4: Terraform CI/Infrastructure
 
@@ -155,7 +154,7 @@ Sequential chain — each fix task depends on the previous (PRs stack on each ot
 |------|--------|-------|-------------|------------|------------|
 | T29 | done | [#26](https://github.com/jamescrowley321/terraform-provider-descope/issues/26) | Resolve pre-existing SonarCloud findings | Medium | After Tier 1 |
 | T30 | done | [#24](https://github.com/jamescrowley321/terraform-provider-descope/issues/24) | Add Snyk CLI workflow job | Small | — |
-| T31 | blocked | [#22](https://github.com/jamescrowley321/terraform-provider-descope/issues/22) | Publish fork to Terraform Registry — **requires manual registry signup, GPG key, secrets** | Medium | After several resources shipped |
+| T31 | done | [#22](https://github.com/jamescrowley321/terraform-provider-descope/issues/22) | Publish fork to Terraform Registry — issue #22 closed, v1.1.0-v1.1.4 released | Medium | After several resources shipped |
 
 ### Tier 5: py-identity-model (Sprint-Based) — ALL FEATURE TASKS COMPLETE
 
@@ -226,44 +225,72 @@ Cross-cutting work best done after core features stabilize.
 | T51 | [#37](https://github.com/jamescrowley321/py-identity-model/issues/37) | Cognito Example | Small | pending | T36 |
 | T54 | [#33](https://github.com/jamescrowley321/py-identity-model/issues/33) | Flask Middleware Example | Small | pending | T36 |
 
-### Tier 6: SaaS Starter — UI Framework & E2E Testing (UI MIGRATION COMPLETE)
+### Tier 6: Identity Stack — UI Framework & E2E Testing (COMPLETE)
 
 #### Phase 0: shadcn/ui + Tailwind Migration (COMPLETE)
 
 | Task | Repo | Issue | Description | Complexity | Status | Depends On |
 |------|------|-------|-------------|------------|--------|------------|
-| T80 | descope-saas-starter | [#51](https://github.com/jamescrowley321/descope-saas-starter/issues/51) | Tailwind CSS v4 + shadcn/ui foundation | Medium | done | — |
-| T81 | descope-saas-starter | [#52](https://github.com/jamescrowley321/descope-saas-starter/issues/52) | App shell — sidebar, header, navigation, dark mode | Medium | done | T80 |
-| T82 | descope-saas-starter | [#53](https://github.com/jamescrowley321/descope-saas-starter/issues/53) | Migrate Dashboard page (establishes pattern) | Medium | done | T81 |
-| T83 | descope-saas-starter | [#54](https://github.com/jamescrowley321/descope-saas-starter/issues/54) | Migrate remaining pages (Members, Roles, Keys, Profile, Settings, Login) | Large | done | T82 |
-| T84 | descope-saas-starter | [#55](https://github.com/jamescrowley321/descope-saas-starter/issues/55) | Playwright E2E tests (Python) for UI and API | Large | pending | T81 |
+| T80 | identity-stack | [#51](https://github.com/jamescrowley321/identity-stack/issues/51) | Tailwind CSS v4 + shadcn/ui foundation | Medium | done | — |
+| T81 | identity-stack | [#52](https://github.com/jamescrowley321/identity-stack/issues/52) | App shell — sidebar, header, navigation, dark mode | Medium | done | T80 |
+| T82 | identity-stack | [#53](https://github.com/jamescrowley321/identity-stack/issues/53) | Migrate Dashboard page (establishes pattern) | Medium | done | T81 |
+| T83 | identity-stack | [#54](https://github.com/jamescrowley321/identity-stack/issues/54) | Migrate remaining pages (Members, Roles, Keys, Profile, Settings, Login) | Large | done | T82 |
+| T84 | identity-stack | [#55](https://github.com/jamescrowley321/identity-stack/issues/55) | Playwright E2E tests (Python) for UI and API — PR #94 merged, PR #122 fixed session bugs | Large | done | T81 |
 
-### Tier 7: SaaS Starter — Descope Feature Showcase (PARTIAL)
+### Tier 7: Identity Stack — Descope Feature Showcase (COMPLETE)
 
-New phases demonstrating advanced Descope capabilities. Organized by theme.
+All feature showcase work complete. Issues #38-#45 closed 2026-03-31 (completed or superseded by PRD 5).
 
-#### Phase 8: Authorization Deep Dive (RBAC + ReBAC) — COMPLETE
+| Task | Description | Status |
+|------|-------------|--------|
+| T72 | Document-Level Authorization with FGA (ReBAC) | done |
+| T73 | RBAC Enhancement — Hierarchical Roles and Permission Inheritance | done |
+| T74 | Social Login Integration (Google, GitHub) | done |
+| T75 | Passkey / WebAuthn Authentication | done |
+| T76-T79 | Magic Links, Step-Up, Audit Trail, JWT Templates | closed (superseded by PRD 5) |
 
-| Task | Repo | Issue | Description | Complexity | Status | Depends On |
-|------|------|-------|-------------|------------|--------|------------|
-| T72 | descope-saas-starter | [#38](https://github.com/jamescrowley321/descope-saas-starter/issues/38) | Document-Level Authorization with FGA (ReBAC) | Large | done | T12 (TF FGA resources), T16 (RBAC) |
-| T73 | descope-saas-starter | [#39](https://github.com/jamescrowley321/descope-saas-starter/issues/39) | RBAC Enhancement — Hierarchical Roles and Permission Inheritance | Medium | done | T16 (RBAC) |
+### Tier 8: Identity Stack — Canonical Identity Domain Model (PRD 5)
 
-#### Phase 9: Authentication Methods (PARTIAL)
+Run via `ralph-prompts/canonical-identity.md`. 4 epics, 19 stories, chained PRs with inline review cycle.
 
-| Task | Repo | Issue | Description | Complexity | Status | Depends On |
-|------|------|-------|-------------|------------|--------|------------|
-| T74 | descope-saas-starter | [#40](https://github.com/jamescrowley321/descope-saas-starter/issues/40) | Social Login Integration (Google, GitHub) | Medium | done | — |
-| T75 | descope-saas-starter | [#41](https://github.com/jamescrowley321/descope-saas-starter/issues/41) | Passkey / WebAuthn Authentication | Medium | done | — |
-| T76 | descope-saas-starter | [#42](https://github.com/jamescrowley321/descope-saas-starter/issues/42) | Magic Link Authentication for User Invitations | Medium | pending | — |
+#### Epic 1: Canonical Identity Foundation (6 stories)
 
-#### Phase 10: Advanced Features
+| Story | Issue | Description | Status | Depends On |
+|-------|-------|-------------|--------|------------|
+| 1.1 | [#138](https://github.com/jamescrowley321/identity-stack/issues/138) | Docker Compose + Postgres Async Engine | pending | — |
+| 1.2 | [#139](https://github.com/jamescrowley321/identity-stack/issues/139) | Alembic Setup + Canonical Schema Migration | pending | 1.1 |
+| 1.3 | [#140](https://github.com/jamescrowley321/identity-stack/issues/140) | Error Model, Result Types + RFC 9457 | pending | 1.2 |
+| 1.4 | [#141](https://github.com/jamescrowley321/identity-stack/issues/141) | OTel Instrumentation + Aspire Dashboard | pending | 1.3 |
+| 1.5 | [#142](https://github.com/jamescrowley321/identity-stack/issues/142) | Service Interfaces + Test Infrastructure | pending | 1.4 |
+| 1.6 | [#143](https://github.com/jamescrowley321/identity-stack/issues/143) | Seed Migration from Descope | pending | 1.5 |
 
-| Task | Repo | Issue | Description | Complexity | Status | Depends On |
-|------|------|-------|-------------|------------|--------|------------|
-| T77 | descope-saas-starter | [#43](https://github.com/jamescrowley321/descope-saas-starter/issues/43) | Step-Up Authentication for Sensitive Operations | Medium | pending | T34 (py-identity-model #93 enhanced validation) |
-| T78 | descope-saas-starter | [#44](https://github.com/jamescrowley321/descope-saas-starter/issues/44) | Descope Audit Trail Integration | Medium | pending | T67 (structured logging) |
-| T79 | descope-saas-starter | [#45](https://github.com/jamescrowley321/descope-saas-starter/issues/45) | JWT Template Customization Demo | Medium | pending | — |
+#### Epic 2: Identity & Access Administration (5 stories)
+
+| Story | Issue | Description | Status | Depends On |
+|-------|-------|-------------|--------|------------|
+| 2.1 | [#144](https://github.com/jamescrowley321/identity-stack/issues/144) | User Service + Descope Sync Adapter | pending | 1.6 |
+| 2.2 | [#145](https://github.com/jamescrowley321/identity-stack/issues/145) | Role, Permission + Tenant Service | pending | 2.1 |
+| 2.3 | [#146](https://github.com/jamescrowley321/identity-stack/issues/146) | Router Rewire — Identity Routers | pending | 2.2 |
+| 2.4 | [#147](https://github.com/jamescrowley321/identity-stack/issues/147) | Unit + Integration Tests | pending | 2.3 |
+| 2.5 | [#148](https://github.com/jamescrowley321/identity-stack/issues/148) | E2E Tests + Regression | pending | 2.4 |
+
+#### Epic 3: Inbound Sync & Reconciliation (4 stories)
+
+| Story | Issue | Description | Status | Depends On |
+|-------|-------|-------------|--------|------------|
+| 3.1 | [#149](https://github.com/jamescrowley321/identity-stack/issues/149) | Flow HTTP Connector + Webhook Handler | pending | 2.5 |
+| 3.2 | [#150](https://github.com/jamescrowley321/identity-stack/issues/150) | Periodic Reconciliation Job | pending | 3.1 |
+| 3.3 | [#151](https://github.com/jamescrowley321/identity-stack/issues/151) | Redis Pub/Sub + Cache Invalidation | pending | 3.2 |
+| 3.4 | [#152](https://github.com/jamescrowley321/identity-stack/issues/152) | Inbound Sync Tests | pending | 3.3 |
+
+#### Epic 4: Multi-IdP Identity Linking (4 stories)
+
+| Story | Issue | Description | Status | Depends On |
+|-------|-------|-------------|--------|------------|
+| 4.1 | [#153](https://github.com/jamescrowley321/identity-stack/issues/153) | IdP Link + Provider Config Service | pending | 3.4 |
+| 4.2 | [#154](https://github.com/jamescrowley321/identity-stack/issues/154) | Link Management + Provider Config Routers | pending | 4.1 |
+| 4.3 | [#155](https://github.com/jamescrowley321/identity-stack/issues/155) | Internal Identity Resolution API + Redis Cache | pending | 4.2 |
+| 4.4 | [#156](https://github.com/jamescrowley321/identity-stack/issues/156) | Multi-IdP Tests | pending | 4.3 |
 
 ### Tier 9: SaaS Starter Hardening (COMPLETE)
 
@@ -271,19 +298,19 @@ New phases demonstrating advanced Descope capabilities. Organized by theme.
 
 | Task | Repo | Issue | Description | Complexity | Status |
 |------|------|-------|-------------|------------|--------|
-| T64 | descope-saas-starter | [#28](https://github.com/jamescrowley321/descope-saas-starter/issues/28) | Security headers middleware | Small | done |
-| T65 | descope-saas-starter | [#29](https://github.com/jamescrowley321/descope-saas-starter/issues/29) | Rate limiting middleware | Medium | done |
-| T67 | descope-saas-starter | [#30](https://github.com/jamescrowley321/descope-saas-starter/issues/30) | Structured logging with correlation IDs | Medium | done |
-| T66 | descope-saas-starter | [#31](https://github.com/jamescrowley321/descope-saas-starter/issues/31) | Auth audit logging | Medium | done |
+| T64 | identity-stack | [#28](https://github.com/jamescrowley321/identity-stack/issues/28) | Security headers middleware | Small | done |
+| T65 | identity-stack | [#29](https://github.com/jamescrowley321/identity-stack/issues/29) | Rate limiting middleware | Medium | done |
+| T67 | identity-stack | [#30](https://github.com/jamescrowley321/identity-stack/issues/30) | Structured logging with correlation IDs | Medium | done |
+| T66 | identity-stack | [#31](https://github.com/jamescrowley321/identity-stack/issues/31) | Auth audit logging | Medium | done |
 
 #### Sprint H: Reliability & Testing (PARTIAL)
 
 | Task | Repo | Issue | Description | Complexity | Status | Depends On |
 |------|------|-------|-------------|------------|--------|------------|
-| T68 | descope-saas-starter | [#32](https://github.com/jamescrowley321/descope-saas-starter/issues/32) | Enhanced health checks (Descope API, database) | Small | done | — |
-| T69 | descope-saas-starter | [#33](https://github.com/jamescrowley321/descope-saas-starter/issues/33) | Descope API retry logic with exponential backoff | Medium | done | — |
-| T70 | descope-saas-starter | [#34](https://github.com/jamescrowley321/descope-saas-starter/issues/34) | E2E testing framework (Playwright) — **superseded by T84** | Large | blocked | — |
-| T71 | descope-saas-starter | [#35](https://github.com/jamescrowley321/descope-saas-starter/issues/35) | CI/CD pipeline with automated deployment | Medium | pending | T70 |
+| T68 | identity-stack | [#32](https://github.com/jamescrowley321/identity-stack/issues/32) | Enhanced health checks (Descope API, database) | Small | done | — |
+| T69 | identity-stack | [#33](https://github.com/jamescrowley321/identity-stack/issues/33) | Descope API retry logic with exponential backoff | Medium | done | — |
+| T70 | identity-stack | [#34](https://github.com/jamescrowley321/identity-stack/issues/34) | E2E testing framework (Playwright) — **superseded by T84** | Large | blocked | — |
+| T71 | identity-stack | [#35](https://github.com/jamescrowley321/identity-stack/issues/35) | CI/CD pipeline with automated deployment | Medium | pending | T84 |
 
 ---
 
@@ -309,8 +336,8 @@ Tier 6 (SaaS Starter Hardening) — ALL DONE
 
   T68 (#32 Health Checks) [done] ──┐
   T69 (#33 Retry Logic) [done] ────┤── Sprint H (partial)
-  T70 (#34 E2E Testing) [blocked] ─┤
-  T71 (#35 CI/CD Pipeline) ────────┘──> depends on T70
+  T70 (#34 E2E Testing) [blocked — superseded by T84] ─┤
+  T71 (#35 CI/CD Pipeline) ────────┘──> depends on T84 [done]
 ```
 
 ### py-identity-model Internal Dependencies
@@ -345,8 +372,11 @@ Sprint F (Benchmarks) — PARTIAL
   T47 (#112 Performance Benchmarks) [done]
   T48-T54 (docs, examples) [pending]
 
-Review Fix Chain (ACTIVE)
-  T101-T109 [done] → T110 [in_progress] → T111-T116 [pending]
+Review Fix Chain (COMPLETE — all PRs merged 2026-03-30)
+  T101-T116 [done] — all 16 PRs #211-#237 merged
+
+Integration Test Chain (ACTIVE)
+  T120 [done] → T121 [in_progress] → T122 [in_progress] → T123-T125 [pending] → T126,T128 [pending] → T127 [pending]
 ```
 
 ### Cross-Repo: py-identity-model -> SaaS Starter
@@ -371,14 +401,16 @@ T55 (#219 Discovery Cache) [pending]> Production reliability
 
 | Track | Tasks | Notes |
 |-------|-------|-------|
-| **py-identity-model review fixes** | T110 (in progress) -> T111 -> T112 -> T113 -> T114 -> T115 -> T116 | 7 review fix tasks remaining (1 active, 6 pending) |
+| **saas-starter PRD 5 (Canonical Identity)** | Stories 1.1-1.6 (Epic 1 Foundation) → 2.1-2.5 (Epic 2 Service Layer) → 3.1-3.4 (Epic 3 Inbound Sync) → 4.1-4.4 (Epic 4 Multi-IdP) | 19 stories, issues #138-#156, ralph prompt ready at `canonical-identity.md` |
+| **py-identity-model integration tests** | T121 (CI-fix), T122 (PR phase) → T123-T125 → T126 → T128 → T127 | Node-oidc fixture merged. Core flows PR #281 has CI failures. Token mgmt reviewed, ready for PR. |
 
-### Next wave (after review fixes complete)
+### Next wave (after integration tests complete)
 
-1. **Merge all py-identity-model PRs** — 16 feature PRs ready once review fixes land
-2. **SaaS Starter remaining features**: T76 (magic links), T77 (step-up), T78 (audit trail), T79 (JWT demo)
-3. **SaaS Starter E2E**: T84 (Playwright Python) — stable selectors now available from completed UI migration
-4. **py-identity-model remaining protocol features**: T55 (discovery cache), T56 (logout), T57 (JWT client auth), T58 (issuer ID)
+1. **Merge Epic 3 PR chain** — PRs #121-#125 (Stories 3.1-3.4) + remaining stories
+2. **py-identity-model remaining protocol features**: T55 (discovery cache), T56 (logout), T57 (JWT client auth), T58 (issuer ID)
+3. **py-identity-model Sprint F**: T48 (API docs), T49-T54 (provider examples) — feature code on main
+4. **Toolchain expansion** — Multi-provider test infrastructure, multi-IdP gateway demo, etc.
+5. **SaaS Starter remaining features (deprioritized)**: T76-T79 — lower priority than bigger-picture items
 
 ### When TF blocks resolve
 
@@ -412,10 +444,12 @@ These represent the next major phase of workspace evolution, moving from single-
 
 2. **T7/T8 wontfix impact:** JWT templates (T20) and Custom Flows (T23/T24) in the SaaS starter depended on these TF resources. These SaaS starter tasks need to be either descoped or re-approached without TF provider support.
 
-3. **py-identity-model review fix chain:** Sequential dependency chain T110-T116 is the critical path. Each fix depends on the previous PR being complete. Estimated 3-5 days to complete at current velocity.
+3. **py-identity-model review fix chain:** COMPLETE. All 16 PRs (#211-#237) merged to main on 2026-03-30.
 
-4. **Provider examples timing:** All provider examples (#33-#39, tasks T49-T54) depend on Auth Code + PKCE (#90) which is now complete. Examples can start after review fixes land.
+4. **Integration test chain (T120-T128):** T120 merged (fixture on main). T121 has CI failures to investigate. T122 through review, ready for PR. T123-T128 pending — no blockers since all feature code is on main.
 
-5. **FAPI 2.0 completeness:** Core FAPI tasks (DPoP, PAR, JAR) are done, but mTLS (T62) and JWT client auth (T57) remain pending. Full FAPI 2.0 compliance will require these plus the review fixes for T45.
+5. **Provider examples timing:** All provider examples (#33-#39, tasks T49-T54) depend on Auth Code + PKCE (#90) which is on main. Examples can start now.
 
-6. **Toolchain expansion timing:** Four new PRDs are in planning. These should not start until the current review fix chains are complete and all feature PRs are merged.
+6. **FAPI 2.0 completeness:** Core FAPI tasks (DPoP, PAR, JAR) are done, but mTLS (T62) and JWT client auth (T57) remain pending. Full FAPI 2.0 compliance will require these.
+
+7. **Toolchain expansion timing:** Four new PRDs are in planning. These should not start until integration test chain is complete.
