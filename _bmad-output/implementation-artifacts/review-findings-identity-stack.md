@@ -1,4 +1,4 @@
-# Adversarial Code Review — descope-saas-starter (Re-run 2026-03-27)
+# Adversarial Code Review — identity-stack (Re-run 2026-03-27)
 
 Reviews run against correctly scoped diffs (base branch -> head branch), not full diff against main.
 

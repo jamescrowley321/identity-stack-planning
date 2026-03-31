@@ -23,19 +23,19 @@ Three repositories form a vertically integrated identity platform:
 |------|-------|----------|------|
 | py-identity-model | Protocol | Python | OIDC/OAuth2 library — JWT decoding, token validation, discovery. Dual sync/async. Production use. |
 | terraform-provider-descope | Infrastructure | Go | Terraform provider for Descope. Fork of descope/terraform-provider-descope. |
-| descope-saas-starter | Application | Python (FastAPI) + TypeScript (React/Vite) + HCL (Terraform) | B2B SaaS reference app — multi-tenant auth with RBAC, planned ReBAC/FGA/SSO. |
+| identity-stack | Application | Python (FastAPI) + TypeScript (React/Vite) + HCL (Terraform) | B2B SaaS reference app — multi-tenant auth with RBAC, planned ReBAC/FGA/SSO. |
 
 ### Dependency Graph
 
 ```
-descope-saas-starter/backend
+identity-stack/backend
   └── py-identity-model (>= 2.1.0) — token validation
   └── Descope Management API — user/tenant/role/FGA operations
 
-descope-saas-starter/frontend
+identity-stack/frontend
   └── react-oidc-context — vendor-agnostic OIDC (already abstracted)
 
-descope-saas-starter/infra
+identity-stack/infra
   └── terraform-provider-descope — project/tenant/role/permission/FGA resources
 
 py-identity-model
@@ -152,7 +152,7 @@ The harness runs against already-merged features first (baseline), then validate
 | Repo | Quality Tier | Testing Strategy |
 |------|-------------|-----------------|
 | py-identity-model | Production-grade | 80%+ coverage, conformance harness, conventional commits, semantic-release, backwards compatibility |
-| descope-saas-starter | Demo/POC (ReBAC exception) | E2E happy path per wave, tighter coverage for ReBAC/FGA only |
+| identity-stack | Demo/POC (ReBAC exception) | E2E happy path per wave, tighter coverage for ReBAC/FGA only |
 | terraform-provider-descope | Functional | Existing acceptance tests, registry publish validation |
 
 **ReBAC exception:** Authorization bugs in a portfolio piece are worse than missing features — they damage credibility. Wave 2 gets production-quality testing despite being in a demo-tier repo.
@@ -161,7 +161,7 @@ The harness runs against already-merged features first (baseline), then validate
 
 ### SaaS Starter API Convention
 
-All new endpoints follow the existing FastAPI patterns in descope-saas-starter/backend:
+All new endpoints follow the existing FastAPI patterns in identity-stack/backend:
 
 - **Authentication:** All endpoints require valid session token via existing middleware
 - **Authorization:** Admin endpoints check `require_role("admin")` or `require_permission("manage:roles")`
@@ -200,14 +200,14 @@ The Descope data model is fully documented in `docs/descope-data-model.md`. Key 
 
 ## 5. Cross-Repo Interface Contracts
 
-### py-identity-model → descope-saas-starter
+### py-identity-model → identity-stack
 
 - `validate_token()` — sync/async, returns `ClaimsPrincipal` with `sub`, `iss`, `aud`, tenant claims
 - `get_discovery_document()` — OIDC discovery with caching
 - `to_principal()` — JWT claims to typed principal object
 - **Contract:** py-identity-model API must remain backwards-compatible. New features are additive.
 
-### terraform-provider-descope → descope-saas-starter
+### terraform-provider-descope → identity-stack
 
 - TF provisions: project settings, tenants, roles, permissions, FGA schema, SSO defaults, access keys
 - SaaS starter reads TF-provisioned state at runtime via Descope Management API

@@ -51,7 +51,7 @@ This architecture covers the infrastructure secrets pipeline for the identity-st
             │                           │                          │
             ▼                           ▼                          ▼
       ┌──────────────────────────────────────────────────────────────┐
-      │           descope-saas-starter (identity-stack)              │
+      │           identity-stack (identity-stack)              │
       │                                                              │
       │  infra/          backend/              frontend/             │
       │  (Terraform)     (FastAPI)             (Vite/React)          │
@@ -64,18 +64,18 @@ This architecture covers the infrastructure secrets pipeline for the identity-st
 ### Dependency Graph (Infrastructure Layer)
 
 ```
-descope-saas-starter/infra
+identity-stack/infra
   └── HCP Terraform (remote state backend — cloud block in main.tf)
   └── terraform-provider-descope (provisions Descope project config)
   └── infisical/infisical TF provider (writes TF outputs to Infisical)
   └── Infisical Machine Identity (authenticates TF provider to Infisical)
 
-descope-saas-starter/backend
+identity-stack/backend
   └── Infisical CLI (infisical run — injects secrets as env vars)
   └── Infisical Machine Identity (authenticates CLI to Infisical)
   └── No code changes — reads os.environ identically to .env files
 
-descope-saas-starter/frontend
+identity-stack/frontend
   └── Infisical CLI (infisical run -- npm run build — build-time injection)
   └── No code changes — Vite picks up VITE_* from process.env
 
@@ -182,7 +182,7 @@ Docker Compose setup:
 
 ```
 Organization: jamescrowley321
-└── Workspace: descope-saas-starter-dev
+└── Workspace: identity-stack-dev
     │
     ├── Execution Mode: Local
     │   (runs on developer machine / CI runner,
@@ -310,7 +310,7 @@ infra/main.tf
 - The custom `terraform-provider-descope` fork is not published to the Terraform Registry — remote execution would fail because HCP Terraform's runners cannot download unpublished providers.
 - Local execution preserves the existing `dev_overrides` workflow (`make dev` in terraform-provider-descope builds locally and configures `~/.terraformrc`).
 - State encryption, versioning, and locking still apply — only compute location changes.
-- The `cloud` block already exists in `infra/main.tf` with `organization = "jamescrowley321"` and `workspaces { name = "descope-saas-starter-dev" }`.
+- The `cloud` block already exists in `infra/main.tf` with `organization = "jamescrowley321"` and `workspaces { name = "identity-stack-dev" }`.
 
 **Trade-off:** CI/CD requires the custom provider binary on the runner (solved by `make dev` in the GitHub Actions workflow or future Registry publish via PR #108).
 
@@ -364,7 +364,7 @@ services:
 ### Current State
 
 ```
-descope-saas-starter/
+identity-stack/
 ├── .env                          # Backend secrets (gitignored)
 │   ├── DESCOPE_PROJECT_ID
 │   ├── DESCOPE_MANAGEMENT_KEY
@@ -382,7 +382,7 @@ descope-saas-starter/
 ### Target State
 
 ```
-descope-saas-starter/
+identity-stack/
 ├── .env                          # ONLY 2 bootstrap secrets (or empty — use infisical login)
 │   ├── INFISICAL_MACHINE_IDENTITY_CLIENT_ID
 │   └── INFISICAL_MACHINE_IDENTITY_CLIENT_SECRET

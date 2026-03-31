@@ -18,7 +18,7 @@ context_file: ''
 
 ## Session Overview
 
-**Topic:** Infrastructure toolchain expansion, API gateway auth offloading, pluggable identity providers, and the evolution of descope-saas-starter into identity-stack.
+**Topic:** Infrastructure toolchain expansion, API gateway auth offloading, pluggable identity providers, and the evolution of identity-stack into identity-stack.
 
 **Goals:**
 1. Plan six interrelated but distinct initiatives across the auth workspace
@@ -33,7 +33,7 @@ context_file: ''
 4. **node-oidc-provider as integration target** — second OIDC provider for py-identity-model and identity-stack
 5. **node-oidc-provider as embedded OIDC server** — NestJS/Fastify wrapper, full-blown Node OIDC provider
 6. **OpenFeature + deployment topology** — feature flags to toggle standalone vs gateway mode
-7. **Repo rename** — descope-saas-starter → identity-stack
+7. **Repo rename** — identity-stack → identity-stack
 
 **Technique flow:** Question Storming → Morphological Analysis → Party Mode (multi-agent)
 
@@ -41,13 +41,13 @@ context_file: ''
 
 ## Key Decision: Repo Rename
 
-**descope-saas-starter → identity-stack**
+**identity-stack → identity-stack**
 
 The project is evolving beyond Descope into a multi-provider, multi-topology identity reference platform. The rename should happen early while blast radius is small.
 
 ```
 ~/repos/auth/
-├── identity-stack/              # renamed from descope-saas-starter
+├── identity-stack/              # renamed from identity-stack
 ├── py-identity-model/           # unchanged (already provider-agnostic)
 ├── terraform-provider-descope/  # unchanged (IS Descope-specific)
 └── auth-planning/               # unchanged
@@ -172,7 +172,7 @@ The project is evolving beyond Descope into a multi-provider, multi-topology ide
 
 ### Key Decisions Made During Question Storming
 
-1. **Repo rename: descope-saas-starter → identity-stack** — happen early while blast radius is small
+1. **Repo rename: identity-stack → identity-stack** — happen early while blast radius is small
 2. **node-oidc-provider v1: in-memory only** — no configuration management system, no persistent adapter, no custom login UI. Start with zero-infrastructure OIDC provider.
 3. **Standalone mode preserved** — OpenFeature flags toggle features that behave differently behind the gateway. One codebase, two deployment modes.
 4. **Docker Compose profiles** — `standalone` vs `gateway` vs `full` control which containers start; feature flags control which code paths execute.
@@ -184,7 +184,7 @@ The project is evolving beyond Descope into a multi-provider, multi-topology ide
 3. **PRD: OpenFeature Integration** — feature flags, standalone/gateway toggle, deployment profiles
 4. **PRD: node-oidc-provider Integration** — py-identity-model test fixture + identity-stack second provider
 5. **PRD: Embedded OIDC Provider** — NestJS/Fastify wrapper, new repo in auth workspace
-6. **PRD: Repo Rename** — descope-saas-starter → identity-stack (may be a task, not a full PRD)
+6. **PRD: Repo Rename** — identity-stack → identity-stack (may be a task, not a full PRD)
 
 ---
 
@@ -200,7 +200,7 @@ The project is evolving beyond Descope into a multi-provider, multi-topology ide
 | I4 | node-oidc-provider as integration test target + identity-stack second provider | node-oidc (test) |
 | I5 | Embedded node-oidc-provider in NestJS/Fastify | node-oidc (embedded) |
 | I6 | OpenFeature integration | OpenFeature |
-| I7 | Repo rename: descope-saas-starter → identity-stack | Rename |
+| I7 | Repo rename: identity-stack → identity-stack | Rename |
 
 ---
 
@@ -321,7 +321,7 @@ PRD 3: Multi-Provider Identity (I4 + I5, or I4 standalone)
   ├── Epic 3: Tyk multi-provider OIDC configuration
   └── Epic 4 (if I5 in scope): Embedded NestJS OIDC server (v1: in-memory)
 
-Task: Repo rename descope-saas-starter → identity-stack (I7)
+Task: Repo rename identity-stack → identity-stack (I7)
 ```
 
 ---
@@ -330,7 +330,7 @@ Task: Repo rename descope-saas-starter → identity-stack (I7)
 
 Which repos does each initiative touch?
 
-| Initiative | identity-stack (née descope-saas-starter) | py-identity-model | terraform-provider-descope | auth-planning |
+| Initiative | identity-stack (née identity-stack) | py-identity-model | terraform-provider-descope | auth-planning |
 |---|---|---|---|---|
 | **I1 HCP TF** | `infra/` — add `cloud` block, migrate state | — | `CLAUDE.md` reference updates | PRD, task queue |
 | **I2 Infisical** | `docker-compose.yml` (CLI injection or Infisical containers), backend entrypoint, `.env` elimination | — | Provider config to pull/push Infisical secrets | PRD, task queue |
@@ -558,7 +558,7 @@ I5 (embedded node-oidc NestJS server) deferred to backlog — revisit after the 
 ## Revised PRD Plan (Final)
 
 ```
-Task: Repo rename descope-saas-starter → identity-stack (I7)
+Task: Repo rename identity-stack → identity-stack (I7)
   └── Sprint 0 (pre-sprint)
 
 PRD 1: Infrastructure Secrets Pipeline (I1 + I2)

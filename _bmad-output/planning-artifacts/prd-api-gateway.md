@@ -32,7 +32,7 @@ classification:
 
 ## Executive Summary
 
-This PRD defines the requirements for integrating a Tyk OSS API gateway into identity-stack (formerly descope-saas-starter), offloading cross-cutting middleware concerns from the FastAPI backend to the gateway layer, and establishing a dual deployment topology (standalone vs. gateway) toggled by environment configuration. The work produces a reference architecture demonstrating the progressive adoption pattern: "build with application middleware first, then offload to a gateway without rewriting your app."
+This PRD defines the requirements for integrating a Tyk OSS API gateway into identity-stack (formerly identity-stack), offloading cross-cutting middleware concerns from the FastAPI backend to the gateway layer, and establishing a dual deployment topology (standalone vs. gateway) toggled by environment configuration. The work produces a reference architecture demonstrating the progressive adoption pattern: "build with application middleware first, then offload to a gateway without rewriting your app."
 
 The FastAPI backend currently implements six middleware layers: ProxyHeadersMiddleware, CorrelationIdMiddleware, SecurityHeadersMiddleware, SlowAPIMiddleware (rate limiting), TokenValidationMiddleware (JWT validation via py-identity-model), and CORSMiddleware. Five of these can be offloaded to Tyk. Authorization logic (`require_role()` / `require_permission()` dependency factories) remains in FastAPI because Descope's multi-tenant claims structure (`tenants.{tenant-id}.roles[]`) is domain-specific and not suited for gateway-level enforcement.
 

@@ -11,7 +11,7 @@ inputDocuments:
 
 ## Overview
 
-This document provides the complete epic and story breakdown for the Infrastructure Secrets Pipeline (PRD 1), decomposing the requirements from the PRD and Architecture into implementable stories across two repositories: `[TFP]` terraform-provider-descope (infra config) and `[IS]` descope-saas-starter (identity-stack). Each story is scoped to a single PR.
+This document provides the complete epic and story breakdown for the Infrastructure Secrets Pipeline (PRD 1), decomposing the requirements from the PRD and Architecture into implementable stories across two repositories: `[TFP]` terraform-provider-descope (infra config) and `[IS]` identity-stack (identity-stack). Each story is scoped to a single PR.
 
 ## Requirements Inventory
 
@@ -20,7 +20,7 @@ This document provides the complete epic and story breakdown for the Infrastruct
 **Epic 1 — HCP Terraform Remote State Migration**
 
 - FR-1: Authenticate Terraform CLI with HCP Terraform via `terraform login`
-- FR-2: Configure HCP Terraform workspace `descope-saas-starter-dev` with local execution mode
+- FR-2: Configure HCP Terraform workspace `identity-stack-dev` with local execution mode
 - FR-3: Configure variable set "Descope Credentials" with `DESCOPE_MANAGEMENT_KEY` as sensitive env var
 - FR-4: Migrate local state to HCP Terraform via `terraform init -migrate-state`
 - FR-5: Verify migration — `terraform state list` + `terraform plan` shows no drift
@@ -131,11 +131,11 @@ So that Terraform state is stored remotely with encryption, versioning, and lock
   **When** `terraform login` is run on the development machine
   **Then** the API token is stored in `~/.terraform.d/credentials.tfrc.json` and the CLI can authenticate to HCP Terraform
 
-- [ ] **Given** the workspace `descope-saas-starter-dev` is configured in HCP Terraform
+- [ ] **Given** the workspace `identity-stack-dev` is configured in HCP Terraform
   **When** checking the workspace settings
   **Then** execution mode is set to **Local** (runs on developer machine, state stored remotely)
 
-- [ ] **Given** the `cloud` block already exists in `infra/main.tf` with `organization = "jamescrowley321"` and `workspaces { name = "descope-saas-starter-dev" }`
+- [ ] **Given** the `cloud` block already exists in `infra/main.tf` with `organization = "jamescrowley321"` and `workspaces { name = "identity-stack-dev" }`
   **When** reviewing the Terraform configuration
   **Then** no changes to the `cloud` block are needed — the existing configuration is correct
 
@@ -153,9 +153,9 @@ So that the credential is encrypted, write-only (not readable from UI), and auto
 
 **Acceptance Criteria:**
 
-- [ ] **Given** the HCP Terraform workspace `descope-saas-starter-dev` exists
+- [ ] **Given** the HCP Terraform workspace `identity-stack-dev` exists
   **When** a variable set named "Descope Credentials" is created
-  **Then** it is scoped to the `descope-saas-starter-dev` workspace
+  **Then** it is scoped to the `identity-stack-dev` workspace
 
 - [ ] **Given** the "Descope Credentials" variable set exists
   **When** `DESCOPE_MANAGEMENT_KEY` is added as a variable
@@ -413,7 +413,7 @@ So that Terraform can read and write secrets in Infisical declaratively.
 
 - [ ] **Given** the Infisical provider needs credentials during `terraform apply`
   **When** the HCP Terraform variable set "Infisical Credentials" is created
-  **Then** it contains `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` as sensitive environment variables, scoped to the `descope-saas-starter-dev` workspace
+  **Then** it contains `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` as sensitive environment variables, scoped to the `identity-stack-dev` workspace
 
 - [ ] **Given** the provider and variable set are configured
   **When** `terraform init` is run

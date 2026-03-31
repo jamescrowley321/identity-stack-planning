@@ -270,7 +270,7 @@ _bmad/_config/agents/bmm-red-team.customize.yaml
 _bmad/_config/agents/bmm-auth-domain-expert.customize.yaml
 
 # Ralph config update
-descope-saas-starter/ralph.yml (add hat definitions)
+identity-stack/ralph.yml (add hat definitions)
 
 # Ralph loop update
 .claude/ralph-loop.local.md (add security phase)

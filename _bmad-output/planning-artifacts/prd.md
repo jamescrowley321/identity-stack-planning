@@ -19,7 +19,7 @@ classification:
   complexity: 'high'
   projectContext: 'brownfield'
   prdStrategy: 'single-unified-then-split-to-three'
-  repoTagging: '[PIM] py-identity-model, [SSS] descope-saas-starter, [TFP] terraform-provider-descope, [CROSS] cross-repo'
+  repoTagging: '[PIM] py-identity-model, [SSS] identity-stack, [TFP] terraform-provider-descope, [CROSS] cross-repo'
   qualityTiers:
     pim: 'production-grade'
     sss: 'demo-poc-quality'
@@ -37,7 +37,7 @@ classification:
 
 ## Executive Summary
 
-This PRD defines the requirements for a vertically integrated identity platform spanning three repositories: **py-identity-model** (OIDC/OAuth2 Python library), **descope-saas-starter** (B2B SaaS reference application with FastAPI + React + Terraform), and **terraform-provider-descope** (Descope IaC provider). py-identity-model is a production library targeting competitive dominance in the Python identity ecosystem — achieving OpenID Foundation RP certification, feature parity with Duende IdentityModel (.NET), and expansion into framework-specific middleware (FastAPI). The SaaS starter and TF provider serve as portfolio, consulting, and POC acceleration assets demonstrating enterprise identity patterns (RBAC, ReBAC/FGA, SSO, multi-tenancy) against real providers.
+This PRD defines the requirements for a vertically integrated identity platform spanning three repositories: **py-identity-model** (OIDC/OAuth2 Python library), **identity-stack** (B2B SaaS reference application with FastAPI + React + Terraform), and **terraform-provider-descope** (Descope IaC provider). py-identity-model is a production library targeting competitive dominance in the Python identity ecosystem — achieving OpenID Foundation RP certification, feature parity with Duende IdentityModel (.NET), and expansion into framework-specific middleware (FastAPI). The SaaS starter and TF provider serve as portfolio, consulting, and POC acceleration assets demonstrating enterprise identity patterns (RBAC, ReBAC/FGA, SSO, multi-tenancy) against real providers.
 
 The work proceeds in parallel tracks: (A) py-identity-model review fix chain completion + OIDC conformance test harness + certification, (B) SaaS starter feature waves exposing TF-only resources as runtime APIs — RBAC CRUD, ReBAC/FGA, SSO configuration, tenant/access key enhancement, (C) TF provider registry publishing and maintenance, and (D) reference architecture documentation followed by iterative provider abstraction with Ory as the validation target. All tracks execute concurrently via Ralph loops against git worktrees. Each feature wave must be independently implementable without cross-wave dependencies within a repo.
 
@@ -54,7 +54,7 @@ The long-term trajectory: complete Descope-specific features, document the three
 - **Complexity:** High — OIDC spec compliance, security-critical token handling, multi-tenancy, ReBAC/FGA, formal conformance testing, multi-provider abstraction
 - **Project Context:** Brownfield — three existing repos with significant work complete; py-identity-model in production
 - **PRD Strategy:** Single unified PRD, split into three coordinated repo-specific PRDs post-authoring
-- **Repo Tagging:** `[PIM]` py-identity-model, `[SSS]` descope-saas-starter, `[TFP]` terraform-provider-descope, `[CROSS]` cross-repo
+- **Repo Tagging:** `[PIM]` py-identity-model, `[SSS]` identity-stack, `[TFP]` terraform-provider-descope, `[CROSS]` cross-repo
 - **Quality Tiers:** Production-grade (PIM), Demo/POC with ReBAC exception (SSS), Functional (TFP)
 - **Target Audiences:** OSS community + production users (PIM), consulting clients + portfolio (SSS/TFP)
 
@@ -145,7 +145,7 @@ The long-term trajectory: complete Descope-specific features, document the three
 - FR-PIM-21: Discovery Cache TTL (issue #219)
 - FR-PIM-22: AS Issuer Identification
 
-### [SSS] descope-saas-starter
+### [SSS] identity-stack
 
 #### Wave 1 — RBAC CRUD
 

@@ -9,7 +9,7 @@ inputDocuments:
 
 ## Overview
 
-This document provides the complete epic and story breakdown for PRD 2: API Gateway & Deployment Topology. All work is confined to the identity-stack (descope-saas-starter) repository. Each story is scoped to a single PR.
+This document provides the complete epic and story breakdown for PRD 2: API Gateway & Deployment Topology. All work is confined to the identity-stack (identity-stack) repository. Each story is scoped to a single PR.
 
 ## Requirements Inventory
 

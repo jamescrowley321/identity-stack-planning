@@ -12,7 +12,7 @@ inputDocuments:
 This document provides the complete epic and story breakdown for Initiative I4: Multi-Provider Test Infrastructure. It decomposes the requirements from the PRD and Architecture into implementable stories across two repositories:
 
 - **[PIM]** py-identity-model — node-oidc-provider test fixture, Docker Compose integration, integration tests
-- **[IS]** identity-stack (descope-saas-starter) — `full` profile second provider, Tyk multi-provider OIDC
+- **[IS]** identity-stack (identity-stack) — `full` profile second provider, Tyk multi-provider OIDC
 
 Each story is scoped to a single PR. Acceptance criteria reference FRs from the PRD.
 
@@ -113,12 +113,12 @@ Developers can run py-identity-model integration tests against a lightweight, Op
 ### Epic 2: identity-stack Second Provider
 Solutions architects running `docker compose --profile full up` see two functional OIDC providers (Descope + node-oidc-provider) demonstrating multi-provider capability.
 **FRs covered:** FR-15 through FR-19
-**Repo:** identity-stack (descope-saas-starter)
+**Repo:** identity-stack (identity-stack)
 
 ### Epic 3: Tyk Multi-Provider OIDC Configuration
 Tyk API gateway validates JWTs from both Descope and node-oidc-provider simultaneously, proving the identity-stack works with any OIDC-compliant provider — not just Descope.
 **FRs covered:** FR-20 through FR-24
-**Repo:** identity-stack (descope-saas-starter)
+**Repo:** identity-stack (identity-stack)
 
 ---
 

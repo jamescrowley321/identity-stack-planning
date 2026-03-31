@@ -15,11 +15,11 @@ This repo lives at `~/repos/auth/auth-planning/` alongside three sibling reposit
 | `auth-planning` (this repo) | `~/repos/auth/auth-planning/` | BMAD planning artifacts and project knowledge |
 | `py-identity-model` | `~/repos/auth/py-identity-model/` | Production OIDC/OAuth2.0 Python library (JWT, token validation, discovery) |
 | `terraform-provider-descope` | `~/repos/auth/terraform-provider-descope/` | Terraform provider for Descope (Go). Fork of `descope/terraform-provider-descope` |
-| `descope-saas-starter` | `~/repos/auth/descope-saas-starter/` | SaaS starter kit — FastAPI backend + Vite/React frontend + Terraform infra |
+| `identity-stack` | `~/repos/auth/identity-stack/` | SaaS starter kit — FastAPI backend + Vite/React frontend + Terraform infra |
 
 ### Cross-Repo Relationships
 
-- `descope-saas-starter/backend` depends on `py-identity-model` (>= 2.1.0) for token validation
+- `identity-stack/backend` depends on `py-identity-model` (>= 2.1.0) for token validation
 - `terraform-provider-descope` manages Descope project infrastructure that the SaaS starter connects to
 - `py-identity-model/examples/descope/` contains Descope-specific integration examples
 
@@ -50,7 +50,7 @@ This repo uses [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) v6 fo
 
 When BMAD workflows reference implementation details, architecture, or existing code:
 
-1. **Read sibling repos directly** — You have full access to `~/repos/auth/py-identity-model/`, `~/repos/auth/terraform-provider-descope/`, and `~/repos/auth/descope-saas-starter/`. Read their code, tests, configs, and CLAUDE.md files to inform planning.
+1. **Read sibling repos directly** — You have full access to `~/repos/auth/py-identity-model/`, `~/repos/auth/terraform-provider-descope/`, and `~/repos/auth/identity-stack/`. Read their code, tests, configs, and CLAUDE.md files to inform planning.
 2. **Never modify sibling repos from this context** — Planning artifacts live here; code changes happen in the target repos.
 3. **Reference by repo name** — In planning docs, refer to repos by name (e.g., "py-identity-model") rather than absolute paths.
 

@@ -17,7 +17,7 @@ date: '2026-03-29'
 
 ### Scope
 
-This architecture covers PRD 2: integrating Tyk OSS as an API gateway into identity-stack (descope-saas-starter), offloading authentication and rate limiting from FastAPI middleware to the gateway, and establishing dual deployment topologies (standalone vs gateway) controlled by a single environment variable and Docker Compose profiles.
+This architecture covers PRD 2: integrating Tyk OSS as an API gateway into identity-stack (identity-stack), offloading authentication and rate limiting from FastAPI middleware to the gateway, and establishing dual deployment topologies (standalone vs gateway) controlled by a single environment variable and Docker Compose profiles.
 
 All changes are confined to the identity-stack repository. No modifications to py-identity-model, terraform-provider-descope, or auth-planning application code.
 

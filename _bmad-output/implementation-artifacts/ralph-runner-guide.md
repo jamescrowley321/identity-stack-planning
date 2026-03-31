@@ -15,7 +15,7 @@ cd ~/repos/auth/terraform-provider-descope
 /ralph-loop "$(cat ~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/run-next-task.txt)" --completion-promise 'TASK COMPLETE' --max-iterations 15
 
 # SaaS starter tasks
-cd ~/repos/auth/descope-saas-starter
+cd ~/repos/auth/identity-stack
 /ralph-loop "$(cat ~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/run-next-task.txt)" --completion-promise 'TASK COMPLETE' --max-iterations 25
 
 # py-identity-model tasks
@@ -35,7 +35,7 @@ cd ~/repos/auth/terraform-provider-descope
 /ralph-loop "$(cat ~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/fix-review-findings.md)" --completion-promise 'TASK COMPLETE' --max-iterations 10
 
 # Fix SaaS starter PRs (phased first, then cross-cutting)
-cd ~/repos/auth/descope-saas-starter
+cd ~/repos/auth/identity-stack
 /ralph-loop "$(cat ~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/fix-review-findings.md)" --completion-promise 'TASK COMPLETE' --max-iterations 15
 
 # Fix py-identity-model PRs (chained — 16 PRs)

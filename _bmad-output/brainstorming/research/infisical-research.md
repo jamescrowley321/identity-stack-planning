@@ -248,7 +248,7 @@ services:
       - secrets-vol:/secrets:ro
 ```
 
-**Recommendation for descope-saas-starter:** Use **Option B (CLI injection)** for development and Docker Compose deployments. Use **Option A (SDK)** only if you need runtime secret refresh without restarts.
+**Recommendation for identity-stack:** Use **Option B (CLI injection)** for development and Docker Compose deployments. Use **Option A (SDK)** only if you need runtime secret refresh without restarts.
 
 ---
 
@@ -440,7 +440,7 @@ Native integrations with: AWS Parameter Store, AWS Secrets Manager, GitHub Actio
 
 ### Verdict for This Project
 
-**Infisical is the clear winner** for the descope-saas-starter use case:
+**Infisical is the clear winner** for the identity-stack use case:
 
 1. **Right-sized complexity** — You need to store ~10 secrets (Descope credentials, database URL, API keys). Vault's dynamic secret engines, PKI, and transit encryption are overkill.
 2. **Faster adoption** — Team can be productive in an afternoon vs. days with Vault.
