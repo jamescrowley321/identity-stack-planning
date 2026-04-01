@@ -7,7 +7,7 @@ inputDocuments:
   - _bmad-output/brainstorming/research/node-oidc-provider-research.md
   - _bmad-output/planning-artifacts/architecture.md
 workflowType: 'architecture'
-project_name: 'auth-planning'
+project_name: 'identity-stack-planning'
 user_name: 'James'
 date: '2026-03-29'
 ---

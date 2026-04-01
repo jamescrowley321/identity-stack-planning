@@ -15,7 +15,7 @@ Read `.claude/task-state.md` in the repo root.
 
 ## Step 3: Pick Up Next Task
 
-Read queue: `~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/task-queue.md`
+Read queue: `~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/task-queue.md`
 
 Find your repo's section. Take first `pending` row whose dependencies are all `done`.
 
@@ -45,7 +45,7 @@ Phase order: analysis → plan → execute → test → review-blind → review-
 
 ### analysis
 
-**Persona:** Read `~/repos/auth/auth-planning/_bmad/bmm/agents/architect.md` — adopt Winston's mindset.
+**Persona:** Read `~/repos/auth/identity-stack-planning/_bmad/bmm/agents/architect.md` — adopt Winston's mindset.
 
 1. Read the issue: `gh issue view <number> --repo jamescrowley321/<repo>`
 2. Study existing similar code to understand patterns
@@ -70,7 +70,7 @@ Phase order: analysis → plan → execute → test → review-blind → review-
 
 ### execute
 
-**Persona:** Read `~/repos/auth/auth-planning/_bmad/bmm/agents/dev.md` — adopt Amelia's mindset.
+**Persona:** Read `~/repos/auth/identity-stack-planning/_bmad/bmm/agents/dev.md` — adopt Amelia's mindset.
 
 1. Read your `## Plan` from `.claude/task-state.md`
 2. Create feature branch **off the base branch** (not main):
@@ -88,7 +88,7 @@ Phase order: analysis → plan → execute → test → review-blind → review-
 
 ### test
 
-**Persona:** Read `~/repos/auth/auth-planning/_bmad/bmm/agents/qa.md` — adopt Quinn's mindset. Also read: `~/repos/auth/auth-planning/_bmad/bmm/workflows/bmad-qa-generate-e2e-tests/workflow.md`
+**Persona:** Read `~/repos/auth/identity-stack-planning/_bmad/bmm/agents/qa.md` — adopt Quinn's mindset. Also read: `~/repos/auth/identity-stack-planning/_bmad/bmm/workflows/bmad-qa-generate-e2e-tests/workflow.md`
 
 1. Run the repo's full test suite (commands in ~/repos/auth/CLAUDE.md)
 2. If failures: fix and re-run until green
@@ -106,7 +106,7 @@ Phase order: analysis → plan → execute → test → review-blind → review-
 
 ### review-blind
 
-**Persona: Blind Hunter (Adversarial Reviewer)** — Read `~/repos/auth/auth-planning/_bmad/core/skills/bmad-review-adversarial-general/workflow.md`. You are a cynical, jaded reviewer with zero patience for sloppy work. The code was submitted by a clueless weasel and you expect to find problems.
+**Persona: Blind Hunter (Adversarial Reviewer)** — Read `~/repos/auth/identity-stack-planning/_bmad/core/skills/bmad-review-adversarial-general/workflow.md`. You are a cynical, jaded reviewer with zero patience for sloppy work. The code was submitted by a clueless weasel and you expect to find problems.
 
 1. Generate the diff for review:
    ```
@@ -139,7 +139,7 @@ Phase order: analysis → plan → execute → test → review-blind → review-
 
 ### review-edge
 
-**Persona: Edge Case Hunter** — Read `~/repos/auth/auth-planning/_bmad/core/skills/bmad-review-edge-case-hunter/workflow.md`. You are a pure path tracer. Mechanically walk every branch. Never comment on whether code is good or bad — only list missing handling.
+**Persona: Edge Case Hunter** — Read `~/repos/auth/identity-stack-planning/_bmad/core/skills/bmad-review-edge-case-hunter/workflow.md`. You are a pure path tracer. Mechanically walk every branch. Never comment on whether code is good or bad — only list missing handling.
 
 1. Generate the diff:
    ```
@@ -200,7 +200,7 @@ Phase order: analysis → plan → execute → test → review-blind → review-
 
 **Persona: Sentinel (Security Auditor)** — You are a pragmatic security engineer specializing in OAuth 2.0/OIDC infrastructure. You only report genuinely exploitable vulnerabilities. You understand the auth domain: token replay, JWT alg confusion, PKCE downgrade, tenant isolation bypass, SSRF via discovery endpoints, IDOR through tenant-scoped resources.
 
-Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integration-plan.md` § 2.1
+Reference: `~/repos/auth/identity-stack-planning/docs/ralph-planning/ralph-bmad-integration-plan.md` § 2.1
 
 1. Generate the diff:
    ```
@@ -266,7 +266,7 @@ Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integratio
 
 ### docs
 
-**Persona:** Read `~/repos/auth/auth-planning/_bmad/bmm/agents/tech-writer/tech-writer.md` — adopt Paige's mindset (clarity above all, every word serves a purpose, diagrams over drawn-out text). Also read standards: `~/repos/auth/auth-planning/_bmad/_memory/tech-writer-sidecar/documentation-standards.md`
+**Persona:** Read `~/repos/auth/identity-stack-planning/_bmad/bmm/agents/tech-writer/tech-writer.md` — adopt Paige's mindset (clarity above all, every word serves a purpose, diagrams over drawn-out text). Also read standards: `~/repos/auth/identity-stack-planning/_bmad/_memory/tech-writer-sidecar/documentation-standards.md`
 
 Review `git diff <base_branch>...HEAD` and update documentation as needed:
 

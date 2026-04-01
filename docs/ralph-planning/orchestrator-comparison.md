@@ -283,7 +283,7 @@ Both projects have a **bus factor of 1**. Ralph Orchestrator has broader communi
 
 ### Current Usage
 
-The auth workspace already uses Ralph-style loops via the `ralph-loop` skill (see `identity-stack/.claude/task-state.md` and `auth-planning/_bmad-output/implementation-artifacts/ralph-runner-guide.md`). This is a lightweight implementation — not the full Ralph Orchestrator or Chief Wiggum.
+The auth workspace already uses Ralph-style loops via the `ralph-loop` skill (see `identity-stack/.claude/task-state.md` and `identity-stack-planning/_bmad-output/implementation-artifacts/ralph-runner-guide.md`). This is a lightweight implementation — not the full Ralph Orchestrator or Chief Wiggum.
 
 ### Considerations for Adoption
 

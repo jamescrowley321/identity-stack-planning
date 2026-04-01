@@ -30,7 +30,7 @@ classification:
     tfp: 'consulting clients using Descope'
 ---
 
-# Product Requirements Document - auth-planning
+# Product Requirements Document - identity-stack-planning
 
 **Author:** James
 **Date:** 2026-03-28

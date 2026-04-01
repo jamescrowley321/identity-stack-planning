@@ -6,7 +6,7 @@ inputDocuments:
   - _bmad-output/brainstorming/brainstorming-session-2026-03-28-01.md
   - _bmad-output/planning-artifacts/prd.md
 workflowType: 'architecture'
-project_name: 'auth-planning'
+project_name: 'identity-stack-planning'
 user_name: 'James'
 date: '2026-03-28'
 ---

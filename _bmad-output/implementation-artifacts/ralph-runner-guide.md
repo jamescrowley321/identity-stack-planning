@@ -12,15 +12,15 @@ One prompt, one queue. The prompt reads the task queue, picks up the next pendin
 ```bash
 # Terraform provider tasks
 cd ~/repos/auth/terraform-provider-descope
-/ralph-loop "$(cat ~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/run-next-task.txt)" --completion-promise 'TASK COMPLETE' --max-iterations 15
+/ralph-loop "$(cat ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/run-next-task.txt)" --completion-promise 'TASK COMPLETE' --max-iterations 15
 
 # SaaS starter tasks
 cd ~/repos/auth/identity-stack
-/ralph-loop "$(cat ~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/run-next-task.txt)" --completion-promise 'TASK COMPLETE' --max-iterations 25
+/ralph-loop "$(cat ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/run-next-task.txt)" --completion-promise 'TASK COMPLETE' --max-iterations 25
 
 # py-identity-model tasks
 cd ~/repos/auth/py-identity-model
-/ralph-loop "$(cat ~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/run-next-task.txt)" --completion-promise 'TASK COMPLETE' --max-iterations 25
+/ralph-loop "$(cat ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/run-next-task.txt)" --completion-promise 'TASK COMPLETE' --max-iterations 25
 ```
 
 Each iteration completes one task. The loop restarts, reads the queue, picks up the next one.
@@ -32,15 +32,15 @@ Use the `fix-review-findings.md` prompt to fix issues identified in adversarial 
 ```bash
 # Fix terraform provider PRs
 cd ~/repos/auth/terraform-provider-descope
-/ralph-loop "$(cat ~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/fix-review-findings.md)" --completion-promise 'TASK COMPLETE' --max-iterations 10
+/ralph-loop "$(cat ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/fix-review-findings.md)" --completion-promise 'TASK COMPLETE' --max-iterations 10
 
 # Fix SaaS starter PRs (phased first, then cross-cutting)
 cd ~/repos/auth/identity-stack
-/ralph-loop "$(cat ~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/fix-review-findings.md)" --completion-promise 'TASK COMPLETE' --max-iterations 15
+/ralph-loop "$(cat ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/fix-review-findings.md)" --completion-promise 'TASK COMPLETE' --max-iterations 15
 
 # Fix py-identity-model PRs (chained — 16 PRs)
 cd ~/repos/auth/py-identity-model
-/ralph-loop "$(cat ~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/fix-review-findings.md)" --completion-promise 'TASK COMPLETE' --max-iterations 50
+/ralph-loop "$(cat ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/fix-review-findings.md)" --completion-promise 'TASK COMPLETE' --max-iterations 50
 ```
 
 Fix tasks are in the "Review Fix Tasks" sections of `task-queue.md`. Phase order: checkout → fix → test → ci → complete.

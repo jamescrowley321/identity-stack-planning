@@ -1,4 +1,4 @@
-# auth-planning
+# identity-stack-planning
 
 Planning and orchestration hub for a multi-repo identity platform. This repo contains zero application code — only the planning artifacts, architecture decisions, task tracking, and autonomous execution prompts that drive development across three sibling repositories.
 
@@ -31,7 +31,7 @@ graph TB
     end
 
     subgraph planning["Planning & Orchestration"]
-        AP["auth-planning<br/>PRDs, architecture, task queue"]
+        AP["identity-stack-planning<br/>PRDs, architecture, task queue"]
         RALPH["Ralph Orchestrator<br/>Autonomous execution"]
         REVIEW["Review Agents<br/>Independent adversarial review"]
     end
@@ -309,7 +309,7 @@ Running a ralph loop:
 
 ```bash
 cd ~/repos/auth/identity-stack
-cp ~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/canonical-identity.md PROMPT.md
+cp ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/canonical-identity.md PROMPT.md
 ralph run
 
 # Monitor
@@ -335,7 +335,7 @@ Start with the [roadmap](docs/roadmap.md), then explore by topic:
 ## Repository Structure
 
 ```
-auth-planning/
+identity-stack-planning/
   _bmad/                          # BMAD-METHOD v6 installation
     bmm/                          # Agents, workflows, config
   _bmad-output/

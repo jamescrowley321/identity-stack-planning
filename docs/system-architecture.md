@@ -15,7 +15,7 @@ C4Context
         System(pim, "py-identity-model", "OIDC/OAuth2 Python library<br/>JWT validation, discovery, protocol flows")
         System(tfp, "terraform-provider-descope", "Terraform provider (Go)<br/>Provisions Descope infrastructure")
         System(is, "identity-stack", "FastAPI + React SaaS app<br/>Multi-tenant identity platform")
-        System(ap, "auth-planning", "BMAD planning hub<br/>PRDs, architecture, task queue")
+        System(ap, "identity-stack-planning", "BMAD planning hub<br/>PRDs, architecture, task queue")
     }
 
     System_Ext(descope, "Descope", "Identity provider<br/>Hosted login, management API")

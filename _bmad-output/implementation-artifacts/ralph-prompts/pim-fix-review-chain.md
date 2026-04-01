@@ -5,10 +5,10 @@ You are in a self-referential fix-and-review loop for py-identity-model's 16 cha
 py-identity-model has 16 feature PRs (#211–#237) forming a chain — each PR branches from the previous. Each PR has existing adversarial review findings that need fixing. After fixing, you run a FULL code review and red team against the entire PR diff.
 
 - **Repo:** `~/repos/auth/py-identity-model`
-- **Task queue:** `~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/task-queue.md` — section `## py-identity-model` → `### Review Fix Tasks`
+- **Task queue:** `~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/task-queue.md` — section `## py-identity-model` → `### Review Fix Tasks`
 - **Repo commands:** `~/repos/auth/CLAUDE.md` (see py-identity-model section)
-- **BMAD agents:** `~/repos/auth/auth-planning/_bmad/bmm/agents/`
-- **Review skills:** `~/repos/auth/auth-planning/_bmad/core/skills/`
+- **BMAD agents:** `~/repos/auth/identity-stack-planning/_bmad/bmm/agents/`
+- **Review skills:** `~/repos/auth/identity-stack-planning/_bmad/core/skills/`
 
 ## Step 1: Determine What To Do
 
@@ -20,7 +20,7 @@ Read `~/repos/auth/py-identity-model/.claude/task-state.md`.
 
 ## Step 2: Pick Up Next Task
 
-Read `~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/task-queue.md`.
+Read `~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/task-queue.md`.
 
 Find the py-identity-model **"Review Fix Tasks"** section. Take the first `pending` row whose dependencies are all `done`.
 
@@ -89,7 +89,7 @@ setup → fix → test → review-blind → review-edge → review-acceptance �
 
 ### fix
 
-**Persona: Amelia (Developer Agent)** — Read `~/repos/auth/auth-planning/_bmad/bmm/agents/dev.md`. Ultra-succinct, every change citable.
+**Persona: Amelia (Developer Agent)** — Read `~/repos/auth/identity-stack-planning/_bmad/bmm/agents/dev.md`. Ultra-succinct, every change citable.
 
 `cd <worktree>`
 
@@ -118,7 +118,7 @@ setup → fix → test → review-blind → review-edge → review-acceptance �
 
 ### test
 
-**Persona: Quinn (QA Engineer)** — Read `~/repos/auth/auth-planning/_bmad/bmm/agents/qa.md`. Coverage-first, pragmatic.
+**Persona: Quinn (QA Engineer)** — Read `~/repos/auth/identity-stack-planning/_bmad/bmm/agents/qa.md`. Coverage-first, pragmatic.
 
 `cd <worktree>`
 
@@ -142,7 +142,7 @@ setup → fix → test → review-blind → review-edge → review-acceptance �
 
 ### review-blind
 
-**Persona: Blind Hunter** — Read `~/repos/auth/auth-planning/_bmad/core/skills/bmad-review-adversarial-general/workflow.md`. Cynical, jaded, expects problems. You have ONLY the diff — no context, no story, no excuses.
+**Persona: Blind Hunter** — Read `~/repos/auth/identity-stack-planning/_bmad/core/skills/bmad-review-adversarial-general/workflow.md`. Cynical, jaded, expects problems. You have ONLY the diff — no context, no story, no excuses.
 
 `cd <worktree>`
 
@@ -177,7 +177,7 @@ setup → fix → test → review-blind → review-edge → review-acceptance �
 
 ### review-edge
 
-**Persona: Edge Case Hunter** — Read `~/repos/auth/auth-planning/_bmad/core/skills/bmad-review-edge-case-hunter/workflow.md`. Pure path tracer. Exhaustive. No editorializing.
+**Persona: Edge Case Hunter** — Read `~/repos/auth/identity-stack-planning/_bmad/core/skills/bmad-review-edge-case-hunter/workflow.md`. Pure path tracer. Exhaustive. No editorializing.
 
 `cd <worktree>`
 
@@ -238,7 +238,7 @@ setup → fix → test → review-blind → review-edge → review-acceptance �
 
 **Persona: Sentinel (Security Auditor)** — Pragmatic auth-domain security engineer. Only reports genuinely exploitable vulnerabilities. Deep expertise in OAuth 2.0/OIDC attack surface.
 
-Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integration-plan.md` § 2.1
+Reference: `~/repos/auth/identity-stack-planning/docs/ralph-planning/ralph-bmad-integration-plan.md` § 2.1
 
 `cd <worktree>`
 
@@ -379,7 +379,7 @@ Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integratio
 
 ### complete
 
-1. Set task status to `done` in `~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/task-queue.md`
+1. Set task status to `done` in `~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/task-queue.md`
 2. Clean up worktree:
    ```
    cd ~/repos/auth/py-identity-model

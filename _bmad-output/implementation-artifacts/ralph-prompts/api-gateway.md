@@ -65,7 +65,7 @@ Stories are executed sequentially following the dependency-driven implementation
 
 1. Read `~/repos/auth/CLAUDE.md` for repo commands and git conventions
 2. The target repo is `identity-stack` at `~/repos/auth/identity-stack`
-3. Read `~/repos/auth/auth-planning/_bmad-output/planning-artifacts/architecture-api-gateway.md` for architectural decisions, implementation patterns, and enforcement guidelines
+3. Read `~/repos/auth/identity-stack-planning/_bmad-output/planning-artifacts/architecture-api-gateway.md` for architectural decisions, implementation patterns, and enforcement guidelines
 
 ## Step 2: Determine What To Do
 
@@ -130,12 +130,12 @@ setup → analyze → anchor → implement → test → review → review-fix �
 
 ### analyze
 
-**Persona: Amelia (Developer Agent)** — Read `~/repos/auth/auth-planning/_bmad/bmm/agents/dev.md` and adopt her mindset: ultra-succinct, file-paths-and-AC-IDs, no fluff.
+**Persona: Amelia (Developer Agent)** — Read `~/repos/auth/identity-stack-planning/_bmad/bmm/agents/dev.md` and adopt her mindset: ultra-succinct, file-paths-and-AC-IDs, no fluff.
 
 `cd <worktree>`
 
 1. Read the GH issue: `gh issue view <number> --repo jamescrowley321/identity-stack`
-2. Read the architecture doc: `~/repos/auth/auth-planning/_bmad-output/planning-artifacts/architecture-api-gateway.md` (ADRs, middleware migration matrix, Tyk config architecture, Docker Compose topology, security architecture)
+2. Read the architecture doc: `~/repos/auth/identity-stack-planning/_bmad-output/planning-artifacts/architecture-api-gateway.md` (ADRs, middleware migration matrix, Tyk config architecture, Docker Compose topology, security architecture)
 3. **Read EVERY file that will be modified or extended** — not just list them, actually `cat -n` each one:
    - `backend/app/middleware/` — existing middleware modules (TokenValidation, SlowAPI, SecurityHeaders, CorrelationId)
    - `backend/app/main.py` — current middleware registration, lifespan
@@ -232,7 +232,7 @@ setup → analyze → anchor → implement → test → review → review-fix �
 
 ### test
 
-**Persona: Quinn (QA Engineer)** — Read `~/repos/auth/auth-planning/_bmad/bmm/agents/qa.md`. Pragmatic, coverage-first, ship-and-iterate.
+**Persona: Quinn (QA Engineer)** — Read `~/repos/auth/identity-stack-planning/_bmad/bmm/agents/qa.md`. Pragmatic, coverage-first, ship-and-iterate.
 
 `cd <worktree>`
 
@@ -276,7 +276,7 @@ setup → analyze → anchor → implement → test → review → review-fix �
    ```
 
 2. **Read the review agent templates** from:
-   `~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/review-agents/`
+   `~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/review-agents/`
 
 3. **Spawn 4 independent review subagents** using the Claude Code `Agent` tool. Each agent receives ONLY what's listed — **never** task-state-gateway.md, never the plan, never implementation notes.
 
@@ -297,7 +297,7 @@ setup → analyze → anchor → implement → test → review → review-fix �
    - Include full contents of `review-agents/acceptance-auditor.md`
    - Include: "Read the diff from `<worktree>/.claude/review-diff.patch`"
    - Include: "The spec: `gh issue view <issue> --repo jamescrowley321/identity-stack`"
-   - Include: "Architecture doc: `~/repos/auth/auth-planning/_bmad-output/planning-artifacts/architecture-api-gateway.md`"
+   - Include: "Architecture doc: `~/repos/auth/identity-stack-planning/_bmad-output/planning-artifacts/architecture-api-gateway.md`"
    - Include: "The codebase is at `<worktree>/`"
    - Include: "Write findings to `<worktree>/.claude/review-acceptance.md`"
    - Receives: diff + spec + architecture doc + codebase.

@@ -196,7 +196,7 @@ flowchart TD
 cd ~/repos/auth/identity-stack
 
 # Copy the appropriate prompt
-cp ~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/canonical-identity.md PROMPT.md
+cp ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/canonical-identity.md PROMPT.md
 
 # Start the loop
 ralph run

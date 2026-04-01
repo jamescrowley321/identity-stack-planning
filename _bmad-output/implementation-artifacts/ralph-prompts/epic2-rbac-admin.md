@@ -31,7 +31,7 @@ Find the first `pending` row in the Task Queue above whose dependencies are met 
 - If none eligible (all done) → output: <promise>LOOP_COMPLETE</promise>
 - Otherwise:
   1. Read the GH issue: `gh issue view <number> --repo jamescrowley321/identity-stack`
-  2. Read the epic stories for acceptance criteria: `~/repos/auth/auth-planning/_bmad-output/planning-artifacts/epics.md` — find the `### Story 2.X` section
+  2. Read the epic stories for acceptance criteria: `~/repos/auth/identity-stack-planning/_bmad-output/planning-artifacts/epics.md` — find the `### Story 2.X` section
   3. Create `~/repos/auth/identity-stack/.claude/task-state.md`:
      ```
      story: 2.X
@@ -81,12 +81,12 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 ### analyze
 
-**Persona: Amelia (Developer Agent)** — Read `~/repos/auth/auth-planning/_bmad/bmm/agents/dev.md` and adopt her mindset: ultra-succinct, file-paths-and-AC-IDs, no fluff.
+**Persona: Amelia (Developer Agent)** — Read `~/repos/auth/identity-stack-planning/_bmad/bmm/agents/dev.md` and adopt her mindset: ultra-succinct, file-paths-and-AC-IDs, no fluff.
 
 `cd <worktree>`
 
 1. Read the GH issue: `gh issue view <number> --repo jamescrowley321/identity-stack`
-2. Read acceptance criteria from `~/repos/auth/auth-planning/_bmad-output/planning-artifacts/epics.md`
+2. Read acceptance criteria from `~/repos/auth/identity-stack-planning/_bmad-output/planning-artifacts/epics.md`
 3. Read existing code that will be modified or extended:
    - `backend/app/services/descope.py` — DescopeManagementClient
    - `backend/app/routers/roles.py` — existing role endpoints
@@ -136,7 +136,7 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 ### test
 
-**Persona: Quinn (QA Engineer)** — Read `~/repos/auth/auth-planning/_bmad/bmm/agents/qa.md`. Pragmatic, coverage-first, ship-and-iterate.
+**Persona: Quinn (QA Engineer)** — Read `~/repos/auth/identity-stack-planning/_bmad/bmm/agents/qa.md`. Pragmatic, coverage-first, ship-and-iterate.
 
 `cd <worktree>`
 
@@ -164,7 +164,7 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 ### review-blind
 
-**Persona: Blind Hunter (Adversarial Reviewer)** — Read `~/repos/auth/auth-planning/_bmad/core/skills/bmad-review-adversarial-general/workflow.md`. You are a cynical, jaded reviewer with zero patience for sloppy work. The code was submitted by a clueless weasel and you expect to find problems.
+**Persona: Blind Hunter (Adversarial Reviewer)** — Read `~/repos/auth/identity-stack-planning/_bmad/core/skills/bmad-review-adversarial-general/workflow.md`. You are a cynical, jaded reviewer with zero patience for sloppy work. The code was submitted by a clueless weasel and you expect to find problems.
 
 `cd <worktree>`
 
@@ -199,7 +199,7 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 ### review-edge
 
-**Persona: Edge Case Hunter** — Read `~/repos/auth/auth-planning/_bmad/core/skills/bmad-review-edge-case-hunter/workflow.md`. You are a pure path tracer. Mechanically walk every branch. Never comment on whether code is good or bad — only list missing handling.
+**Persona: Edge Case Hunter** — Read `~/repos/auth/identity-stack-planning/_bmad/core/skills/bmad-review-edge-case-hunter/workflow.md`. You are a pure path tracer. Mechanically walk every branch. Never comment on whether code is good or bad — only list missing handling.
 
 `cd <worktree>`
 
@@ -236,7 +236,7 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 `cd <worktree>`
 
-1. Read the story's acceptance criteria from `~/repos/auth/auth-planning/_bmad-output/planning-artifacts/epics.md`
+1. Read the story's acceptance criteria from `~/repos/auth/identity-stack-planning/_bmad-output/planning-artifacts/epics.md`
 2. Read the GH issue: `gh issue view <issue> --repo jamescrowley321/identity-stack`
 3. Generate the diff:
    ```
@@ -266,7 +266,7 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 **Persona: Sentinel (Security Auditor)** — You are a pragmatic security engineer specializing in OAuth 2.0/OIDC infrastructure. You only report genuinely exploitable vulnerabilities. You understand the auth domain: token replay, JWT alg confusion, PKCE downgrade, tenant isolation bypass, SSRF via discovery endpoints, IDOR through tenant-scoped resources.
 
-Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integration-plan.md` § 2.1
+Reference: `~/repos/auth/identity-stack-planning/docs/ralph-planning/ralph-bmad-integration-plan.md` § 2.1
 
 `cd <worktree>`
 

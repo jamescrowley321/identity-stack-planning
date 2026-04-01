@@ -5,11 +5,11 @@ inputDocuments:
   - _bmad-output/planning-artifacts/architecture.md
 ---
 
-# auth-planning - Epic Breakdown
+# identity-stack-planning - Epic Breakdown
 
 ## Overview
 
-This document provides the complete epic and story breakdown for auth-planning, decomposing the requirements from the PRD and Architecture into implementable stories across the three-repo vertically integrated identity platform (py-identity-model, identity-stack, terraform-provider-descope).
+This document provides the complete epic and story breakdown for identity-stack-planning, decomposing the requirements from the PRD and Architecture into implementable stories across the three-repo vertically integrated identity platform (py-identity-model, identity-stack, terraform-provider-descope).
 
 ## Requirements Inventory
 
@@ -1888,7 +1888,7 @@ So that I can understand the design and apply it to my own projects.
 
 **Given** the three-repo pattern (protocol lib / IaC / application)
 **When** the documentation is complete
-**Then** a reference architecture document exists in `auth-planning/docs/` covering:
+**Then** a reference architecture document exists in `identity-stack-planning/docs/` covering:
 - Repository roles and responsibilities
 - Dependency graph and coupling analysis
 - TF-seeds-defaults / runtime-manages-lifecycle pattern

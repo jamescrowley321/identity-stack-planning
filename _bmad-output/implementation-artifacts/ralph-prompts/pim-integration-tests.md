@@ -78,7 +78,7 @@ setup → analyze → implement → test → review → fix → pr → ci → ci
    - `examples/identity-server/` — current Dockerfile and config
    - `src/tests/integration/` — existing integration test patterns
    - `examples/descope/` — Descope example patterns
-2. Read node-oidc-provider research: `~/repos/auth/auth-planning/_bmad-output/brainstorming/research/node-oidc-provider-research.md`
+2. Read node-oidc-provider research: `~/repos/auth/identity-stack-planning/_bmad-output/brainstorming/research/node-oidc-provider-research.md`
 3. Plan the fixture:
    - `test-fixtures/node-oidc-provider/provider.js` — configuration:
      - Enable features: introspection, revocation, deviceFlow, pushedAuthorizationRequests, requestObjects (JAR), dPoP, clientCredentials

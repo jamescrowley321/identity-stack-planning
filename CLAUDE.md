@@ -1,4 +1,4 @@
-# Claude Code Instructions — auth-planning
+# Claude Code Instructions — identity-stack-planning
 
 ## Purpose
 
@@ -8,11 +8,11 @@ This repo is the BMAD-METHOD planning hub for the auth workspace. It contains pr
 
 ## Workspace Layout
 
-This repo lives at `~/repos/auth/auth-planning/` alongside three sibling repositories that form a pseudo-monorepo:
+This repo lives at `~/repos/auth/identity-stack-planning/` alongside three sibling repositories that form a pseudo-monorepo:
 
 | Repo | Path | Description |
 |------|------|-------------|
-| `auth-planning` (this repo) | `~/repos/auth/auth-planning/` | BMAD planning artifacts and project knowledge |
+| `identity-stack-planning` (this repo) | `~/repos/auth/identity-stack-planning/` | BMAD planning artifacts and project knowledge |
 | `py-identity-model` | `~/repos/auth/py-identity-model/` | Production OIDC/OAuth2.0 Python library (JWT, token validation, discovery) |
 | `terraform-provider-descope` | `~/repos/auth/terraform-provider-descope/` | Terraform provider for Descope (Go). Fork of `descope/terraform-provider-descope` |
 | `identity-stack` | `~/repos/auth/identity-stack/` | SaaS starter kit — FastAPI backend + Vite/React frontend + Terraform infra |

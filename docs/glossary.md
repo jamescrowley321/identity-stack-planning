@@ -1,6 +1,6 @@
 # Glossary
 
-Definitions for terms used across auth-planning documents. Organized alphabetically.
+Definitions for terms used across identity-stack-planning documents. Organized alphabetically.
 
 ---
 
@@ -8,7 +8,7 @@ Definitions for terms used across auth-planning documents. Organized alphabetica
 
 **Blind Hunter** — Review agent persona that reviews code diffs with zero project context. Sees only the diff, assumes the worst about every line. Catches logic errors, security holes, dead code, and resource leaks. See [review process](review-process.md).
 
-**BMAD-METHOD** — AI-driven agile planning framework (v6) providing structured agent personas, workflows, and skill integration. Installed at `_bmad/` in auth-planning. See [bmad-code-org/BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD).
+**BMAD-METHOD** — AI-driven agile planning framework (v6) providing structured agent personas, workflows, and skill integration. Installed at `_bmad/` in identity-stack-planning. See [bmad-code-org/BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD).
 
 **Canonical identity** — The Postgres-backed identity model that serves as the source of truth for users, tenants, roles, and permissions. Identity providers (Descope, Ory, etc.) become sync targets rather than the source of truth. Defined in PRD 5. See [system architecture](system-architecture.md#canonical-identity-data-model-prd-5).
 

@@ -53,7 +53,7 @@ Cross-reference PR branches with active task-state branches to identify which PR
 Read the task queue file:
 
 ```
-~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/task-queue.md
+~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/task-queue.md
 ```
 
 For each repo section (terraform-provider-descope, identity-stack, py-identity-model), count tasks by status:

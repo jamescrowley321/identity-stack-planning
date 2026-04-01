@@ -50,7 +50,7 @@ The project is evolving beyond Descope into a multi-provider, multi-topology ide
 ├── identity-stack/              # renamed from identity-stack
 ├── py-identity-model/           # unchanged (already provider-agnostic)
 ├── terraform-provider-descope/  # unchanged (IS Descope-specific)
-└── auth-planning/               # unchanged
+└── identity-stack-planning/               # unchanged
 ```
 
 ---
@@ -330,7 +330,7 @@ Task: Repo rename identity-stack → identity-stack (I7)
 
 Which repos does each initiative touch?
 
-| Initiative | identity-stack (née identity-stack) | py-identity-model | terraform-provider-descope | auth-planning |
+| Initiative | identity-stack (née identity-stack) | py-identity-model | terraform-provider-descope | identity-stack-planning |
 |---|---|---|---|---|
 | **I1 HCP TF** | `infra/` — add `cloud` block, migrate state | — | `CLAUDE.md` reference updates | PRD, task queue |
 | **I2 Infisical** | `docker-compose.yml` (CLI injection or Infisical containers), backend entrypoint, `.env` elimination | — | Provider config to pull/push Infisical secrets | PRD, task queue |
@@ -342,7 +342,7 @@ Which repos does each initiative touch?
 
 **Repo touch count:**
 - identity-stack: **all 7 initiatives** touch it (it's the center of gravity)
-- auth-planning: **all 7** (planning artifacts)
+- identity-stack-planning: **all 7** (planning artifacts)
 - py-identity-model: **I4, I5** (test fixtures, multi-provider claims testing)
 - terraform-provider-descope: **I1, I2** (state migration, secrets flow)
 

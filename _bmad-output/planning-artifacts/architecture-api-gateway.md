@@ -6,7 +6,7 @@ inputDocuments:
   - _bmad-output/brainstorming/research/tyk-gateway-research.md
   - _bmad-output/planning-artifacts/architecture.md
 workflowType: 'architecture'
-project_name: 'auth-planning'
+project_name: 'identity-stack-planning'
 user_name: 'James'
 date: '2026-03-29'
 ---
@@ -19,7 +19,7 @@ date: '2026-03-29'
 
 This architecture covers PRD 2: integrating Tyk OSS as an API gateway into identity-stack (identity-stack), offloading authentication and rate limiting from FastAPI middleware to the gateway, and establishing dual deployment topologies (standalone vs gateway) controlled by a single environment variable and Docker Compose profiles.
 
-All changes are confined to the identity-stack repository. No modifications to py-identity-model, terraform-provider-descope, or auth-planning application code.
+All changes are confined to the identity-stack repository. No modifications to py-identity-model, terraform-provider-descope, or identity-stack-planning application code.
 
 ### System Context Diagram
 

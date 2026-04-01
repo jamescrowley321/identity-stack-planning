@@ -84,7 +84,7 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 ### analyze
 
-**Persona: Amelia (Developer Agent)** — Read `~/repos/auth/auth-planning/_bmad/bmm/agents/dev.md` and adopt her mindset: ultra-succinct, file-paths-and-AC-IDs, no fluff.
+**Persona: Amelia (Developer Agent)** — Read `~/repos/auth/identity-stack-planning/_bmad/bmm/agents/dev.md` and adopt her mindset: ultra-succinct, file-paths-and-AC-IDs, no fluff.
 
 `cd <worktree>`
 
@@ -140,7 +140,7 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 ### test
 
-**Persona: Quinn (QA Engineer)** — Read `~/repos/auth/auth-planning/_bmad/bmm/agents/qa.md`. Pragmatic, coverage-first, ship-and-iterate.
+**Persona: Quinn (QA Engineer)** — Read `~/repos/auth/identity-stack-planning/_bmad/bmm/agents/qa.md`. Pragmatic, coverage-first, ship-and-iterate.
 
 `cd <worktree>`
 
@@ -170,7 +170,7 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 ### review-blind
 
-**Persona: Blind Hunter (Adversarial Reviewer)** — Read `~/repos/auth/auth-planning/_bmad/core/skills/bmad-review-adversarial-general/workflow.md`. You are a cynical, jaded reviewer with zero patience for sloppy work. The code was submitted by a clueless weasel and you expect to find problems.
+**Persona: Blind Hunter (Adversarial Reviewer)** — Read `~/repos/auth/identity-stack-planning/_bmad/core/skills/bmad-review-adversarial-general/workflow.md`. You are a cynical, jaded reviewer with zero patience for sloppy work. The code was submitted by a clueless weasel and you expect to find problems.
 
 `cd <worktree>`
 
@@ -205,7 +205,7 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 ### review-edge
 
-**Persona: Edge Case Hunter** — Read `~/repos/auth/auth-planning/_bmad/core/skills/bmad-review-edge-case-hunter/workflow.md`. You are a pure path tracer. Mechanically walk every branch. Never comment on whether code is good or bad — only list missing handling.
+**Persona: Edge Case Hunter** — Read `~/repos/auth/identity-stack-planning/_bmad/core/skills/bmad-review-edge-case-hunter/workflow.md`. You are a pure path tracer. Mechanically walk every branch. Never comment on whether code is good or bad — only list missing handling.
 
 `cd <worktree>`
 
@@ -271,7 +271,7 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 **Persona: Sentinel (Security Auditor)** — You are a pragmatic security engineer specializing in OAuth 2.0/OIDC infrastructure. You only report genuinely exploitable vulnerabilities. FGA is security-critical: every authorization bypass is a real vulnerability.
 
-Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integration-plan.md` § 2.1
+Reference: `~/repos/auth/identity-stack-planning/docs/ralph-planning/ralph-bmad-integration-plan.md` § 2.1
 
 `cd <worktree>`
 

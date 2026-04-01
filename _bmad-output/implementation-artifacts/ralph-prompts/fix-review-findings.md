@@ -16,7 +16,7 @@ Read `.claude/task-state.md` in the repo root.
 
 ## Step 3: Pick Up Next Fix Task
 
-Read queue: `~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/task-queue.md`
+Read queue: `~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/task-queue.md`
 
 Find your repo's **"Review Fix Tasks"** section(s). ONLY look at sections whose heading contains "Review Fix Tasks" — do NOT pick tasks from any other section. Take first `pending` row whose dependencies are all `done`.
 
@@ -68,7 +68,7 @@ Phase order: checkout → fix → test → review-blind → review-edge → revi
 
 ### fix
 
-**Persona:** Read `~/repos/auth/auth-planning/_bmad/bmm/agents/dev.md` — adopt Amelia's mindset.
+**Persona:** Read `~/repos/auth/identity-stack-planning/_bmad/bmm/agents/dev.md` — adopt Amelia's mindset.
 
 1. Read `## Findings` from `.claude/task-state.md`
 2. Fix ALL **MUST FIX** items — these are non-negotiable
@@ -84,7 +84,7 @@ Phase order: checkout → fix → test → review-blind → review-edge → revi
 
 ### test
 
-**Persona:** Read `~/repos/auth/auth-planning/_bmad/bmm/agents/qa.md` — adopt Quinn's mindset.
+**Persona:** Read `~/repos/auth/identity-stack-planning/_bmad/bmm/agents/qa.md` — adopt Quinn's mindset.
 
 1. Run the repo's full test suite (commands in ~/repos/auth/CLAUDE.md)
 2. If failures: fix and re-run until green
@@ -99,7 +99,7 @@ Phase order: checkout → fix → test → review-blind → review-edge → revi
 
 ### review-blind
 
-**Persona: Blind Hunter (Adversarial Reviewer)** — Read `~/repos/auth/auth-planning/_bmad/core/skills/bmad-review-adversarial-general/workflow.md`. Cynical, jaded reviewer. The fixes may have introduced new problems.
+**Persona: Blind Hunter (Adversarial Reviewer)** — Read `~/repos/auth/identity-stack-planning/_bmad/core/skills/bmad-review-adversarial-general/workflow.md`. Cynical, jaded reviewer. The fixes may have introduced new problems.
 
 1. Generate the diff — scope to ONLY the fix commits (not the entire PR history):
    ```
@@ -126,7 +126,7 @@ Phase order: checkout → fix → test → review-blind → review-edge → revi
 
 ### review-edge
 
-**Persona: Edge Case Hunter** — Read `~/repos/auth/auth-planning/_bmad/core/skills/bmad-review-edge-case-hunter/workflow.md`. Pure path tracer on the fix diff only.
+**Persona: Edge Case Hunter** — Read `~/repos/auth/identity-stack-planning/_bmad/core/skills/bmad-review-edge-case-hunter/workflow.md`. Pure path tracer on the fix diff only.
 
 1. Generate the fix diff (same scope as review-blind)
 2. Walk ALL branching paths in the changed code. Collect ONLY unhandled paths.
@@ -147,7 +147,7 @@ Phase order: checkout → fix → test → review-blind → review-edge → revi
 
 ### review-security
 
-**Persona: Sentinel (Security Auditor)** — Read `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integration-plan.md` § 2.1. Pragmatic auth-domain security review of the fixes.
+**Persona: Sentinel (Security Auditor)** — Read `~/repos/auth/identity-stack-planning/docs/ralph-planning/ralph-bmad-integration-plan.md` § 2.1. Pragmatic auth-domain security review of the fixes.
 
 1. Generate the fix diff
 2. **Security review through the auth-domain lens.** Focus on:
