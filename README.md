@@ -1,166 +1,147 @@
 # auth-planning
 
-BMAD-METHOD v6 planning hub for a multi-repo authentication workspace. This repo contains zero application code — only planning artifacts, architecture documents, research, and project knowledge that drive development across three sibling repositories.
+Planning hub for a multi-repo identity platform built on Descope, demonstrating how AI orchestration can coordinate planning and implementation across multiple repositories at scale.
 
-This project also serves as a **use case for agentic development**, demonstrating how AI orchestration tools (BMAD agents, Ralph Orchestrator, Claude Code) can coordinate planning and implementation across multiple repositories.
+## The Problem
 
-## What This Repo Is For
+Building a production identity platform means juggling OIDC/OAuth2 libraries, Terraform infrastructure-as-code, and a full-stack application — each with their own repo, language, and release cycle. Traditional planning tools don't bridge the gap between "what we decided" and "what got built." AI-generated code compounds this: you need rigorous review processes that don't share context with the implementation.
 
-- **Planning** — PRDs, architecture docs, epics, stories, and sprint plans that define what gets built
-- **Research** — Technical research, brainstorming sessions, and competitive analysis that inform planning decisions
-- **Orchestration** — Task queue, ralph loop prompts, and runner guides that drive autonomous implementation across sibling repos
-- **Review** — Adversarial code review findings and review fix tracking
-- **Knowledge** — Project-level documentation (Descope data model, OIDC certification analysis) shared across repos
+## What We're Building
 
-## Workspace
+A vertically integrated identity platform spanning three application repositories, with this repo as the planning and orchestration layer:
 
-This repo lives at `~/repos/auth/auth-planning/` alongside three sibling repositories. The parent `~/repos/auth/CLAUDE.md` is the single source of truth for workspace-wide build commands, git conventions, and cross-repo relationships.
+**[py-identity-model](https://github.com/jamescrowley321/py-identity-model)** — Production OIDC/OAuth2.0 Python library providing JWT decoding, token validation, and discovery with dual sync/async APIs. Implements 15+ RFCs including PKCE, DPoP, PAR, JAR, Device Authorization, Token Exchange, Introspection, Revocation, and FAPI 2.0 security profiles. Used as the token validation foundation for the identity-stack backend.
 
-| Repo | Description |
-|------|-------------|
-| **auth-planning** (this repo) | BMAD planning artifacts and project knowledge |
-| **py-identity-model** | Production OIDC/OAuth2.0 Python library — JWT decoding, token validation, discovery. Dual sync/async API |
-| **terraform-provider-descope** | Terraform provider for Descope (Go). Fork of `descope/terraform-provider-descope` |
-| **identity-stack** | SaaS starter kit — FastAPI backend + Vite/React frontend + Terraform infra |
+**[terraform-provider-descope](https://github.com/jamescrowley321/terraform-provider-descope)** — Terraform provider for Descope (Go) managing project infrastructure: roles, permissions, tenants, SSO, access keys, FGA, and password settings. Published to the Terraform Registry.
 
-### Cross-Repo Dependencies
+**[identity-stack](https://github.com/jamescrowley321/identity-stack)** — Full-stack SaaS starter kit with a FastAPI backend, Vite/React frontend (shadcn/ui + Tailwind), and Terraform infrastructure. Features multi-tenant RBAC, fine-grained authorization (ReBAC), social login, passkeys, structured logging, rate limiting, and an admin portal.
 
-- `identity-stack/backend` depends on `py-identity-model` (>= 2.1.0) for token validation
-- `terraform-provider-descope` manages Descope project infrastructure the SaaS starter connects to
-- `py-identity-model/examples/descope/` contains Descope-specific integration examples
-
-## Agentic Development Stack
-
-This workspace uses three layers of AI-driven development tooling:
-
-### Layer 1: BMAD-METHOD (Planning & Personas)
-
-[BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) v6 provides structured AI-driven agile planning with specialized agent personas:
-
-| Agent | Persona | Role |
-|-------|---------|------|
-| Winston | Architect | System design, API architecture, scalable patterns |
-| Amelia | Developer | Story execution, TDD, code implementation |
-| John | Product Manager | PRDs, requirements discovery, stakeholder alignment |
-| Mary | Business Analyst | Market research, competitive analysis |
-| Quinn | QA Engineer | Test automation, E2E testing, coverage analysis |
-| Bob | Scrum Master | Sprint planning, agile ceremonies |
-| Sally | UX Designer | User research, interaction design |
-| Paige | Tech Writer | Documentation, standards compliance |
-| Barry | Quick Flow Solo Dev | Rapid spec-to-implementation |
-
-Each agent is a full persona with activation protocol, interactive menu, and Claude Code skill integration. See `_bmad/bmm/agents/` for definitions.
-
-### Layer 2: Ralph Orchestrator (Autonomous Loop Execution)
-
-[Ralph Orchestrator](https://github.com/mikeyobrien/ralph-orchestrator) provides autonomous AI agent orchestration with a hat-based pub/sub architecture. Each application repo has a `ralph.yml` (configuring the Claude backend, iteration limits, and completion promise) and a `PROMPT.md` that drives the loop.
-
-**Current setup:**
-- `ralph.yml` in `py-identity-model` and `identity-stack` (Claude backend, 15 min timeout per iteration)
-- Task queue in this repo at `_bmad-output/implementation-artifacts/task-queue.md` with cross-repo dependencies and priority
-- Ralph loop prompts in `_bmad-output/implementation-artifacts/ralph-prompts/` for different execution modes (new tasks, review fixes, epic-specific work)
-- Each iteration completes one phase of one task, persisting state to `.claude/task-state.md` in the target repo
-- Custom loop phases: `analysis → plan → execute → test → review → docs → ci → complete`
-
-**Running:**
-```bash
-# From the target repo directory — copy the appropriate prompt into PROMPT.md, then:
-ralph run
-
-# Monitor progress
-cat .claude/task-state.md
-```
-
-See `_bmad-output/implementation-artifacts/ralph-runner-guide.md` for full details.
-
-### Layer 3: Custom Integration (Planned)
-
-Bridging BMAD agents with Ralph hats to create security-focused development pipelines. See [Ralph-BMAD Integration Plan](docs/ralph-planning/ralph-bmad-integration-plan.md) for the full proposal including:
-
-- **Security Auditor (Sentinel)** — auth-domain-aware security review on every PR
-- **Red Team (Viper)** — 5-stage offensive security pipeline (inspired by [Chief Wiggum](https://github.com/wiggum-cc/chief-wiggum))
-- **Auth Domain Expert (Cipher)** — OAuth 2.0/OIDC protocol compliance specialist
-- Ralph hat topology mapping BMAD personas to pub/sub event flows
-
-## Artifacts
-
-### Planning (`_bmad-output/planning-artifacts/`)
-
-| Document | Description |
-|----------|-------------|
-| `prd.md` | Product Requirements Document |
-| `architecture.md` | System architecture and design decisions |
-| `epics.md` | Epics breakdown with stories |
-
-### Implementation (`_bmad-output/implementation-artifacts/`)
-
-| Document | Description |
-|----------|-------------|
-| `task-queue.md` | Cross-repo task tracker with dependencies and priority |
-| `sprint-plan.md` | Prioritized sprint plan |
-| `review-findings-identity-stack.md` | Adversarial code review findings |
-| `ralph-runner-guide.md` | Guide for running ralph loops |
-| `ralph-prompts/` | Loop prompt files for different execution modes |
-
-### Brainstorming & Research (`_bmad-output/brainstorming/`)
-
-| Document | Description |
-|----------|-------------|
-| `brainstorming-session-*.md` | BMAD brainstorming session outputs |
-| `research/hcp-terraform-research.md` | HCP Terraform (Terraform Cloud) research |
-| `research/infisical-research.md` | Infisical secrets management research |
-| `research/node-oidc-provider-research.md` | node-oidc-provider research |
-| `research/tyk-gateway-research.md` | Tyk API gateway research |
-
-### Project Knowledge Base (`docs/`)
-
-| Document | Description |
-|----------|-------------|
-| [Descope Data Model](docs/descope-data-model.md) | OAuth 2.0/OIDC mapping for Descope — endpoints, JWT claims, tenant model |
-| [OIDC Certification Analysis](docs/oidc-certification-analysis.md) | OpenID Foundation certification readiness assessment for py-identity-model |
-| [Orchestrator Comparison](docs/ralph-planning/orchestrator-comparison.md) | Chief Wiggum vs Ralph Orchestrator — architecture, security, community analysis |
-| [BMAD Integration Plan](docs/ralph-planning/ralph-bmad-integration-plan.md) | Custom agents, skills, and Ralph hat topology for the auth workspace |
-
-## Getting Started
-
-All BMAD skills are available as `/bmad-*` commands in Claude Code:
+### Data Flow
 
 ```
-/bmad-help                    # Contextual guidance on what to do next
-/bmad-pm                      # Product Manager agent
-/bmad-architect               # Architect agent
-/bmad-create-product-brief    # Kick off a new initiative
-/bmad-create-prd              # Product Requirements Document
-/bmad-create-architecture     # System architecture design
-/bmad-create-epics-and-stories # Break down work into implementable units
-/bmad-code-review             # Multi-layer adversarial code review
-/bmad-sprint-planning         # Generate sprint plan from epics
-/bmad-brainstorming           # Facilitated ideation sessions
+terraform-provider-descope            py-identity-model
+  (provisions Descope infra)            (validates tokens at runtime)
+         |                                       |
+         |  roles, permissions,                  |  OIDC discovery, JWKS,
+         |  tenants, SSO, keys                   |  JWT decode & validate
+         v                                       v
+                    identity-stack
+         +--------------------------------------------+
+         |  React frontend    |  FastAPI backend       |
+         |  react-oidc-context |  TokenValidation-     |
+         |  OAuth2 code flow  |  Middleware uses       |
+         |  Descope hosted    |  py-identity-model     |
+         |  login             |                        |
+         +--------------------------------------------+
 ```
+
+## What We've Accomplished
+
+**py-identity-model** — All 16 protocol features shipped and published (v2.17.1). Full review cycle complete across 100+ merged PRs. Integration test harness deployed using node-oidc-provider for RFC-compliant validation.
+
+**terraform-provider-descope** — 15 resources and 4 data sources implemented. Published to Terraform Registry (v1.1.x). All review fix cycles complete across 65+ merged PRs.
+
+**identity-stack** — Core platform operational: session management, tenant management, RBAC, custom attributes, access keys, admin portal, FGA/ReBAC, social login, passkeys. Security hardening complete (headers, rate limiting, audit logging, structured logging, health checks, retry logic). UI migrated to shadcn/ui + Tailwind CSS v4. 44+ merged PRs.
+
+## What's Next
+
+**Canonical Identity Domain Model (PRD 5)** — Postgres-backed identity layer beneath the existing Descope API surface. 4 epics, 19 stories covering database schema, Alembic migrations, error models, OpenTelemetry integration, inbound sync from Descope via webhooks, and multi-IdP identity linking.
+
+**py-identity-model Integration Tests** — RFC-compliant test suites running against a live OIDC provider (node-oidc-provider). Core flows and token management tests in progress; advanced request patterns, alternative grants, and FAPI 2.0 compliance validation planned.
+
+**Planned PRDs** — API gateway (Tyk), infrastructure secrets pipeline (Infisical), multi-provider test infrastructure, and multi-IdP gateway demo.
+
+## How It's Built — Agentic Development
+
+This workspace uses three layers of AI-driven tooling to plan, implement, and review code autonomously:
+
+### BMAD-METHOD (Planning)
+
+[BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) v6 provides structured planning with 9 specialized agent personas — Architect, Developer, Product Manager, Business Analyst, QA Engineer, Scrum Master, UX Designer, Tech Writer, and Quick Flow Solo Dev. Each agent has an activation protocol, interactive menu, and Claude Code skill integration. Available as `/bmad-*` commands.
+
+### Ralph Orchestrator (Execution)
+
+[Ralph Orchestrator](https://github.com/mikeyobrien/ralph-orchestrator) drives autonomous task execution across repos. A single task queue in this repo tracks cross-repo dependencies and priority. Ralph loops execute one phase per iteration — analysis, plan, implement, test, review, docs, CI — persisting state between iterations for crash recovery and manual inspection.
+
+### Independent Review Agents (Quality)
+
+Multi-persona adversarial review system where each reviewer runs in a fresh context with zero access to the implementation plan:
+
+- **Blind Hunter** — Cynical diff-only review (logic errors, security holes, dead code)
+- **Edge Case Hunter** — Exhaustive path tracer (unhandled branches, boundary conditions)
+- **Acceptance Auditor** — Requirements traceability (spec compliance, test coverage mapping)
+- **Sentinel** — Auth-domain security specialist (tenant isolation, JWT attacks, IDOR)
+- **Viper** — Red team offensive security (5-stage pipeline from recon through remediation)
 
 ## Repository Structure
 
 ```
 auth-planning/
-  _bmad/                      # BMAD-METHOD v6 installation
-    bmm/                      # BMM module — agents, workflows, config
-      agents/                 # Agent persona definitions (9 agents)
-      config.yaml             # Project-level configuration
-      teams/                  # Agent team bundles
-    core/                     # Core skills and shared workflows
-    _config/                  # Agent/skill manifests and customization
-    _memory/                  # Agent persistent memory
-  _bmad-output/               # Generated artifacts
-    planning-artifacts/       # PRDs, architecture docs, epics
-    implementation-artifacts/ # Task queue, sprint plan, review findings
-      ralph-prompts/          # Loop prompts for autonomous execution
-    brainstorming/            # Brainstorming sessions
-      research/               # Technical research reports
-  docs/                       # Project knowledge base
-    ralph-planning/           # Ralph orchestrator analysis and integration plans
-  .claude/                    # Claude Code configuration
-    skills/                   # BMAD skill wrappers
+  _bmad/                          # BMAD-METHOD v6 installation
+    bmm/                          # Agents, workflows, config
+  _bmad-output/
+    planning-artifacts/           # PRDs, architecture docs, epics
+      prd.md                      # Main PRD — unified platform vision
+      prd-canonical-identity.md   # PRD 5 — canonical identity domain model
+      prd-api-gateway.md          # Planned — Tyk API gateway
+      prd-infrastructure-secrets.md
+      prd-multi-provider-test.md
+      prd-multi-idp-demo.md
+      architecture.md             # System architecture + ADRs
+      epics.md                    # Epics with story breakdowns
+    implementation-artifacts/
+      task-queue.md               # Cross-repo task tracker
+      sprint-plan.md              # Prioritized sprint plan
+      ralph-prompts/              # Loop prompts for autonomous execution
+        run-next-task.md          # General task execution
+        fix-review-findings.md    # Review fix loop
+        canonical-identity.md     # PRD 5 story loop
+        pim-adversarial-review.md # Full codebase security review
+        review-agents/            # Independent reviewer templates
+      ralph-runner-guide.md       # Guide for running ralph loops
+    brainstorming/
+      research/                   # Technical research (Tyk, Infisical, HCP Terraform, node-oidc-provider)
+  docs/                           # Project knowledge base
+    descope-data-model.md         # OAuth 2.0/OIDC mapping for Descope
+    oidc-certification-analysis.md
+    ralph-planning/               # Orchestrator analysis + integration plans
+  .claude/
+    skills/                       # 45 BMAD skills + ralph-status
 ```
+
+## Quick Start
+
+All BMAD skills are available as `/bmad-*` commands in Claude Code:
+
+```
+/bmad-help                      # Contextual guidance on what to do next
+/bmad-pm                        # Product Manager agent
+/bmad-architect                 # Architect agent
+/bmad-create-prd                # Create a Product Requirements Document
+/bmad-create-architecture       # Design system architecture
+/bmad-create-epics-and-stories  # Break down work into stories
+/bmad-sprint-planning           # Generate sprint plan
+/bmad-code-review               # Multi-layer adversarial code review
+/ralph-status                   # Monitor active ralph loops across workspace
+```
+
+Running a ralph loop:
+
+```bash
+cd ~/repos/auth/identity-stack
+cp ~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/canonical-identity.md PROMPT.md
+ralph run
+```
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Descope Data Model](docs/descope-data-model.md) | OAuth 2.0/OIDC endpoint mapping, JWT claims, tenant model |
+| [OIDC Certification Analysis](docs/oidc-certification-analysis.md) | OpenID Foundation certification readiness for py-identity-model |
+| [Orchestrator Comparison](docs/ralph-planning/orchestrator-comparison.md) | Chief Wiggum vs Ralph Orchestrator analysis |
+| [BMAD Integration Plan](docs/ralph-planning/ralph-bmad-integration-plan.md) | Security agents, skills, and Ralph hat topology |
+| [Ralph Runner Guide](_bmad-output/implementation-artifacts/ralph-runner-guide.md) | Running and monitoring ralph loops |
 
 ## License
 
