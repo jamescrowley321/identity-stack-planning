@@ -67,6 +67,8 @@ The parent directory `~/repos/auth/CLAUDE.md` contains consolidated commands, gi
 
 ## Git Conventions
 
-- Standard commit messages (no conventional commits required)
+- **Conventional commits** (Angular convention) — commit messages must use prefixes like `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `ci:`, `build:`, `test:`, `style:`, `perf:`
 - Planning artifacts are committed to this repo
+- Always work on feature branches, never commit directly to `main`
+- Branch names follow `<type>/<short-description>` format (e.g., `feat/ralph-status-skill`, `docs/update-architecture`)
 - Each sibling repo has its own git history and remote — see `~/repos/auth/CLAUDE.md` for per-repo conventions
