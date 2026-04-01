@@ -85,7 +85,7 @@ Read phase from task-state.md. Execute ONLY that phase. When done, update the ph
 Phase order:
 
 ```
-setup → analyze → implement → test → review-blind → review-edge → review-acceptance → review-security → review-fix → pr → ci → ci-fix (loop) → complete
+setup → analyze → anchor → implement → test → review → review-fix → pr → ci → ci-fix (loop) → complete
 ```
 
 ---
@@ -120,19 +120,58 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 1. Read the GH issue: `gh issue view <number> --repo jamescrowley321/identity-stack`
 2. Read the architecture doc: `~/repos/auth/auth-planning/_bmad-output/planning-artifacts/architecture-canonical-identity.md` (implementation patterns, enforcement guidelines, module structure)
-3. Read existing code that will be modified or extended:
+3. **Read EVERY file that will be modified or extended** — not just list them, actually `cat -n` each one:
    - `backend/app/services/descope.py` — DescopeManagementClient (becomes sync adapter data source)
    - `backend/app/routers/roles.py`, `permissions.py`, `users.py` — existing CRUD patterns to follow
    - `backend/app/dependencies/rbac.py` — require_role pattern
    - `backend/app/main.py` — router registration, middleware, lifespan
    - `backend/app/models/` — existing SQLModel patterns
    - `docker-compose.yml` — existing service configuration
+   - Any additional files the story touches
 4. Write implementation plan to task-state.md under `## Plan`:
-   - List files to create/modify
+   - List files to create/modify **with current line counts**
+   - List functions/classes/imports that exist in each file (from step 3)
    - List methods/endpoints to add
    - Note edge cases from ACs
    - Map each AC to the code change that satisfies it
-5. **Set phase to `implement`. End your response.**
+5. **Set phase to `anchor`. End your response.**
+
+---
+
+### anchor
+
+**Codebase anchoring — verify the plan matches reality before implementing.**
+
+`cd <worktree>`
+
+1. Record the current HEAD SHA:
+   ```
+   git rev-parse HEAD
+   ```
+   Write to task-state.md under `## Anchor`.
+
+2. For every file listed in `## Plan`, read the actual file and record a snapshot:
+   ```
+   ## Anchor: File Snapshots
+
+   ### <file_path> (N lines)
+   First 5 lines:
+   <lines 1-5>
+   Last 5 lines:
+   <lines N-4 to N>
+   ```
+   For new files (to be created), record: `NEW FILE — does not exist yet`
+
+3. **Cross-reference the plan against reality.** For each file the plan modifies:
+   - Does every function/class/import referenced in the plan actually exist in the file?
+   - Are the line numbers roughly correct?
+   - Does the file structure match what the plan assumes?
+
+4. **If any mismatch is found** (plan references functions, classes, or imports that don't exist):
+   - Log the mismatch under `## Anchor: Mismatches`
+   - **Set phase back to `analyze`. End your response.** (forces re-analysis)
+
+5. If all files match: **Set phase to `implement`. End your response.**
 
 ---
 
@@ -142,8 +181,9 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
 `cd <worktree>`
 
-1. Read `## Plan` from task-state.md
-2. Implement the plan:
+1. Read `## Plan` AND `## Anchor: File Snapshots` from task-state.md
+2. **Cross-reference anchor snapshots** — before modifying a file, verify it still matches the snapshot (hasn't been changed by another process)
+3. Implement the plan:
    - Follow existing code patterns exactly
    - **Enforcement guidelines from architecture doc (ALL mandatory):**
      1. Use `AsyncSession` — never `Session`. No sync database access anywhere.
@@ -161,9 +201,9 @@ setup → analyze → implement → test → review-blind → review-edge → re
    - Write endpoints use `@limiter.limit(RATE_LIMIT_AUTH)` with `request: Request` as first param
    - Error handling: `httpx.HTTPStatusError` → SyncError, `httpx.RequestError` → SyncError
    - Register new routers in `main.py` if creating new files
-3. Run lint: `make lint` (from worktree root)
-4. Fix any lint issues
-5. Commit with descriptive message:
+4. Run lint: `make lint` (from worktree root)
+5. Fix any lint issues
+6. Commit with descriptive message:
    ```
    git add <specific files — never git add .>
    git commit -m "feat: <description>
@@ -171,7 +211,7 @@ setup → analyze → implement → test → review-blind → review-edge → re
    Refs #<issue>"
    ```
    (Use `Refs` not `Closes` — the PR will close the issue)
-6. **Set phase to `test`. End your response.**
+7. **Set phase to `test`. End your response.**
 
 ---
 
@@ -206,163 +246,123 @@ setup → analyze → implement → test → review-blind → review-edge → re
 
    Refs #<issue>"
    ```
-9. **Set phase to `review-blind`. End your response.**
+9. **Set phase to `review`. End your response.**
 
 ---
 
-### review-blind
+### review
 
-**Persona: Blind Hunter (Adversarial Reviewer)** — Read `~/repos/auth/auth-planning/_bmad/core/skills/bmad-review-adversarial-general/workflow.md`. Cynical, jaded, expects problems.
-
-`cd <worktree>`
-
-1. Generate the diff:
-   ```
-   git diff origin/<base_branch>...HEAD
-   ```
-2. **Review with extreme skepticism.** Diff-only — no project context, no excuses. Look for:
-   - Logic errors, off-by-one, incorrect assumptions
-   - Missing error handling, swallowed exceptions
-   - Security vulnerabilities (injection, auth bypass, IDOR, fail-open)
-   - API contract violations (wrong status codes, missing fields)
-   - Race conditions, concurrency issues (especially write-through ordering)
-   - Hardcoded values that should be configurable
-   - Dead code, unused imports, copy-paste errors
-   - Missing validation on inputs
-   - **Sync-specific:** Does Postgres write commit before sync? Does sync failure avoid rollback?
-   - **Tenant isolation:** Is tenant_id checked on every query?
-3. Write findings to task-state.md under `## Review: Blind Hunter`:
-   ```
-   ### MUST FIX
-   - [location] finding
-
-   ### SHOULD FIX
-   - [location] finding
-
-   ### NITPICK
-   - [location] finding
-   ```
-4. **Set phase to `review-edge`. End your response.**
-
----
-
-### review-edge
-
-**Persona: Edge Case Hunter** — Read `~/repos/auth/auth-planning/_bmad/core/skills/bmad-review-edge-case-hunter/workflow.md`. Pure path tracer. No editorializing.
+**Spawn independent review subagents.** Each reviewer runs in a fresh context with NO access to the implementation plan or task-state.md.
 
 `cd <worktree>`
 
-1. Generate the diff:
+1. **Generate the diff and save to disk:**
+   ```bash
+   git diff origin/<base_branch>...HEAD > .claude/review-diff.patch
    ```
-   git diff origin/<base_branch>...HEAD
+
+2. **Read the review agent templates** from:
+   `~/repos/auth/auth-planning/_bmad-output/implementation-artifacts/ralph-prompts/review-agents/`
+
+3. **Spawn 4 independent review subagents** using the Claude Code `Agent` tool. Each agent receives ONLY what's listed — **never** task-state.md, never the plan, never implementation notes.
+
+   **Blind Hunter** — `Agent` call with prompt:
+   - Include full contents of `review-agents/blind-hunter.md`
+   - Include: "Read the diff from `<worktree>/.claude/review-diff.patch`"
+   - Include: "Write findings to `<worktree>/.claude/review-blind.md`"
+   - Receives: diff only. No spec, no project context, no codebase access.
+
+   **Edge Case Hunter** — `Agent` call with prompt:
+   - Include full contents of `review-agents/edge-case-hunter.md`
+   - Include: "Read the diff from `<worktree>/.claude/review-diff.patch`"
+   - Include: "The codebase is at `<worktree>/` — read any file you need for context"
+   - Include: "Write findings to `<worktree>/.claude/review-edge.md`"
+   - Receives: diff + full codebase read access.
+
+   **Acceptance Auditor** — `Agent` call with prompt:
+   - Include full contents of `review-agents/acceptance-auditor.md`
+   - Include: "Read the diff from `<worktree>/.claude/review-diff.patch`"
+   - Include: "The spec: `gh issue view <issue> --repo jamescrowley321/identity-stack`"
+   - Include: "Architecture doc: `~/repos/auth/auth-planning/_bmad-output/planning-artifacts/architecture-canonical-identity.md`"
+   - Include: "The codebase is at `<worktree>/`"
+   - Include: "Write findings to `<worktree>/.claude/review-acceptance.md`"
+   - Receives: diff + spec + architecture doc + codebase.
+
+   **Sentinel** — `Agent` call with prompt:
+   - Include full contents of `review-agents/sentinel.md`
+   - Include: "Read the diff from `<worktree>/.claude/review-diff.patch`"
+   - Include: "The codebase is at `<worktree>/` — read any file you need"
+   - Include: "Write findings to `<worktree>/.claude/review-security.md`"
+   - Receives: diff + full codebase read access.
+
+   Launch all 4 agents in parallel (multiple Agent calls in one response).
+
+4. **Conditional: Red Team (Viper)** — after the 4 agents complete, check if any changed file matches:
    ```
-2. **Exhaustive path analysis.** For each changed function:
-   - Walk ALL branching paths
-   - Walk ALL domain boundaries: null/empty, type edges, zero-length collections
-   - Walk ALL async boundaries: unhandled exceptions in awaits
-   - Collect ONLY unhandled paths
-3. Write findings to task-state.md under `## Review: Edge Case Hunter` as JSON:
-   ```json
-   [
-     {
-       "location": "file:line",
-       "trigger_condition": "description (max 15 words)",
-       "guard_snippet": "minimal code sketch",
-       "potential_consequence": "what goes wrong (max 15 words)"
-     }
-   ]
+   middleware/* | dependencies/rbac.py | dependencies/auth.py | routers/auth.py |
+   **/token* | **/jwt* | **/oidc* | docker-compose* | tyk/*
    ```
-4. **Set phase to `review-acceptance`. End your response.**
+   If yes: spawn a 5th `Agent` with `review-agents/viper.md`, the diff, and full codebase access.
+   Write findings to `<worktree>/.claude/review-redteam.md`.
+   If no: skip.
 
----
+5. **Verify all review files were written** — read each `.claude/review-*.md` file to confirm they exist and are non-empty.
 
-### review-acceptance
-
-**Persona: Acceptance Auditor** — Meticulous spec-compliance. Zero tolerance for gaps.
-
-`cd <worktree>`
-
-1. Read ACs from GH issue: `gh issue view <issue> --repo jamescrowley321/identity-stack`
-2. Generate diff: `git diff origin/<base_branch>...HEAD`
-3. For each AC: Is it implemented? Is it tested? Does it match the spec's intent?
-4. Verify E2E coverage exists for the story
-5. Write findings to task-state.md under `## Review: Acceptance Auditor`:
-   ```
-   ### PASS
-   - [AC ref] — implemented at [file:line], tested at [test:line]
-
-   ### FAIL
-   - [AC ref] — what's missing
-
-   ### PARTIAL
-   - [AC ref] — what's done vs what's missing
-   ```
-6. **Set phase to `review-security`. End your response.**
-
----
-
-### review-security
-
-**Persona: Sentinel (Security Auditor)** — Pragmatic auth-domain security. Only genuinely exploitable vulnerabilities.
-
-Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integration-plan.md` section 2.1
-
-`cd <worktree>`
-
-1. Generate diff: `git diff origin/<base_branch>...HEAD`
-2. **Security review through the identity-domain lens:**
-   - **Tenant isolation:** Can tenant A access tenant B data? Is tenant_id checked everywhere?
-   - **Authorization bypass:** Can non-admin reach admin endpoints? Can auth be bypassed?
-   - **IDOR:** Can users enumerate or access others' data by guessing IDs?
-   - **Sync ordering:** If Postgres writes but sync fails, is state consistent?
-   - **Credential exposure:** Are IdP credentials, config_ref values, or internal paths leaked in responses?
-   - **Input validation:** Are all inputs validated before hitting Postgres or Descope API?
-   - **Rate limiting:** Are write endpoints rate-limited?
-   - **Internal API exposure:** Are `/api/internal/*` endpoints accessible externally?
-3. Write findings to task-state.md under `## Review: Security (Sentinel)`:
-   ```
-   ### BLOCK (must fix)
-   - [CONFIRMED/LIKELY] [location] — finding + attack scenario
-
-   ### WARN (should fix)
-   - [LIKELY/UNLIKELY] [location] — finding + mitigation
-
-   ### INFO (acceptable risk)
-   - [location] — observation
-   ```
-4. **Set phase to `review-fix`. End your response.**
+6. **Set phase to `review-fix`. End your response.**
 
 ---
 
 ### review-fix
 
-**Persona: Amelia (Developer Agent)** — Fix mode.
+**Persona: Amelia (Developer Agent)** — Fix mode with review gate.
 
 `cd <worktree>`
 
-1. Read ALL review sections from task-state.md
-2. Triage by priority:
-   1. Security BLOCK — fix ALL
-   2. Acceptance FAIL — fix ALL
-   3. Blind Hunter MUST FIX — fix ALL
-   4. Edge cases with security/crash consequence — fix ALL
-   5. Security WARN — fix where straightforward
-   6. Blind Hunter SHOULD FIX — fix where low-risk
-   7. Acceptance PARTIAL — complete if feasible
-   8. Remaining edge cases — fix where guard is simple
-   9. NITPICK/INFO — skip unless trivial
-3. For each fix: make change, verify lint + tests
-4. Commit:
-   ```
-   git add <specific files>
-   git commit -m "fix: address review findings
+1. **Read ALL review files:**
+   - `.claude/review-blind.md`
+   - `.claude/review-edge.md`
+   - `.claude/review-acceptance.md`
+   - `.claude/review-security.md`
+   - `.claude/review-redteam.md` (if exists)
 
-   - <summary of key fixes>
+2. **Count blocking findings** across all reviewers:
+   - Blind Hunter: `MUST FIX` items
+   - Edge Case Hunter: `[CRASH]` or `[DATA]` items
+   - Acceptance Auditor: `FAIL` items
+   - Sentinel: `BLOCK` items
+   - Viper: `CRITICAL` or `HIGH` items
 
-   Refs #<issue>"
-   ```
-5. Write summary to task-state.md under `## Review Fix Summary`
-6. **Set phase to `pr`. End your response.**
+3. **If blocking count > 0:**
+   a. Address each blocking finding with a code change
+   b. Run `make lint && make test-unit`
+   c. Commit fixes:
+      ```
+      git add <specific files>
+      git commit -m "fix: address review findings (iteration N)
+
+      Refs #<issue>"
+      ```
+   d. Regenerate diff: `git diff origin/<base_branch>...HEAD > .claude/review-diff.patch`
+   e. Re-spawn ONLY the reviewer(s) that had blocking findings (not all reviewers)
+   f. Read new review files and recount
+   g. **Repeat up to 3 iterations total**
+
+4. **If 3 iterations exhausted with unresolved blocking findings:**
+   - Write `## Review Gate: BLOCKED` to task-state.md with remaining findings
+   - Set task to `blocked` — do NOT create PR
+   - **End your response.**
+
+5. **If blocking count is 0 (or reaches 0 within 3 iterations):**
+   - Write `## Review Summary` to task-state.md:
+     ```
+     ### Review Gate: PASSED (iteration N)
+     - Blind Hunter: N MUST FIX (all resolved), N SHOULD FIX, N NITPICK
+     - Edge Case Hunter: N paths found, N critical (all resolved)
+     - Acceptance: N PASS, N FAIL (all resolved), N PARTIAL
+     - Security: N BLOCK (all resolved), N WARN, N INFO
+     - Red Team: [N findings / skipped]
+     ```
+   - **Set phase to `pr`. End your response.**
 
 ---
 
@@ -398,11 +398,13 @@ Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integratio
    - Blind Hunter: <count> MUST FIX, <count> SHOULD FIX
    - Edge Cases: <count> unhandled paths found, <count> fixed
    - Acceptance: <count> PASS, <count> FAIL fixed, <count> PARTIAL
+   - Red Team: <count> findings / skipped
 
    ## Test plan
    - [x] Unit tests pass (`make test-unit`)
    - [x] E2E tests pass (`make test-e2e`)
    - [x] Lint passes (`make lint`)
+   - [x] Independent review agents passed (blind, edge, acceptance, security)
    - [ ] CI passes
    - [ ] Manual verification against Descope sandbox
 
@@ -466,26 +468,27 @@ Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integratio
 | Phase | Persona | Source | Mindset |
 |-------|---------|--------|---------|
 | analyze | Amelia (Dev) | `_bmad/bmm/agents/dev.md` | Ultra-succinct, file-paths-and-ACs, zero fluff |
+| anchor | — | Mechanical verification | Compare plan to actual files, halt on mismatch |
 | implement | Amelia (Dev) | `_bmad/bmm/agents/dev.md` | Focused, every line citable to an AC |
 | test | Quinn (QA) | `_bmad/bmm/agents/qa.md` | Pragmatic, coverage-first, ship-and-iterate |
-| review-blind | Blind Hunter | `_bmad/core/skills/bmad-review-adversarial-general/workflow.md` | Cynical, diff-only, expects problems |
-| review-edge | Edge Case Hunter | `_bmad/core/skills/bmad-review-edge-case-hunter/workflow.md` | Pure path tracer, exhaustive |
-| review-acceptance | Acceptance Auditor | GH issue ACs | Meticulous spec-compliance |
-| review-security | Sentinel | `docs/ralph-planning/ralph-bmad-integration-plan.md` section 2.1 | Auth-domain security, only real vulns |
-| review-fix | Amelia (Dev) | `_bmad/bmm/agents/dev.md` | Systematic triage, fix by priority |
+| review | Subagents | `review-agents/*.md` | Each persona in fresh context, isolated from plan |
+| review-fix | Amelia (Dev) | `_bmad/bmm/agents/dev.md` | Systematic triage, fix by priority, gate enforcement |
 | ci-fix | Amelia (Dev) | `_bmad/bmm/agents/dev.md` | CI ops, diagnose and fix |
 
 ## Rules
 
 - Execute ONE phase per iteration, then end — do NOT chain phases
 - NEVER output a promise unless a task just completed or no tasks remain
-- NEVER skip phases — every story goes through all review layers
+- NEVER skip phases — every story goes through anchor + all review layers
 - NEVER commit to main — always work on feature branches in worktrees
 - **All work after `setup` happens in the worktree** — always `cd <worktree>` first
 - PRs are chained: each story branches from the previous story's branch
 - Always read `~/repos/auth/CLAUDE.md` for repo commands
 - Always read the architecture doc for enforcement guidelines and patterns
 - Follow existing code patterns — do not invent new conventions
+- **Anchor before implement:** Never implement without verifying the plan matches the real codebase
+- **Review isolation:** Review subagents MUST NOT read task-state.md, the plan, or implementation notes. They receive only what's specified in the review phase.
+- **Review gate:** PRs are blocked if any reviewer has unresolved blocking findings after 3 fix iterations
 - **IdentityService pattern:** All new identity routes inject `IdentityService`, not `DescopeManagementClient` directly
 - **FGA/access keys stay proxied:** These routes continue using `get_descope_client()` directly (ADR-2, D11)
 - **Async only:** No sync engine, no sync Session, no sync fallback anywhere (D3)
@@ -494,5 +497,4 @@ Reference: `~/repos/auth/auth-planning/docs/ralph-planning/ralph-bmad-integratio
 - **Write-through:** Postgres first, sync second. Sync failure → log, never rollback (D7)
 - **Git operations:** Use `gh` CLI for GitHub operations. Use `git` for push/pull/fetch.
 - **Scope discipline:** Only implement what the story specifies — no extras
-- **Review integrity:** Each persona operates independently. Don't pre-fix to avoid findings.
 - If stuck 3+ iterations on same phase: set task to `blocked`, clean up worktree, delete state, pick up next
