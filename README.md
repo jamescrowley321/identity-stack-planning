@@ -51,6 +51,177 @@ terraform-provider-descope            py-identity-model
 
 **Planned PRDs** — API gateway (Tyk), infrastructure secrets pipeline (Infisical), multi-provider test infrastructure, and multi-IdP gateway demo.
 
+## Architecture
+
+### Provider Abstraction Tiers
+
+Capabilities are classified by cross-provider mapping feasibility. This determines what gets abstracted vs what stays provider-specific:
+
+```
++------------------------------------------------------------------+
+|                     Tier 1: Abstract                              |
+|  (similar shape across providers — common interface)              |
+|                                                                   |
+|   User CRUD    ReBAC/Authz    SSO/Federation    Session Mgmt     |
+|   M2M Keys     Token Validation                                  |
++------------------------------------------------------------------+
+|                     Tier 2: Translate                             |
+|  (interface + provider-specific adapters)                         |
+|                                                                   |
+|   RBAC Roles/Permissions         Password Policy                 |
++------------------------------------------------------------------+
+|                     Tier 3: Provider-Specific                     |
+|  (don't abstract — too divergent)                                |
+|                                                                   |
+|   Multi-Tenancy    Flows/Orchestration    Connectors    JWTs     |
++------------------------------------------------------------------+
+```
+
+### Canonical Identity Domain Model (PRD 5)
+
+Inverts the current architecture: the backend owns a canonical Postgres store, with IdPs becoming sync targets instead of the source of truth.
+
+```
+                        API Request
+                            |
+                            v
+                    +---------------+
+                    |  FastAPI       |
+                    |  Router        |
+                    +-------+-------+
+                            |
+                            v
+                  +-------------------+
+                  | IdentityService   |  <-- ABC interface
+                  | (Postgres impl)   |
+                  +--------+----------+
+                           |
+              +------------+------------+
+              |                         |
+              v                         v
+     +----------------+     +------------------------+
+     |  PostgreSQL 16  |     | IdentityProviderAdapter |  <-- ABC
+     |  (canonical     |     |   +-- DescopeSyncAdapter |
+     |   source of     |     |   +-- NoOpSyncAdapter    |
+     |   truth)        |     |   +-- (future: Ory, etc) |
+     +----------------+     +------------------------+
+                                       |
+                              write-through sync
+                              (never rollback on
+                               sync failure)
+                                       |
+                                       v
+                              +----------------+
+                              |  Descope API   |
+                              |  (or other IdP)|
+                              +----------------+
+```
+
+**Schema** (8 tables, SCIM-aligned):
+
+```
+users ──────< idp_links >────── providers
+  |
+  +──< user_tenant_roles >──+
+  |                          |
+tenants              roles ──< role_permissions >── permissions
+```
+
+**Write-through sync pattern**: Postgres write first, IdP sync second. Sync failures are logged and warned but never rolled back — a reconciliation job catches up asynchronously.
+
+### Deployment Topology (PRD 2)
+
+Two deployment modes coexist in a single codebase, toggled by `DEPLOYMENT_MODE` at startup:
+
+```
+STANDALONE MODE (default)              GATEWAY MODE (--profile gateway)
+========================               ==============================
+
+React SPA (:3000)                      React SPA (:3000)
+     |                                      |
+     | /api/*                               | /api/*
+     v                                      v
+FastAPI (:8000)                        Tyk Gateway (:8080)
+  - JWT validation (pim)                 - JWT validation (JWKS/RSA)
+  - Rate limiting (SlowAPI)              - Rate limiting (Redis)
+  - Security headers                     - Header forwarding
+  - CORS                                 - CORS
+  - Authorization                             |
+  |                                           v
+  v                                    FastAPI (:8000)
+Descope API                              - Security headers
+                                         - Authorization only
+                                         - (no JWT/rate limit -
+                                         -  offloaded to Tyk)
+                                         |
+                                         v
+                                    Descope API
+                                         |
+                                    Redis (:6379)
+```
+
+**Key boundary**: Tyk handles authentication ("is this token valid?"), FastAPI handles authorization ("does user X have role Y in tenant Z?"). Descope JWTs contain nested multi-tenant claims that gateways cannot enforce.
+
+### Secrets Pipeline (PRD 3)
+
+Reduces N secrets in `.env` files down to 2 bootstrap credentials:
+
+```
+Developer Workstation
+  |
+  |  2 bootstrap secrets:
+  |    INFISICAL_MACHINE_IDENTITY_CLIENT_ID
+  |    INFISICAL_MACHINE_IDENTITY_CLIENT_SECRET
+  |
+  +--------+-----------+-----------+
+  |        |           |           |
+  v        v           v           v
+
+HCP         Infisical       Descope       identity-stack
+Terraform   Cloud           API           (consumer)
+  |           |               |               |
+  |  state    |  secrets      |  provisions   |  infisical run
+  |  locking  |  audit log    |  roles/perms  |  injects env vars
+  |  history  |  folders      |  tenants/keys |  zero code changes
+  |           |               |               |
+  +-----------+---------------+---------------+
+              |
+              v
+       terraform apply
+         1. Provision Descope config
+         2. Write outputs to Infisical
+         3. App reads via `infisical run`
+```
+
+### Ralph Loop Execution Model
+
+Each ralph iteration completes one phase, then exits. State persists to disk for crash recovery:
+
+```
+ralph run
+  |
+  v
+Iteration 1    Iteration 2    Iteration 3      ...     Iteration N
++---------+    +---------+    +---------+              +---------+
+| analyze |    |  plan   |    |implement|              |complete |
+| phase   |--->| phase   |--->| phase   |--- ... ----->| phase   |
++---------+    +---------+    +---------+              +---------+
+     |              |              |                        |
+     v              v              v                        v
+  .claude/       .claude/       .claude/                 delete
+  task-state.md  task-state.md  task-state.md            task-state
+  (persisted)    (updated)      (updated)                mark done
+
+                    |
+                    |  Review phases spawn independent agents:
+                    |
+                    +---> Blind Hunter    (fresh context, diff only)
+                    +---> Edge Case Hunter (fresh context, full repo)
+                    +---> Acceptance Auditor (fresh context, spec + repo)
+                    +---> Sentinel         (fresh context, security lens)
+                    +---> Viper            (conditional, auth changes only)
+```
+
 ## How It's Built — Agentic Development
 
 This workspace uses three layers of AI-driven tooling to plan, implement, and review code autonomously:
