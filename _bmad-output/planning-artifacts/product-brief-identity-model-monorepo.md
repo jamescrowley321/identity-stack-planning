@@ -21,11 +21,11 @@ The identity protocol client space outside of C#/.NET is fragmented and underwhe
 - **Go:** `coreos/go-oidc` is minimal; `golang.org/x/oauth2` is low-level; no cohesive OIDC client library
 - **Rust:** Nascent ecosystem — `openidconnect-rs` exists but has rough ergonomics and limited adoption
 
-**Duende IdentityServer** dominates in C# because it provides the complete, standards-compliant, well-abstracted identity experience. Outside of C#, developers cobble together 3-4 libraries per language to achieve what Duende gives .NET developers in one package. There is no cross-language identity client brand.
+Duende Software's [IdentityModel](https://github.com/IdentityModel/IdentityModel) and [IdentityServer](https://github.com/DuendeSoftware/IdentityServer) set the standard for what a well-designed identity client library looks like — clean abstractions, comprehensive RFC coverage, and a developer experience that makes complex protocols accessible. Their work is the gold standard in C#/.NET and a direct inspiration for this project. Outside of .NET, however, no equivalent exists. Developers cobble together 3-4 libraries per language to approximate what Duende's ecosystem provides in one cohesive package. There is no cross-language identity client brand.
 
 ## The Vision
 
-**identity-model** becomes the Duende of the non-C# world — a single project providing production-grade, RFC-compliant OIDC/OAuth2 client libraries across Python, Node/TypeScript, Go, and Rust.
+**identity-model** brings the design philosophy pioneered by Duende's IdentityModel to the rest of the ecosystem — a single project providing production-grade, RFC-compliant OIDC/OAuth2 client libraries across Python, Node/TypeScript, Go, and Rust. This is an explicit port: we adopt their architectural patterns, capability taxonomy, and commitment to spec compliance, adapted idiomatically for each target language.
 
 The value is not in any single language port. **The value is the abstraction and standardization across client interactions.** A developer moving between Python and Go gets the same mental model, the same capability surface, the same RFC compliance guarantees. An organization using multiple languages gets one identity client library family with consistent behavior.
 
@@ -45,7 +45,7 @@ The value is not in any single language port. **The value is the abstraction and
 
 | Competitor | Language | Strengths | Gaps |
 |------------|----------|-----------|------|
-| **Duende IdentityModel** | C# | Complete, well-maintained, RFC-compliant, trusted brand | C#-only |
+| **Duende IdentityModel** | C# | The reference implementation — complete, well-maintained, RFC-compliant, trusted. Direct inspiration for this project. | .NET ecosystem only |
 | **openid-client (panva)** | Node | Solid RP implementation, good maintenance | Node-only, no unified cross-language story |
 | **jose (panva)** | Node | Best-in-class JOSE/JWT | Separate from OIDC, Node-only |
 | **authlib** | Python | Broad scope (client + server) | Monolithic, maintenance concerns, Python-only |
@@ -53,7 +53,7 @@ The value is not in any single language port. **The value is the abstraction and
 | **openidconnect-rs** | Rust | Only real option | Rough DX, limited adoption, Rust-only |
 | **py-identity-model** | Python | Production-proven, clean API, RFC-compliant | Python-only (until now) |
 
-**Our wedge:** No one owns the cross-language identity client space. Duende proved the model works in C#. We replicate the value proposition — standardized, RFC-compliant, production-grade — across the four most relevant non-C# languages.
+**Our wedge:** No one owns the cross-language identity client space. Duende proved the model works — their IdentityModel library demonstrated that a well-abstracted, RFC-compliant client library creates enormous value for an ecosystem. We're porting that proven design philosophy to the four most relevant non-.NET languages, with full credit to the patterns and thinking that Duende established.
 
 ## Existing Foundation: py-identity-model
 
@@ -307,9 +307,10 @@ All languages add:
 
 ### Strategic
 
-- Position identity-model as the "Duende for everyone else"
+- Position identity-model as the cross-language port of Duende's IdentityModel patterns, with explicit attribution
 - Consulting engagements reference the cross-language capability as a differentiator
 - Foundation for potential server-side (IdP) capabilities in the future
+- Maintain a respectful relationship with Duende Software — credit their work prominently in README, docs, and launch materials
 
 ## Relationship to Existing Roadmap
 
