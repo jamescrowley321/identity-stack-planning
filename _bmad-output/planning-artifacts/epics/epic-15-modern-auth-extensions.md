@@ -269,3 +269,5 @@ Research and evaluate:
 | Passkeys | Planned (#92) | No | No | Story 15.4 (spike) |
 | MFA client | Yes | No | Partial | Story 15.5 (spike) |
 | Anonymous upgrade | Requested | No | No | Story 15.6 (spike) |
+
+> **Note:** Supabase Auth and GoTrue are server-side authentication services, not client libraries. They are included here to illustrate the market direction for auth features (refresh rotation, device flow, passkeys) that users expect, but direct feature comparison is not applicable — identity-model is a protocol client library, not an auth service.

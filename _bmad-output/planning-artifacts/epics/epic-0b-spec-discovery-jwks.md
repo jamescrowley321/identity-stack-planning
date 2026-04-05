@@ -56,6 +56,8 @@ The capabilities document must specify the following behaviors:
 | DISC-006 | Handle HTTP error (404, 500)             | Given an issuer whose discovery endpoint returns HTTP 404 or 500, when discovery is invoked, then a transport/HTTP error is raised with the status code. |
 | DISC-007 | Handle invalid JSON response             | Given an issuer whose discovery endpoint returns a non-JSON body (e.g., HTML), when discovery is invoked, then a parse error is raised. |
 | DISC-008 | Handle missing required field            | Given a discovery document that omits one or more required fields (e.g., `jwks_uri` is absent), when field validation runs, then a validation error is raised identifying the missing field(s). |
+| DISC-009 | Ignore unknown fields in discovery document | Given a discovery document containing extra fields not defined in the spec (e.g., `x_custom_field`), when discovery is invoked, then the extra fields are ignored (not rejected) and all required fields are still accessible. |
+| DISC-010 | Require HTTPS issuer URL | Given an issuer URL using `http://` (not HTTPS), when discovery is invoked, then an error is raised indicating that HTTPS is required for issuer URLs in production mode (configurable for development). |
 
 #### spec/test-fixtures/discovery/
 
@@ -69,7 +71,7 @@ Sample discovery documents to be used by conformance test harnesses:
 **Acceptance Criteria (Given/When/Then)**
 
 - **AC-S.1.1** Given the `spec/capabilities.md` Discovery section, when reviewed against this story, then it covers all five specified behaviors (fetch, validate required fields, issuer validation, caching with configurable TTL, error handling) with normative language (MUST/SHOULD/MAY) and links to the corresponding OIDC Discovery 1.0 sections.
-- **AC-S.1.2** Given `spec/conformance/discovery.json`, when parsed, then it contains exactly eight test case definitions (DISC-001 through DISC-008) each with: `id`, `title`, `description`, `given`, `when`, `then`, and `references` (RFC/spec section links).
+- **AC-S.1.2** Given `spec/conformance/discovery.json`, when parsed, then it contains ten test case definitions (DISC-001 through DISC-010) each with: `id`, `title`, `description`, `given`, `when`, `then`, and `references` (RFC/spec section links).
 - **AC-S.1.3** Given `spec/test-fixtures/discovery/`, when the directory is listed, then it contains at least four fixture files: `valid.json`, `missing-jwks-uri.json`, `missing-multiple-fields.json`, `issuer-mismatch.json`.
 - **AC-S.1.4** Given `valid.json`, when parsed, then it contains all seven required OIDC Discovery metadata fields with syntactically correct values.
 - **AC-S.1.5** Given any fixture file with intentional defects (missing field, issuer mismatch), when parsed, then the defect is clearly present and no other unintentional differences exist relative to `valid.json`.
@@ -77,11 +79,11 @@ Sample discovery documents to be used by conformance test harnesses:
 **Unit Test Requirements**
 
 - Parse each fixture file and assert its structural properties (field presence/absence, issuer value).
-- Validate that `discovery.json` is well-formed JSON, all eight test IDs are present, and each test case contains all required keys.
+- Validate that `discovery.json` is well-formed JSON, all ten test IDs are present, and each test case contains all required keys.
 
 **Integration Test Requirements**
 
-- Stand up a mock OIDC provider (e.g., via HTTP stub or node-oidc-provider) that serves each fixture file at the `.well-known/openid-configuration` endpoint, and execute the DISC-001 through DISC-008 scenarios end-to-end.
+- Stand up a mock OIDC provider (e.g., via HTTP stub or node-oidc-provider) that serves each fixture file at the `.well-known/openid-configuration` endpoint, and execute the DISC-001 through DISC-010 scenarios end-to-end.
 
 **Example Requirements**
 

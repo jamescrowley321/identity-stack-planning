@@ -23,6 +23,8 @@ GREENFIELD implementation of an OIDC/OAuth2.0 client library in Rust, published 
 | Configuration | Builder patterns |
 | Crate name | `identity-model` (crates.io) |
 
+> **Note:** The crate name `identity-model` is provisional pending availability research in [Epic 13 Story 13.1](epic-13-naming-versioning-strategy.md).
+
 ### RFC & Specification References
 
 | Spec | URL | Relevant Sections |

@@ -40,6 +40,8 @@ For each of the four target language ecosystems, produce a comprehensive compari
 - **Go:** coreos/go-oidc, golang.org/x/oauth2, zitadel/oidc, ory/fosite
 - **Rust:** openidconnect-rs, oauth2-rs, jsonwebtoken, josekit
 
+> **Note:** While this epic focuses on the four target language ecosystems (Python, Node/TS, Go, Rust), the Duende IdentityModel (.NET) should be included as a reference baseline in each comparison matrix. This provides the "gold standard" benchmark that identity-model aims to match across languages.
+
 **Per-library evaluation dimensions:**
 
 - Feature matrix (OIDC Discovery, JWKS, JWT validation, token flows, DPoP, PAR, RAR, FAPI support)
@@ -183,6 +185,8 @@ Evaluate the developer experience of the top 2-3 competitors in each language ec
 - **Node/TypeScript:** openid-client, jose
 - **Go:** coreos/go-oidc, zitadel/oidc
 - **Rust:** openidconnect-rs, oauth2-rs
+
+> **Note:** PyJWT is a low-level JWT encoding/decoding library, not an OIDC client library. Include it in the comparison matrix for the JWT validation capability only, not for full OIDC protocol coverage. The primary Python comparison should be against `authlib` and `openid-client` equivalents.
 
 **Acceptance Criteria**
 

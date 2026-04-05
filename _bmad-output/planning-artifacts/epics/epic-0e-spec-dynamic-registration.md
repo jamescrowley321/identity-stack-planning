@@ -1,7 +1,7 @@
 ---
 workflowType: 'epic'
 project_name: 'identity-model'
-epic_id: 'EPIC-0E'
+epic_id: 'EPIC-0E-REG'
 epic_title: 'Conformance Specification — Dynamic Client Registration'
 date: '2026-04-04'
 status: 'draft'
@@ -10,7 +10,7 @@ inputDocuments:
   - _bmad-output/planning-artifacts/epics/epic-0b-ecosystem-research.md
 ---
 
-# Epic 0E: Conformance Specification — Dynamic Client Registration
+# Epic 0E-REG: Conformance Specification — Dynamic Client Registration
 
 ## Overview
 
@@ -35,7 +35,7 @@ These artifacts directly drive the implementation stories in Epics 1 (Python), 2
 ```yaml
 story_id: S.9
 title: "Dynamic Client Registration Spec + Conformance Tests"
-epic: EPIC-0E
+epic: EPIC-0E-REG
 status: draft
 priority: high
 estimation: L

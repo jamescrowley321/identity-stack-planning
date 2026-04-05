@@ -21,11 +21,11 @@ The single net-new implementation is the Authorization Code + PKCE flow, which i
 
 | Module | Path | Conformance Suite |
 |--------|------|-------------------|
-| `discovery.py` | `py-identity-model/identity_model/discovery.py` | DISC-* |
-| `jwks.py` | `py-identity-model/identity_model/jwks.py` | JWK-* |
-| `token_validation.py` | `py-identity-model/identity_model/token_validation.py` | VAL-* |
-| `token_client.py` | `py-identity-model/identity_model/token_client.py` | CC-*, AUTHZ-* |
-| `identity.py` | `py-identity-model/identity_model/identity.py` | UI-* |
+| `discovery.py` | `python/src/py_identity_model/discovery.py` | DISC-* |
+| `jwks.py` | `python/src/py_identity_model/jwks.py` | JWK-* |
+| `token_validation.py` | `python/src/py_identity_model/token_validation.py` | VAL-* |
+| `token_client.py` | `python/src/py_identity_model/token_client.py` | CC-*, AUTHZ-* |
+| `identity.py` | `python/src/py_identity_model/identity.py` | UI-* |
 | Supporting | `jwk/`, `aio/`, `sync/`, `client/`, `core/`, `messages/`, `exceptions.py` | — |
 
 ## Stories

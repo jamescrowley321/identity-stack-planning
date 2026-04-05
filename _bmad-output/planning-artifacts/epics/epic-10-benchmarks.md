@@ -71,10 +71,10 @@ Implement benchmarks per `spec/benchmarks.md` using each language's standard too
 
 | Language | Tool | Location |
 |----------|------|----------|
-| Python | `pytest-benchmark` | `packages/py/benchmarks/` |
-| Node/TypeScript | `vitest bench` | `packages/node/benchmarks/` |
-| Go | `testing.B` | `packages/go/benchmarks/` |
-| Rust | `criterion` | `packages/rs/benches/` |
+| Python | `pytest-benchmark` | `python/benchmarks/` |
+| Node/TypeScript | `vitest bench` | `node/benchmarks/` |
+| Go | `testing.B` | `go/benchmarks/` |
+| Rust | `criterion` | `rust/benches/` |
 
 Each suite must:
 - Cover all five benchmark categories from the spec

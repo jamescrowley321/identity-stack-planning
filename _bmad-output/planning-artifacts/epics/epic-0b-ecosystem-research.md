@@ -16,15 +16,15 @@ inputDocuments:
 
 ## Overview
 
-This is an addendum to Epic 0. Before building (or restructuring) language-specific implementations, we need to audit the existing open-source ecosystem for each target language. The goal is to make informed build-vs-wrap-vs-integrate decisions for every major dependency area: OIDC discovery, JOSE/JWT, OAuth2 flows, HTTP transport, and framework middleware.
+This is an addendum to Epic 0. Before building (or restructuring) language-specific implementations, we need to audit the existing open-source ecosystem for each target language (Python, Go, Rust, and Node/TypeScript). The goal is to make informed build-vs-wrap-vs-integrate decisions for every major dependency area: OIDC discovery, JOSE/JWT, OAuth2 flows, HTTP transport, and framework middleware.
 
-Each story produces a structured research report with a comparison matrix and a per-library recommendation (build from scratch, wrap/extend an existing library, integrate as a dependency, or replace our current approach). These reports directly inform the implementation strategies for Epics 1, 3, and 4.
+Each story produces a structured research report with a comparison matrix and a per-library recommendation (build from scratch, wrap/extend an existing library, integrate as a dependency, or replace our current approach). These reports directly inform the implementation strategies for Epics 1, 2, 3, and 4.
 
 ## Stories
 
 ---
 
-### Story R.1 — Research: Python Ecosystem Audit
+### Story 0B.1 — Research: Python Ecosystem Audit
 
 **User Story**
 
@@ -48,11 +48,11 @@ Libraries to evaluate:
 
 **Acceptance Criteria**
 
-- **AC-R.1.1** Given the research is complete, when the report is reviewed, then it documents the research methodology including: selection criteria, evaluation rubric, and how each library was tested or assessed.
-- **AC-R.1.2** Given the set of evaluated libraries, when the comparison matrix is reviewed, then it includes columns for: license, maintenance status (last release, commit frequency, bus factor), feature coverage relative to our conformance spec, API ergonomics, async support, and dependency footprint.
-- **AC-R.1.3** Given each library in the matrix, when the recommendation column is reviewed, then it contains one of: **build** (write from scratch), **wrap** (use internally behind our API), **integrate** (depend on directly in public API), or **replace** (swap out our current dependency) — with a written rationale for the choice.
-- **AC-R.1.4** Given the framework middleware survey, when reviewed, then it covers at least FastAPI, Starlette, Django, and Flask — documenting existing auth middleware packages, their limitations, and how identity-model could complement or replace them.
-- **AC-R.1.5** Given the final report, when reviewed by the team, then it includes a risk assessment for each "integrate" or "wrap" recommendation (maintenance abandonment, API breakage, license change).
+- **AC-0B.1.1** Given the research is complete, when the report is reviewed, then it documents the research methodology including: selection criteria, evaluation rubric, and how each library was tested or assessed.
+- **AC-0B.1.2** Given the set of evaluated libraries, when the comparison matrix is reviewed, then it includes columns for: license, maintenance status (last release, commit frequency, bus factor), feature coverage relative to our conformance spec, API ergonomics, async support, and dependency footprint.
+- **AC-0B.1.3** Given each library in the matrix, when the recommendation column is reviewed, then it contains one of: **build** (write from scratch), **wrap** (use internally behind our API), **integrate** (depend on directly in public API), or **replace** (swap out our current dependency) — with a written rationale for the choice.
+- **AC-0B.1.4** Given the framework middleware survey, when reviewed, then it covers at least FastAPI, Starlette, Django, and Flask — documenting existing auth middleware packages, their limitations, and how identity-model could complement or replace them.
+- **AC-0B.1.5** Given the final report, when reviewed by the team, then it includes a risk assessment for each "integrate" or "wrap" recommendation (maintenance abandonment, API breakage, license change).
 
 **Verification (Given/When/Then)**
 
@@ -66,7 +66,7 @@ Research report with build/wrap/integrate/replace recommendation for each librar
 
 ---
 
-### Story R.2 — Research: Go Ecosystem Audit
+### Story 0B.2 — Research: Go Ecosystem Audit
 
 **User Story**
 
@@ -90,11 +90,11 @@ Libraries to evaluate:
 
 **Acceptance Criteria**
 
-- **AC-R.2.1** Given the research is complete, when the report is reviewed, then it documents the research methodology including: selection criteria, evaluation rubric, and how each library was tested or assessed.
-- **AC-R.2.2** Given the set of evaluated libraries, when the comparison matrix is reviewed, then it includes columns for: license, maintenance status (last release, commit frequency, bus factor), feature coverage relative to our conformance spec, API ergonomics, idiomatic Go patterns, and dependency footprint.
-- **AC-R.2.3** Given each library in the matrix, when the recommendation column is reviewed, then it contains one of: **build** (write from scratch), **wrap** (use internally behind our API), **integrate** (depend on directly in public API), or **fork** (fork and extend) — with a written rationale for the choice.
-- **AC-R.2.4** Given the framework middleware survey, when reviewed, then it covers at least Echo, Gin, and Chi — documenting existing auth middleware packages, their limitations, and how identity-model could complement or replace them.
-- **AC-R.2.5** Given the final report, when reviewed by the team, then it includes a risk assessment for each "integrate", "wrap", or "fork" recommendation (maintenance abandonment, API breakage, license change, fork drift).
+- **AC-0B.2.1** Given the research is complete, when the report is reviewed, then it documents the research methodology including: selection criteria, evaluation rubric, and how each library was tested or assessed.
+- **AC-0B.2.2** Given the set of evaluated libraries, when the comparison matrix is reviewed, then it includes columns for: license, maintenance status (last release, commit frequency, bus factor), feature coverage relative to our conformance spec, API ergonomics, idiomatic Go patterns, and dependency footprint.
+- **AC-0B.2.3** Given each library in the matrix, when the recommendation column is reviewed, then it contains one of: **build** (write from scratch), **wrap** (use internally behind our API), **integrate** (depend on directly in public API), or **fork** (fork and extend) — with a written rationale for the choice.
+- **AC-0B.2.4** Given the framework middleware survey, when reviewed, then it covers at least Echo, Gin, and Chi — documenting existing auth middleware packages, their limitations, and how identity-model could complement or replace them.
+- **AC-0B.2.5** Given the final report, when reviewed by the team, then it includes a risk assessment for each "integrate", "wrap", or "fork" recommendation (maintenance abandonment, API breakage, license change, fork drift).
 
 **Verification (Given/When/Then)**
 
@@ -108,7 +108,7 @@ Research report with build/wrap/integrate/fork recommendation for each library, 
 
 ---
 
-### Story R.3 — Research: Rust Ecosystem Audit
+### Story 0B.3 — Research: Rust Ecosystem Audit
 
 **User Story**
 
@@ -131,11 +131,11 @@ Libraries to evaluate:
 
 **Acceptance Criteria**
 
-- **AC-R.3.1** Given the research is complete, when the report is reviewed, then it documents the research methodology including: selection criteria, evaluation rubric, and how each crate was tested or assessed.
-- **AC-R.3.2** Given the set of evaluated crates, when the comparison matrix is reviewed, then it includes columns for: license, maintenance status (last release, commit frequency, bus factor), feature coverage relative to our conformance spec, API ergonomics, async runtime compatibility (tokio vs async-std), trait design quality, and dependency footprint.
-- **AC-R.3.3** Given each crate in the matrix, when the recommendation column is reviewed, then it contains one of: **build** (write from scratch), **wrap** (use internally behind our API), **integrate** (depend on directly in public API), or **fork** (fork and extend) — with a written rationale for the choice.
-- **AC-R.3.4** Given the framework middleware survey, when reviewed, then it covers at least axum, actix-web, and rocket — documenting existing auth middleware crates, their limitations, and how identity-model could complement or replace them.
-- **AC-R.3.5** Given the final report, when reviewed by the team, then it includes a risk assessment for each "integrate", "wrap", or "fork" recommendation (maintenance abandonment, API breakage, license change, MSRV compatibility, fork drift).
+- **AC-0B.3.1** Given the research is complete, when the report is reviewed, then it documents the research methodology including: selection criteria, evaluation rubric, and how each crate was tested or assessed.
+- **AC-0B.3.2** Given the set of evaluated crates, when the comparison matrix is reviewed, then it includes columns for: license, maintenance status (last release, commit frequency, bus factor), feature coverage relative to our conformance spec, API ergonomics, async runtime compatibility (tokio vs async-std), trait design quality, and dependency footprint.
+- **AC-0B.3.3** Given each crate in the matrix, when the recommendation column is reviewed, then it contains one of: **build** (write from scratch), **wrap** (use internally behind our API), **integrate** (depend on directly in public API), or **fork** (fork and extend) — with a written rationale for the choice.
+- **AC-0B.3.4** Given the framework middleware survey, when reviewed, then it covers at least axum, actix-web, and rocket — documenting existing auth middleware crates, their limitations, and how identity-model could complement or replace them.
+- **AC-0B.3.5** Given the final report, when reviewed by the team, then it includes a risk assessment for each "integrate", "wrap", or "fork" recommendation (maintenance abandonment, API breakage, license change, MSRV compatibility, fork drift).
 
 **Verification (Given/When/Then)**
 
@@ -149,7 +149,48 @@ Research report with build/wrap/integrate/fork recommendation for each crate, st
 
 ---
 
-### Story R.4 — Research: Cross-Language Conformance Strategy
+### Story 0B.4 — Research: Node/TypeScript Ecosystem Audit
+
+**User Story**
+
+> As the architect planning the identity-model monorepo,
+> I want a thorough audit of the Node/TypeScript identity/auth library ecosystem,
+> so that I can make an informed decision about what @identity-model/node should build from scratch versus wrapping or depending on existing libraries.
+
+**Description**
+
+Before building @identity-model/node, audit the Node/TypeScript identity ecosystem. Evaluate each library for API quality, maintenance health, license compatibility (MIT/Apache-2.0), feature coverage, TypeScript support quality, and alignment with our conformance spec.
+
+Libraries to evaluate:
+
+- [`openid-client`](https://github.com/panva/openid-client) — OIDC Relying Party. Can we wrap or extend?
+- [`jose`](https://github.com/panva/jose) — JOSE/JWT/JWK/JWS/JWE. Use as our JOSE layer?
+- [`oidc-client-ts`](https://github.com/authts/oidc-client-ts) — Browser-focused OIDC. Evaluate scope overlap.
+- [`next-auth`](https://github.com/nextauthjs/next-auth) — Next.js auth. Framework integration patterns.
+- [`passport`](https://github.com/jaredhanson/passport) — Express auth middleware ecosystem. Integration patterns.
+- NestJS, Next.js, Express, Fastify middleware patterns — survey existing auth middleware.
+
+**Acceptance Criteria**
+
+- **AC-0B.4.1** Given the research is complete, when the report is reviewed, then it documents the research methodology including: selection criteria, evaluation rubric, and how each library was tested or assessed.
+- **AC-0B.4.2** Given the set of evaluated libraries, when the comparison matrix is reviewed, then it includes columns for: license, maintenance status (last release, commit frequency, bus factor), feature coverage relative to our conformance spec, API ergonomics, TypeScript support quality, and dependency footprint.
+- **AC-0B.4.3** Given each library in the matrix, when the recommendation column is reviewed, then it contains one of: **build** (write from scratch), **wrap** (use internally behind our API), **integrate** (depend on directly in public API), or **replace** (swap out) — with a written rationale for the choice.
+- **AC-0B.4.4** Given the framework middleware survey, when reviewed, then it covers at least NestJS, Next.js, Express, and Fastify — documenting existing auth middleware packages, their limitations, and how identity-model could complement or replace them.
+- **AC-0B.4.5** Given the final report, when reviewed by the team, then it includes a risk assessment for each "integrate" or "wrap" recommendation (maintenance abandonment, API breakage, license change).
+
+**Verification (Given/When/Then)**
+
+- Given the Node/TypeScript ecosystem audit is delivered, when it is checked against this story's acceptance criteria, then all five ACs are satisfied.
+- Given the comparison matrix, when it is reviewed, then every library listed in the description appears with a complete row of data.
+- Given the recommendation section, when a "build" recommendation is made, then it includes justification for why no existing library is suitable.
+
+**Deliverable**
+
+Research report with build/wrap/integrate/replace recommendation for each library, stored at `docs/research/node-ecosystem-audit.md`.
+
+---
+
+### Story 0B.5 — Research: Cross-Language Conformance Strategy
 
 **User Story**
 
@@ -171,13 +212,13 @@ Areas to investigate:
 
 **Acceptance Criteria**
 
-- **AC-R.4.1** Given the research is complete, when the report is reviewed, then it documents the research methodology including: what tools, specs, and test suites were evaluated and how feasibility was assessed.
-- **AC-R.4.2** Given the code generation investigation, when reviewed, then it includes a feasibility assessment with concrete examples of what could be generated (models, test stubs, validation logic) and what cannot.
-- **AC-R.4.3** Given the OpenAPI/JSON Schema investigation, when reviewed, then it lists all discovered specs with links, evaluates their completeness, and recommends which (if any) to adopt.
-- **AC-R.4.4** Given the OpenID Foundation conformance suite evaluation, when reviewed, then it documents: setup requirements, per-language integration effort estimate, and any limitations or gaps.
-- **AC-R.4.5** Given the shared test fixture investigation, when reviewed, then it recommends a fixture format with rationale, includes a sample fixture structure, and documents how each language's test runner would consume it.
-- **AC-R.4.6** Given the OIDC test provider survey, when reviewed, then it includes a comparison matrix of at least three providers (node-oidc-provider, Keycloak, Ory Hydra) covering: ease of setup, protocol coverage, CI integration feasibility, and licensing.
-- **AC-R.4.7** Given the final strategy document, when reviewed by the team, then it contains a prioritized list of recommendations with effort estimates and dependencies.
+- **AC-0B.5.1** Given the research is complete, when the report is reviewed, then it documents the research methodology including: what tools, specs, and test suites were evaluated and how feasibility was assessed.
+- **AC-0B.5.2** Given the code generation investigation, when reviewed, then it includes a feasibility assessment with concrete examples of what could be generated (models, test stubs, validation logic) and what cannot.
+- **AC-0B.5.3** Given the OpenAPI/JSON Schema investigation, when reviewed, then it lists all discovered specs with links, evaluates their completeness, and recommends which (if any) to adopt.
+- **AC-0B.5.4** Given the OpenID Foundation conformance suite evaluation, when reviewed, then it documents: setup requirements, per-language integration effort estimate, and any limitations or gaps.
+- **AC-0B.5.5** Given the shared test fixture investigation, when reviewed, then it recommends a fixture format with rationale, includes a sample fixture structure, and documents how each language's test runner would consume it.
+- **AC-0B.5.6** Given the OIDC test provider survey, when reviewed, then it includes a comparison matrix of at least three providers (node-oidc-provider, Keycloak, Ory Hydra) covering: ease of setup, protocol coverage, CI integration feasibility, and licensing.
+- **AC-0B.5.7** Given the final strategy document, when reviewed by the team, then it contains a prioritized list of recommendations with effort estimates and dependencies.
 
 **Verification (Given/When/Then)**
 

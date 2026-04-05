@@ -90,6 +90,9 @@ The JWT Validation section of the capabilities spec must define the following re
 | VAL-012 | Accept audience as string or array | Accept |
 | VAL-013 | Validate azp when multiple audiences | Accept |
 | VAL-014 | Reject alg/key type mismatch | Reject: algorithm key type mismatch |
+| VAL-015 | Valid token with PS256 signature | Accept |
+| VAL-016 | Valid token with ES384 signature | Accept |
+| VAL-017 | Reject wrong audience when aud is an array | Reject: audience mismatch |
 
 **Test Fixtures (`spec/test-fixtures/tokens/`)**
 
@@ -102,6 +105,9 @@ Pre-generated sample JWTs and corresponding key material:
 - `wrong-audience.jwt` — Token with incorrect `aud` claim
 - `tampered.jwt` — Token with modified payload but original signature
 - `alg-none.jwt` — Token with `alg=none` and no signature
+- `valid-ps256.jwt` — Valid token signed with PS256
+- `valid-es384.jwt` — Valid token signed with ES384
+- `wrong-audience-array.jwt` — Token with `aud` as array not containing expected audience
 - `keys/` — RSA and EC key pairs (PEM + JWK format) used to sign the fixtures
 
 **Acceptance Criteria**
@@ -111,7 +117,7 @@ Pre-generated sample JWTs and corresponding key material:
   - _Given_ the capability spec exists, _When_ a reviewer checks for registered claims, _Then_ every claim from [RFC 7519 Section 4.1](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1) is listed with its subsection reference and validation rule.
   - _Given_ the capability spec exists, _When_ a reviewer checks for ID Token validation, _Then_ all checks from [OIDC Core 1.0 Section 3.1.3.7](https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation) are enumerated.
 
-- **AC-S.3.2** Given the `spec/conformance/validation.json` file is reviewed, when parsed, then it contains all 14 test cases (VAL-001 through VAL-014) with fields: `test_id`, `description`, `input` (token reference + validation parameters), `expected_result` (accept/reject + error category), and `rfc_reference`.
+- **AC-S.3.2** Given the `spec/conformance/validation.json` file is reviewed, when parsed, then it contains all 17 test cases (VAL-001 through VAL-017) with fields: `test_id`, `description`, `input` (token reference + validation parameters), `expected_result` (accept/reject + error category), and `rfc_reference`.
   - _Given_ the conformance file is loaded, _When_ a test runner reads it, _Then_ each test case is self-contained with enough information to execute without ambiguity.
   - _Given_ a test case specifies "reject", _When_ it is reviewed, _Then_ it includes the expected error category (e.g., `signature_invalid`, `token_expired`, `issuer_mismatch`).
 
@@ -119,7 +125,7 @@ Pre-generated sample JWTs and corresponding key material:
   - _Given_ the fixture tokens exist, _When_ a valid token fixture is decoded and verified against the fixture keys, _Then_ signature verification succeeds.
   - _Given_ the tampered token fixture exists, _When_ it is decoded and verified against the fixture keys, _Then_ signature verification fails.
 
-- **AC-S.3.4** Given any language implementation, when it runs its conformance test suite against `spec/conformance/validation.json` using `spec/test-fixtures/tokens/`, then all 14 test cases produce the expected result.
+- **AC-S.3.4** Given any language implementation, when it runs its conformance test suite against `spec/conformance/validation.json` using `spec/test-fixtures/tokens/`, then all 17 test cases produce the expected result.
 
 **Unit Test Requirements**
 
@@ -207,6 +213,7 @@ The UserInfo section of the capabilities spec must define the following required
 | UI-004 | Reject sub mismatch between UserInfo and ID token | Reject: subject mismatch |
 | UI-005 | Handle 401 unauthorized response | Error: unauthorized (invalid token) |
 | UI-006 | Handle 403 forbidden response (insufficient scope) | Error: forbidden (insufficient scope) |
+| UI-007 | Parse JWT-encoded UserInfo response | Success: JWT decoded, signature verified, claims extracted |
 
 **Test Fixtures (`spec/test-fixtures/userinfo/`)**
 
@@ -217,6 +224,7 @@ Pre-built sample responses:
 - `sub-mismatch-response.json` — Response where `sub` differs from the associated ID Token's `sub`
 - `error-401.json` — Simulated 401 Unauthorized error response body
 - `error-403.json` — Simulated 403 Forbidden error response body
+- `jwt-response.json` — Successful UserInfo response encoded as a signed JWT
 
 **Acceptance Criteria**
 
@@ -225,7 +233,7 @@ Pre-built sample responses:
   - _Given_ the capability spec exists, _When_ a reviewer checks for standard claims, _Then_ every claim from [OIDC Core 1.0 Section 5.1](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims) is listed.
   - _Given_ the capability spec exists, _When_ a reviewer checks for sub validation, _Then_ it references [OIDC Core 1.0 Section 5.3.4](https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponseValidation) and states that mismatched `sub` values must result in rejection.
 
-- **AC-S.4.2** Given the `spec/conformance/userinfo.json` file is reviewed, when parsed, then it contains all 6 test cases (UI-001 through UI-006) with fields: `test_id`, `description`, `input` (request parameters + fixture references), `expected_result` (success/error + details), and `oidc_reference`.
+- **AC-S.4.2** Given the `spec/conformance/userinfo.json` file is reviewed, when parsed, then it contains all 7 test cases (UI-001 through UI-007) with fields: `test_id`, `description`, `input` (request parameters + fixture references), `expected_result` (success/error + details), and `oidc_reference`.
   - _Given_ the conformance file is loaded, _When_ a test runner reads it, _Then_ each test case is self-contained with enough information to execute without ambiguity.
   - _Given_ a test case specifies an error, _When_ it is reviewed, _Then_ it includes the expected HTTP status code and error category.
 
@@ -233,7 +241,7 @@ Pre-built sample responses:
   - _Given_ the valid response fixture exists, _When_ it is parsed as JSON, _Then_ it contains at minimum `sub`, `name`, `email`, and `email_verified` claims.
   - _Given_ the full claims response fixture exists, _When_ it is parsed, _Then_ it contains every standard claim from OIDC Core 1.0 Section 5.1.
 
-- **AC-S.4.4** Given any language implementation, when it runs its conformance test suite against `spec/conformance/userinfo.json` using `spec/test-fixtures/userinfo/`, then all 6 test cases produce the expected result.
+- **AC-S.4.4** Given any language implementation, when it runs its conformance test suite against `spec/conformance/userinfo.json` using `spec/test-fixtures/userinfo/`, then all 7 test cases produce the expected result.
 
 **Unit Test Requirements**
 

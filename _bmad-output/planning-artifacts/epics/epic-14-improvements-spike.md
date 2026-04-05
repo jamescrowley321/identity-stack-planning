@@ -20,6 +20,8 @@ These are the known gaps that warrant investigation before committing to full ep
 
 ### Story 14.1: Spike — Threat Model & Security Considerations
 
+> **Scheduling Note:** While this story is structured as a spike within Epic 14, threat modeling for an identity/security library is a foundational concern. This story SHOULD be scheduled as a prerequisite to Core Tier implementation (Epics 1-4), not deferred to post-launch. The STRIDE analysis and attack surface mapping directly inform validation logic, error handling, and security boundaries in every language implementation.
+
 As a **project maintainer**,
 I want a STRIDE threat model of the identity-model library,
 So that we identify and address security risks before they become vulnerabilities.

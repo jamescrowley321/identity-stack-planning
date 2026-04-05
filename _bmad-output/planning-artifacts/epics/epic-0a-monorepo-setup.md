@@ -34,6 +34,8 @@ identity-model/
 
 ## Stories
 
+> **Note:** Package and repository names used throughout this epic (e.g., `identity-model`, `@identity-model/node`) are provisional. Final names depend on the outcome of [Epic 13 — Naming, Versioning & Package Identity Strategy](epic-13-naming-versioning-strategy.md), which must be resolved before this epic begins.
+
 ---
 
 ### Story 0A.1 — Restructure py-identity-model into identity-model/python/
@@ -193,6 +195,34 @@ Create `infra/docker-compose.yml` that runs [node-oidc-provider](https://github.
 
 ---
 
+### Story 0A.5 — Authorization Code Flow Test Automation
+
+**User Story**
+
+> As a CI/CD pipeline maintainer,
+> I want an automated mechanism to execute Authorization Code + PKCE flows in CI without browser interaction,
+> so that integration tests for all four language implementations can verify the complete authentication flow end-to-end.
+
+**Description**
+
+The Authorization Code + PKCE flow requires a browser redirect (authorization endpoint → user agent → callback). In CI, this needs automation. Investigate and implement one of:
+- A headless browser automation approach (Playwright/Puppeteer) that handles the login form on node-oidc-provider
+- A test-mode endpoint on node-oidc-provider that auto-approves authorization requests
+- A pre-seeded authorization code approach where the test harness generates codes directly
+
+**Acceptance Criteria**
+
+- **AC-0A.5.1** Given the CI environment, when an Authorization Code + PKCE integration test runs, then the full flow completes without human interaction: authorization request → code issuance → token exchange → token validation.
+- **AC-0A.5.2** Given the automation mechanism, when reviewed, then it works identically across all four language test runners (Python pytest, Node vitest, Go testing, Rust cargo test).
+- **AC-0A.5.3** Given the test infrastructure, when the automation approach is documented, then it includes setup instructions, known limitations, and guidance for adding new test scenarios.
+
+**RFC References**
+
+- [RFC 6749 §4.1 — Authorization Code Grant](https://datatracker.ietf.org/doc/html/rfc6749#section-4.1)
+- [RFC 7636 — PKCE](https://datatracker.ietf.org/doc/html/rfc7636)
+
+---
+
 ## Dependencies
 
 - **git filter-repo** must be available for Story 0A.1 (installable via `pip install git-filter-repo`).
@@ -208,5 +238,6 @@ Create `infra/docker-compose.yml` that runs [node-oidc-provider](https://github.
 | 2 | 0A.2 Scaffold language directories | Depends on 0A.1 — adds language stubs alongside the relocated Python code |
 | 3 | 0A.3 Set up monorepo CI | Depends on 0A.1 and 0A.2 — needs all language directories present to configure path filters and matrix jobs |
 | 4 | 0A.4 Set up shared test infrastructure | Can run in parallel with 0A.3 — independent of CI setup but benefits from having the repo structure finalized |
+| 5 | 0A.5 Authorization Code flow test automation | Depends on 0A.4 — requires the shared test infrastructure (node-oidc-provider) to be running |
 
-Stories 0A.3 and 0A.4 can run in parallel after 0A.2 completes.
+Stories 0A.3 and 0A.4 can run in parallel after 0A.2 completes. Story 0A.5 depends on 0A.4.

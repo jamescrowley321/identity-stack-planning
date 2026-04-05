@@ -144,16 +144,16 @@ Define the cross-language specification and conformance test definitions for the
    - `state` parameter for CSRF protection ([RFC 6749 §10.12](https://datatracker.ietf.org/doc/html/rfc6749#section-10.12))
 
 2. **`spec/conformance/authorization-code.json`** with test cases:
-   - **AC-001**: Generate valid `code_verifier` — verify output length is between 43 and 128 characters, and every character is in the unreserved set `[A-Za-z0-9\-._~]` (RFC 7636 §4.1)
-   - **AC-002**: Generate S256 `code_challenge` from verifier — given a known `code_verifier`, verify the output matches `BASE64URL(SHA256(code_verifier))` using a precomputed expected value (RFC 7636 §4.2)
-   - **AC-003**: Build authorization URL with PKCE parameters — verify the constructed URL includes `response_type=code`, `client_id`, `redirect_uri`, `code_challenge`, `code_challenge_method=S256`, and `scope` as query parameters (RFC 6749 §4.1.1, RFC 7636 §4.3)
-   - **AC-004**: Build authorization URL with `state` — verify the constructed URL includes a `state` parameter and that it is preserved through the flow for CSRF validation (RFC 6749 §4.1.1, §10.12)
-   - **AC-005**: Exchange authorization code for tokens with `code_verifier` — verify the token request body includes `grant_type=authorization_code`, `code`, `redirect_uri`, `client_id`, and `code_verifier` (RFC 6749 §4.1.3, RFC 7636 §4.5)
-   - **AC-006**: Parse token response with ID token — verify the library extracts `access_token`, `token_type`, `expires_in`, `refresh_token`, and `id_token` from the response (RFC 6749 §5.1, OIDC Core §3.1.3.3)
-   - **AC-007**: Handle `invalid_grant` error (expired or already-used code) — verify the library correctly parses and surfaces the error (HTTP 400, `error=invalid_grant`) (RFC 6749 §5.2)
-   - **AC-008**: Handle `redirect_uri` mismatch error — verify the library correctly parses and surfaces the error when the token request `redirect_uri` does not match the authorization request (HTTP 400, `error=invalid_grant`) (RFC 6749 §4.1.3)
-   - **AC-009**: Validate `state` matches on callback — verify the library detects when the `state` returned by the authorization server does not match the original value, and raises an appropriate error (RFC 6749 §10.12)
-   - **AC-010**: Reject `plain` `code_challenge_method` — verify the library refuses to use `code_challenge_method=plain` and requires S256, in alignment with security best practices (RFC 7636 §4.2, OAuth Security BCP §2.1.1)
+   - **AUTHZ-001**: Generate valid `code_verifier` — verify output length is between 43 and 128 characters, and every character is in the unreserved set `[A-Za-z0-9\-._~]` (RFC 7636 §4.1)
+   - **AUTHZ-002**: Generate S256 `code_challenge` from verifier — given a known `code_verifier`, verify the output matches `BASE64URL(SHA256(code_verifier))` using a precomputed expected value (RFC 7636 §4.2)
+   - **AUTHZ-003**: Build authorization URL with PKCE parameters — verify the constructed URL includes `response_type=code`, `client_id`, `redirect_uri`, `code_challenge`, `code_challenge_method=S256`, and `scope` as query parameters (RFC 6749 §4.1.1, RFC 7636 §4.3)
+   - **AUTHZ-004**: Build authorization URL with `state` — verify the constructed URL includes a `state` parameter and that it is preserved through the flow for CSRF validation (RFC 6749 §4.1.1, §10.12)
+   - **AUTHZ-005**: Exchange authorization code for tokens with `code_verifier` — verify the token request body includes `grant_type=authorization_code`, `code`, `redirect_uri`, `client_id`, and `code_verifier` (RFC 6749 §4.1.3, RFC 7636 §4.5)
+   - **AUTHZ-006**: Parse token response with ID token — verify the library extracts `access_token`, `token_type`, `expires_in`, `refresh_token`, and `id_token` from the response (RFC 6749 §5.1, OIDC Core §3.1.3.3)
+   - **AUTHZ-007**: Handle `invalid_grant` error (expired or already-used code) — verify the library correctly parses and surfaces the error (HTTP 400, `error=invalid_grant`) (RFC 6749 §5.2)
+   - **AUTHZ-008**: Handle `redirect_uri` mismatch error — verify the library correctly parses and surfaces the error when the token request `redirect_uri` does not match the authorization request (HTTP 400, `error=invalid_grant`) (RFC 6749 §4.1.3)
+   - **AUTHZ-009**: Validate `state` matches on callback — verify the library detects when the `state` returned by the authorization server does not match the original value, and raises an appropriate error (RFC 6749 §10.12)
+   - **AUTHZ-010**: Reject `plain` `code_challenge_method` — verify the library refuses to use `code_challenge_method=plain` and requires S256, in alignment with security best practices (RFC 7636 §4.2, OAuth Security BCP §2.1.1)
 
 3. **`spec/test-fixtures/auth-code/`** with sample requests and responses:
    - `pkce-verifier-challenge-pairs.json` — array of known `code_verifier` / `code_challenge` pairs for deterministic testing
@@ -168,11 +168,11 @@ Define the cross-language specification and conformance test definitions for the
 **Acceptance Criteria (Given/When/Then)**
 
 - **AC-S.6.1** Given the `spec/capabilities.md` Authorization Code + PKCE section is reviewed, when each normative statement is checked, then every statement includes an explicit RFC section reference (RFC 6749 §4.1.1, §4.1.2, §4.1.2.1, §4.1.3, §5.1, §5.2, §10.12; RFC 7636 §4.1, §4.2, §4.3, §4.5; OIDC Core §3.1.3.3).
-- **AC-S.6.2** Given the conformance test definition file `spec/conformance/authorization-code.json` is reviewed, when the test case list is checked, then it contains exactly ten test cases (AC-001 through AC-010) each with: `id`, `title`, `description`, `rfc_references` (array of section links), `given`/`when`/`then` fields, and `fixture_files` (array of paths to test fixture files used by the test).
+- **AC-S.6.2** Given the conformance test definition file `spec/conformance/authorization-code.json` is reviewed, when the test case list is checked, then it contains exactly ten test cases (AUTHZ-001 through AUTHZ-010) each with: `id`, `title`, `description`, `rfc_references` (array of section links), `given`/`when`/`then` fields, and `fixture_files` (array of paths to test fixture files used by the test).
 - **AC-S.6.3** Given a test case in the conformance file, when its `given`/`when`/`then` fields are reviewed, then they are precise enough for a developer to implement the test in any language without ambiguity.
 - **AC-S.6.4** Given the PKCE test fixtures, when the `code_verifier`/`code_challenge` pairs are validated, then each pair is independently verifiable by computing `BASE64URL(SHA256(code_verifier))` and comparing to the expected `code_challenge`.
-- **AC-S.6.5** Given the test case AC-010, when reviewed, then it explicitly requires that the library reject `plain` as a `code_challenge_method` and mandate S256.
-- **AC-S.6.6** Given the `state` validation test cases (AC-004, AC-009), when reviewed, then they cover both the happy path (state matches) and the failure path (state mismatch or missing).
+- **AC-S.6.5** Given the test case AUTHZ-010, when reviewed, then it explicitly requires that the library reject `plain` as a `code_challenge_method` and mandate S256.
+- **AC-S.6.6** Given the `state` validation test cases (AUTHZ-004, AUTHZ-009), when reviewed, then they cover both the happy path (state matches) and the failure path (state mismatch or missing).
 - **AC-S.6.7** Given the token response fixtures, when reviewed, then at least one fixture includes an `id_token` field to validate OIDC-layer parsing alongside the OAuth2 fields.
 
 **Unit Test Requirements**
@@ -183,7 +183,7 @@ Define the cross-language specification and conformance test definitions for the
 
 **Integration Test Requirements**
 
-- When a language implementation claims conformance, run all AC-* test cases against a mock authorization server. The mock must handle both the authorization endpoint (returning `code` and `state`) and the token endpoint (validating `code_verifier` and returning tokens). The implementation must pass all ten tests.
+- When a language implementation claims conformance, run all AUTHZ-* test cases against a mock authorization server. The mock must handle both the authorization endpoint (returning `code` and `state`) and the token endpoint (validating `code_verifier` and returning tokens). The implementation must pass all ten tests.
 
 **Example Requirements**
 

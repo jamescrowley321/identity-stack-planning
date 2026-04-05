@@ -250,6 +250,49 @@ Each language port translates these into native test cases. The shared `infra/do
 - **Error handling:** `thiserror` for library errors, `Result<T, IdentityError>` everywhere
 - **Differentiator vs openidconnect-rs:** Better DX (builder patterns, clear error types), complete RFC coverage, actively maintained, part of cross-language family
 
+## Cross-Language Conformance Architecture
+
+### Build-Time Enforcement
+
+The cross-language conformance strategy operates at three levels:
+
+1. **Shared Specification Layer** (`spec/`)
+   - `spec/capabilities.md` — canonical feature matrix with per-language status (implemented/in-progress/planned/N-A)
+   - `spec/conformance/*.json` — machine-readable test case definitions consumed by each language's test runner
+   - `spec/test-fixtures/` — shared test data (JWKs, tokens, discovery docs, request/response pairs)
+
+2. **Per-Language Test Harness**
+   - Each language implements a conformance test runner that loads `spec/conformance/*.json` and executes tests against its own implementation
+   - Test runners produce standardized JSON output for cross-language comparison
+   - CI enforces that all languages pass the same conformance test suite before merge
+
+3. **Integration Test Infrastructure** (`infra/`)
+   - Shared `docker-compose.yml` running `node-oidc-provider` as the conformance target
+   - Authorization Code flow automation (headless browser or test-mode endpoints)
+   - Per-language integration test suites execute against the shared provider
+
+### spec/capabilities.md Schema
+
+The capabilities file uses this structure to enable automated status tracking and documentation generation:
+
+```yaml
+capabilities:
+  - name: "OIDC Discovery"
+    tier: core
+    spec_ref: "OpenID Connect Discovery 1.0"
+    conformance_file: "spec/conformance/discovery.json"
+    languages:
+      python: { status: implemented, version: "2.17.1" }
+      node: { status: planned }
+      go: { status: planned }
+      rust: { status: planned }
+```
+
+This schema is consumed by:
+- Epic 9 Story 9.3 (RFC coverage matrix generator)
+- CI status checks (fail if a language claims "implemented" but conformance tests fail)
+- Documentation site (auto-generated feature comparison tables)
+
 ## Phasing
 
 ### Phase 0: Specification + Monorepo Setup (2-3 weeks)
@@ -288,6 +331,18 @@ All languages add:
 - Cross-language documentation site
 - Registry publishing (PyPI, npm, crates.io, Go modules)
 - Blog post / launch announcement
+
+## Risk Register
+
+| # | Risk | Likelihood | Impact | Mitigation |
+|---|------|-----------|--------|------------|
+| R1 | Package name unavailable on one or more registries (crates.io, npm, PyPI) | Medium | High | Epic 13 Story 13.1 researches availability early. Have 2-3 fallback names pre-approved. |
+| R2 | One language implementation falls significantly behind others | High | Medium | Define a Minimum Viable Language (MVL) — Core tier only. Ship languages independently as they reach MVL. Do not gate one language's release on another. |
+| R3 | Conformance spec definitions are ambiguous, causing divergent implementations | Medium | High | Story R.4 (cross-language conformance strategy) evaluates spec clarity. Each conformance test must include given/when/then with fixture references. Run cross-language conformance comparison in CI. |
+| R4 | node-oidc-provider limitations prevent testing certain flows (DPoP, FAPI 2.0) | Medium | Medium | Epic 14 Story 14.6 evaluates alternative providers (Keycloak, Ory Hydra). Maintain provider-agnostic test harness. |
+| R5 | Monorepo tooling complexity (4 languages, 4 build systems, 1 CI) | High | Medium | Epic 11 (Contributor DX) provides dev containers, unified Makefile. Accept that CI will be slow; optimize with path-filtered triggers (Epic 0A Story 0A.3). |
+| R6 | Duende Software objects to "port" framing | Low | High | Prominent attribution in README, docs, and launch materials. Frame as "inspired by" not "port of." Reach out to Duende before launch. |
+| R7 | Scope creep — framework integrations (Epic 2B) dilute focus from core library | Medium | Medium | Treat Epic 2B as post-Core. Ship Core tier for all languages before any framework integration. |
 
 ## Success Criteria
 
