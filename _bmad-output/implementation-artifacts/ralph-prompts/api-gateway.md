@@ -339,15 +339,18 @@ setup → analyze → anchor → implement → test → review → review-fix �
    - `.claude/review-security.md`
    - `.claude/review-redteam.md` (if exists)
 
-2. **Count blocking findings** across all reviewers:
-   - Blind Hunter: `MUST FIX` items
-   - Edge Case Hunter: `[CRASH]` or `[DATA]` items
-   - Acceptance Auditor: `FAIL` items
-   - Sentinel: `BLOCK` items
-   - Viper: `CRITICAL` or `HIGH` items
+2. **Count ALL findings** across all reviewers:
+   - Blind Hunter: `MUST FIX` + `SHOULD FIX` + `NITPICK` items
+   - Edge Case Hunter: `[CRASH]` + `[DATA]` + `[DEGRADED]` items
+   - Acceptance Auditor: `FAIL` + `PARTIAL` items
+   - Sentinel: `BLOCK` + `WARN` items (INFO = acceptable risk, skip)
+   - Viper: `CRITICAL` + `HIGH` + `MEDIUM` + `LOW` items
 
-3. **If blocking count > 0:**
-   a. Address each blocking finding with a code change
+3. **If open finding count > 0:**
+   a. Address each finding with a code change, working in priority order:
+      - P0: MUST FIX, CRASH, DATA, FAIL, BLOCK, CRITICAL, HIGH
+      - P1: SHOULD FIX, DEGRADED, PARTIAL, WARN, MEDIUM
+      - P2: NITPICK, LOW
    b. Run `make lint && make test-unit`
    c. Commit fixes:
       ```
@@ -357,24 +360,24 @@ setup → analyze → anchor → implement → test → review → review-fix �
       Refs #<issue>"
       ```
    d. Regenerate diff: `git diff origin/main...HEAD > .claude/review-diff.patch`
-   e. Re-spawn ONLY the reviewer(s) that had blocking findings (not all reviewers)
+   e. Re-spawn ONLY the reviewer(s) that had findings (not all reviewers)
    f. Read new review files and recount
-   g. **Repeat up to 3 iterations total**
+   g. **Repeat up to 5 iterations total**
 
-4. **If 3 iterations exhausted with unresolved blocking findings:**
+4. **If 5 iterations exhausted with unresolved findings:**
    - Write `## Review Gate: BLOCKED` to task-state-gateway.md with remaining findings
    - Set task to `blocked` — do NOT create PR
    - **End your response.**
 
-5. **If blocking count is 0 (or reaches 0 within 3 iterations):**
+5. **If all findings are resolved (or reach 0 within 5 iterations):**
    - Write `## Review Summary` to task-state-gateway.md:
      ```
      ### Review Gate: PASSED (iteration N)
-     - Blind Hunter: N MUST FIX (all resolved), N SHOULD FIX, N NITPICK
-     - Edge Case Hunter: N paths found, N critical (all resolved)
-     - Acceptance: N PASS, N FAIL (all resolved), N PARTIAL
-     - Security: N BLOCK (all resolved), N WARN, N INFO
-     - Red Team: [N findings / skipped]
+     - Blind Hunter: N MUST FIX, N SHOULD FIX, N NITPICK — all resolved
+     - Edge Case Hunter: N paths found — all resolved
+     - Acceptance: N PASS, N FAIL, N PARTIAL — all non-PASS resolved
+     - Security: N BLOCK, N WARN — all resolved (N INFO accepted)
+     - Red Team: [N findings — all resolved / skipped]
      ```
    - **Set phase to `pr`. End your response.**
 
@@ -421,8 +424,16 @@ setup → analyze → anchor → implement → test → review → review-fix �
    )" \
      --repo jamescrowley321/identity-stack
    ```
-3. Record PR number and URL in task-state-gateway.md under `## PR`
-4. **Set phase to `ci`. End your response.**
+3. **Post all review findings as PR comments** — one comment per reviewer:
+   ```bash
+   for review_file in .claude/review-blind.md .claude/review-edge.md .claude/review-acceptance.md .claude/review-security.md .claude/review-redteam.md; do
+     if [ -f "$review_file" ]; then
+       gh pr comment <pr_number> --repo jamescrowley321/identity-stack --body "$(cat "$review_file")"
+     fi
+   done
+   ```
+4. Record PR number and URL in task-state-gateway.md under `## PR`
+5. **Set phase to `ci`. End your response.**
 
 ---
 
@@ -460,14 +471,19 @@ setup → analyze → anchor → implement → test → review → review-fix �
 
 ### complete
 
-1. Update task queue in THIS prompt file: replace `pending` with `done` for this story's row
-2. Clean up worktree:
+1. **Merge the PR using rebase merge:**
+   ```
+   gh pr merge <pr_number> --repo jamescrowley321/identity-stack --rebase --delete-branch
+   ```
+   If merge fails, write the error to `## Merge` in task-state-gateway.md and retry next iteration.
+2. Update task queue in THIS prompt file: replace `pending` with `done` for this story's row
+3. Clean up worktree:
    ```
    cd ~/repos/auth/identity-stack
    git worktree remove /tmp/is-gateway-story-<N.M> --force
    ```
-3. Delete `~/repos/auth/identity-stack/.claude/task-state-gateway.md`
-4. Output: <promise>TASK COMPLETE</promise>
+4. Delete `~/repos/auth/identity-stack/.claude/task-state-gateway.md`
+5. Output: <promise>TASK COMPLETE</promise>
 
 ---
 

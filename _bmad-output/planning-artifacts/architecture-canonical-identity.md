@@ -77,24 +77,33 @@ The canonical model is designed domain-first, not as a mirror of Descope's API s
 
 ### Interface Architecture
 
-**Two ABC interfaces, constructor injection, no generics:**
+**Three interface layers (onion architecture), constructor injection, no generics:**
 
-- **`IdentityService`** (ABC) — core contract for canonical identity operations. Routers depend on this. Postgres-backed implementation (`PostgresIdentityService`) is the only production impl.
-- **`IdentityProviderAdapter`** (ABC) — sync adapter for IdP write-through. Descope adapter is the first impl. `NoOpSyncAdapter` for testing.
-- **Constructor injection:** `PostgresIdentityService(session, adapter)` — FastAPI DI wires it up.
+- **Repository layer (inner)** — Data access classes. Handle all SQLAlchemy queries. No business logic, no adapter calls, no OTel spans. Take `AsyncSession`, return domain objects or `Result` types.
+  - `UserRepository`, `RoleRepository`, `PermissionRepository`, `TenantRepository`, `UserTenantRoleRepository`
+- **Domain service layer (middle)** — `IdentityService` (ABC) is the domain service contract. Routers depend on this. Orchestrates business logic by calling repositories for persistence and adapters for sync. No direct SQLAlchemy imports.
+  - `UserService`, `RoleService`, `PermissionService`, `TenantService`
+- **Adapter layer (outer)** — `IdentityProviderAdapter` (ABC) for IdP write-through sync. Descope adapter is the first impl. `NoOpSyncAdapter` for testing.
+- **Constructor injection:** `UserService(repository, adapter)` — repository handles DB, adapter handles IdP sync. FastAPI DI composes all layers at the edge:
+  ```python
+  async def get_user_service(session = Depends(get_async_session)) -> UserService:
+      repository = UserRepository(session)
+      adapter = DescopeSyncAdapter(get_descope_client())
+      return UserService(repository=repository, adapter=adapter)
+  ```
 
-**Canonical operations** (IdentityService — Postgres-backed, synced to provider):
+**Canonical operations** (domain services — Postgres-backed via repositories, synced to provider via adapters):
 - User CRUD + search, Role definition CRUD, Permission definition CRUD
 - Role-permission mapping, Tenant CRUD + domains, User-tenant-role assignment
 - IdP link management, Provider configuration
 
-**Proxied operations** (stay on DescopeManagementClient, not routed through IdentityService):
+**Proxied operations** (stay on DescopeManagementClient, not routed through domain services):
 - FGA schema, relations, checks
 - Access key lifecycle
 - Auth/logout
 
 **Result types (ADR-6) from day one:**
-- Service methods return `Result[T, IdentityError]` — not exceptions
+- Domain service methods return `Result[T, IdentityError]` — not exceptions
 - Error hierarchy: `NotFound`, `Conflict`, `ValidationError`, `SyncFailed`, `ProviderError`
 - `SyncFailed` models the partial-success state: Postgres succeeded, IdP sync failed → HTTP 202 with warning
 - Router helper maps `Result` → HTTP response with RFC 9457 Problem Detail format
@@ -102,13 +111,25 @@ The canonical model is designed domain-first, not as a mirror of Descope's API s
 
 **Module structure:**
 ```
-backend/app/services/
-├── identity.py          # ABC: IdentityService
-├── identity_impl.py     # PostgresIdentityService(IdentityService)
-├── adapters/
-│   ├── base.py          # ABC: IdentityProviderAdapter
-│   ├── descope.py       # DescopeSyncAdapter(IdentityProviderAdapter)
-│   └── noop.py          # NoOpSyncAdapter — testing, returns Ok(None)
+backend/app/
+├── repositories/
+│   ├── __init__.py
+│   ├── user.py              # UserRepository — SQLAlchemy user queries
+│   ├── role.py              # RoleRepository — role + role_permission queries
+│   ├── permission.py        # PermissionRepository — permission queries
+│   ├── tenant.py            # TenantRepository — tenant queries
+│   └── assignment.py        # UserTenantRoleRepository — membership queries
+├── services/
+│   ├── identity.py          # ABC: IdentityService (domain interface)
+│   ├── user.py              # UserService — domain logic, calls UserRepository + adapter
+│   ├── role.py              # RoleService — domain logic, calls RoleRepository + adapter
+│   ├── permission.py        # PermissionService — domain logic
+│   ├── tenant.py            # TenantService — domain logic
+│   ├── adapters/
+│   │   ├── base.py          # ABC: IdentityProviderAdapter
+│   │   ├── descope.py       # DescopeSyncAdapter(IdentityProviderAdapter)
+│   │   └── noop.py          # NoOpSyncAdapter — testing, returns Ok(None)
+│   └── descope.py           # DescopeManagementClient (existing, proxied ops only)
 ```
 
 ### Technical Constraints & Dependencies
@@ -185,9 +206,9 @@ This is a brownfield project with an established tech stack. No starter template
 | D1 | Primary database | PostgreSQL 16 | Replaces SQLite. Canonical identity store. |
 | D2 | ORM + migrations | SQLModel + Alembic (async-only) | Single async `env.py`. No sync engine anywhere in the project. |
 | D3 | Async engine | `create_async_engine` + `AsyncSession` everywhere | asyncpg driver. No sync Session, no sync fallback. Alembic uses `run_async`. |
-| D4 | Interface pattern | ABCs with constructor injection | `IdentityService` (ABC), `IdentityProviderAdapter` (ABC). No generics. |
+| D4 | Interface pattern | Onion architecture with ABCs and constructor injection | Three layers: Repositories (data access), Domain Services (business logic), Adapters (external sync). No generics. |
 | D5 | Error handling | `Result[T, E]` via `expression` + RFC 9457 Problem Details | From day one. `SyncFailed` → HTTP 202. `application/problem+json` with trace IDs. |
-| D6 | Observability | OTel auto-instrumentation + Aspire Dashboard | FastAPI, httpx, SQLAlchemy instrumentors. Custom spans on IdentityService. |
+| D6 | Observability | OTel auto-instrumentation + Aspire Dashboard | FastAPI, httpx, SQLAlchemy instrumentors. Custom spans on domain service methods (NOT repositories). |
 | D7 | Sync pattern | Write-through (Postgres first, IdP second) | `SyncFailed` logged, not rolled back. Reconciliation catches up. |
 | D8 | Tenant isolation | Repository-level scoping | Every query method takes `tenant_id`. Enforced in repository layer. Explicit, testable, no Postgres RLS magic. |
 
@@ -297,9 +318,9 @@ redis:
 1. **Postgres + Alembic + async engine** — foundation, blocks everything
 2. **OTel + Aspire Dashboard** — observability before service layer
 3. **RFC 9457 error model + Result types** — error contract before router rewrites
-4. **IdentityService ABC + IdentityProviderAdapter ABC** — interfaces before implementations
-5. **PostgresIdentityService + DescopeSyncAdapter** — implementations
-6. **Router rewrites** — inject IdentityService, replace direct Descope calls
+4. **IdentityService ABC + IdentityProviderAdapter ABC + Repository classes** — interfaces and data access before domain services
+5. **Domain services (UserService, RoleService, etc.) + DescopeSyncAdapter** — domain logic orchestrates repositories + adapters
+6. **Router rewrites** — inject domain services via DI factories, replace direct Descope calls
 7. **Seed migration** — import Descope state into canonical tables
 8. **Redis cache** — identity lookup caching + pub/sub
 
@@ -331,45 +352,55 @@ redis:
 - Headers: standard HTTP (`traceparent`, `content-type: application/problem+json`)
 
 **Python Code:**
-- Modules: snake_case (`identity_impl.py`, `descope.py`)
-- Classes: PascalCase (`PostgresIdentityService`, `DescopeSyncAdapter`)
+- Modules: snake_case (`user.py`, `descope.py`)
+- Classes: PascalCase (`UserService`, `UserRepository`, `DescopeSyncAdapter`)
 - Functions/methods: snake_case (`create_user`, `sync_role`)
 - Constants: UPPER_SNAKE (`RATE_LIMIT_AUTH`, `DEFAULT_CACHE_TTL`)
 - Type aliases: PascalCase (`UserResult = Result[User, IdentityError]`)
 
 ### Structure Patterns
 
-**Service Layer Organization:**
+**Onion Layer Organization:**
 ```
 backend/app/
-├── services/
-│   ├── identity.py              # ABC: IdentityService
-│   ├── identity_impl.py         # PostgresIdentityService
-│   ├── adapters/
-│   │   ├── base.py              # ABC: IdentityProviderAdapter
-│   │   ├── descope.py           # DescopeSyncAdapter
-│   │   └── noop.py              # NoOpSyncAdapter (testing)
-│   └── descope.py               # DescopeManagementClient (existing, proxied ops only)
+├── repositories/                    # INNER LAYER — data access only
+│   ├── __init__.py
+│   ├── user.py                      # UserRepository — SQLAlchemy user queries
+│   ├── role.py                      # RoleRepository — role + role_permission queries
+│   ├── permission.py                # PermissionRepository — permission queries
+│   ├── tenant.py                    # TenantRepository — tenant queries
+│   └── assignment.py                # UserTenantRoleRepository — membership queries
+├── services/                        # MIDDLE LAYER — domain logic
+│   ├── identity.py                  # ABC: IdentityService (domain interface)
+│   ├── user.py                      # UserService — orchestrates UserRepository + adapter
+│   ├── role.py                      # RoleService — orchestrates RoleRepository + adapter
+│   ├── permission.py                # PermissionService — orchestrates PermissionRepository + adapter
+│   ├── tenant.py                    # TenantService — orchestrates TenantRepository + adapter
+│   ├── adapters/                    # OUTER LAYER — external system sync
+│   │   ├── base.py                  # ABC: IdentityProviderAdapter
+│   │   ├── descope.py               # DescopeSyncAdapter
+│   │   └── noop.py                  # NoOpSyncAdapter (testing)
+│   └── descope.py                   # DescopeManagementClient (existing, proxied ops only)
 ├── models/
-│   ├── database.py              # AsyncEngine, async_sessionmaker
-│   ├── identity/                # Canonical identity models
-│   │   ├── user.py              # User, IdPLink
-│   │   ├── tenant.py            # Tenant (canonical, distinct from existing TenantResource)
-│   │   ├── role.py              # Role, Permission, RolePermission
-│   │   ├── assignment.py        # UserTenantRole
-│   │   └── provider.py          # Provider
-│   ├── document.py              # Existing Document model
-│   └── tenant.py                # Existing TenantResource model
+│   ├── database.py                  # AsyncEngine, async_sessionmaker
+│   ├── identity/                    # Canonical identity models
+│   │   ├── user.py                  # User, IdPLink
+│   │   ├── tenant.py                # Tenant (canonical, distinct from existing TenantResource)
+│   │   ├── role.py                  # Role, Permission, RolePermission
+│   │   ├── assignment.py            # UserTenantRole
+│   │   └── provider.py              # Provider
+│   ├── document.py                  # Existing Document model
+│   └── tenant.py                    # Existing TenantResource model
 ├── errors/
-│   ├── identity.py              # IdentityError hierarchy
-│   └── problem_detail.py        # RFC 9457 ProblemDetailResponse
-├── telemetry.py                 # OTel configuration
-├── routers/                     # Existing routers (rewired to IdentityService)
-├── dependencies/                # Existing + new DI factories
-│   └── identity.py              # get_identity_service() dependency
-└── migrations/                  # Alembic
-    ├── env.py                   # Async-only
-    ├── versions/                # Migration scripts
+│   ├── identity.py                  # IdentityError hierarchy
+│   └── problem_detail.py            # RFC 9457 ProblemDetailResponse
+├── telemetry.py                     # OTel configuration
+├── routers/                         # EDGE — HTTP handling, DI composition
+├── dependencies/                    # DI factories compose onion layers
+│   └── identity.py                  # get_user_service(), get_role_service(), etc.
+└── migrations/                      # Alembic
+    ├── env.py                       # Async-only
+    ├── versions/                    # Migration scripts
     └── alembic.ini
 ```
 
@@ -377,18 +408,28 @@ backend/app/
 ```
 backend/tests/
 ├── unit/
+│   ├── repositories/
+│   │   ├── test_user_repository.py      # UserRepository (real Postgres via testcontainers)
+│   │   ├── test_role_repository.py      # RoleRepository
+│   │   ├── test_permission_repository.py
+│   │   └── test_tenant_repository.py
 │   ├── services/
-│   │   ├── test_identity_impl.py    # PostgresIdentityService (with NoOpSyncAdapter)
-│   │   └── test_descope_adapter.py  # DescopeSyncAdapter (mocked httpx)
+│   │   ├── test_user_service.py         # UserService (mocked repository + NoOpSyncAdapter)
+│   │   ├── test_role_service.py         # RoleService
+│   │   ├── test_permission_service.py   # PermissionService
+│   │   ├── test_tenant_service.py       # TenantService
+│   │   └── test_descope_adapter.py      # DescopeSyncAdapter (mocked httpx)
 │   ├── models/
-│   │   └── test_identity_models.py  # SQLModel validation
+│   │   └── test_identity_models.py      # SQLModel validation
 │   ├── errors/
-│   │   └── test_problem_detail.py   # RFC 9457 response formatting
-│   └── routers/                     # Existing + updated router tests
+│   │   └── test_problem_detail.py       # RFC 9457 response formatting
+│   └── routers/                         # Existing + updated router tests
 ├── integration/
-│   ├── conftest.py                  # testcontainers Postgres fixture
-│   └── test_identity_service.py     # Full service → Postgres (NoOpSyncAdapter)
-└── e2e/                             # Existing Playwright tests (unchanged)
+│   ├── conftest.py                      # testcontainers Postgres fixture
+│   ├── test_user_service.py             # Full service → repository → Postgres
+│   ├── test_role_service.py
+│   └── test_tenant_service.py
+└── e2e/                                 # Existing Playwright tests (unchanged)
 ```
 
 ### Format Patterns
@@ -422,34 +463,71 @@ backend/tests/
 | `ProviderError` | `/errors/provider-error` | 502 |
 | `Forbidden` | `/errors/forbidden` | 403 |
 
-### Service Method Pattern
+### Repository Method Pattern
 
-Every `IdentityService` method follows this structure:
+Every repository method handles data access only — no business logic, no OTel, no adapter calls:
 
 ```python
-async def create_role(self, tenant_id: UUID, cmd: CreateRole) -> Result[Role, IdentityError]:
-    with tracer.start_as_current_span("identity.create_role") as span:
-        span.set_attribute("tenant.id", str(tenant_id))
+# In repositories/role.py
+class RoleRepository:
+    def __init__(self, session: AsyncSession):
+        self._session = session
 
-        # 1. Validate
-        # 2. Postgres write
-        role = Role(...)
+    async def create(self, role: Role) -> Role:
         self._session.add(role)
         await self._session.flush()
+        return role
 
-        # 3. Sync to provider (don't roll back on failure)
-        sync_result = await self._adapter.sync_role(role)
-        match sync_result:
-            case Error(e):
-                logger.warning("sync_failed", role_id=str(role.id), error=str(e))
-                span.set_status(StatusCode.ERROR, "sync_failed")
+    async def get_by_id(self, role_id: UUID, tenant_id: UUID) -> Role | None:
+        result = await self._session.execute(
+            select(Role).where(Role.id == role_id, Role.tenant_id == tenant_id)
+        )
+        return result.scalar_one_or_none()
 
+    async def commit(self) -> None:
         await self._session.commit()
-        return Ok(role)
 ```
 
 **Key invariants:**
-- Postgres write FIRST, sync SECOND
+- Takes `AsyncSession` via constructor
+- Returns domain objects or None — not `Result` types
+- Tenant scoping enforced in every query (explicit `tenant_id` parameter)
+- No OTel spans, no adapter calls, no business logic
+
+### Domain Service Method Pattern
+
+Every domain service method orchestrates repository + adapter:
+
+```python
+# In services/role.py
+class RoleService:
+    def __init__(self, repository: RoleRepository, adapter: IdentityProviderAdapter):
+        self._repository = repository
+        self._adapter = adapter
+
+    async def create_role(self, tenant_id: UUID, cmd: CreateRole) -> Result[Role, IdentityError]:
+        with tracer.start_as_current_span("identity.create_role") as span:
+            span.set_attribute("tenant.id", str(tenant_id))
+
+            # 1. Validate
+            # 2. Persist via repository
+            role = Role(...)
+            await self._repository.create(role)
+
+            # 3. Sync to provider (don't roll back on failure)
+            sync_result = await self._adapter.sync_role(role)
+            match sync_result:
+                case Error(e):
+                    logger.warning("sync_failed", role_id=str(role.id), error=str(e))
+                    span.set_status(StatusCode.ERROR, "sync_failed")
+
+            await self._repository.commit()
+            return Ok(role)
+```
+
+**Key invariants:**
+- Repository FIRST (via `self._repository`), sync SECOND (via `self._adapter`)
+- No direct SQLAlchemy imports — all data access through repository
 - Sync failure → log + warn, never rollback
 - Every method gets an OTel span with domain attributes
 - `tenant_id` is explicit param, never extracted from ambient context
@@ -457,7 +535,7 @@ async def create_role(self, tenant_id: UUID, cmd: CreateRole) -> Result[Role, Id
 
 ### Router Pattern
 
-Every router that uses IdentityService follows this structure:
+Every router that uses domain services follows this structure:
 
 ```python
 @router.post("/roles", status_code=201)
@@ -466,14 +544,14 @@ async def create_role(
     request: Request,
     tenant_id: UUID = Depends(get_tenant_id),
     _roles: list[str] = Depends(require_role("owner", "admin")),
-    identity: IdentityService = Depends(get_identity_service),
+    role_service: RoleService = Depends(get_role_service),
 ):
-    result = await identity.create_role(tenant_id, CreateRole(...))
+    result = await role_service.create_role(tenant_id, CreateRole(...))
     return result_to_response(result, status=201)
 ```
 
 **Key invariants:**
-- `IdentityService` injected via `Depends(get_identity_service)`
+- Domain services injected via `Depends(get_user_service)`, `Depends(get_role_service)`, etc.
 - `result_to_response()` maps `Ok` → JSON, `Error` → RFC 9457 Problem Detail
 - Rate limiting, role enforcement, tenant extraction unchanged from existing patterns
 - FGA/access key routes continue using `get_descope_client()` directly
@@ -652,7 +730,7 @@ test-all: lint test-unit test-integration test-e2e
 | `raise HTTPException(404, detail="not found")` | `return Error(NotFound("User", user_id))` → `result_to_response()` |
 | `sync Session` or `create_engine()` | `AsyncSession` via `async_sessionmaker` + `create_async_engine()` |
 | `create_all()` in app startup | Alembic migration (`alembic upgrade head`) |
-| `get_descope_client()` in canonical routers | `Depends(get_identity_service)` |
+| `get_descope_client()` in canonical routers | `Depends(get_user_service)` / `Depends(get_role_service)` / etc. |
 | Implicit tenant from JWT in service layer | Explicit `tenant_id: UUID` parameter |
 | `try/except` returning HTTP status in service | `Result[T, IdentityError]` — let router map to HTTP |
 | Mock Postgres with SQLite in tests | `testcontainers[postgres]` for real Postgres |
@@ -693,7 +771,7 @@ The complete project structure is defined in the Structure Patterns section abov
 | Component | FRs Covered |
 |-----------|-------------|
 | Postgres + Alembic + async engine | FR30-32 |
-| `IdentityService` ABC + `PostgresIdentityService` | FR1-12 |
+| `IdentityService` ABC + Repositories + Domain Services (`UserService`, `RoleService`, etc.) | FR1-12 |
 | `IdentityProviderAdapter` ABC + `DescopeSyncAdapter` | FR23-25 |
 | `NoOpSyncAdapter` | Testing infrastructure |
 | `IdentityError` + `ProblemDetailResponse` | NFR error contract |
