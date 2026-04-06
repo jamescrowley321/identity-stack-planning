@@ -12,6 +12,7 @@ This document is the master index for all planned work across the auth workspace
 | PRD 3 | Multi-Provider Test Infrastructure | py-identity-model, identity-stack | Planned | ~25 stories / 3 epics |
 | PRD 4 | Multi-IdP Gateway Demo | identity-stack | Planned | ~20 stories / 4 epics |
 | PRD 5 | Canonical Identity Domain Model | identity-stack | Active | 19 stories / 4 epics |
+| PRD 6 | identity-model Multi-Language Monorepo | identity-model (new repo) | Planned | ~100 stories / 15 epics |
 
 ## Dependency Graph
 
@@ -23,6 +24,7 @@ graph TD
     PRD3["PRD 3: Multi-Provider Test<br/>node-oidc-provider fixture"]
     PRD4["PRD 4: Multi-IdP Demo<br/>Capstone: Descope + Ory + cloud IdPs"]
     PRD5["PRD 5: Canonical Identity<br/>Postgres domain model"]
+    PRD6["PRD 6: identity-model Monorepo<br/>Multi-language OIDC/OAuth2"]
 
     MAIN --> PRD5
     MAIN --> PRD1
@@ -30,6 +32,8 @@ graph TD
     PRD2 --> PRD3
     PRD3 --> PRD4
     PRD5 --> PRD4
+    MAIN --> PRD6
+    PRD3 --> PRD6
 
     style MAIN fill:#2d6a4f,color:#fff
     style PRD5 fill:#1b4332,color:#fff
@@ -37,12 +41,14 @@ graph TD
     style PRD2 fill:#40916c,color:#fff
     style PRD3 fill:#52b788,color:#000
     style PRD4 fill:#95d5b2,color:#000
+    style PRD6 fill:#40916c,color:#fff
 ```
 
 **Parallel tracks:**
 - PRD 1 (secrets), PRD 2 (gateway), and PRD 5 (canonical identity) can all begin independently
 - PRD 3 (multi-provider test) requires PRD 2's Tyk integration for the second OIDC provider endpoint
 - PRD 4 (multi-IdP demo) is the capstone — requires PRD 3's test infrastructure AND PRD 5's canonical identity model
+- PRD 6 (identity-model monorepo) depends on Main PRD completion and PRD 3's shared test infrastructure
 
 ## PRD Details
 
@@ -159,6 +165,23 @@ graph TD
 - PRD: [`prd-canonical-identity.md`](../_bmad-output/planning-artifacts/prd-canonical-identity.md)
 - Architecture: [`architecture-canonical-identity.md`](../_bmad-output/planning-artifacts/architecture-canonical-identity.md)
 - Epics: [`epics.md`](../_bmad-output/planning-artifacts/epics.md) (PRD 5 section)
+
+### PRD 6 — identity-model Multi-Language Monorepo
+
+**Problem:** The identity protocol client space outside of C#/.NET is fragmented. Developers in Python, Node/TypeScript, Go, and Rust must cobble together 3-4 libraries for basic OIDC/OAuth2 support. No ecosystem has a unified client library with modern RFC coverage (DPoP, PAR, RAR, Token Exchange).
+
+**Solution:** Transform py-identity-model into a multi-language monorepo — `identity-model` — porting the design philosophy of Duende's IdentityModel (.NET) to Python, Node/TypeScript, Go, and Rust. A shared `spec/` directory defines cross-language conformance test definitions; each language implements them idiomatically.
+
+**Scope:** 15 epics covering: monorepo setup, cross-language conformance specs, Core Tier (all 4 languages), Extended Tier (Introspection, Revocation, Token Exchange, DPoP), Advanced Tier (PAR, RAR), OpenTelemetry, security pipeline, documentation site, benchmarks, contributor DX, competitive analysis, naming/versioning, improvement spikes, and modern auth extensions.
+
+**Depends on:** Main PRD (py-identity-model protocol features complete), PRD 3 (node-oidc-provider test infrastructure for shared conformance tests).
+
+**Artifacts:**
+- Product Brief: [`product-brief-identity-model-monorepo.md`](../_bmad-output/planning-artifacts/product-brief-identity-model-monorepo.md)
+- Competitive Analysis: [`competitive-analysis-identity-model.md`](../_bmad-output/planning-artifacts/competitive-analysis-identity-model.md)
+- Epics: [`epics/epic-0a-monorepo-setup.md`](../_bmad-output/planning-artifacts/epics/epic-0a-monorepo-setup.md) through [`epic-15-modern-auth-extensions.md`](../_bmad-output/planning-artifacts/epics/epic-15-modern-auth-extensions.md) (24 files)
+
+---
 
 ## Cross-PRD Functional Requirement Mapping
 

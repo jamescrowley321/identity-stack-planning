@@ -232,3 +232,67 @@ All RFCs covered across the project are referenced in launch materials:
 - [RFC 9449 — DPoP](https://www.rfc-editor.org/rfc/rfc9449)
 - [RFC 9126 — PAR](https://www.rfc-editor.org/rfc/rfc9126)
 - [RFC 9396 — RAR](https://www.rfc-editor.org/rfc/rfc9396)
+
+---
+
+## Story 6.6: OpenID Foundation Certification Submission
+
+### User Story
+
+**As a** project maintainer building trust with enterprise adopters,
+**I want** to submit identity-model for OpenID Foundation certification across all four language SDKs,
+**So that** users can rely on an independent, industry-recognized verification that the libraries are spec-compliant, and the project appears in the OpenID Foundation's certified implementations directory.
+
+### Background
+
+The [OpenID Foundation](https://openid.net/certification/) offers certification programs for Relying Party (RP) libraries. Relevant profiles for identity-model:
+
+- **Basic RP** — OIDC Core discovery, ID token validation, UserInfo
+- **Config RP** — Dynamic discovery of provider configuration
+- **Dynamic RP** — Dynamic client registration (RFC 7591)
+- **FAPI 2.0 RP** — Financial-grade security profile (DPoP, PAR, JARM)
+
+Certification involves running the Foundation's [conformance test suite](https://openid.net/certification/testing/) against each language SDK and submitting the results. Python should certify first (existing codebase), then Node/Go/Rust as they reach Core Tier completion.
+
+### Acceptance Criteria
+
+**Given** the Python SDK has passed all internal conformance tests (DISC-*, JWK-*, VAL-*, CC-*, AUTHZ-*, UI-*),
+**When** the OpenID Foundation conformance suite is run against py-identity-model,
+**Then** the library passes all required tests for the Basic RP and Config RP profiles, and the results are submitted to the Foundation for certification.
+
+**Given** each additional language SDK (Node, Go, Rust) reaches Core Tier completion,
+**When** the Foundation conformance suite is run against that SDK,
+**Then** the library passes Basic RP and Config RP certification, and results are submitted.
+
+**Given** the Extended Tier (DPoP, PAR) is implemented in any SDK,
+**When** FAPI 2.0 RP conformance tests are run,
+**Then** the library passes the FAPI 2.0 RP profile, and results are submitted for certification.
+
+**Given** certification is achieved,
+**When** the Foundation publishes the results,
+**Then** each certified SDK's README, documentation site, and registry page display the OpenID Certified badge with a link to the certification results.
+
+**Given** any language SDK,
+**When** certification is pursued,
+**Then** the deliverables include:
+- A CI job that runs the OpenID Foundation conformance suite on every release candidate
+- Documentation of the certification submission process (repeatable for future versions)
+- Conformance test result artifacts archived in the repository
+
+### Certification Phasing
+
+| Phase | SDK | Profile | Prerequisite |
+|-------|-----|---------|-------------|
+| 1 | Python | Basic RP, Config RP | Epic 1 complete |
+| 2 | Node | Basic RP, Config RP | Epic 2 complete |
+| 2 | Go | Basic RP, Config RP | Epic 3 complete |
+| 2 | Rust | Basic RP, Config RP | Epic 4 complete |
+| 3 | All | Dynamic RP | Epic 0E-REG (Dynamic Registration) implemented |
+| 4 | All | FAPI 2.0 RP | Epic 5 (DPoP) + Epic 6.1 (PAR) complete |
+
+### References
+
+- [OpenID Foundation Certification](https://openid.net/certification/)
+- [OpenID Conformance Testing Suite](https://openid.net/certification/testing/)
+- [Certified OpenID Connect Implementations](https://openid.net/developers/certified-openid-connect-implementations/)
+- [OIDC Certification Analysis (py-identity-model)](../../docs/oidc-certification-analysis.md)
