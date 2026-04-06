@@ -125,6 +125,7 @@ graph LR
     PRD3["PRD 3: Multi-Provider Test<br/>node-oidc-provider fixture<br/>⏳ Planned"]
     PRD4["PRD 4: Multi-IdP Demo<br/>Capstone: claim normalization<br/>⏳ Planned"]
     PRD5["PRD 5: Canonical Identity<br/>Postgres domain model<br/>🔄 Active"]
+    PRD6["PRD 6: identity-model Monorepo<br/>Multi-language OIDC/OAuth2<br/>📋 Planned"]
 
     MAIN --> PRD5
     MAIN --> PRD1
@@ -132,6 +133,8 @@ graph LR
     PRD2 --> PRD3
     PRD3 --> PRD4
     PRD5 --> PRD4
+    MAIN --> PRD6
+    PRD3 --> PRD6
 ```
 
 **Current focus:**
@@ -141,6 +144,9 @@ graph LR
 **Next:**
 - **PRD 1** — Reduce N scattered `.env` secrets to 2 bootstrap credentials via Infisical + HCP Terraform
 - **PRD 2** — Tyk API gateway with dual deployment modes (standalone vs gateway), offloading JWT validation and rate limiting
+
+**Future:**
+- **PRD 6** — Transform py-identity-model into a multi-language OIDC/OAuth2 client library monorepo (Python, Node/TypeScript, Go, Rust). 15 epics, ~100 stories. See [product brief](_bmad-output/planning-artifacts/product-brief-identity-model-monorepo.md) and [competitive analysis](_bmad-output/planning-artifacts/competitive-analysis-identity-model.md).
 
 **Capstone:**
 - **PRD 4** — User authenticates with Descope, Ory, or a cloud IdP. Tyk normalizes divergent claims. Backend operates on canonical identity without knowing the provider.
@@ -190,6 +196,39 @@ erDiagram
 ```
 
 **Write-through sync:** Postgres write first → sync to IdP second → sync failures logged, never rolled back → reconciliation catches up asynchronously.
+
+### Two-Layer Authorization Model (RBAC + ReBAC)
+
+The platform combines role-based and relationship-based access control, each at its natural layer:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  RBAC Layer (Canonical Postgres)                            │
+│  "Who are you and what role do you have in this tenant?"    │
+│                                                             │
+│  users ──→ user_tenant_roles ──→ roles ──→ permissions      │
+│  Enforced by: require_role() / require_permission()         │
+│  Tenant isolation: repository-level WHERE tenant_id = ?     │
+└─────────────────────────────────────────────────────────────┘
+                          +
+┌─────────────────────────────────────────────────────────────┐
+│  ReBAC/FGA Layer (Descope FGA — proxied, not owned)         │
+│  "What is your relationship to this specific resource?"     │
+│                                                             │
+│  Schema:  type document                                     │
+│             relation owner: user                            │
+│             relation editor: user                           │
+│             relation viewer: user                           │
+│             permission can_view: viewer | editor | owner    │
+│             permission can_edit: editor | owner             │
+│             permission can_delete: owner                    │
+│                                                             │
+│  Enforced by: require_fga("document", "can_view")           │
+│  Tenant isolation: resource_id prefixed with tenant_id      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Why two layers (ADR-2):** RBAC handles identity primitives (who you are, your role). FGA handles resource access (your relationship to a specific document). FGA relation tuples stay in provider engines (Descope FGA, Ory Keto) — they're purpose-built for graph evaluation at scale (Zanzibar architecture). The canonical DB owns RBAC; FGA is proxied, never stored locally. Both layers are fail-closed — any authorization check error results in denial, never a grant.
 
 ### Data Flow
 
@@ -277,17 +316,13 @@ Blocking findings must be resolved before the PR can be created. Maximum 3 fix i
 
 ## Project Status
 
-| Repo | Done | In Progress | Pending | Blocked | Merged PRs |
-|------|------|-------------|---------|---------|------------|
-| terraform-provider-descope | 18 | 0 | 0 | 1 | 65+ |
-| identity-stack | 23 | 0 | 7 | 6 | 44+ |
-| py-identity-model | 47 | 2 | 16 | 0 | 100+ |
+Live status is tracked in the [task queue](_bmad-output/implementation-artifacts/task-queue.md). Use `/ralph-status` in Claude Code for a real-time summary across all repos.
 
-**Blockers:**
-- `T6` (terraform-provider-descope): SSO application resource requires Descope enterprise license
-- identity-stack blocked tasks depend on T6 or intentionally wontfix'd resources
-
-Full task breakdown: [`task-queue.md`](_bmad-output/implementation-artifacts/task-queue.md)
+| Repo | Status | Links |
+|------|--------|-------|
+| terraform-provider-descope | Feature-complete. 1 blocked (SSO app requires enterprise license). | [PRs](https://github.com/jamescrowley321/terraform-provider-descope/pulls) · [Registry](https://registry.terraform.io/providers/jamescrowley321/descope/latest) |
+| identity-stack | Core platform operational. PRD 5 (canonical identity) active. | [PRs](https://github.com/jamescrowley321/identity-stack/pulls) |
+| py-identity-model | All 16 protocol features shipped. Review fix cycle complete. | [PRs](https://github.com/jamescrowley321/py-identity-model/pulls) · [PyPI](https://pypi.org/project/py-identity-model/) |
 
 ## Quick Start
 
@@ -347,12 +382,16 @@ identity-stack-planning/
       prd-multi-provider-test.md  # PRD 3 — node-oidc-provider test fixture
       prd-multi-idp-demo.md       # PRD 4 — capstone multi-IdP demo
       architecture*.md            # Per-PRD architecture + ADRs
-      epics*.md                   # Per-PRD story breakdowns
+      epics*.md                   # Per-PRD story breakdowns (PRDs 1-5)
+      epics/                      # PRD 6 epic files (epic-0a through epic-15)
+      competitive-analysis-identity-model.md  # Cross-ecosystem library analysis
+      product-brief-identity-model-monorepo.md  # PRD 6 product brief
     implementation-artifacts/
-      task-queue.md               # Cross-repo task tracker (147+ tasks)
+      task-queue.md               # Cross-repo task tracker
       sprint-plan.md              # Prioritized sprint plan
       ralph-prompts/              # Loop prompts for autonomous execution
         review-agents/            # Independent reviewer templates
+        phases/                   # Per-phase prompt templates
       ralph-runner-guide.md       # Running and monitoring ralph loops
     brainstorming/
       research/                   # Technical research (Tyk, Infisical, HCP TF, node-oidc-provider)

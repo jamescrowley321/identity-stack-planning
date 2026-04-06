@@ -1,84 +1,79 @@
 # Ralph Loop Runner Guide
 
-One prompt, one queue. The prompt reads the task queue, picks up the next pending task, runs it through 5 phases (analysis → plan → execute → test → review), marks it done, and signals for the next iteration.
+Quick reference for running autonomous task execution with [Ralph Orchestrator](https://github.com/mikeyobrien/ralph-orchestrator). For the full process documentation, see [docs/ralph-loop-process.md](../../docs/ralph-loop-process.md).
 
 ## Files
 
-- **Prompt:** `ralph-prompts/run-next-task.txt` — the single reusable prompt
+- **Prompts:** `ralph-prompts/*.md` — per-initiative prompt files (see table below)
 - **Queue:** `task-queue.md` — prioritized task list with statuses and dependencies
+- **Config:** `ralph.yml` in each target repo — backend, timeout, iteration limits
 
 ## Running
 
-```bash
-# Terraform provider tasks
-cd ~/repos/auth/terraform-provider-descope
-/ralph-loop "$(cat ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/run-next-task.txt)" --completion-promise 'TASK COMPLETE' --max-iterations 15
+1. Navigate to the target repo
+2. Copy the appropriate prompt to `PROMPT.md`
+3. Run `ralph run`
 
-# SaaS starter tasks
+```bash
+# Example: PRD 5 canonical identity stories
 cd ~/repos/auth/identity-stack
-/ralph-loop "$(cat ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/run-next-task.txt)" --completion-promise 'TASK COMPLETE' --max-iterations 25
+cp ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/canonical-identity.md PROMPT.md
+ralph run
 
-# py-identity-model tasks
+# Example: General task execution from queue
 cd ~/repos/auth/py-identity-model
-/ralph-loop "$(cat ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/run-next-task.txt)" --completion-promise 'TASK COMPLETE' --max-iterations 25
+cp ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/run-next-task.md PROMPT.md
+ralph run
 ```
 
-Each iteration completes one task. The loop restarts, reads the queue, picks up the next one.
+Each iteration completes one phase. The loop persists state to `.claude/task-state.md` and resumes from where it left off.
 
-## Fixing Review Findings
+## Available Prompts
 
-Use the `fix-review-findings.md` prompt to fix issues identified in adversarial code reviews on existing PRs. This prompt checks out existing branches (instead of creating new ones) and applies targeted fixes.
-
-```bash
-# Fix terraform provider PRs
-cd ~/repos/auth/terraform-provider-descope
-/ralph-loop "$(cat ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/fix-review-findings.md)" --completion-promise 'TASK COMPLETE' --max-iterations 10
-
-# Fix SaaS starter PRs (phased first, then cross-cutting)
-cd ~/repos/auth/identity-stack
-/ralph-loop "$(cat ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/fix-review-findings.md)" --completion-promise 'TASK COMPLETE' --max-iterations 15
-
-# Fix py-identity-model PRs (chained — 16 PRs)
-cd ~/repos/auth/py-identity-model
-/ralph-loop "$(cat ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/fix-review-findings.md)" --completion-promise 'TASK COMPLETE' --max-iterations 50
-```
-
-Fix tasks are in the "Review Fix Tasks" sections of `task-queue.md`. Phase order: checkout → fix → test → ci → complete.
-
-## Between Runs
-
-After a ralph loop finishes (or you cancel it):
-
-```bash
-# Review what was done
-git log main..HEAD --oneline
-
-# Create PR if satisfied
-gh pr create --title "..." --body "..."
-
-# Return to main for the next task
-git checkout main && git pull
-```
-
-Then re-run the same command to pick up the next task.
+| Prompt | Purpose | Target Repos |
+|--------|---------|-------------|
+| `run-next-task.md` | General task execution from queue | All repos |
+| `fix-review-findings.md` | Fix review findings on existing PRs | All repos |
+| `canonical-identity.md` | PRD 5 story execution (worktree-based) | identity-stack |
+| `api-gateway.md` | PRD 2 story execution (worktree-based) | identity-stack |
+| `pim-integration-tests.md` | Integration test chain | py-identity-model |
+| `pim-fix-review-chain.md` | Chained PR fix loop | py-identity-model |
+| `pim-adversarial-review.md` | Full codebase security review | py-identity-model |
 
 ## Monitoring
 
 ```bash
-# Current loop iteration
-grep '^iteration:' .claude/ralph-loop.local.md
-
 # Current task and phase
 cat .claude/task-state.md
 
-# Cancel the loop
-/cancel-ralph
+# Full task state with review findings
+cat .claude/task-state.md | less
+
+# List active worktrees
+git worktree list
+
+# Check status from any repo using the skill
+/ralph-status
+```
+
+## Between Runs
+
+Ralph loops stop cleanly between iterations. To resume after a pause or crash:
+
+```bash
+ralph run    # Reads existing task-state.md and continues
+```
+
+To start a new task after one completes:
+
+```bash
+ralph run    # No task-state.md → reads queue → picks next pending task
 ```
 
 ## Adjusting the Queue
 
 Edit `task-queue.md` to:
-- Reorder tasks (first pending row wins)
-- Skip a task (set status to `blocked`)
+- Reorder tasks (ralph picks the first pending task with met dependencies)
+- Skip a task (set status to `blocked` or `wontfix`)
 - Add new tasks
 - Change dependencies

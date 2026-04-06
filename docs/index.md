@@ -45,8 +45,10 @@ The raw planning documents that drive implementation:
 - **[PRD 3: Multi-Provider Test](../_bmad-output/planning-artifacts/prd-multi-provider-test.md)** — node-oidc-provider test fixture for provider-agnostic validation.
 - **[PRD 4: Multi-IdP Demo](../_bmad-output/planning-artifacts/prd-multi-idp-demo.md)** — Capstone: Descope + Ory + cloud IdPs with claim normalization.
 - **[PRD 5: Canonical Identity](../_bmad-output/planning-artifacts/prd-canonical-identity.md)** — Postgres-backed domain model inverting the Descope-first architecture.
+- **[PRD 6: identity-model Monorepo (Product Brief)](../_bmad-output/planning-artifacts/product-brief-identity-model-monorepo.md)** — Multi-language OIDC/OAuth2 client library: Python, Node/TypeScript, Go, Rust. 15 epics, ~100 stories.
+- **[PRD 6: Competitive Analysis](../_bmad-output/planning-artifacts/competitive-analysis-identity-model.md)** — 18-library analysis across 5 ecosystems with layered dependency strategy.
 - **[Architecture docs](../_bmad-output/planning-artifacts/)** — Per-PRD architecture decisions (`architecture-*.md`).
-- **[Epic breakdowns](../_bmad-output/planning-artifacts/)** — Per-PRD story decompositions (`epics-*.md`).
+- **[Epic breakdowns](../_bmad-output/planning-artifacts/)** — Per-PRD story decompositions (`epics-*.md`, `epics/epic-*.md`).
 
 ## Implementation Tracking
 
