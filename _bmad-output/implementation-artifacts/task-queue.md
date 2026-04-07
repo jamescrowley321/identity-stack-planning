@@ -63,7 +63,7 @@ Blocked on account setup — James needs to configure Cognito and Entra ID accou
 | T133 | | pending | Cassette test infrastructure — pytest-recording for httpx, live/replay mode, per-provider env templates | medium | — |
 | T134 | | blocked | AWS Cognito integration tests — discovery, token validation, `cognito:groups` claims, non-standard discovery URL | medium | T133, Cognito account |
 | T135 | | blocked | Microsoft Entra ID integration tests — v2.0 discovery, multi-tenant, `tid`/`oid` claims | medium | T133, Entra ID account |
-| T136 | | pending | Auth0 integration tests — discovery, token validation, `permissions`/`org_id` claims, custom domains | medium | T133 |
+| T136 | | blocked | Auth0 integration tests — discovery, token validation, `permissions`/`org_id` claims, custom domains | medium | T133, Auth0 account |
 | T137 | | pending | Nightly CI workflow — scheduled run against live providers, auto-create issues on drift | small | T134, T135, T136 |
 
 ### Remaining Feature Work
