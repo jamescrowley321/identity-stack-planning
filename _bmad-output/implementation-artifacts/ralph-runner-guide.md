@@ -1,32 +1,23 @@
 # Ralph Loop Runner Guide
 
-Quick reference for running autonomous task execution with [Ralph Orchestrator](https://github.com/mikeyobrien/ralph-orchestrator). For the full process documentation, see [docs/ralph-loop-process.md](../../docs/ralph-loop-process.md).
+Quick reference for running autonomous task execution with [Ralph Orchestrator](https://github.com/mikeyobrien/ralph-orchestrator). For full process docs, see [docs/ralph-loop-process.md](../../docs/ralph-loop-process.md). For token efficiency architecture, see [docs/ralph-loop-efficiency.md](../../docs/ralph-loop-efficiency.md).
 
-## Files
+## Architecture
 
-- **Prompts:** `ralph-prompts/*.md` — per-initiative prompt files (see table below)
-- **Queue:** `task-queue.md` — prioritized task list with statuses and dependencies
-- **Config:** `ralph.yml` in each target repo — backend, timeout, iteration limits
+All prompts use the **router + shared phase file** pattern:
+- **Router** (`ralph-prompts/*.md`): task queue, routing logic, domain rules (~300-650 words)
+- **Phase files** (`ralph-prompts/phases/*.md`): generic, shared across all loops (~100-250 words each)
+- **Review agents** (`ralph-prompts/review-agents/*.md`): loaded only by subagents during review phase
 
 ## Running
 
-1. Navigate to the target repo
-2. Copy the appropriate prompt to `PROMPT.md`
-3. Run `ralph run`
-
 ```bash
-# Example: PRD 5 canonical identity stories
 cd ~/repos/auth/identity-stack
 cp ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/canonical-identity.md PROMPT.md
 ralph run
-
-# Example: General task execution from queue
-cd ~/repos/auth/py-identity-model
-cp ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/run-next-task.md PROMPT.md
-ralph run
 ```
 
-Each iteration completes one phase. The loop persists state to `.claude/task-state.md` and resumes from where it left off.
+Each iteration completes one phase, persists state to `.claude/task-state.md`, and exits.
 
 ## Available Prompts
 
@@ -38,42 +29,24 @@ Each iteration completes one phase. The loop persists state to `.claude/task-sta
 | `api-gateway.md` | PRD 2 story execution (worktree-based) | identity-stack |
 | `pim-integration-tests.md` | Integration test chain | py-identity-model |
 | `pim-fix-review-chain.md` | Chained PR fix loop | py-identity-model |
-| `pim-adversarial-review.md` | Full codebase security review | py-identity-model |
+| `pim-adversarial-review.md` | Full codebase security review (one-shot) | py-identity-model |
+
+## Phase Pipeline
+
+Feature: `setup → analyze → implement → test → review → review-fix → pr → ci → complete`
+Fix: `(setup →) fix → test → review → review-fix → ci → complete`
+
+Review phase spawns conditional subagents based on change scope (auth changes get all 5 reviewers; docs-only gets Acceptance only). Review-fix uses delta-only re-review (max 3 iterations).
 
 ## Monitoring
 
 ```bash
-# Current task and phase
-cat .claude/task-state.md
-
-# Full task state with review findings
-cat .claude/task-state.md | less
-
-# List active worktrees
-git worktree list
-
-# Check status from any repo using the skill
-/ralph-status
-```
-
-## Between Runs
-
-Ralph loops stop cleanly between iterations. To resume after a pause or crash:
-
-```bash
-ralph run    # Reads existing task-state.md and continues
-```
-
-To start a new task after one completes:
-
-```bash
-ralph run    # No task-state.md → reads queue → picks next pending task
+cat .claude/task-state.md       # Current phase and task
+git worktree list               # Active worktrees
+/ralph-status                   # Full dashboard
+/ralph-audit                    # Token efficiency audit
 ```
 
 ## Adjusting the Queue
 
-Edit `task-queue.md` to:
-- Reorder tasks (ralph picks the first pending task with met dependencies)
-- Skip a task (set status to `blocked` or `wontfix`)
-- Add new tasks
-- Change dependencies
+Edit `task-queue.md` to reorder, skip (`blocked`/`wontfix`), add tasks, or change dependencies.
