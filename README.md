@@ -117,39 +117,6 @@ Full-stack SaaS starter with FastAPI backend, Vite/React frontend, and Terraform
 
 Six PRDs define the platform evolution. See [docs/roadmap.md](docs/roadmap.md) for full details, sequencing, and cross-PRD dependencies.
 
-```mermaid
-graph TD
-    MAIN["Main PRD<br/>Descope features ✅"]
-
-    subgraph phase1["Phase 1 — Parallel"]
-        PRD1["PRD 1: Secrets<br/>⏳ Planned"]
-        PRD2["PRD 2: Gateway<br/>⏳ Planned"]
-        PRD5["PRD 5: Canonical Identity<br/>🔄 Active"]
-        PRD6["PRD 6: identity-model<br/>📋 Planned"]
-    end
-
-    subgraph phase2["Phase 2 — Sequential"]
-        PRD3["PRD 3: Multi-Provider Test<br/>⏳ Planned"]
-    end
-
-    subgraph capstone["Capstone"]
-        PRD4["PRD 4: Multi-IdP Demo<br/>⏳ Planned"]
-    end
-
-    MAIN --> PRD1
-    MAIN --> PRD2
-    MAIN --> PRD5
-    MAIN --> PRD6
-    PRD2 --> PRD3
-    PRD3 --> PRD4
-    PRD5 --> PRD4
-    PRD3 --> PRD6
-
-    style phase1 fill:none,stroke:#40916c
-    style phase2 fill:none,stroke:#52b788
-    style capstone fill:none,stroke:#95d5b2
-```
-
 **Current focus:**
 - **PRD 5** — Canonical identity domain model: Postgres-backed source of truth with 8 SCIM-aligned tables, write-through sync to Descope, webhook inbound sync, multi-IdP identity linking. 4 epics, 19 stories. [Ralph loop ready](docs/ralph-loop-process.md).
 - **Main PRD** — py-identity-model integration tests against live OIDC provider (node-oidc-provider).
