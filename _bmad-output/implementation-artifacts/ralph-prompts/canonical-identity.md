@@ -19,6 +19,7 @@ Sequential, chained PRs (each branches from previous story's branch).
 | 4.2 | #154 | canonical/story-4.2-link-provider-routers | canonical/story-4.1-idp-link-provider-service | pending |
 | 4.3 | #155 | canonical/story-4.3-identity-resolution-redis-cache | canonical/story-4.2-link-provider-routers | pending |
 | 4.4 | #156 | canonical/story-4.4-multi-idp-tests | canonical/story-4.3-identity-resolution-redis-cache | pending |
+| R1 | #216 | refactor/singleton-to-app-state-di | main | pending |
 
 ## Routing
 

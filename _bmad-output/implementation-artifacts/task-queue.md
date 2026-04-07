@@ -15,6 +15,12 @@ All tasks complete except blocked/wontfix. Releases v1.1.0-v1.1.4 published.
 
 All prior phases complete (T14-T26, T64-T75, T80-T84, T90-T98, T117-T119 — all done/merged).
 
+### Refactor (next after canonical loop)
+
+| ID | Issue | Status | Description | Depends On |
+|----|-------|--------|-------------|------------|
+| T150 | 216 | pending | Replace module-level singletons (Descope client + cache publisher) with app.state DI | — |
+
 ### Pending Features
 
 | ID | Issue | Status | Description | Depends On |
