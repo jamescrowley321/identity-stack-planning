@@ -33,7 +33,7 @@ This repo uses [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) v6 fo
 - `_bmad-output/planning-artifacts/` — PRDs, architecture docs, product briefs
 - `_bmad-output/implementation-artifacts/` — Epics, stories, sprint plans
 - `docs/` — Project knowledge base (see `docs/index.md` for full index)
-- `docs/ralph-planning/` — Ralph Orchestrator analysis and BMAD integration plans
+- `_archive/` — Historical research, brainstorming, completed review findings
 - `.claude/skills/` — BMAD skills invocable via `/bmad-*` commands
 
 ### Getting Started with BMAD
@@ -56,10 +56,7 @@ When BMAD workflows reference implementation details, architecture, or existing 
 
 ## Ralph Orchestrator Integration
 
-[Ralph Orchestrator](https://github.com/mikeyobrien/ralph-orchestrator) is used for autonomous task execution across the workspace. Each application repo has its own `ralph.yml` configuration. See:
-
-- `docs/ralph-planning/orchestrator-comparison.md` — Chief Wiggum vs Ralph Orchestrator analysis
-- `docs/ralph-planning/ralph-bmad-integration-plan.md` — Custom security agents and Ralph hat topology proposal
+[Ralph Orchestrator](https://github.com/mikeyobrien/ralph-orchestrator) is used for autonomous task execution across the workspace. Each application repo has its own `ralph.yml` configuration.
 
 ## Workspace Root CLAUDE.md
 
