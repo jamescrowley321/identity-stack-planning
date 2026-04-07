@@ -18,21 +18,30 @@ This document is the master index for all planned work across the auth workspace
 
 ```mermaid
 graph TD
-    MAIN["Main PRD<br/>(Descope feature waves)"]
-    PRD1["PRD 1: Secrets Pipeline<br/>HCP Terraform + Infisical"]
-    PRD2["PRD 2: API Gateway<br/>Tyk OSS integration"]
-    PRD3["PRD 3: Multi-Provider Test<br/>node-oidc-provider fixture"]
-    PRD4["PRD 4: Multi-IdP Demo<br/>Capstone: Descope + Ory + cloud IdPs"]
-    PRD5["PRD 5: Canonical Identity<br/>Postgres domain model"]
-    PRD6["PRD 6: identity-model Monorepo<br/>Multi-language OIDC/OAuth2"]
+    MAIN["Main PRD<br/>(Descope features)"]
 
-    MAIN --> PRD5
+    subgraph phase1["Phase 1 — Parallel"]
+        PRD1["PRD 1: Secrets Pipeline"]
+        PRD2["PRD 2: API Gateway"]
+        PRD5["PRD 5: Canonical Identity"]
+        PRD6["PRD 6: identity-model Monorepo"]
+    end
+
+    subgraph phase2["Phase 2"]
+        PRD3["PRD 3: Multi-Provider Test"]
+    end
+
+    subgraph capstone["Capstone"]
+        PRD4["PRD 4: Multi-IdP Demo"]
+    end
+
     MAIN --> PRD1
     MAIN --> PRD2
+    MAIN --> PRD5
+    MAIN --> PRD6
     PRD2 --> PRD3
     PRD3 --> PRD4
     PRD5 --> PRD4
-    MAIN --> PRD6
     PRD3 --> PRD6
 
     style MAIN fill:#2d6a4f,color:#fff
@@ -42,6 +51,9 @@ graph TD
     style PRD3 fill:#52b788,color:#000
     style PRD4 fill:#95d5b2,color:#000
     style PRD6 fill:#40916c,color:#fff
+    style phase1 fill:none,stroke:#40916c
+    style phase2 fill:none,stroke:#52b788
+    style capstone fill:none,stroke:#95d5b2
 ```
 
 **Parallel tracks:**

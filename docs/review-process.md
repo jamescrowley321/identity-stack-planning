@@ -97,27 +97,34 @@ Five specialized reviewers, each designed to catch a different class of defects:
 
 ```mermaid
 flowchart TD
-    IMPL[Implementation complete<br/>Tests passing] --> DIFF[Generate review diff]
-    DIFF --> BH[Blind Hunter<br/>fresh context, diff only]
-    DIFF --> ECH[Edge Case Hunter<br/>fresh context, diff + repo]
-    DIFF --> AA[Acceptance Auditor<br/>fresh context, spec + repo]
-    DIFF --> SEN[Sentinel<br/>fresh context, security lens]
+    IMPL[Implementation complete] --> DIFF[Generate diff]
 
-    BH --> TRIAGE[Triage findings]
-    ECH --> TRIAGE
-    AA --> TRIAGE
-    SEN --> TRIAGE
+    subgraph reviewers["Parallel Review"]
+        BH[Blind Hunter<br/>diff only]
+        ECH[Edge Case Hunter<br/>diff + repo]
+        AA[Acceptance Auditor<br/>spec + repo]
+        SEN[Sentinel<br/>security lens]
+    end
 
-    TRIAGE --> CHECK{Blocking<br/>findings?}
+    DIFF --> reviewers
+    reviewers --> TRIAGE[Triage findings]
+
+    TRIAGE --> CHECK{Blocking?}
     CHECK -->|No| PR[Create PR]
-    CHECK -->|Yes| FIX[Fix Loop<br/>max 3 iterations]
+    CHECK -->|Yes| FIX[Fix Loop ≤3x]
     FIX --> RECHECK{Resolved?}
     RECHECK -->|Yes| PR
-    RECHECK -->|No, iteration < 3| FIX
-    RECHECK -->|No, iteration = 3| BLOCK[Block PR<br/>manual intervention]
+    RECHECK -->|No, retries left| FIX
+    RECHECK -->|Exhausted| BLOCK[Block for manual review]
 
-    TRIAGE -.->|Auth/middleware changes?| VIP[Viper Red Team<br/>fresh context, offensive]
-    VIP --> TRIAGE
+    TRIAGE -.->|Auth changes?| VIP[Viper Red Team] -.-> TRIAGE
+
+    style BH fill:#e76f51,color:#fff
+    style ECH fill:#e76f51,color:#fff
+    style AA fill:#e76f51,color:#fff
+    style SEN fill:#e76f51,color:#fff
+    style reviewers fill:none,stroke:#e76f51,stroke-width:2px
+    style VIP fill:#9b2226,color:#fff
 ```
 
 **Key properties:**

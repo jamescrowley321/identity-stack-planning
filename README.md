@@ -12,7 +12,7 @@ Build a provider-independent identity platform where swapping or adding an ident
 graph TB
     subgraph app["Identity Platform"]
         FE["React Frontend<br/>react-oidc-context + shadcn/ui"]
-        GW["Tyk API Gateway<br/>JWT validation + claim normalization"]
+        GW["Tyk API Gateway<br/>JWT validation, claim normalization"]
         BE["FastAPI Backend<br/>Authorization + domain logic"]
         DB["PostgreSQL<br/>Canonical identity store"]
     end
@@ -21,7 +21,7 @@ graph TB
         DESC["Descope<br/>(primary)"]
         OIDC["node-oidc-provider<br/>(test fixture)"]
         ORY["Ory Hydra<br/>(planned)"]
-        CLOUD["Cloud IdPs<br/>Google, Entra, Cognito<br/>(planned)"]
+        CLOUD["Cloud IdPs<br/>Google · Entra · Cognito"]
     end
 
     subgraph infra["Infrastructure"]
@@ -31,7 +31,7 @@ graph TB
     end
 
     subgraph planning["Planning & Orchestration"]
-        AP["identity-stack-planning<br/>PRDs, architecture, task queue"]
+        AP["identity-stack-planning<br/>PRDs, architecture, tasks"]
         RALPH["Ralph Orchestrator<br/>Autonomous execution"]
         REVIEW["Review Agents<br/>Independent adversarial review"]
     end
@@ -117,26 +117,6 @@ Full-stack SaaS starter with FastAPI backend, Vite/React frontend, and Terraform
 
 Six PRDs define the platform evolution. See [docs/roadmap.md](docs/roadmap.md) for full details, sequencing, and cross-PRD dependencies.
 
-```mermaid
-graph LR
-    MAIN["Main PRD<br/>Descope feature waves<br/>✅ ~80% complete"]
-    PRD1["PRD 1: Secrets Pipeline<br/>HCP Terraform + Infisical<br/>⏳ Planned"]
-    PRD2["PRD 2: API Gateway<br/>Tyk OSS + dual deploy modes<br/>⏳ Planned"]
-    PRD3["PRD 3: Multi-Provider Test<br/>node-oidc-provider fixture<br/>⏳ Planned"]
-    PRD4["PRD 4: Multi-IdP Demo<br/>Capstone: claim normalization<br/>⏳ Planned"]
-    PRD5["PRD 5: Canonical Identity<br/>Postgres domain model<br/>🔄 Active"]
-    PRD6["PRD 6: identity-model Monorepo<br/>Multi-language OIDC/OAuth2<br/>📋 Planned"]
-
-    MAIN --> PRD5
-    MAIN --> PRD1
-    MAIN --> PRD2
-    PRD2 --> PRD3
-    PRD3 --> PRD4
-    PRD5 --> PRD4
-    MAIN --> PRD6
-    PRD3 --> PRD6
-```
-
 **Current focus:**
 - **PRD 5** — Canonical identity domain model: Postgres-backed source of truth with 8 SCIM-aligned tables, write-through sync to Descope, webhook inbound sync, multi-IdP identity linking. 4 epics, 19 stories. [Ralph loop ready](docs/ralph-loop-process.md).
 - **Main PRD** — py-identity-model integration tests against live OIDC provider (node-oidc-provider).
@@ -186,14 +166,16 @@ The architectural foundation for provider independence (PRD 5). Inverts the curr
 ```mermaid
 erDiagram
     users ||--o{ idp_links : "linked via"
-    providers ||--o{ idp_links : "provides identity"
+    providers ||--o{ idp_links : "provides"
     users ||--o{ user_tenant_roles : "assigned"
     tenants ||--o{ user_tenant_roles : "scoped to"
     roles ||--o{ user_tenant_roles : "has role"
     roles ||--o{ role_permissions : "grants"
     permissions ||--o{ role_permissions : "granted by"
-    roles }o--o| tenants : "scoped to (optional)"
+    roles }o--o| tenants : "scoped to"
 ```
+
+8 tables: `users`, `tenants`, `roles`, `permissions`, `role_permissions`, `user_tenant_roles`, `idp_links`, `providers`. Full schema with field definitions in [system-architecture.md](docs/system-architecture.md#canonical-identity-data-model).
 
 **Write-through sync:** Postgres write first → sync to IdP second → sync failures logged, never rolled back → reconciliation catches up asynchronously.
 
@@ -278,20 +260,10 @@ Each persona has an activation protocol, interactive menu, and Claude Code skill
 ```mermaid
 flowchart LR
     A[analyze] --> P[plan] --> AN[anchor] --> I[implement] --> T[test]
-    T --> R1[review-blind]
-    T --> R2[review-edge]
-    T --> R3[review-acceptance]
-    T --> R4[review-security]
-    R1 --> RF[review-fix]
-    R2 --> RF
-    R3 --> RF
-    R4 --> RF
-    RF --> D[docs] --> CI[ci] --> DONE[complete]
+    T --> R["review\n(blind · edge · acceptance · security)"]
+    R --> RF[review-fix] --> D[docs] --> CI[ci] --> DONE[complete]
 
-    style R1 fill:#e76f51,color:#fff
-    style R2 fill:#e76f51,color:#fff
-    style R3 fill:#e76f51,color:#fff
-    style R4 fill:#e76f51,color:#fff
+    style R fill:#e76f51,color:#fff
 ```
 
 **Key properties:**

@@ -55,25 +55,27 @@ flowchart TD
     P --> AN[anchor]
     AN --> I[implement]
     I --> T[test]
-    T --> RB[review-blind]
-    T --> RE[review-edge]
-    T --> RA[review-acceptance]
-    T --> RS[review-security]
-    RB --> RF[review-fix]
-    RE --> RF
-    RA --> RF
-    RS --> RF
+
+    subgraph review["Review Phase"]
+        RB[blind]
+        RE[edge-case]
+        RA[acceptance]
+        RS[security]
+    end
+
+    T --> review
+    review --> RF[review-fix]
     RF --> D[docs]
     D --> CI[ci]
-    CI --> CIF{CI passes?}
+    CI --> CIF{passes?}
     CIF -->|Yes| DONE[complete]
-    CIF -->|No| CIFIX[ci-fix]
-    CIFIX --> CI
+    CIF -->|No| CIFIX[ci-fix] --> CI
 
     style RB fill:#e76f51,color:#fff
     style RE fill:#e76f51,color:#fff
     style RA fill:#e76f51,color:#fff
     style RS fill:#e76f51,color:#fff
+    style review fill:none,stroke:#e76f51,stroke-width:2px
 ```
 
 | Phase | What Happens | Agent/Persona |
@@ -160,14 +162,17 @@ Story-based loops create isolated git worktrees so multiple stories can execute 
 
 ```mermaid
 flowchart TD
-    MAIN["identity-stack (main repo)<br/>/home/james/repos/auth/identity-stack"]
-    WT1["Worktree: Story 1.1<br/>/tmp/is-gateway-story-1.1<br/>branch: gateway/story-1.1"]
-    WT2["Worktree: Story 1.3<br/>/tmp/sss-canonical-story-1.3<br/>branch: canonical/story-1.3"]
-    WT3["Worktree: Gateway<br/>/tmp/identity-stack-gateway<br/>branch: main"]
+    MAIN["identity-stack<br/>(main repo)"]
 
-    MAIN --> WT1
-    MAIN --> WT2
-    MAIN --> WT3
+    subgraph worktrees["Active Worktrees"]
+        WT1["Story 1.1<br/>/tmp/is-gateway-story-1.1"]
+        WT2["Story 1.3<br/>/tmp/sss-canonical-story-1.3"]
+        WT3["Gateway<br/>/tmp/identity-stack-gateway"]
+    end
+
+    MAIN --> worktrees
+
+    style worktrees fill:none,stroke:#888,stroke-dasharray:5
 ```
 
 **Lifecycle:**

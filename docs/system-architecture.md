@@ -5,39 +5,41 @@ Unified technical overview of the auth workspace. For detailed architecture deci
 ## System Context
 
 ```mermaid
-C4Context
-    title Auth Workspace — System Context
+graph TB
+    dev(["Developer"])
+    user(["End User"])
 
-    Person(dev, "Developer", "Builds and operates the identity platform")
-    Person(user, "End User", "Authenticates and uses the SaaS application")
+    subgraph workspace["Auth Workspace"]
+        ap["identity-stack-planning<br/>BMAD planning hub"]
+        pim["py-identity-model<br/>OIDC/OAuth2 Python library"]
+        tfp["terraform-provider-descope<br/>Terraform provider"]
+        is["identity-stack<br/>FastAPI + React SaaS app"]
+    end
 
-    System_Boundary(workspace, "Auth Workspace") {
-        System(pim, "py-identity-model", "OIDC/OAuth2 Python library<br/>JWT validation, discovery, protocol flows")
-        System(tfp, "terraform-provider-descope", "Terraform provider (Go)<br/>Provisions Descope infrastructure")
-        System(is, "identity-stack", "FastAPI + React SaaS app<br/>Multi-tenant identity platform")
-        System(ap, "identity-stack-planning", "BMAD planning hub<br/>PRDs, architecture, task queue")
-    }
+    subgraph external["External Services"]
+        descope["Descope"]
+        pg["PostgreSQL"]
+        redis["Redis"]
+        tyk["Tyk Gateway"]
+        infisical["Infisical"]
+        hcp["HCP Terraform"]
+    end
 
-    System_Ext(descope, "Descope", "Identity provider<br/>Hosted login, management API")
-    System_Ext(infisical, "Infisical", "Secrets management<br/>Audit, rotation, injection")
-    System_Ext(hcp, "HCP Terraform", "Remote state<br/>Locking, history, variable sets")
-    System_Ext(tyk, "Tyk Gateway", "API gateway (optional)<br/>JWT validation, rate limiting")
-    System_Ext(redis, "Redis", "Cache + rate limits<br/>Identity cache, pub/sub")
-    System_Ext(pg, "PostgreSQL", "Canonical identity store<br/>8 SCIM-aligned tables")
+    dev --> ap
+    dev --> tfp
+    dev --> is
+    user --> is
 
-    Rel(dev, ap, "Plans work")
-    Rel(dev, tfp, "terraform apply")
-    Rel(dev, is, "Develops")
-    Rel(user, is, "Authenticates, uses app")
-    Rel(is, pim, "Token validation")
-    Rel(is, descope, "Management API, hosted login")
-    Rel(is, pg, "Canonical identity CRUD")
-    Rel(is, redis, "Identity cache, pub/sub")
-    Rel(tfp, descope, "Provisions roles, perms, tenants")
-    Rel(tfp, hcp, "Remote state")
-    Rel(tyk, descope, "JWKS fetch for JWT validation")
-    Rel(tyk, redis, "Rate limit counters")
-    Rel(tyk, is, "Proxies to backend")
+    is --> pim
+    is --> descope
+    is --> pg
+    is --> redis
+    tfp --> descope
+    tfp --> hcp
+    infisical -.-> is
+    tyk --> is
+    tyk --> descope
+    tyk --> redis
 ```
 
 ## Component Architecture
@@ -281,19 +283,19 @@ sequenceDiagram
 
 ```mermaid
 graph LR
-    subgraph standalone["Standalone Mode (default)"]
+    subgraph standalone["Standalone"]
         SPA1[React SPA :3000] --> API1[FastAPI :8000]
         API1 --> DESC1[Descope API]
     end
 
-    subgraph gateway["Gateway Mode (--profile gateway)"]
+    subgraph gateway["Gateway (--profile gateway)"]
         SPA2[React SPA :3000] --> TYK[Tyk Gateway :8080]
         TYK --> API2[FastAPI :8000]
         TYK --> REDIS[Redis :6379]
         API2 --> DESC2[Descope API]
     end
 
-    subgraph full["Full Mode (--profile full, future)"]
+    subgraph full["Full (--profile full)"]
         SPA3[React SPA :3000] --> TYK2[Tyk Gateway :8080]
         TYK2 --> API3[FastAPI :8000]
         TYK2 --> REDIS2[Redis :6379]
@@ -301,6 +303,7 @@ graph LR
         API3 --> DESC3[Descope API]
         OIDC[node-oidc-provider :9000] --> TYK2
         ASPIRE[Aspire Dashboard :18888]
+        ASPIRE -.-> API3
     end
 ```
 
