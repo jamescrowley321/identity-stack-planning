@@ -6,9 +6,9 @@ This document describes how autonomous task execution works in the auth workspac
 
 A ralph loop is an autonomous execution cycle that takes a task from the queue, implements it through a multi-phase pipeline, reviews it with independent agents, and delivers a PR. Each iteration completes one phase, persists state to disk, and exits — allowing crash recovery, manual inspection, and fresh context on every phase.
 
-```mermaid
-flowchart LR
-    PRD[PRD] --> EPIC[Epic breakdown<br/>with stories] --> QUEUE[Task Queue<br/>task-queue.md] --> RALPH[Ralph Loop<br/>ralph run] --> PR[Merged PR]
+```
+PRD → Epic breakdown → Task Queue → ralph run → Merged PR
+                       (task-queue.md)
 ```
 
 ## From Planning to Execution
@@ -49,33 +49,22 @@ Each ralph iteration completes exactly one phase, then exits. The next iteration
 
 ### Feature Task Phases
 
-```mermaid
-flowchart TD
-    A[analyze] --> P[plan]
-    P --> AN[anchor]
-    AN --> I[implement]
-    I --> T[test]
-
-    subgraph review["Review Phase"]
-        RB[blind]
-        RE[edge-case]
-        RA[acceptance]
-        RS[security]
-    end
-
-    T --> review
-    review --> RF[review-fix]
-    RF --> D[docs]
-    D --> CI[ci]
-    CI --> CIF{passes?}
-    CIF -->|Yes| DONE[complete]
-    CIF -->|No| CIFIX[ci-fix] --> CI
-
-    style RB fill:#e76f51,color:#fff
-    style RE fill:#e76f51,color:#fff
-    style RA fill:#e76f51,color:#fff
-    style RS fill:#e76f51,color:#fff
-    style review fill:none,stroke:#e76f51,stroke-width:2px
+```
+analyze → plan → anchor → implement → test
+                                        │
+                          ┌─────────────┼─────────────┐
+                          ▼             ▼             ▼
+                     review-blind  review-edge  review-acceptance
+                          │             │             │
+                          └──────┬──────┘    review-security
+                                 │                │
+                                 ▼                │
+                            review-fix ◄──────────┘
+                                 │
+                          docs → ci ──→ complete
+                                 │
+                                 ▼ (if CI fails)
+                               ci-fix ──→ ci (retry)
 ```
 
 | Phase | What Happens | Agent/Persona |
@@ -160,19 +149,11 @@ Below the metadata header, the file accumulates section content as phases comple
 
 Story-based loops create isolated git worktrees so multiple stories can execute in parallel without filesystem conflicts.
 
-```mermaid
-flowchart TD
-    MAIN["identity-stack<br/>(main repo)"]
-
-    subgraph worktrees["Active Worktrees"]
-        WT1["Story 1.1<br/>/tmp/is-gateway-story-1.1"]
-        WT2["Story 1.3<br/>/tmp/sss-canonical-story-1.3"]
-        WT3["Gateway<br/>/tmp/identity-stack-gateway"]
-    end
-
-    MAIN --> worktrees
-
-    style worktrees fill:none,stroke:#888,stroke-dasharray:5
+```
+identity-stack (main repo)
+  ├── /tmp/is-gateway-story-1.1       (branch: gateway/story-1.1)
+  ├── /tmp/sss-canonical-story-1.3    (branch: canonical/story-1.3)
+  └── /tmp/identity-stack-gateway     (branch: main)
 ```
 
 **Lifecycle:**
@@ -253,26 +234,12 @@ Edit `_bmad-output/implementation-artifacts/task-queue.md` to:
 
 The task queue tracks dependencies across repos:
 
-```mermaid
-flowchart LR
-    subgraph tfp["terraform-provider-descope"]
-        T4["T4: permission/role resources"]
-        T5["T5: SSO resource"]
-        T12["T12: FGA resources"]
-    end
-    subgraph is["identity-stack"]
-        T16["T16: RBAC"]
-        T18["T18: SSO config"]
-        T72["T72: FGA/ReBAC"]
-    end
-    subgraph pim["py-identity-model"]
-        T34["T34: token validation"]
-    end
-
-    T4 --> T16
-    T5 --> T18
-    T12 --> T72
-    T34 -.->|"runtime dep"| is
+```
+terraform-provider-descope        py-identity-model
+  T4 (permission/role) ──────→ identity-stack T16 (RBAC)
+  T5 (SSO) ───────────────→ identity-stack T18 (SSO config)
+  T12 (FGA) ──────────────→ identity-stack T72 (FGA/ReBAC)
+                              T34 (token validation) ···→ identity-stack (runtime dep)
 ```
 
 Ralph loops running in different repos respect these dependencies — a task won't be picked up if its cross-repo dependency is still pending.
