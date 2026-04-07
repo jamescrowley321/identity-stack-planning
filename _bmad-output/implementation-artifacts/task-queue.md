@@ -29,35 +29,40 @@ All prior phases complete (T14-T26, T64-T75, T80-T84, T90-T98, T117-T119 — all
 
 **Requirements:** Every feature task MUST include integration tests (in `src/tests/integration/`) and usage examples (in `examples/`). Unit tests alone are not sufficient.
 
-All feature tasks (T32-T47) complete. All review fixes (T101-T116) complete — all 16 PRs #211-#237 merged 2026-03-30.
+All feature tasks (T32-T47) complete. All review fixes (T101-T116) complete — all 16 PRs #211-#237 merged 2026-03-30. Integration test chain (T120-T125) complete.
 
-### Integration Test Chain (node-oidc-provider)
+### OIDC Conformance Certification (TOP PRIORITY)
+
+Target: OpenID Foundation Basic RP + Config RP certification. See `docs/oidc-certification-analysis.md` for full gap analysis.
 
 | ID | Issue | Status | Description | Size | Depends |
 |----|-------|--------|-------------|------|---------|
-| T120 | | done | Build node-oidc-provider test fixture | medium | T116 |
-| T121 | | done | Integration tests: Core flows (Auth Code + PKCE, Token Validation, Refresh) — PR #281 merged | medium | T120 |
-| T122 | | done | Integration tests: Token management (Introspection, Revocation) — PR #299 merged | medium | T120 |
-| T123 | | done | Integration tests: Advanced request patterns (DPoP, PAR, JAR) — test_dpop_par_jar.py exists | large | T120 |
-| T124 | | done | Integration tests: Alternative grants (Device Auth, Token Exchange) — test_device_token_exchange.py exists | medium | T120 |
-| T125 | | done | Integration tests: FAPI 2.0 Security Profile — test_fapi_compliance.py exists | medium | T120 |
-| T126 | | in_progress | Integration test fixture gap analysis — PR #306 open | small | T120 |
+| T140 | | pending | Fix `kid` absent fallback — when JWT has no `kid` and JWKS has single key, use that key instead of throwing | small | — |
+| T141 | | pending | Add UserInfo `sub` mismatch validation — reject UserInfo response when `sub` != ID token `sub` | small | — |
+| T142 | 219 | pending | JWKS cache TTL with forced refresh on signature failure — required for key rotation conformance tests | medium | — |
+| T143 | | pending | Build conformance test harness — thin FastAPI RP app in `conformance/`, Docker Compose extending OpenID conformance suite, API-driven test runner | large | T140, T141, T142 |
+| T144 | | pending | Pass Basic RP conformance tests — auth code flow, ID token validation (iss, sub, aud, iat, kid, sig), nonce, UserInfo sub check, client_secret_basic | medium | T143 |
+| T145 | | pending | Pass Config RP conformance tests — discovery retrieval, JWKS retrieval, issuer mismatch detection, key rotation handling | medium | T143 |
+| T146 | | pending | Fix any conformance test failures from T144/T145 — iterative fix-and-rerun cycle | medium | T144, T145 |
+| T147 | | pending | Expand to Implicit + Hybrid RP profiles — at_hash validation, c_hash validation, nonce enforcement | medium | T146 |
 
 ### IdentityServer Fixture Expansion
 
 | ID | Issue | Status | Description | Size | Depends |
 |----|-------|--------|-------------|------|---------|
-| T130 | | pending | Enable introspection + revocation in IdentityServer fixture | small | T126 |
-| T131 | | pending | Add public PKCE client + enforce PKCE in IdentityServer fixture | small | T126 |
+| T130 | | pending | Enable introspection + revocation in IdentityServer fixture | small | — |
+| T131 | | pending | Add public PKCE client + enforce PKCE in IdentityServer fixture | small | — |
 | T132 | | pending | Run existing integration tests against IdentityServer (expand provider matrix) | medium | T130, T131 |
 
 ### Cloud Provider Integration Tests (cassette-based)
 
+Blocked on account setup — James needs to configure Cognito and Entra ID accounts before these can start.
+
 | ID | Issue | Status | Description | Size | Depends |
 |----|-------|--------|-------------|------|---------|
-| T133 | | pending | Cassette test infrastructure — pytest-recording for httpx, live/replay mode, per-provider env templates | medium | T126 |
-| T134 | | pending | AWS Cognito integration tests — discovery, token validation, `cognito:groups` claims, non-standard discovery URL | medium | T133 |
-| T135 | | pending | Microsoft Entra ID integration tests — v2.0 discovery, multi-tenant, `tid`/`oid` claims | medium | T133 |
+| T133 | | pending | Cassette test infrastructure — pytest-recording for httpx, live/replay mode, per-provider env templates | medium | — |
+| T134 | | blocked | AWS Cognito integration tests — discovery, token validation, `cognito:groups` claims, non-standard discovery URL | medium | T133, Cognito account |
+| T135 | | blocked | Microsoft Entra ID integration tests — v2.0 discovery, multi-tenant, `tid`/`oid` claims | medium | T133, Entra ID account |
 | T136 | | pending | Auth0 integration tests — discovery, token validation, `permissions`/`org_id` claims, custom domains | medium | T133 |
 | T137 | | pending | Nightly CI workflow — scheduled run against live providers, auto-create issues on drift | small | T134, T135, T136 |
 
