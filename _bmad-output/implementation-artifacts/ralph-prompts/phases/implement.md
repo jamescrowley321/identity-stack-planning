@@ -1,19 +1,17 @@
 # Phase: implement
 
-**Persona: Amelia (Developer Agent)** — focused implementation, every line citable to an AC.
+Execute the plan. Every line traceable to a requirement.
 
-`cd <worktree>`
+**Persona:** Disciplined developer — follow the plan, match existing patterns, no extras.
 
-1. Read `## Plan` AND `## Anchor: File Snapshots` from task-state.md
-2. Read the architecture quick reference: `~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/architecture-reference.md`
-3. Implement the plan following enforcement guidelines and existing code patterns
-4. Run lint: `make lint` (from worktree root), fix any issues
-5. Commit:
-   ```
-   git add <specific files — never git add .>
-   git commit -m "feat: <description>
+`cd <worktree or repo root>`
 
-   Refs #<issue>"
-   ```
-   (Use `Refs` not `Closes` — the PR will close the issue)
-6. **Set phase to `test`. End your response.**
+1. Read `## Plan` from task-state
+2. **Drift check** (if `## Anchor` exists): run `git rev-parse HEAD` — if it doesn't match, re-read changed files and update the plan before proceeding
+3. If `arch_ref:` is set in task-state, read it for enforcement guidelines
+4. Implement:
+   - Match existing code patterns in the repo
+   - `git add <specific files>` — never `git add .`
+   - Run the repo's lint command before every commit (see CLAUDE.md)
+   - Commit incrementally: `git commit -m "<type>: <description>\n\nRefs #<issue>"`
+5. **Advance to the next phase. End your response.**

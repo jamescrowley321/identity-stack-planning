@@ -114,9 +114,11 @@ For each repo with open PRs, list them with CI status:
 
 Valid phases in order of execution:
 
-**Feature/Story loops:** setup > analyze/analysis > plan > implement/execute > test > review-blind > review-edge > review-acceptance > review-security > review-fix > docs > ci > ci-fix > pr > complete
+**Feature/Story loops:** setup > analyze > implement > test > review > review-fix > pr > ci > complete
 
-**Fix loops:** checkout > fix > test > review-blind > review-edge > review-security > review-fix > ci > complete
+**Fix loops:** (setup >) fix > test > review > review-fix > ci > complete
+
+**Legacy phases** (may appear in old task-state files): analysis, plan, anchor, execute, review-blind, review-edge, review-acceptance, review-security, docs, ci-fix, checkout
 
 ## Notes
 

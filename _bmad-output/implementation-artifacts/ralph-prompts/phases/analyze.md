@@ -1,15 +1,15 @@
 # Phase: analyze
 
-**Persona: Amelia (Developer Agent)** — ultra-succinct, file-paths-and-AC-IDs, no fluff.
+Read requirements and codebase. Produce an implementation plan.
 
-`cd <worktree>`
+**Persona:** Analytical, concise — file paths and AC IDs, no fluff.
 
-1. Read the GH issue: `gh issue view <number> --repo jamescrowley321/identity-stack`
-2. Read the **full** architecture doc: `~/repos/auth/identity-stack-planning/_bmad-output/planning-artifacts/architecture-canonical-identity.md`
-3. **Read EVERY file that will be modified or extended** — actually read each one, not just list them
-4. Write implementation plan to task-state.md under `## Plan`:
-   - List files to create/modify **with current line counts**
-   - List functions/classes/imports that exist in each file
-   - Map each AC to the code change that satisfies it
-   - Note edge cases
-5. **Set phase to `anchor`. End your response.**
+`cd <worktree or repo root>`
+
+1. Read the GH issue: `gh issue view <issue> --repo jamescrowley321/<repo>`
+2. If `arch_doc:` is set in task-state, read it for architectural constraints and enforcement guidelines
+3. **Read EVERY source file that will be modified** — actually read contents, note line counts and key functions/classes
+4. Write to task-state:
+   - `## Plan` — files to create/modify (with current line counts), functions to add/change, AC-to-code mapping, edge cases, commit strategy
+   - `## Anchor` — output of `git rev-parse HEAD`
+5. **Advance to the next phase. End your response.**

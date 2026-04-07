@@ -28,7 +28,7 @@ Read `~/repos/auth/identity-stack/.claude/task-state.md`.
 - **phase is `complete`** → update this file (`pending` → `done`), clean up worktree, delete task-state.md, pick next story
 - **Any other phase** → read the phase file and execute it
 
-Phase order: `setup → analyze → anchor → implement → test → review → review-fix → pr → ci → ci-fix (loop) → complete`
+Phase order: `setup → analyze → implement → test → review → review-fix → pr → ci → complete`
 
 ## Phase Instructions
 
@@ -37,8 +37,6 @@ Read ONLY the current phase file — do not read other phase files:
 ```
 ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/phases/<phase>.md
 ```
-
-Phases `ci`, `ci-fix`, and `complete` are in `phases/ci.md` (combined).
 
 **All work after `setup` happens in the worktree** — `cd` to the path in `worktree:` first.
 
@@ -52,6 +50,8 @@ branch: <branch from queue>
 base_branch: <base_branch from queue>
 worktree: /tmp/sss-canonical-story-<N.M>
 phase: setup
+arch_doc: ~/repos/auth/identity-stack-planning/_bmad-output/planning-artifacts/architecture-canonical-identity.md
+arch_ref: ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/architecture-reference.md
 ```
 
 If all stories are `done`: output `<promise>LOOP_COMPLETE</promise>`
@@ -59,14 +59,13 @@ If all stories are `done`: output `<promise>LOOP_COMPLETE</promise>`
 ## Rules
 
 - ONE phase per iteration — never chain phases
-- Never skip phases — every story goes through all phases including anchor + review
-- Never commit to main — feature branches in worktrees only
+- Never skip phases, never commit to main
 - PRs are chained: each story branches from the previous story's branch
-- **Rebase merge only** — never squash merge. Squash deletes the base branch SHA and breaks downstream chained PRs. The `complete` phase merges via `gh pr merge --rebase`.
-- Follow existing code patterns — do not invent new conventions
+- **Rebase merge only** — never squash merge (complete phase auto-merges)
+- Follow existing code patterns
 - Review subagents MUST NOT read task-state.md or the plan
-- All findings must be resolved before PR creation
-- Use `gh` CLI for GitHub operations, `git` for push/pull/fetch
+- Use `gh` for GitHub ops, `git` for push/pull/fetch
 - Only implement what the story specifies — no extras
 - If stuck 3+ iterations on same phase: set to `blocked`, clean up, pick next
 - `make lint` before every commit
+- **IdentityService seam (D21):** All new API routes MUST inject `IdentityService`, not `DescopeManagementClient` directly
