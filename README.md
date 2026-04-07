@@ -8,28 +8,47 @@ The workspace is also a case study in **agentic software development**: AI agent
 
 Build a provider-independent identity platform where swapping or adding an identity provider means implementing one adapter — not rewriting the application. The platform starts with Descope, proves the abstraction with a second provider, and delivers a capstone multi-IdP demo.
 
-```
-┌─ Identity Platform ──────────────────────────────────────────────┐
-│                                                                  │
-│  React Frontend ──→ Tyk Gateway ──→ FastAPI Backend ──→ Postgres │
-│  react-oidc-context   JWT validation   Authorization     Canonical│
-│  shadcn/ui            rate limiting    domain logic      identity │
-│                                                                  │
-└──────────────────────────┬───────────────────────────────────────┘
-                           │
-          ┌────────────────┼────────────────┐
-          ▼                ▼                ▼
-   ┌─ Identity Providers ──────────────────────────┐
-   │  Descope (primary)      Ory Hydra (planned)   │
-   │  node-oidc-provider     Cloud IdPs (planned)  │
-   │  (test fixture)         Google · Entra · Cognito│
-   └───────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph app["Identity Platform"]
+        FE["React Frontend<br/>react-oidc-context + shadcn/ui"]
+        GW["Tyk API Gateway<br/>JWT validation, claim normalization"]
+        BE["FastAPI Backend<br/>Authorization + domain logic"]
+        DB["PostgreSQL<br/>Canonical identity store"]
+    end
 
-┌─ Infrastructure ─────────────┐  ┌─ Planning & Orchestration ─────┐
-│  Terraform Provider → Descope│  │  identity-stack-planning       │
-│  Infisical → Backend         │  │    → Ralph Orchestrator        │
-│  HCP Terraform (remote state)│  │    → Review Agents             │
-└──────────────────────────────┘  └────────────────────────────────┘
+    subgraph providers["Identity Providers"]
+        DESC["Descope<br/>(primary)"]
+        OIDC["node-oidc-provider<br/>(test fixture)"]
+        ORY["Ory Hydra<br/>(planned)"]
+        CLOUD["Cloud IdPs<br/>Google · Entra · Cognito"]
+    end
+
+    subgraph infra["Infrastructure"]
+        TF["Terraform Provider<br/>Provisions Descope config"]
+        INF["Infisical<br/>Secrets management"]
+        HCP["HCP Terraform<br/>Remote state"]
+    end
+
+    subgraph planning["Planning & Orchestration"]
+        AP["identity-stack-planning<br/>PRDs, architecture, tasks"]
+        RALPH["Ralph Orchestrator<br/>Autonomous execution"]
+        REVIEW["Review Agents<br/>Independent adversarial review"]
+    end
+
+    FE --> GW
+    GW --> BE
+    BE --> DB
+    GW -.-> DESC
+    GW -.-> OIDC
+    GW -.-> ORY
+    GW -.-> CLOUD
+    BE --> DESC
+    TF --> DESC
+    TF --> HCP
+    INF --> BE
+    AP --> RALPH
+    RALPH --> REVIEW
 ```
 
 ## The Repositories
@@ -98,20 +117,38 @@ Full-stack SaaS starter with FastAPI backend, Vite/React frontend, and Terraform
 
 Six PRDs define the platform evolution. See [docs/roadmap.md](docs/roadmap.md) for full details, sequencing, and cross-PRD dependencies.
 
-**Phase 1 (parallel, in progress):**
-- Main PRD — Descope feature completion (~80% done) ✅
-- PRD 5 — Canonical identity domain model (19 stories, ralph loop active) 🔄
+```mermaid
+graph TD
+    MAIN["Main PRD<br/>Descope features ✅"]
 
-**Phase 2 (parallel, after Phase 1 foundations):**
-- PRD 1 — Infrastructure secrets pipeline (HCP Terraform + Infisical)
-- PRD 2 — API gateway integration (Tyk OSS, dual deploy modes)
+    subgraph phase1["Phase 1 — Parallel"]
+        PRD1["PRD 1: Secrets<br/>⏳ Planned"]
+        PRD2["PRD 2: Gateway<br/>⏳ Planned"]
+        PRD5["PRD 5: Canonical Identity<br/>🔄 Active"]
+        PRD6["PRD 6: identity-model<br/>📋 Planned"]
+    end
 
-**Phase 3 (sequential, depends on Phase 2):**
-- PRD 3 — Multi-provider test infrastructure (node-oidc-provider)
-- PRD 6 — identity-model multi-language monorepo (depends on Main PRD + PRD 3)
+    subgraph phase2["Phase 2 — Sequential"]
+        PRD3["PRD 3: Multi-Provider Test<br/>⏳ Planned"]
+    end
 
-**Capstone (depends on Phase 1 + Phase 3):**
-- PRD 4 — Multi-IdP gateway demo (Descope + Ory + cloud IdPs with claim normalization)
+    subgraph capstone["Capstone"]
+        PRD4["PRD 4: Multi-IdP Demo<br/>⏳ Planned"]
+    end
+
+    MAIN --> PRD1
+    MAIN --> PRD2
+    MAIN --> PRD5
+    MAIN --> PRD6
+    PRD2 --> PRD3
+    PRD3 --> PRD4
+    PRD5 --> PRD4
+    PRD3 --> PRD6
+
+    style phase1 fill:none,stroke:#40916c
+    style phase2 fill:none,stroke:#52b788
+    style capstone fill:none,stroke:#95d5b2
+```
 
 **Current focus:**
 - **PRD 5** — Canonical identity domain model: Postgres-backed source of truth with 8 SCIM-aligned tables, write-through sync to Descope, webhook inbound sync, multi-IdP identity linking. 4 epics, 19 stories. [Ralph loop ready](docs/ralph-loop-process.md).
@@ -159,34 +196,16 @@ Capabilities are classified by cross-provider mapping feasibility (see ADR-3):
 
 The architectural foundation for provider independence (PRD 5). Inverts the current architecture: the backend owns a canonical Postgres store, with identity providers becoming sync targets.
 
-```
-┌─────────────┐       ┌──────────────────┐       ┌─────────────┐
-│   users      │       │ user_tenant_roles │       │  tenants    │
-├─────────────┤       ├──────────────────┤       ├─────────────┤
-│ id       PK │──┐    │ user_id       FK │       │ id       PK │
-│ email    UK │  │    │ tenant_id     FK │    ┌──│ name     UK │
-│ display_name│  │    │ role_id       FK │    │  │ status      │
-│ status      │  │    └──────────────────┘    │  └─────────────┘
-└─────────────┘  │             │              │
-       │         └─────────────┘              │
-       │                                      │
-┌──────┴──────┐       ┌──────────────────┐    │  ┌─────────────┐
-│  idp_links   │       │     roles        │    │  │ permissions │
-├─────────────┤       ├──────────────────┤    │  ├─────────────┤
-│ id       PK │       │ id           PK  │────┘  │ id       PK │
-│ user_id  FK │       │ name             │       │ name     UK │
-│ provider_id FK│      │ tenant_id FK     │       └──────┬──────┘
-│ external_sub │       │ (null = global)  │              │
-└──────┬──────┘       └────────┬─────────┘    ┌─────────┘
-       │                       │              │
-┌──────┴──────┐       ┌───────┴──────────┐   │
-│  providers   │       │ role_permissions  │───┘
-├─────────────┤       ├──────────────────┤
-│ id       PK │       │ role_id       FK │
-│ name     UK │       │ permission_id FK │
-│ type        │       └──────────────────┘
-│ issuer_url  │
-└─────────────┘
+```mermaid
+erDiagram
+    users ||--o{ idp_links : "linked via"
+    providers ||--o{ idp_links : "provides identity"
+    users ||--o{ user_tenant_roles : "assigned"
+    tenants ||--o{ user_tenant_roles : "scoped to"
+    roles ||--o{ user_tenant_roles : "has role"
+    roles ||--o{ role_permissions : "grants"
+    permissions ||--o{ role_permissions : "granted by"
+    roles }o--o| tenants : "scoped to (optional)"
 ```
 
 **Write-through sync:** Postgres write first → sync to IdP second → sync failures logged, never rolled back → reconciliation catches up asynchronously.
@@ -269,19 +288,26 @@ Each persona has an activation protocol, interactive menu, and Claude Code skill
 
 [Ralph Orchestrator](https://github.com/mikeyobrien/ralph-orchestrator) drives autonomous task execution. A single task queue tracks cross-repo dependencies. Ralph loops execute one phase per iteration:
 
-```
-analyze → plan → anchor → implement → test
-                                        │
-                          ┌─────────────┼─────────────┐
-                          ▼             ▼             ▼
-                     review-blind  review-edge  review-acceptance
-                          │             │             │
-                          └──────┬──────┘    review-security
-                                 │                │
-                                 ▼                │
-                            review-fix ◄──────────┘
-                                 │
-                          docs → ci → complete
+```mermaid
+flowchart TD
+    A[analyze] --> P[plan] --> AN[anchor] --> I[implement] --> T[test]
+
+    subgraph review["Review Phase"]
+        R1[blind]
+        R2[edge-case]
+        R3[acceptance]
+        R4[security]
+    end
+
+    T --> review
+    review --> RF[review-fix]
+    RF --> D[docs] --> CI[ci] --> DONE[complete]
+
+    style R1 fill:#e76f51,color:#fff
+    style R2 fill:#e76f51,color:#fff
+    style R3 fill:#e76f51,color:#fff
+    style R4 fill:#e76f51,color:#fff
+    style review fill:none,stroke:#e76f51,stroke-width:2px
 ```
 
 **Key properties:**

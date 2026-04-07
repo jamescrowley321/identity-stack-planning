@@ -4,31 +4,40 @@ Unified technical overview of the auth workspace. For detailed architecture deci
 
 ## System Context
 
-```
-┌─ Auth Workspace ──────────────────────────────────────────────────────┐
-│                                                                       │
-│  identity-stack-planning    py-identity-model    terraform-provider   │
-│  (BMAD planning hub)        (OIDC/OAuth2 lib)    -descope (IaC)      │
-│        │                         │                      │             │
-│        │                         │                      │             │
-│  identity-stack (FastAPI + React SaaS app) ◄────────────┘             │
-│        │         uses py-identity-model                               │
-│        │         for token validation                                 │
-└────────┼──────────────────────────────────────────────────────────────┘
-         │
-    ┌────┼──────────────────────────────────────┐
-    │    ▼                                      │
-    │  Descope ◄── Terraform provisions         │
-    │  (identity provider)                      │
-    │                                           │
-    │  PostgreSQL    Redis      Tyk Gateway     │
-    │  (canonical    (cache,    (JWT validation, │
-    │   identity)    pub/sub)   rate limiting)   │
-    │                                           │
-    │  Infisical          HCP Terraform         │
-    │  (secrets)          (remote state)        │
-    └───────────────────────────────────────────┘
-         External Services
+```mermaid
+C4Context
+    title Auth Workspace — System Context
+
+    Person(dev, "Developer", "Builds and operates the identity platform")
+    Person(user, "End User", "Authenticates and uses the SaaS application")
+
+    System_Boundary(workspace, "Auth Workspace") {
+        System(pim, "py-identity-model", "OIDC/OAuth2 Python library")
+        System(tfp, "terraform-provider-descope", "Terraform provider for Descope")
+        System(is, "identity-stack", "FastAPI + React SaaS app")
+        System(ap, "identity-stack-planning", "BMAD planning hub")
+    }
+
+    System_Ext(descope, "Descope", "Identity provider")
+    System_Ext(infisical, "Infisical", "Secrets management")
+    System_Ext(hcp, "HCP Terraform", "Remote state + locking")
+    System_Ext(tyk, "Tyk Gateway", "API gateway")
+    System_Ext(redis, "Redis", "Cache + rate limits")
+    System_Ext(pg, "PostgreSQL", "Canonical identity store")
+
+    Rel(dev, ap, "Plans work")
+    Rel(dev, tfp, "terraform apply")
+    Rel(dev, is, "Develops")
+    Rel(user, is, "Authenticates, uses app")
+    Rel(is, pim, "Token validation")
+    Rel(is, descope, "Management API, hosted login")
+    Rel(is, pg, "Canonical identity CRUD")
+    Rel(is, redis, "Identity cache, pub/sub")
+    Rel(tfp, descope, "Provisions roles, perms, tenants")
+    Rel(tfp, hcp, "Remote state")
+    Rel(tyk, descope, "JWKS fetch for JWT validation")
+    Rel(tyk, redis, "Rate limit counters")
+    Rel(tyk, is, "Proxies to backend")
 ```
 
 ## Component Architecture
@@ -270,22 +279,30 @@ sequenceDiagram
 
 ## Deployment Topologies
 
-```
-Standalone (default)        Gateway (--profile gateway)    Full (--profile full)
-────────────────────        ───────────────────────────    ─────────────────────
-React :3000                 React :3000                    React :3000
-  │                           │                              │
-  ▼                           ▼                              ▼
-FastAPI :8000               Tyk :8080 ──→ Redis :6379      Tyk :8080 ──→ Redis :6379
-  │                           │                              │
-  ▼                           ▼                              ▼
-Descope API                 FastAPI :8000                   FastAPI :8000
-                              │                              │       │
-                              ▼                              ▼       ▼
-                            Descope API                    Postgres  Descope API
-                                                           :5432
-                                                    node-oidc-provider :9000
-                                                    Aspire Dashboard :18888
+```mermaid
+graph LR
+    subgraph standalone["Standalone"]
+        SPA1[React SPA :3000] --> API1[FastAPI :8000]
+        API1 --> DESC1[Descope API]
+    end
+
+    subgraph gateway["Gateway (--profile gateway)"]
+        SPA2[React SPA :3000] --> TYK[Tyk Gateway :8080]
+        TYK --> API2[FastAPI :8000]
+        TYK --> REDIS[Redis :6379]
+        API2 --> DESC2[Descope API]
+    end
+
+    subgraph full["Full (--profile full)"]
+        SPA3[React SPA :3000] --> TYK2[Tyk Gateway :8080]
+        TYK2 --> API3[FastAPI :8000]
+        TYK2 --> REDIS2[Redis :6379]
+        API3 --> PG[PostgreSQL :5432]
+        API3 --> DESC3[Descope API]
+        OIDC[node-oidc-provider :9000] --> TYK2
+        ASPIRE[Aspire Dashboard :18888]
+        ASPIRE -.-> API3
+    end
 ```
 
 | Profile | Containers | Use Case |

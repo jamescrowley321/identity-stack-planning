@@ -95,32 +95,36 @@ Five specialized reviewers, each designed to catch a different class of defects:
 
 ## Review Flow in Ralph Loops
 
-```
-Implementation complete
-        │
-        ▼
-  Generate diff
-        │
-   ┌────┼────┬────────────┐
-   ▼    ▼    ▼            ▼
- Blind  Edge  Acceptance  Sentinel
-Hunter  Case  Auditor     (security)
-   │    │     │            │
-   └────┼─────┘            │
-        ▼                  │
-   Triage findings ◄───────┘
-        │                    ╌╌╌╌╌▶ Viper Red Team
-        │                           (auth changes only)
-        ▼
-   Blocking findings?
-   ├── No ──→ Create PR
-   └── Yes ──→ Fix Loop (max 3x)
-                 │
-                 ▼
-              Resolved?
-              ├── Yes ──→ Create PR
-              ├── Retries left ──→ Fix Loop
-              └── Exhausted ──→ Block for manual review
+```mermaid
+flowchart TD
+    IMPL[Implementation complete] --> DIFF[Generate diff]
+
+    subgraph reviewers["Parallel Review"]
+        BH[Blind Hunter<br/>diff only]
+        ECH[Edge Case Hunter<br/>diff + repo]
+        AA[Acceptance Auditor<br/>spec + repo]
+        SEN[Sentinel<br/>security lens]
+    end
+
+    DIFF --> reviewers
+    reviewers --> TRIAGE[Triage findings]
+
+    TRIAGE --> CHECK{Blocking?}
+    CHECK -->|No| PR[Create PR]
+    CHECK -->|Yes| FIX[Fix Loop ≤3x]
+    FIX --> RECHECK{Resolved?}
+    RECHECK -->|Yes| PR
+    RECHECK -->|No, retries left| FIX
+    RECHECK -->|Exhausted| BLOCK[Block for manual review]
+
+    TRIAGE -.->|Auth changes?| VIP[Viper Red Team] -.-> TRIAGE
+
+    style BH fill:#e76f51,color:#fff
+    style ECH fill:#e76f51,color:#fff
+    style AA fill:#e76f51,color:#fff
+    style SEN fill:#e76f51,color:#fff
+    style reviewers fill:none,stroke:#e76f51,stroke-width:2px
+    style VIP fill:#9b2226,color:#fff
 ```
 
 **Key properties:**
