@@ -12,18 +12,18 @@ C4Context
     Person(user, "End User", "Authenticates and uses the SaaS application")
 
     System_Boundary(workspace, "Auth Workspace") {
-        System(pim, "py-identity-model", "OIDC/OAuth2 Python library<br/>JWT validation, discovery, protocol flows")
-        System(tfp, "terraform-provider-descope", "Terraform provider (Go)<br/>Provisions Descope infrastructure")
-        System(is, "identity-stack", "FastAPI + React SaaS app<br/>Multi-tenant identity platform")
-        System(ap, "identity-stack-planning", "BMAD planning hub<br/>PRDs, architecture, task queue")
+        System(pim, "py-identity-model", "OIDC/OAuth2 Python library")
+        System(tfp, "terraform-provider-descope", "Terraform provider for Descope")
+        System(is, "identity-stack", "FastAPI + React SaaS app")
+        System(ap, "identity-stack-planning", "BMAD planning hub")
     }
 
-    System_Ext(descope, "Descope", "Identity provider<br/>Hosted login, management API")
-    System_Ext(infisical, "Infisical", "Secrets management<br/>Audit, rotation, injection")
-    System_Ext(hcp, "HCP Terraform", "Remote state<br/>Locking, history, variable sets")
-    System_Ext(tyk, "Tyk Gateway", "API gateway (optional)<br/>JWT validation, rate limiting")
-    System_Ext(redis, "Redis", "Cache + rate limits<br/>Identity cache, pub/sub")
-    System_Ext(pg, "PostgreSQL", "Canonical identity store<br/>8 SCIM-aligned tables")
+    System_Ext(descope, "Descope", "Identity provider")
+    System_Ext(infisical, "Infisical", "Secrets management")
+    System_Ext(hcp, "HCP Terraform", "Remote state + locking")
+    System_Ext(tyk, "Tyk Gateway", "API gateway")
+    System_Ext(redis, "Redis", "Cache + rate limits")
+    System_Ext(pg, "PostgreSQL", "Canonical identity store")
 
     Rel(dev, ap, "Plans work")
     Rel(dev, tfp, "terraform apply")
@@ -281,19 +281,19 @@ sequenceDiagram
 
 ```mermaid
 graph LR
-    subgraph standalone["Standalone Mode (default)"]
+    subgraph standalone["Standalone"]
         SPA1[React SPA :3000] --> API1[FastAPI :8000]
         API1 --> DESC1[Descope API]
     end
 
-    subgraph gateway["Gateway Mode (--profile gateway)"]
+    subgraph gateway["Gateway (--profile gateway)"]
         SPA2[React SPA :3000] --> TYK[Tyk Gateway :8080]
         TYK --> API2[FastAPI :8000]
         TYK --> REDIS[Redis :6379]
         API2 --> DESC2[Descope API]
     end
 
-    subgraph full["Full Mode (--profile full, future)"]
+    subgraph full["Full (--profile full)"]
         SPA3[React SPA :3000] --> TYK2[Tyk Gateway :8080]
         TYK2 --> API3[FastAPI :8000]
         TYK2 --> REDIS2[Redis :6379]
@@ -301,6 +301,7 @@ graph LR
         API3 --> DESC3[Descope API]
         OIDC[node-oidc-provider :9000] --> TYK2
         ASPIRE[Aspire Dashboard :18888]
+        ASPIRE -.-> API3
     end
 ```
 

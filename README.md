@@ -12,7 +12,7 @@ Build a provider-independent identity platform where swapping or adding an ident
 graph TB
     subgraph app["Identity Platform"]
         FE["React Frontend<br/>react-oidc-context + shadcn/ui"]
-        GW["Tyk API Gateway<br/>JWT validation + claim normalization"]
+        GW["Tyk API Gateway<br/>JWT validation, claim normalization"]
         BE["FastAPI Backend<br/>Authorization + domain logic"]
         DB["PostgreSQL<br/>Canonical identity store"]
     end
@@ -21,7 +21,7 @@ graph TB
         DESC["Descope<br/>(primary)"]
         OIDC["node-oidc-provider<br/>(test fixture)"]
         ORY["Ory Hydra<br/>(planned)"]
-        CLOUD["Cloud IdPs<br/>Google, Entra, Cognito<br/>(planned)"]
+        CLOUD["Cloud IdPs<br/>Google · Entra · Cognito"]
     end
 
     subgraph infra["Infrastructure"]
@@ -31,7 +31,7 @@ graph TB
     end
 
     subgraph planning["Planning & Orchestration"]
-        AP["identity-stack-planning<br/>PRDs, architecture, task queue"]
+        AP["identity-stack-planning<br/>PRDs, architecture, tasks"]
         RALPH["Ralph Orchestrator<br/>Autonomous execution"]
         REVIEW["Review Agents<br/>Independent adversarial review"]
     end
@@ -118,23 +118,36 @@ Full-stack SaaS starter with FastAPI backend, Vite/React frontend, and Terraform
 Six PRDs define the platform evolution. See [docs/roadmap.md](docs/roadmap.md) for full details, sequencing, and cross-PRD dependencies.
 
 ```mermaid
-graph LR
-    MAIN["Main PRD<br/>Descope feature waves<br/>✅ ~80% complete"]
-    PRD1["PRD 1: Secrets Pipeline<br/>HCP Terraform + Infisical<br/>⏳ Planned"]
-    PRD2["PRD 2: API Gateway<br/>Tyk OSS + dual deploy modes<br/>⏳ Planned"]
-    PRD3["PRD 3: Multi-Provider Test<br/>node-oidc-provider fixture<br/>⏳ Planned"]
-    PRD4["PRD 4: Multi-IdP Demo<br/>Capstone: claim normalization<br/>⏳ Planned"]
-    PRD5["PRD 5: Canonical Identity<br/>Postgres domain model<br/>🔄 Active"]
-    PRD6["PRD 6: identity-model Monorepo<br/>Multi-language OIDC/OAuth2<br/>📋 Planned"]
+graph TD
+    MAIN["Main PRD<br/>Descope features ✅"]
 
-    MAIN --> PRD5
+    subgraph phase1["Phase 1 — Parallel"]
+        PRD1["PRD 1: Secrets<br/>⏳ Planned"]
+        PRD2["PRD 2: Gateway<br/>⏳ Planned"]
+        PRD5["PRD 5: Canonical Identity<br/>🔄 Active"]
+        PRD6["PRD 6: identity-model<br/>📋 Planned"]
+    end
+
+    subgraph phase2["Phase 2 — Sequential"]
+        PRD3["PRD 3: Multi-Provider Test<br/>⏳ Planned"]
+    end
+
+    subgraph capstone["Capstone"]
+        PRD4["PRD 4: Multi-IdP Demo<br/>⏳ Planned"]
+    end
+
     MAIN --> PRD1
     MAIN --> PRD2
+    MAIN --> PRD5
+    MAIN --> PRD6
     PRD2 --> PRD3
     PRD3 --> PRD4
     PRD5 --> PRD4
-    MAIN --> PRD6
     PRD3 --> PRD6
+
+    style phase1 fill:none,stroke:#40916c
+    style phase2 fill:none,stroke:#52b788
+    style capstone fill:none,stroke:#95d5b2
 ```
 
 **Current focus:**
@@ -276,22 +289,25 @@ Each persona has an activation protocol, interactive menu, and Claude Code skill
 [Ralph Orchestrator](https://github.com/mikeyobrien/ralph-orchestrator) drives autonomous task execution. A single task queue tracks cross-repo dependencies. Ralph loops execute one phase per iteration:
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[analyze] --> P[plan] --> AN[anchor] --> I[implement] --> T[test]
-    T --> R1[review-blind]
-    T --> R2[review-edge]
-    T --> R3[review-acceptance]
-    T --> R4[review-security]
-    R1 --> RF[review-fix]
-    R2 --> RF
-    R3 --> RF
-    R4 --> RF
+
+    subgraph review["Review Phase"]
+        R1[blind]
+        R2[edge-case]
+        R3[acceptance]
+        R4[security]
+    end
+
+    T --> review
+    review --> RF[review-fix]
     RF --> D[docs] --> CI[ci] --> DONE[complete]
 
     style R1 fill:#e76f51,color:#fff
     style R2 fill:#e76f51,color:#fff
     style R3 fill:#e76f51,color:#fff
     style R4 fill:#e76f51,color:#fff
+    style review fill:none,stroke:#e76f51,stroke-width:2px
 ```
 
 **Key properties:**
