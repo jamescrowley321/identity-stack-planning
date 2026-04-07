@@ -165,48 +165,6 @@ The architectural foundation for provider independence (PRD 5). Inverts the curr
 
 ```mermaid
 erDiagram
-    users {
-        uuid id PK
-        string email UK
-        string display_name
-        string status
-    }
-    tenants {
-        uuid id PK
-        string name UK
-        string status
-    }
-    roles {
-        uuid id PK
-        string name
-        uuid tenant_id FK "nullable = global"
-    }
-    permissions {
-        uuid id PK
-        string name UK
-    }
-    role_permissions {
-        uuid role_id FK
-        uuid permission_id FK
-    }
-    user_tenant_roles {
-        uuid user_id FK
-        uuid tenant_id FK
-        uuid role_id FK
-    }
-    idp_links {
-        uuid id PK
-        uuid user_id FK
-        uuid provider_id FK
-        string external_sub
-    }
-    providers {
-        uuid id PK
-        string name UK
-        string type
-        string issuer_url
-    }
-
     users ||--o{ idp_links : "linked via"
     providers ||--o{ idp_links : "provides"
     users ||--o{ user_tenant_roles : "assigned"
@@ -216,6 +174,8 @@ erDiagram
     permissions ||--o{ role_permissions : "granted by"
     roles }o--o| tenants : "scoped to"
 ```
+
+8 tables: `users`, `tenants`, `roles`, `permissions`, `role_permissions`, `user_tenant_roles`, `idp_links`, `providers`. Full schema with field definitions in [system-architecture.md](docs/system-architecture.md#canonical-identity-data-model).
 
 **Write-through sync:** Postgres write first → sync to IdP second → sync failures logged, never rolled back → reconciliation catches up asynchronously.
 
@@ -298,25 +258,12 @@ Each persona has an activation protocol, interactive menu, and Claude Code skill
 [Ralph Orchestrator](https://github.com/mikeyobrien/ralph-orchestrator) drives autonomous task execution. A single task queue tracks cross-repo dependencies. Ralph loops execute one phase per iteration:
 
 ```mermaid
-flowchart TD
+flowchart LR
     A[analyze] --> P[plan] --> AN[anchor] --> I[implement] --> T[test]
+    T --> R["review\n(blind · edge · acceptance · security)"]
+    R --> RF[review-fix] --> D[docs] --> CI[ci] --> DONE[complete]
 
-    subgraph review["Review Phase"]
-        R1[blind]
-        R2[edge-case]
-        R3[acceptance]
-        R4[security]
-    end
-
-    T --> review
-    review --> RF[review-fix]
-    RF --> D[docs] --> CI[ci] --> DONE[complete]
-
-    style R1 fill:#e76f51,color:#fff
-    style R2 fill:#e76f51,color:#fff
-    style R3 fill:#e76f51,color:#fff
-    style R4 fill:#e76f51,color:#fff
-    style review fill:none,stroke:#e76f51,stroke-width:2px
+    style R fill:#e76f51,color:#fff
 ```
 
 **Key properties:**
