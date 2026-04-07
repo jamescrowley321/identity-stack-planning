@@ -6,13 +6,13 @@ Self-referential implementation loop. Execute ONE phase of ONE story per iterati
 
 | Story | Issue | Branch | Base Branch | Status |
 |-------|-------|--------|-------------|--------|
-| 3.1 | #171 | gateway/story-3.1-deployment-mode-env-var | main | pending |
+| 3.1 | #171 | gateway/story-3.1-deployment-mode-env-var | main | done |
 
 ### Epic 1: Tyk Gateway Integration
 
 | Story | Issue | Branch | Base Branch | Status |
 |-------|-------|--------|-------------|--------|
-| 1.1 | #161 | gateway/story-1.1-tyk-config-directory | main | pending |
+| 1.1 | #161 | gateway/story-1.1-tyk-config-directory | main | done |
 | 1.2 | #162 | gateway/story-1.2-api-definition-backend-proxy | main | pending |
 | 1.3 | #163 | gateway/story-1.3-docker-compose-tyk-redis | main | pending |
 
