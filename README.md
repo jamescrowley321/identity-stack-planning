@@ -198,14 +198,56 @@ The architectural foundation for provider independence (PRD 5). Inverts the curr
 
 ```mermaid
 erDiagram
+    users {
+        uuid id PK
+        string email UK
+        string display_name
+        string status
+    }
+    tenants {
+        uuid id PK
+        string name UK
+        string status
+    }
+    roles {
+        uuid id PK
+        string name
+        uuid tenant_id FK "nullable = global"
+    }
+    permissions {
+        uuid id PK
+        string name UK
+    }
+    role_permissions {
+        uuid role_id FK
+        uuid permission_id FK
+    }
+    user_tenant_roles {
+        uuid user_id FK
+        uuid tenant_id FK
+        uuid role_id FK
+    }
+    idp_links {
+        uuid id PK
+        uuid user_id FK
+        uuid provider_id FK
+        string external_sub
+    }
+    providers {
+        uuid id PK
+        string name UK
+        string type
+        string issuer_url
+    }
+
     users ||--o{ idp_links : "linked via"
-    providers ||--o{ idp_links : "provides identity"
+    providers ||--o{ idp_links : "provides"
     users ||--o{ user_tenant_roles : "assigned"
     tenants ||--o{ user_tenant_roles : "scoped to"
     roles ||--o{ user_tenant_roles : "has role"
     roles ||--o{ role_permissions : "grants"
     permissions ||--o{ role_permissions : "granted by"
-    roles }o--o| tenants : "scoped to (optional)"
+    roles }o--o| tenants : "scoped to"
 ```
 
 **Write-through sync:** Postgres write first → sync to IdP second → sync failures logged, never rolled back → reconciliation catches up asynchronously.

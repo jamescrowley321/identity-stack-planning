@@ -5,39 +5,41 @@ Unified technical overview of the auth workspace. For detailed architecture deci
 ## System Context
 
 ```mermaid
-C4Context
-    title Auth Workspace — System Context
+graph TB
+    dev(["Developer"])
+    user(["End User"])
 
-    Person(dev, "Developer", "Builds and operates the identity platform")
-    Person(user, "End User", "Authenticates and uses the SaaS application")
+    subgraph workspace["Auth Workspace"]
+        ap["identity-stack-planning<br/>BMAD planning hub"]
+        pim["py-identity-model<br/>OIDC/OAuth2 Python library"]
+        tfp["terraform-provider-descope<br/>Terraform provider"]
+        is["identity-stack<br/>FastAPI + React SaaS app"]
+    end
 
-    System_Boundary(workspace, "Auth Workspace") {
-        System(pim, "py-identity-model", "OIDC/OAuth2 Python library")
-        System(tfp, "terraform-provider-descope", "Terraform provider for Descope")
-        System(is, "identity-stack", "FastAPI + React SaaS app")
-        System(ap, "identity-stack-planning", "BMAD planning hub")
-    }
+    subgraph external["External Services"]
+        descope["Descope"]
+        pg["PostgreSQL"]
+        redis["Redis"]
+        tyk["Tyk Gateway"]
+        infisical["Infisical"]
+        hcp["HCP Terraform"]
+    end
 
-    System_Ext(descope, "Descope", "Identity provider")
-    System_Ext(infisical, "Infisical", "Secrets management")
-    System_Ext(hcp, "HCP Terraform", "Remote state + locking")
-    System_Ext(tyk, "Tyk Gateway", "API gateway")
-    System_Ext(redis, "Redis", "Cache + rate limits")
-    System_Ext(pg, "PostgreSQL", "Canonical identity store")
+    dev --> ap
+    dev --> tfp
+    dev --> is
+    user --> is
 
-    Rel(dev, ap, "Plans work")
-    Rel(dev, tfp, "terraform apply")
-    Rel(dev, is, "Develops")
-    Rel(user, is, "Authenticates, uses app")
-    Rel(is, pim, "Token validation")
-    Rel(is, descope, "Management API, hosted login")
-    Rel(is, pg, "Canonical identity CRUD")
-    Rel(is, redis, "Identity cache, pub/sub")
-    Rel(tfp, descope, "Provisions roles, perms, tenants")
-    Rel(tfp, hcp, "Remote state")
-    Rel(tyk, descope, "JWKS fetch for JWT validation")
-    Rel(tyk, redis, "Rate limit counters")
-    Rel(tyk, is, "Proxies to backend")
+    is --> pim
+    is --> descope
+    is --> pg
+    is --> redis
+    tfp --> descope
+    tfp --> hcp
+    infisical -.-> is
+    tyk --> is
+    tyk --> descope
+    tyk --> redis
 ```
 
 ## Component Architecture
