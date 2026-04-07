@@ -31,17 +31,35 @@ All prior phases complete (T14-T26, T64-T75, T80-T84, T90-T98, T117-T119 — all
 
 All feature tasks (T32-T47) complete. All review fixes (T101-T116) complete — all 16 PRs #211-#237 merged 2026-03-30.
 
-### Integration Test Chain
+### Integration Test Chain (node-oidc-provider)
 
 | ID | Issue | Status | Description | Size | Depends |
 |----|-------|--------|-------------|------|---------|
 | T120 | | done | Build node-oidc-provider test fixture | medium | T116 |
-| T121 | | in_progress | Integration tests: Core flows (Auth Code + PKCE, Enhanced Token Validation, Refresh) | medium | T120 |
-| T122 | | in_progress | Integration tests: Token management (Introspection RFC 7662, Revocation RFC 7009) | medium | T120 |
-| T123 | | pending | Integration tests: Advanced request patterns (DPoP RFC 9449, PAR RFC 9126, JAR RFC 9101) | large | T120 |
-| T124 | | pending | Integration tests: Alternative grants (Device Authorization RFC 8628, Token Exchange RFC 8693) | medium | T120 |
-| T125 | | pending | Integration tests: FAPI 2.0 Security Profile | medium | T120 |
-| T126 | | pending | Document Duende IdentityServer integration test gaps | small | T120 |
+| T121 | | done | Integration tests: Core flows (Auth Code + PKCE, Token Validation, Refresh) — PR #281 merged | medium | T120 |
+| T122 | | done | Integration tests: Token management (Introspection, Revocation) — PR #299 merged | medium | T120 |
+| T123 | | done | Integration tests: Advanced request patterns (DPoP, PAR, JAR) — test_dpop_par_jar.py exists | large | T120 |
+| T124 | | done | Integration tests: Alternative grants (Device Auth, Token Exchange) — test_device_token_exchange.py exists | medium | T120 |
+| T125 | | done | Integration tests: FAPI 2.0 Security Profile — test_fapi_compliance.py exists | medium | T120 |
+| T126 | | in_progress | Integration test fixture gap analysis — PR #306 open | small | T120 |
+
+### IdentityServer Fixture Expansion
+
+| ID | Issue | Status | Description | Size | Depends |
+|----|-------|--------|-------------|------|---------|
+| T130 | | pending | Enable introspection + revocation in IdentityServer fixture | small | T126 |
+| T131 | | pending | Add public PKCE client + enforce PKCE in IdentityServer fixture | small | T126 |
+| T132 | | pending | Run existing integration tests against IdentityServer (expand provider matrix) | medium | T130, T131 |
+
+### Cloud Provider Integration Tests (cassette-based)
+
+| ID | Issue | Status | Description | Size | Depends |
+|----|-------|--------|-------------|------|---------|
+| T133 | | pending | Cassette test infrastructure — pytest-recording for httpx, live/replay mode, per-provider env templates | medium | T126 |
+| T134 | | pending | AWS Cognito integration tests — discovery, token validation, `cognito:groups` claims, non-standard discovery URL | medium | T133 |
+| T135 | | pending | Microsoft Entra ID integration tests — v2.0 discovery, multi-tenant, `tid`/`oid` claims | medium | T133 |
+| T136 | | pending | Auth0 integration tests — discovery, token validation, `permissions`/`org_id` claims, custom domains | medium | T133 |
+| T137 | | pending | Nightly CI workflow — scheduled run against live providers, auto-create issues on drift | small | T134, T135, T136 |
 
 ### Remaining Feature Work
 
