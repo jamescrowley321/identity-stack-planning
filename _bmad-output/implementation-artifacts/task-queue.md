@@ -86,3 +86,26 @@ Blocked on account setup — James needs to configure Cognito and Entra ID accou
 | T61 | 216 | pending | Dynamic Client Registration (RFC 7591) | medium |
 | T62 | 215 | pending | mTLS Client Auth and Certificate-Bound Tokens (RFC 8705) | large |
 | T63 | 218 | pending | JARM (JWT Secured Authorization Response Mode) | medium |
+
+### OIDC RP Certification (ACTIVE — separate session)
+
+Tracking issue: [#242](https://github.com/jamescrowley321/py-identity-model/issues/242). Certify py-identity-model as a library (same pattern as pyoidc/oidcrp). See #242 for the full phased plan.
+
+| ID | Issue | Status | Description | Size |
+|----|-------|--------|-------------|------|
+| T160 | 326 | in_review | Switch conformance runner to certification.openid.net REST API | large |
+| T161 | 327 | in_review | Fix JWKS cache bypass (http_client= removal + SSL cert sharing) | medium |
+| T162 | 329 | in_review | Document Config RP test count and variant config | small |
+| T163 | 330 | in_review | Add Form Post RP profile to conformance runner | medium |
+| T164 | 331 | pending | Apply for OIDF OSS certification fee waiver (owner-driven, manual) | — |
+| T165 | 342 | pending | Refactor Makefile — consolidate conformance targets | small |
+
+### Products (after monorepo restructure)
+
+These are downstream of the OIDC certification work. They inherit credibility from py-identity-model's library cert. Each ships as a separate PyPI package inside a uv workspace monorepo.
+
+| ID | Issue | Status | Description | Size | Depends |
+|----|-------|--------|-------------|------|---------|
+| T170 | 332 | pending | Monorepo restructure — uv workspace with member packages | large | — |
+| T171 | 333 | pending | py-identity-model-cli — RFC 8252 loopback CLI login tool | large | T170 |
+| T172 | 334 | pending | fastapi-identity-model — FastAPI middleware for OIDC auth | large | T170 |

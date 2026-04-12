@@ -212,16 +212,22 @@ The main PRD defines 22 high-level FRs. Here's how the specialized PRDs implemen
 
 ## Implementation Order
 
-**Phase 1 (parallel, in progress):**
-- Main PRD completion: py-identity-model integration tests, remaining identity-stack features
-- PRD 5: Canonical identity domain model (19 stories, ralph loop ready)
+**Phase 1 — DONE:**
+- Main PRD: py-identity-model feature tasks, identity-stack features — all shipped
+- PRD 5: Canonical identity domain model (19 stories) — shipped 2026-04-09
+- PRD 2: API gateway (17 stories) — shipped 2026-04-11/12
 
-**Phase 2 (parallel, after Phase 1 foundations):**
+**Phase 1b — ACTIVE: py-identity-model certification + products:**
+- OIDC RP Certification ([#242](https://github.com/jamescrowley321/py-identity-model/issues/242)) — certify py-identity-model as a library via OIDF, Basic + Config + Form Post profiles
+- Monorepo restructure ([#332](https://github.com/jamescrowley321/py-identity-model/issues/332)) — uv workspace with member packages
+- CLI tool ([#333](https://github.com/jamescrowley321/py-identity-model/issues/333)) — `py-identity-model-cli`, RFC 8252 loopback login (like `aws sso login`, `gh auth login`)
+- FastAPI middleware ([#334](https://github.com/jamescrowley321/py-identity-model/issues/334)) — `fastapi-identity-model`, drop-in OIDC auth for FastAPI apps
+- Makefile refactor ([#342](https://github.com/jamescrowley321/py-identity-model/issues/342)) — consolidate conformance targets
+
+**Phase 2 (parallel, after Phase 1b foundations):**
 - PRD 1: Infrastructure secrets pipeline
-- PRD 2: API gateway integration
+- PRD 3: Multi-provider test infrastructure
 
-**Phase 3 (sequential, depends on Phase 2):**
-- PRD 3: Multi-provider test infrastructure (needs PRD 2 gateway)
-
-**Phase 4 (capstone, depends on Phase 1 + Phase 3):**
+**Phase 3 (capstone, depends on Phase 2):**
 - PRD 4: Multi-IdP gateway demo (needs PRD 3 test infra + PRD 5 canonical identity)
+- PRD 6: identity-model multi-language monorepo (depends on Main PRD + PRD 3)
