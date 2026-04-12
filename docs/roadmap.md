@@ -8,10 +8,10 @@ This document is the master index for all planned work across the auth workspace
 |-----|-------|-------------|--------|---------|
 | Main | Unified Identity Platform | all 3 | Active | 147+ tasks tracked |
 | PRD 1 | Infrastructure Secrets Pipeline | identity-stack, terraform-provider-descope | Planned | 22 stories / 3 epics |
-| PRD 2 | API Gateway & Deployment Topology | identity-stack | Planned | 17 stories / 4 epics |
+| PRD 2 | API Gateway & Deployment Topology | identity-stack | Done | 17 stories / 4 epics |
 | PRD 3 | Multi-Provider Test Infrastructure | py-identity-model, identity-stack | Planned | ~25 stories / 3 epics |
 | PRD 4 | Multi-IdP Gateway Demo | identity-stack | Planned | ~20 stories / 4 epics |
-| PRD 5 | Canonical Identity Domain Model | identity-stack | Active | 19 stories / 4 epics |
+| PRD 5 | Canonical Identity Domain Model | identity-stack | Done | 19 stories / 4 epics |
 | PRD 6 | identity-model Multi-Language Monorepo | identity-model (new repo) | Planned | ~100 stories / 15 epics |
 
 ## Dependency Graph
@@ -45,9 +45,9 @@ graph TD
     PRD3 --> PRD6
 
     style MAIN fill:#2d6a4f,color:#fff
-    style PRD5 fill:#1b4332,color:#fff
+    style PRD5 fill:#2d6a4f,color:#fff
+    style PRD2 fill:#2d6a4f,color:#fff
     style PRD1 fill:#40916c,color:#fff
-    style PRD2 fill:#40916c,color:#fff
     style PRD3 fill:#52b788,color:#000
     style PRD4 fill:#95d5b2,color:#000
     style PRD6 fill:#40916c,color:#fff
@@ -217,12 +217,14 @@ The main PRD defines 22 high-level FRs. Here's how the specialized PRDs implemen
 - PRD 5: Canonical identity domain model (19 stories) — shipped 2026-04-09
 - PRD 2: API gateway (17 stories) — shipped 2026-04-11/12
 
-**Phase 1b — ACTIVE: py-identity-model certification + products:**
+**Phase 1b — ACTIVE: py-identity-model certification + products + infra:**
 - OIDC RP Certification ([#242](https://github.com/jamescrowley321/py-identity-model/issues/242)) — certify py-identity-model as a library via OIDF, Basic + Config + Form Post profiles
 - Monorepo restructure ([#332](https://github.com/jamescrowley321/py-identity-model/issues/332)) — uv workspace with member packages
 - CLI tool ([#333](https://github.com/jamescrowley321/py-identity-model/issues/333)) — `py-identity-model-cli`, RFC 8252 loopback login (like `aws sso login`, `gh auth login`)
 - FastAPI middleware ([#334](https://github.com/jamescrowley321/py-identity-model/issues/334)) — `fastapi-identity-model`, drop-in OIDC auth for FastAPI apps
 - Makefile refactor ([#342](https://github.com/jamescrowley321/py-identity-model/issues/342)) — consolidate conformance targets
+- Conformance SSL cert sharing ([#343](https://github.com/jamescrowley321/py-identity-model/issues/343)) — Docker cert-init service for nginx/RP cert sharing
+- Secrets rotation automation ([#346](https://github.com/jamescrowley321/py-identity-model/issues/346)) — GH + HCP Vault Secrets sync, rotation scripts, monthly age-check workflow
 
 **Phase 2 (parallel, after Phase 1b foundations):**
 - PRD 1: Infrastructure secrets pipeline
