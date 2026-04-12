@@ -100,6 +100,14 @@ Tracking issue: [#242](https://github.com/jamescrowley321/py-identity-model/issu
 | T164 | 331 | pending | Apply for OIDF OSS certification fee waiver (owner-driven, manual) | — |
 | T165 | 342 | pending | Refactor Makefile — consolidate conformance targets | small |
 
+### Infrastructure & Secrets Automation
+
+| ID | Issue | Status | Description | Size | Depends |
+|----|-------|--------|-------------|------|---------|
+| T176 | 343 | pending | Share nginx self-signed cert with RP container (cert-init service) | medium | — |
+| T177 | 346 | pending | Secrets rotation automation — GH secrets + HCP Vault Secrets sync, rotation scripts, scheduled reminders | large | HCP CLI install |
+| T178 | 345 | done | Release workflow — use RELEASE_TOKEN PAT to bypass branch protection | small | — |
+
 ### Products (after monorepo restructure)
 
 These are downstream of the OIDC certification work. They inherit credibility from py-identity-model's library cert. Each ships as a separate PyPI package inside a uv workspace monorepo.
