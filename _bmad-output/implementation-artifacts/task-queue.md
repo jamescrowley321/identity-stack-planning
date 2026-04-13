@@ -37,12 +37,12 @@ Target: OpenID Foundation Basic RP + Config RP certification. See `docs/oidc-cer
 
 | ID | Issue | Status | Description | Size | Depends |
 |----|-------|--------|-------------|------|---------|
-| T140 | | pending | Fix `kid` absent fallback — when JWT has no `kid` and JWKS has single key, use that key instead of throwing | small | — |
-| T141 | | pending | Add UserInfo `sub` mismatch validation — reject UserInfo response when `sub` != ID token `sub` | small | — |
-| T142 | 219 | pending | JWKS cache TTL with forced refresh on signature failure — required for key rotation conformance tests | medium | — |
-| T143 | | pending | Build conformance test harness — thin FastAPI RP app in `conformance/`, Docker Compose extending OpenID conformance suite, API-driven test runner | large | T140, T141, T142 |
-| T144 | | pending | Pass Basic RP conformance tests — auth code flow, ID token validation (iss, sub, aud, iat, kid, sig), nonce, UserInfo sub check, client_secret_basic | medium | T143 |
-| T145 | | pending | Pass Config RP conformance tests — discovery retrieval, JWKS retrieval, issuer mismatch detection, key rotation handling | medium | T143 |
+| T140 | | done | Fix `kid` absent fallback — when JWT has no `kid` and JWKS has single key, use that key (OIDC Core §10.1). Implemented in `find_key_by_kid` | small | — |
+| T141 | | done | Add UserInfo `sub` mismatch validation — `validate_userinfo_sub()` in `core/userinfo_logic.py` rejects mismatched sub | small | — |
+| T142 | 219 | done | JWKS cache TTL with forced refresh on signature failure — TTL cache + `_retry_with_refreshed_jwks` in sync/async token_validation | medium | — |
+| T143 | | done | Build conformance test harness — `conformance/app.py` RP + `run_tests.py` runner + Docker Compose + CI workflow | large | T140, T141, T142 |
+| T144 | | done | Pass Basic RP conformance tests — 13/13 PASS. SSL cert sharing, cache clearing, UserInfo fatal error, claims display. PR #362 merged 2026-04-12 | medium | T143 |
+| T145 | | pending | Pass Config RP conformance tests — 4/5 PASS, `signing-key-rotation` still times out. Needs double-flow key rotation fix | medium | T143 |
 | T146 | | pending | Fix any conformance test failures from T144/T145 — iterative fix-and-rerun cycle | medium | T144, T145 |
 | T147 | | pending | Expand to Implicit + Hybrid RP profiles — at_hash validation, c_hash validation, nonce enforcement | medium | T146 |
 
@@ -93,18 +93,18 @@ Tracking issue: [#242](https://github.com/jamescrowley321/py-identity-model/issu
 
 | ID | Issue | Status | Description | Size |
 |----|-------|--------|-------------|------|
-| T160 | 326 | in_review | Switch conformance runner to certification.openid.net REST API | large |
-| T161 | 327 | in_review | Fix JWKS cache bypass (http_client= removal + SSL cert sharing) | medium |
-| T162 | 329 | in_review | Document Config RP test count and variant config | small |
-| T163 | 330 | in_review | Add Form Post RP profile to conformance runner | medium |
+| T160 | 326 | done | Switch conformance runner to certification.openid.net REST API — hosted workflow added, token auth, env var overrides | large |
+| T161 | 327 | done | Fix JWKS cache bypass — http_client= removal, SSL cert sharing via cert-init, cache clearing between tests | medium |
+| T162 | 329 | done | Document Config RP test count and variant config | small |
+| T163 | 330 | done | Add Form Post RP profile — 13/13 PASS in CI. Parser, multi-value callback, unit tests | medium |
 | T164 | 331 | pending | Apply for OIDF OSS certification fee waiver (owner-driven, manual) | — |
-| T165 | 342 | pending | Refactor Makefile — consolidate conformance targets | small |
+| T165 | 342 | done | Refactor Makefile — consolidated targets, help, HOSTED=1 support. PR #361 merged 2026-04-12 | small |
 
 ### Infrastructure & Secrets Automation
 
 | ID | Issue | Status | Description | Size | Depends |
 |----|-------|--------|-------------|------|---------|
-| T176 | 343 | pending | Share nginx self-signed cert with RP container (cert-init service) | medium | — |
+| T176 | 343 | done | Share nginx self-signed cert with RP container — cert-init service, SSL_CERT_FILE env, cache clearing. Merged 2026-04-12 | medium | — |
 | T177 | 346 | pending | Secrets rotation automation — GH secrets + HCP Vault Secrets sync, rotation scripts, scheduled reminders | large | HCP CLI install |
 | T178 | 345 | done | Release workflow — use RELEASE_TOKEN PAT to bypass branch protection | small | — |
 
