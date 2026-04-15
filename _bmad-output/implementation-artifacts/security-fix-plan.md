@@ -1,103 +1,95 @@
 # Security Fix Plan — py-identity-model
 
 **Created:** 2026-04-12
+**Updated:** 2026-04-14 (re-audit results)
 **Tracking issue:** #300 (umbrella)
-**Status:** In progress
+**Status:** Phase 1 complete, Phase 2 open
 
 ## Overview
 
-12 open security findings from adversarial review, grouped into 6 implementation batches to minimize CI wait time. Small, related fixes share a branch.
+The original adversarial review (2026-04-12) identified 12 findings. Fixes were implemented across PRs #364–#372. A re-audit (2026-04-14) verified 10 of 12 fixes and identified 8 new findings (3 high, 5 medium).
 
-## Batches
+## Phase 1 — Original Findings (COMPLETE)
 
-### Batch 1 — Caching overhaul
-**Branch:** `fix/cache-overhaul`
-**Issues:** #351, #352
-**Scope:** Remove all caches except HTTP-header-aware discovery and JWKS caches.
+All 6 batches merged via PRs #364–#372. Status:
 
-Changes:
-- Remove `_decode_jwt_cached` lru_cache (PR #363 in progress)
-- Remove `_get_pyjwk` lru_cache
-- Replace discovery `lru_cache`/`alru_cache` with TTL-based cache respecting `Cache-Control` headers
-- Add `cache_control` field to `DiscoveryDocumentResponse`
-- Generalize `jwks_cache.py` into shared `http_cache.py` module
-- Validate `disco_doc_address` is not None before cache lookup
-- Add cross-user cache pollution test (50+ distinct subs)
-- Add TTL expiry regression tests
+| Batch | Issues | PRs | Status |
+|-------|--------|-----|--------|
+| 1 — Caching overhaul | #351, #352 | #364 | Done |
+| 2 — Options allowlist | #347 | #366 | Done |
+| 3 — HTTP hardening | #350, #354, #355, #356 | #367 | Done |
+| 4 — Algorithm confusion | #349 | #370 | Done |
+| 5 — Resource limits + concurrency | #353, #357 | #371 | Done |
+| 6 — CodeQL harness | #360 | #372 | Done |
 
-**After this batch, the only caches are:**
-| Cache | TTL Source | Eviction |
-|-------|-----------|----------|
-| Discovery | Cache-Control max-age > `DISCO_CACHE_TTL` env > 3600s default | TTL-based |
-| JWKS | Cache-Control max-age > `JWKS_CACHE_TTL` env > 86400s default | TTL-based |
+### Re-Audit Verification
 
-### Batch 2 — Options allowlist (critical)
-**Branch:** `fix/options-allowlist`
-**Issues:** #347
-**Scope:** Prevent callers from disabling signature verification or expiration checks via options pass-through.
+| Finding | Fix Status | Notes |
+|---------|-----------|-------|
+| C-1 (#347) Options bypass | **FIXED** | `_sanitize_options` blocklist effective |
+| C-2 (#348) Unbounded caching | **FIXED** | TTL-based caching with kid-miss refresh |
+| H-1 (#349) Algorithm confusion | **PARTIAL** | Main path fixed; `get_public_key_from_jwk` still mutates → #375 |
+| H-2 (#350) SSRF redirects | **FIXED** | `follow_redirects=False` on all 4 clients + `check_no_redirect()` |
+| H-3 (#351) None cache poisoning | **FIXED** | Early rejection in sync/async |
+| H-4 (#352) Stale decode cache | **FIXED** | Decode caching removed entirely |
+| M-1 (#353) JWKS size limit | **NOT FIXED** | No size limit implemented → #376 |
+| M-2 (#354) Endpoint authority | **FIXED** | `_validate_endpoint_authority` validates all endpoints |
+| M-3 (#355) JWKS Content-Type | **FIXED** (caveat) | Missing Content-Type is warning only → #379 |
+| M-4 (#356) HTTPS enforcement | **FIXED** | Strict by default via `DiscoveryPolicy` |
+| M-5 (#357) Async cleanup race | **PARTIAL** | Safe in event loop; TOCTOU with test reset → #382 |
+| CodeQL (#360) | **FIXED** | All 7 alerts resolved |
 
-Changes:
-- Allowlist permitted `options` keys: `require`, `verify_aud`, `verify_iss`
-- Block: `verify_signature`, `verify_exp`, `verify_nbf` — always enforced
-- Raise `ConfigurationException` if blocked keys are passed
-- Audit `TokenValidationConfig` for unchecked pass-through
+## Phase 2 — Re-Audit Findings (OPEN)
 
-**Breaking change:** Callers passing `verify_signature: False` will get an error. Intentional — they have a vulnerability.
+8 new findings from the 2026-04-14 re-audit.
 
-### Batch 3 — HTTP security hardening
-**Branch:** `fix/http-hardening`
-**Issues:** #350, #354, #355, #356
-**Scope:** Harden all HTTP interactions — redirects, authority, content-type, HTTPS enforcement.
+### Batch 7 — Unfixed residuals (high priority)
+
+**Issues:** #375, #376
+**Scope:** Two original findings that were closed without full remediation.
 
 Changes:
-- Disable `follow_redirects` on all httpx clients (#350)
-- Derive authority from issuer when `policy.authority` not set (#354)
-- Validate JWKS `Content-Type` header (#355)
-- Remove HTTP URL fallback, require HTTPS by default (#356)
-- Add `allow_http` opt-in for development/localhost
+- **#375**: Deprecate `get_public_key_from_jwk` — add `DeprecationWarning`, remove from `__all__`, stop mutating `key.alg` from JWT header
+- **#376**: Add JWKS response size limit — check Content-Length, cap at 512KB, limit to 100 keys max
 
-### Batch 4 — Algorithm confusion
-**Branch:** `fix/algorithm-confusion`
-**Issues:** #349
-**Scope:** Enforce key type / algorithm consistency.
+### Batch 8 — API correctness
+
+**Issues:** #377
+**Scope:** Dead `require_https` field on `TokenValidationConfig`.
 
 Changes:
-- Validate `kty` matches `alg` family (RSA→RS/PS, EC→ES)
-- Check key's `alg` field matches JWT header `alg`
-- Audit `find_key_by_kid` for same issue
+- **#377**: Either wire `require_https` through to `DiscoveryPolicy` in `_discover_and_resolve_key`, or deprecate the field
 
-### Batch 5 — Resource limits + concurrency
-**Branch:** `fix/resource-limits`
-**Issues:** #353, #357
-**Scope:** Add response size limits and fix async race condition.
+### Batch 9 — Defense-in-depth hardening
+
+**Issues:** #378, #379, #380
+**Scope:** Cache stampede prevention, stricter Content-Type handling, JWKS scheme validation.
 
 Changes:
-- Add configurable max JWKS response size (default 512KB) (#353)
-- Fix async cleanup lock race in `aio/http_client.py` (#357)
+- **#378**: Add single-flight cache refresh to prevent thundering herd on TTL expiry
+- **#379**: Reject JWKS responses with missing Content-Type (or add `KeyError` guard on `response_json["keys"]`)
+- **#380**: Add pre-flight URL scheme validation to `get_jwks()` matching the discovery pattern
 
-### Batch 6 — CodeQL harness fixes
-**Branch:** `fix/codeql-harness`
-**Issues:** #360
-**Scope:** Fix 7 CodeQL alerts in conformance harness (not library code).
+### Batch 10 — Harness + test-only fixes
+
+**Issues:** #381, #382
+**Scope:** Conformance harness XSS and async test cleanup.
 
 Changes:
-- Remove stack trace exposure in HTTP error responses
-- Redact sensitive data from log statements
+- **#381**: Escape all interpolated values in conformance harness HTML responses with `html.escape()`
+- **#382**: Eagerly initialize async cleanup lock at module load time, or guard `_reset` against concurrent close
 
-## Execution Order
+## Execution Order (Phase 2)
 
-1. **Batch 1** (caching) — foundational; other batches touch HTTP/validation code that may interact with caching
-2. **Batch 2** (#347 critical) — highest severity, standalone
-3. **Batch 3** (HTTP hardening) — 4 related issues, single branch
-4. **Batch 4** (algorithm) — standalone, lower dependency
-5. **Batch 5** (limits + concurrency) — independent
-6. **Batch 6** (CodeQL) — lowest priority, harness-only
+1. **Batch 7** (residuals) — highest priority, two unfixed findings
+2. **Batch 8** (API correctness) — standalone
+3. **Batch 9** (hardening) — 3 related defense-in-depth improvements
+4. **Batch 10** (harness/test) — lowest priority
 
-Batches 2-6 can be parallelized after Batch 1 lands since they're independent. Batch 1 goes first because it changes caching infrastructure that other batches' tests may depend on.
+Batches 7-10 are independent and can be parallelized.
 
 ## PR Strategy
 
-- Each batch = one PR (except Batch 1 which supersedes PR #363)
-- Small changes within a batch share a single commit where possible
-- Each PR references the relevant issue numbers with `Closes #NNN`
-- All PRs target `main` with conventional commit titles
+- Each batch = one PR with conventional commit title
+- Each PR references issue numbers with `Closes #NNN`
+- All PRs target `main`
