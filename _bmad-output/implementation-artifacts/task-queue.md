@@ -31,6 +31,21 @@ All prior phases complete (T14-T26, T64-T75, T80-T84, T90-T98, T117-T119 — all
 
 All feature tasks (T32-T47) complete. All review fixes (T101-T116) complete — all 16 PRs #211-#237 merged 2026-03-30. Integration test chain (T120-T125) complete.
 
+### Security Re-Audit Fixes (Phase 2)
+
+Re-audit on 2026-04-14 verified Phase 1 fixes (PRs #364-#372) and found 8 new findings. See `security-fix-plan.md` for batch grouping.
+
+| ID | Issue | Status | Description | Size | Depends |
+|----|-------|--------|-------------|------|---------|
+| T200 | 375 | pending | Deprecate `get_public_key_from_jwk` — stop mutating shared JWKS keys, add DeprecationWarning | small | — |
+| T201 | 376 | pending | Add JWKS response size limit — Content-Length check, max 512KB, max 100 keys | small | — |
+| T202 | 377 | pending | Fix dead `require_https` field — wire to DiscoveryPolicy or deprecate | small | — |
+| T203 | 378 | pending | Prevent cache stampede — single-flight refresh on TTL expiry | medium | — |
+| T204 | 379 | pending | Reject JWKS with missing Content-Type + guard `response_json["keys"]` KeyError | small | — |
+| T205 | 380 | pending | Add pre-flight URL scheme validation to `get_jwks()` | small | — |
+| T206 | 381 | pending | Escape HTML in conformance harness error responses | small | — |
+| T207 | 382 | pending | Fix async cleanup lock TOCTOU — eagerly initialize lock | small | — |
+
 ### OIDC Conformance Certification (TOP PRIORITY)
 
 Target: OpenID Foundation Basic RP + Config RP certification. See `docs/oidc-certification-analysis.md` for full gap analysis.
