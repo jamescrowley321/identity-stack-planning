@@ -16,8 +16,8 @@ Tasks are independent — no dependency chain. Each creates its own branch and P
 
 | Task | Issue | Branch | Description | Status |
 |------|-------|--------|-------------|--------|
-| T200 | 375 | fix/deprecate-get-public-key-from-jwk | Deprecate `get_public_key_from_jwk` — stop mutating shared JWKS keys, add DeprecationWarning, remove from `__all__` | pending |
-| T201 | 376 | fix/jwks-response-size-limit | Add JWKS response size limit — Content-Length check (512KB), max 100 keys, guard `response_json["keys"]` KeyError | pending |
+| T200 | 375 | fix/deprecate-get-public-key-from-jwk | Deprecate `get_public_key_from_jwk` — stop mutating shared JWKS keys, add DeprecationWarning, remove from `__all__` | done |
+| T201 | 376 | fix/jwks-response-size-limit | Add JWKS response size limit — Content-Length check (512KB), max 100 keys, guard `response_json["keys"]` KeyError | done |
 | T202 | 377 | fix/require-https-dead-code | Fix dead `require_https` field — wire to DiscoveryPolicy in `_discover_and_resolve_key` or deprecate | pending |
 | T203 | 378 | fix/cache-stampede | Prevent cache stampede — single-flight refresh on TTL expiry (fetch-under-lock or stale-while-revalidate) | pending |
 | T204 | 379 | fix/jwks-missing-content-type | Reject JWKS with missing Content-Type + guard `response_json["keys"]` KeyError with descriptive error | pending |
