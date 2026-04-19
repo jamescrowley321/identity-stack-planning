@@ -1,0 +1,183 @@
+/* Identity Stack Design System — Colors & Type Tokens
+ * Source: frontend/src/index.css (shadcn/ui radix-nova style)
+ * Base: Geist Variable + Geist Mono via @fontsource-variable
+ * Brand accent: purple (promoted from the dark-mode sidebar token to a full primary scale)
+ *
+ * Density update (v2): base 15px / 1.55 line-height, 40px controls, looser paddings —
+ * the earlier 13.5–14px / 32px-control scale was too tight for an admin dashboard.
+ */
+
+/* Type: Geist + Geist Mono, both open source (SIL OFL 1.1), served by Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap");
+
+:root {
+  /* ——— Type system ——— */
+  --font-sans: "Geist", "Geist Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-sans);
+  --font-mono: "Geist Mono", "Geist Mono Variable", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Type scale — bumped one step up across the board for admin readability */
+  --text-xs:   0.8125rem;  /* 13px — metadata, badges, table IDs */
+  --text-sm:   0.9375rem;  /* 15px — body (new default) */
+  --text-base: 1rem;       /* 16px — card titles */
+  --text-lg:   1.125rem;   /* 18px */
+  --text-xl:   1.375rem;   /* 22px */
+  --text-2xl:  1.75rem;    /* 28px — page titles */
+  --text-3xl:  2.25rem;    /* 36px — login hero */
+
+  /* ——— Brand accent: Purple scale — SOFTER, pastel-leaning ——— */
+  /* Chroma dialed back ~35% and lightness lifted on mid-tones so the brand reads
+   * as lavender rather than a bold violet. Tuned in OKLCH for perceptual balance. */
+  --purple-50:  oklch(0.980 0.010 285);
+  --purple-100: oklch(0.955 0.022 285);
+  --purple-200: oklch(0.905 0.050 283);
+  --purple-300: oklch(0.820 0.090 281);
+  --purple-400: oklch(0.735 0.130 279);
+  --purple-500: oklch(0.655 0.150 277);  /* ← brand (was 0.565 / 0.235) */
+  --purple-600: oklch(0.580 0.160 275);
+  --purple-700: oklch(0.495 0.145 272);
+  --purple-800: oklch(0.405 0.115 269);
+  --purple-900: oklch(0.325 0.085 267);
+
+  --brand:               var(--purple-500);
+  --brand-hover:         var(--purple-600);
+  --brand-foreground:    oklch(0.99 0 0);
+  --brand-soft:          oklch(0.970 0.018 285);
+  --brand-soft-foreground: var(--purple-700);
+
+  /* ——— Color tokens (light) ——— */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+
+  /* Primary = brand purple (was near-black) */
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-foreground);
+
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.52 0 0);      /* slightly darker for AA contrast on 15px */
+  --accent: var(--brand-soft);
+  --accent-foreground: var(--brand-soft-foreground);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.92 0 0);
+  --input: oklch(0.92 0 0);
+  --ring: var(--purple-400);
+
+  /* Surface ink — neutral near-black, used for text-heavy controls that should stay monochrome */
+  --ink: oklch(0.205 0 0);
+  --ink-foreground: oklch(0.985 0 0);
+
+  /* Chart ramp — now purple-tinted neutrals, not pure gray */
+  --chart-1: oklch(0.87 0.020 285);
+  --chart-2: oklch(0.72 0.060 283);
+  --chart-3: oklch(0.565 0.235 276);
+  --chart-4: oklch(0.410 0.215 270);
+  --chart-5: oklch(0.270 0.130 266);
+
+  /* Sidebar — lightly purple-tinted off-white + purple active state */
+  --sidebar: oklch(0.985 0.005 285);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: var(--brand-foreground);
+  --sidebar-accent: var(--brand-soft);
+  --sidebar-accent-foreground: var(--brand-soft-foreground);
+  --sidebar-border: oklch(0.92 0.005 285);
+  --sidebar-ring: var(--purple-400);
+
+  /* ——— Radius ——— */
+  --radius: 0.625rem;
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* ——— Spacing — 4px grid ——— */
+  --space-1: 0.25rem;  /* 4  */
+  --space-2: 0.5rem;   /* 8  */
+  --space-3: 0.75rem;  /* 12 */
+  --space-4: 1rem;     /* 16 */
+  --space-5: 1.25rem;  /* 20 */
+  --space-6: 1.5rem;   /* 24 */
+  --space-8: 2rem;     /* 32 */
+  --space-10: 2.5rem;  /* 40 */
+  --space-12: 3rem;    /* 48 */
+
+  /* Control / layout heights (bumped) */
+  --control-h-sm: 32px;
+  --control-h:    40px;   /* was 32 */
+  --control-h-lg: 48px;
+  --header-h:     60px;   /* was 48 */
+  --page-pad:     32px;   /* was 24 */
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+
+  --primary: var(--purple-400);
+  --primary-foreground: oklch(0.15 0.02 270);
+
+  --secondary: oklch(0.255 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.255 0 0);
+  --muted-foreground: oklch(0.72 0 0);
+  --accent: oklch(0.30 0.06 278);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: var(--purple-400);
+
+  --ink: oklch(0.985 0 0);
+  --ink-foreground: oklch(0.205 0 0);
+
+  --brand: var(--purple-400);
+  --brand-hover: var(--purple-300);
+  --brand-foreground: oklch(0.15 0.02 270);
+  --brand-soft: oklch(0.30 0.055 278);
+  --brand-soft-foreground: oklch(0.985 0 0);
+
+  --chart-1: oklch(0.35 0.03 285);
+  --chart-2: oklch(0.50 0.12 278);
+  --chart-3: oklch(0.670 0.200 278);
+  --chart-4: oklch(0.790 0.140 280);
+  --chart-5: oklch(0.885 0.080 283);
+
+  --sidebar: oklch(0.18 0.01 270);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: var(--purple-400);
+  --sidebar-primary-foreground: oklch(0.15 0.02 270);
+  --sidebar-accent: oklch(0.30 0.08 278);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: var(--purple-400);
+}
+
+/* ——— Semantic base ——— */
+html, body {
+  font-family: var(--font-sans); color: var(--foreground); background: var(--background);
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+}
+body { font-size: var(--text-sm); line-height: 1.55; }
+
+h1, .h1 { font-family: var(--font-heading); font-size: var(--text-2xl); font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; margin: 0; }
+h2, .h2 { font-family: var(--font-heading); font-size: var(--text-xl); font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; margin: 0; }
+h3, .h3 { font-family: var(--font-heading); font-size: var(--text-lg); font-weight: 500; line-height: 1.35; margin: 0; }
+h4, .h4 { font-family: var(--font-heading); font-size: var(--text-base); font-weight: 500; line-height: 1.4; margin: 0; }
+p  { font-size: var(--text-sm); line-height: 1.55; }
+small, .small { font-size: var(--text-xs); color: var(--muted-foreground); }
+code, .mono { font-family: var(--font-mono); font-size: 0.88em; }
+.label { font-size: var(--text-sm); font-weight: 500; line-height: 1; }
+.muted { color: var(--muted-foreground); }

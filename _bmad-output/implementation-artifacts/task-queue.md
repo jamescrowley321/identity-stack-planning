@@ -13,7 +13,67 @@ All tasks complete except blocked/wontfix. Releases v1.1.0-v1.1.4 published.
 
 ## identity-stack
 
-All prior phases complete (T14-T26, T64-T75, T80-T84, T90-T98, T117-T119 — all done/merged).
+All prior phases complete (T14-T26, T64-T75, T80-T84, T90-T98, T117-T119 — all done/merged). PRD 5 (Canonical Identity) shipped 2026-04-09 — all 19 stories merged. PRD 2 (API Gateway) shipped 2026-04-12.
+
+### Design System Integration (TOP PRIORITY)
+
+Full breakdown: `epics-design-system.md`. Ralph prompt: `ralph-prompts/design-system.md`.
+
+#### Epic DS-1: Design Token Migration
+
+| ID | Status | Description | Size | Depends |
+|----|--------|-------------|------|---------|
+| T210 | pending | Purple brand color scale + semantic tokens in index.css | small | — |
+| T211 | pending | Density increase — control heights + button sizes | small | T210 |
+| T212 | pending | Header + page layout density (60px header, 32px padding) | medium | T211 |
+| T213 | pending | Typography scale + base styles (15px body, semantic h1-h4) | small | T210 |
+
+#### Epic DS-2: Component & Layout Updates
+
+| ID | Status | Description | Size | Depends |
+|----|--------|-------------|------|---------|
+| T214 | pending | Badge sync-state variants (success, warning) | small | T210 |
+| T215 | pending | Responsive breakpoints (useBreakpoint hook, tablet 1024px) | medium | T210 |
+| T216 | pending | Sidebar nav items for new pages (Platform group) | small | T210 |
+| T217 | pending | Update existing E2E tests for density changes | small | T212 |
+
+#### Epic DS-3: New Shared Components
+
+| ID | Status | Description | Size | Depends |
+|----|--------|-------------|------|---------|
+| T218 | pending | KPI Strip component (4-col metric cards) | small | T210 |
+| T219 | pending | Provider Glyph component (8 provider color schemes) | small | T210 |
+| T220 | pending | Spark (inline sparkline bars) | small | T210 |
+| T221 | pending | Stream Row (monospace event log entry) | small | T210 |
+| T222 | pending | Sync Flow Diagram (3-col topology) | small | T219 |
+| T223 | pending | Matrix Grid (role x permission checkboxes) | medium | T210 |
+| T224 | pending | Audit Row (4-col log entry) | small | T210 |
+| T225 | pending | Confidence Score (color-gradient percentage) | small | T210 |
+
+#### Epic DS-4: PRD 5 Admin Pages
+
+| ID | Status | Description | Size | Depends |
+|----|--------|-------------|------|---------|
+| T226 | pending | Backend endpoints (sync status, events, provisional users) | large | — |
+| T227 | pending | Providers page — list + KPI strip | medium | T218, T219, T226 |
+| T228 | pending | Providers page — detail drill-down (tabs) | medium | T227 |
+| T229 | pending | Sync Dashboard — flow variant + event stream | medium | T221, T222, T226 |
+| T230 | pending | Sync Dashboard — matrix + conflict resolution | medium | T229, T223 |
+| T231 | pending | Inbound Events — live tail | medium | T219, T221, T226 |
+| T232 | pending | Inbound Events — polling + detail expansion | small | T231 |
+| T233 | pending | Identity Correlation — canonical detail | medium | T219, T224 |
+| T234 | pending | Identity Correlation — conflict resolution | medium | T233 |
+| T235 | pending | Provisional Users — queue | medium | T218, T219, T225, T226 |
+| T236 | pending | Provisional Users — merge/create/reject actions | medium | T235 |
+
+#### Epic DS-5: Integration Testing
+
+| ID | Status | Description | Size | Depends |
+|----|--------|-------------|------|---------|
+| T237 | pending | Unit tests for all DS-3 components (>80% coverage) | medium | T218-T225 |
+| T238 | pending | E2E Playwright tests for 5 new pages | large | T226-T236 |
+| T239 | pending | Responsive E2E tests (tablet + mobile viewports) | medium | T215 |
+| T240 | pending | Visual regression baseline snapshots | medium | all |
 
 ### Pending Features
 

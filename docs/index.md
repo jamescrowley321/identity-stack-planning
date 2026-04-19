@@ -27,6 +27,7 @@ Start with the **[Roadmap](roadmap.md)** to understand the 6 PRDs and their sequ
 - **[PRD 3: Multi-Provider Test](../_bmad-output/planning-artifacts/prd-multi-provider-test.md)** — node-oidc-provider fixture.
 - **[PRD 4: Multi-IdP Demo](../_bmad-output/planning-artifacts/prd-multi-idp-demo.md)** — Descope + Ory + cloud IdPs capstone.
 - **[PRD 5: Canonical Identity](../_bmad-output/planning-artifacts/prd-canonical-identity.md)** — Postgres-backed domain model.
+- **[PRD 5b: Design System & Admin Frontend](../_bmad-output/planning-artifacts/epics-design-system.md)** — Purple brand, density, 8 components, 5 admin pages, responsive. [Design system reference](../_bmad-output/planning-artifacts/design-system/).
 - **[PRD 6: identity-model Monorepo (Brief)](../_bmad-output/planning-artifacts/product-brief-identity-model-monorepo.md)** — Multi-language OIDC/OAuth2 library.
 - **[Architecture docs](../_bmad-output/planning-artifacts/)** — Per-PRD architecture decisions (`architecture-*.md`).
 - **[Epic breakdowns](../_bmad-output/planning-artifacts/)** — Per-PRD story decompositions (`epics-*.md`, `epics/epic-*.md`).
