@@ -16,6 +16,7 @@ Start with the **[Roadmap](roadmap.md)** to understand the 6 PRDs and their sequ
 
 ## Identity & Auth Domain Knowledge
 
+- **[IdP RBAC Comparison](idp-rbac-comparison.md)** — Why application-owned RBAC beats IdP-provided: 9-provider analysis.
 - **[Descope Data Model](descope-data-model.md)** — Descope-to-OAuth2/OIDC mapping: JWT claims (`dct`, `tenants`), grant types, session management, cross-repo resources.
 - **[OIDC Certification Analysis](oidc-certification-analysis.md)** — py-identity-model OpenID certification readiness: coverage gaps, conformance harness, phased plan.
 

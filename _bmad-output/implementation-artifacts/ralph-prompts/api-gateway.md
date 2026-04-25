@@ -67,7 +67,7 @@ Read `~/repos/auth/identity-stack/.claude/task-state-gateway.md`.
 - **phase is `complete`** → Update queue status to `done`, clean up worktree, delete task-state, pick next
 - **Any other phase** → Read the phase file and execute it
 
-Phase order: `setup → analyze → implement → test → review → review-fix → pr → ci → complete`
+Phase order: `setup → analyze → implement → test → review → review-fix → pr → docs → ci → complete`
 
 ## Phase Instructions
 

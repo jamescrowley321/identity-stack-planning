@@ -28,7 +28,7 @@ Read `~/repos/auth/identity-stack/.claude/task-state.md`.
 - **phase is `complete`** → update this file (`pending` → `done`), clean up worktree, delete task-state.md, pick next story
 - **Any other phase** → read the phase file and execute it
 
-Phase order: `setup → analyze → implement → test → review → review-fix → pr → ci → complete`
+Phase order: `setup → analyze → implement → test → review → review-fix → pr → docs → ci → complete`
 
 ## Phase Instructions
 
