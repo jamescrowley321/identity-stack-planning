@@ -141,18 +141,14 @@ Capabilities are classified by cross-provider mapping feasibility (ADR-3):
 | **Tier 2: Translate** | Interface + provider-specific adapters | RBAC Roles/Permissions, Password Policy |
 | **Tier 3: Provider-Specific** | Don't abstract — too divergent | Multi-Tenancy, Flows/Orchestration, Connectors, JWTs |
 
-### Why Application-Owned RBAC
+### Two-Layer Authorization (RBAC + ReBAC)
 
-Every identity provider models RBAC differently — Descope uses first-class role/permission objects with tenant-scoped JWT claims, Auth0 requires custom Actions to surface permissions, Cognito offers only flat groups mapped to IAM roles, and Okta explicitly considers authorization out of scope. There is no portable RBAC standard across providers.
+Every identity provider models authorization differently, and none are portable. The reference architecture splits authorization into two layers:
 
-This is why RBAC lives at Tier 2 (Translate) rather than Tier 1 (Abstract), and why the canonical identity model owns RBAC at the application layer:
+- **RBAC in Postgres** — Roles, permissions, and tenant-scoped assignments owned by the application. Provider swap = zero RBAC migration.
+- **ReBAC proxied to Zanzibar engines** — Fine-grained resource relationships (Descope FGA, Ory Keto, OpenFGA) called through an abstraction layer. Swapping engines means changing one adapter.
 
-- **Provider swap = zero RBAC migration** — roles and permissions stay in Postgres
-- **Multi-IdP = unified authorization** — users from any provider get the same role model
-- **No JWT bloat** — roles resolved at the backend, not stuffed into provider-specific token claims
-- **Tenant-scoped by design** — user-tenant-role assignments are first-class, not bolted on
-
-IdPs handle authentication (login, MFA, sessions). The application handles authorization (roles, permissions, tenant scoping). See the [full IdP RBAC comparison](docs/idp-rbac-comparison.md) for a detailed analysis across 9 providers.
+This is a pragmatic middle ground — not the only valid approach. See the [full IdP authorization comparison](docs/idp-rbac-comparison.md) for RBAC and ReBAC analysis across 9 providers, including when simpler models make more sense.
 
 ### Canonical Identity Domain Model
 
@@ -303,7 +299,7 @@ Start with the [roadmap](docs/roadmap.md), then explore by topic:
 |----------|-------------|
 | **[Roadmap](docs/roadmap.md)** | PRD sequencing, dependencies, and implementation phases |
 | **[System Architecture](docs/system-architecture.md)** | C4 diagrams, ER models, request lifecycle, ADR index |
-| **[IdP RBAC Comparison](docs/idp-rbac-comparison.md)** | Why application-owned RBAC beats IdP-provided: 9-provider analysis |
+| **[IdP Authorization Comparison](docs/idp-rbac-comparison.md)** | RBAC and ReBAC across 9 providers: why the reference architecture owns RBAC and proxies ReBAC |
 | **[Ralph Loop Process](docs/ralph-loop-process.md)** | How autonomous execution works end-to-end |
 | **[Review Process](docs/review-process.md)** | Independent review agents and quality gates |
 | **[Glossary](docs/glossary.md)** | Definitions for all terms used across planning docs |
