@@ -22,7 +22,7 @@ Read `~/repos/auth/py-identity-model/.claude/task-state.md`.
 - **phase is `complete`** → Update status to `done` in this file, clean up worktree, delete state, pick next
 - **Any other phase** → Read phase file and execute
 
-Phase order: `setup → analyze → implement → test → review → review-fix → pr → ci → complete`
+Phase order: `setup → analyze → implement → test → review → review-fix → pr → docs → ci → complete`
 
 ## New Task Setup
 

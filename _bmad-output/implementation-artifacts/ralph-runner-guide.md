@@ -33,7 +33,7 @@ Each iteration completes one phase, persists state to `.claude/task-state.md`, a
 
 ## Phase Pipeline
 
-Feature: `setup → analyze → implement → test → review → review-fix → pr → ci → complete`
+Feature: `setup → analyze → implement → test → review → review-fix → pr → docs → ci → complete`
 Fix: `(setup →) fix → test → review → review-fix → ci → complete`
 
 Review phase spawns conditional subagents based on change scope (auth changes get all 5 reviewers; docs-only gets Acceptance only). Review-fix uses delta-only re-review (max 3 iterations).
