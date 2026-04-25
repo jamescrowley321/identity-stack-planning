@@ -12,6 +12,7 @@ This document is the master index for all planned work across the auth workspace
 | PRD 3 | Multi-Provider Test Infrastructure | py-identity-model, identity-stack | Planned | ~25 stories / 3 epics |
 | PRD 4 | Multi-IdP Gateway Demo | identity-stack | Planned | ~20 stories / 4 epics |
 | PRD 5 | Canonical Identity Domain Model | identity-stack | Done | 19 stories / 4 epics |
+| PRD 5b | Design System & Admin Frontend | identity-stack | Active | 31 stories / 5 epics |
 | PRD 6 | identity-model Multi-Language Monorepo | identity-model (new repo) | Planned | ~100 stories / 15 epics |
 
 ## Dependency Graph
@@ -24,6 +25,7 @@ graph TD
         PRD1["PRD 1: Secrets Pipeline"]
         PRD2["PRD 2: API Gateway"]
         PRD5["PRD 5: Canonical Identity"]
+        PRD5b["PRD 5b: Design System<br/>& Admin Frontend"]
         PRD6["PRD 6: identity-model Monorepo"]
     end
 
@@ -38,15 +40,18 @@ graph TD
     MAIN --> PRD1
     MAIN --> PRD2
     MAIN --> PRD5
+    PRD5 --> PRD5b
     MAIN --> PRD6
     PRD2 --> PRD3
     PRD3 --> PRD4
     PRD5 --> PRD4
+    PRD5b --> PRD4
     PRD3 --> PRD6
 
     style MAIN fill:#2d6a4f,color:#fff
     style PRD5 fill:#2d6a4f,color:#fff
     style PRD2 fill:#2d6a4f,color:#fff
+    style PRD5b fill:#6b21a8,color:#fff
     style PRD1 fill:#40916c,color:#fff
     style PRD3 fill:#52b788,color:#000
     style PRD4 fill:#95d5b2,color:#000
@@ -178,6 +183,30 @@ graph TD
 - Architecture: [`architecture-canonical-identity.md`](../_bmad-output/planning-artifacts/architecture-canonical-identity.md)
 - Epics: [`epics.md`](../_bmad-output/planning-artifacts/epics.md) (PRD 5 section)
 
+### PRD 5b — Design System & Admin Frontend
+
+**Problem:** PRD 5 shipped the canonical identity backend (Postgres store, sync adapters, provider management), but the frontend has no admin UI for these new capabilities. The frontend also uses a default neutral grayscale palette with no brand identity.
+
+**Solution:** Integrate a comprehensive design system (exported from Claude Design) that introduces a purple brand color, increased density for admin readability, 8 new reusable components (KPI strip, provider glyph, sparkline, stream row, sync flow, matrix grid, audit row, confidence score), responsive breakpoints (tablet + mobile), and 5 new admin pages for the PRD 5 backend.
+
+**New admin pages:**
+1. **Providers** — IdP registry with KPI strip, detail drill-down with tabs (Overview, Claim Mapping, Linked Users, Webhooks)
+2. **Sync Dashboard** — 3 layout variants (flow, matrix, stack) with event stream and conflict resolution
+3. **Inbound Events** — Live webhook/SCIM event tail with provider + verb filtering
+4. **Identity Correlation** — Canonical user detail with multi-link management and drift detection
+5. **Provisional Users** — Queue of unlinked runtime sign-ins with merge/create/reject actions
+
+**MVP scope:** Token migration, component library, all 5 pages, responsive layout, comprehensive tests.
+
+**Depends on:** PRD 5 backend (COMPLETE).
+
+**Artifacts:**
+- Design system reference: [`design-system/`](../_bmad-output/planning-artifacts/design-system/)
+- Epics: [`epics-design-system.md`](../_bmad-output/planning-artifacts/epics-design-system.md)
+- Ralph prompt: [`ralph-prompts/design-system.md`](../_bmad-output/implementation-artifacts/ralph-prompts/design-system.md)
+
+---
+
 ### PRD 6 — identity-model Multi-Language Monorepo
 
 **Problem:** The identity protocol client space outside of C#/.NET is fragmented. Developers in Python, Node/TypeScript, Go, and Rust must cobble together 3-4 libraries for basic OIDC/OAuth2 support. No ecosystem has a unified client library with modern RFC coverage (DPoP, PAR, RAR, Token Exchange).
@@ -217,19 +246,30 @@ The main PRD defines 22 high-level FRs. Here's how the specialized PRDs implemen
 - PRD 5: Canonical identity domain model (19 stories) — shipped 2026-04-09
 - PRD 2: API gateway (17 stories) — shipped 2026-04-11/12
 
-**Phase 1b — ACTIVE: py-identity-model certification + products + infra:**
-- OIDC RP Certification ([#242](https://github.com/jamescrowley321/py-identity-model/issues/242)) — certify py-identity-model as a library via OIDF, Basic + Config + Form Post profiles
+**Phase 1b — ACTIVE (two parallel tracks):**
+
+*Track 1: py-identity-model (certification + security + products)*
+- Security re-audit Phase 2 (T200-T207) — 8 findings from 2026-04-14 re-audit
+- OIDC RP Certification ([#242](https://github.com/jamescrowley321/py-identity-model/issues/242)) — Config RP (T145), fix cycle (T146), Implicit/Hybrid (T147)
 - Monorepo restructure ([#332](https://github.com/jamescrowley321/py-identity-model/issues/332)) — uv workspace with member packages
-- CLI tool ([#333](https://github.com/jamescrowley321/py-identity-model/issues/333)) — `py-identity-model-cli`, RFC 8252 loopback login (like `aws sso login`, `gh auth login`)
-- FastAPI middleware ([#334](https://github.com/jamescrowley321/py-identity-model/issues/334)) — `fastapi-identity-model`, drop-in OIDC auth for FastAPI apps
-- Makefile refactor ([#342](https://github.com/jamescrowley321/py-identity-model/issues/342)) — consolidate conformance targets
-- Conformance SSL cert sharing ([#343](https://github.com/jamescrowley321/py-identity-model/issues/343)) — Docker cert-init service for nginx/RP cert sharing
-- Secrets rotation automation ([#346](https://github.com/jamescrowley321/py-identity-model/issues/346)) — GH + HCP Vault Secrets sync, rotation scripts, monthly age-check workflow
+- CLI tool ([#333](https://github.com/jamescrowley321/py-identity-model/issues/333)) — `py-identity-model-cli`, RFC 8252 loopback login
+- FastAPI middleware ([#334](https://github.com/jamescrowley321/py-identity-model/issues/334)) — `fastapi-identity-model`, drop-in OIDC auth
+- Secrets rotation automation ([#346](https://github.com/jamescrowley321/py-identity-model/issues/346)) — GH + HCP Vault Secrets sync
+
+*Track 2: identity-stack (Design System Integration — TOP PRIORITY)*
+- PRD 5b: Design System & Admin Frontend — 31 stories / 5 epics
+  - DS-1: Token migration (purple brand, density, typography)
+  - DS-2: Component + layout updates (responsive, sidebar nav, badge variants)
+  - DS-3: 8 new shared components (KPI strip, provider glyph, sparkline, stream row, sync flow, matrix grid, audit row, confidence score)
+  - DS-4: 5 new admin pages (Providers, Sync Dashboard, Events, Identity Correlation, Provisional Users)
+  - DS-5: Integration testing (unit, E2E, responsive, visual regression)
+
+*These tracks are 100% independent — different repos, zero dependency.*
 
 **Phase 2 (parallel, after Phase 1b foundations):**
 - PRD 1: Infrastructure secrets pipeline
 - PRD 3: Multi-provider test infrastructure
 
 **Phase 3 (capstone, depends on Phase 2):**
-- PRD 4: Multi-IdP gateway demo (needs PRD 3 test infra + PRD 5 canonical identity)
+- PRD 4: Multi-IdP gateway demo (needs PRD 3 test infra + PRD 5 canonical identity + PRD 5b frontend)
 - PRD 6: identity-model multi-language monorepo (depends on Main PRD + PRD 3)
