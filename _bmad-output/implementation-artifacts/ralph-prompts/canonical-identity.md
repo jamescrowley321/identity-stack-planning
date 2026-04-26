@@ -28,7 +28,7 @@ Read `~/repos/auth/identity-stack/.claude/task-state.md`.
 - **phase is `complete`** → update this file (`pending` → `done`), clean up worktree, delete task-state.md, pick next story
 - **Any other phase** → read the phase file and execute it
 
-Phase order: `setup → analyze → implement → test → review → review-fix → pr → ci → complete`
+Phase order: `setup → analyze → implement → test → review → review-fix → pr → docs → ci → complete`
 
 ## Phase Instructions
 
@@ -61,7 +61,7 @@ If all stories are `done`: output `<promise>LOOP_COMPLETE</promise>`
 - ONE phase per iteration — never chain phases
 - Never skip phases, never commit to main
 - PRs are chained: each story branches from the previous story's branch
-- **Rebase merge only** — never squash merge (complete phase auto-merges)
+- **Rebase merge only** — never squash merge. Owner merges manually; ralph never calls `gh pr merge`
 - Follow existing code patterns
 - Review subagents MUST NOT read task-state.md or the plan
 - Use `gh` for GitHub ops, `git` for push/pull/fetch

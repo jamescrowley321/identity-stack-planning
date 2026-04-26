@@ -12,43 +12,36 @@ Build a provider-independent identity platform where swapping or adding an ident
 graph TB
     subgraph app["Identity Platform"]
         FE["React Frontend<br/>react-oidc-context + shadcn/ui"]
-        GW["Tyk API Gateway<br/>JWT validation, claim normalization"]
-        BE["FastAPI Backend<br/>Authorization + domain logic"]
-        DB["PostgreSQL<br/>Canonical identity store"]
+        GW["Tyk API Gateway<br/>JWT validation · claim normalization"]
+        BE["FastAPI Backend<br/>Canonical identity · authorization"]
+        DB[("PostgreSQL<br/>Canonical identity store")]
     end
 
     subgraph providers["Identity Providers"]
-        DESC["Descope<br/>(primary)"]
-        OIDC["node-oidc-provider<br/>(test fixture)"]
-        ORY["Ory Hydra<br/>(planned)"]
-        CLOUD["Cloud IdPs<br/>Google · Entra · Cognito"]
+        DESC["Descope"]
+        OIDC["node-oidc-provider"]
+        ORY["Ory Hydra"]
+        CLOUD["Entra · Cognito · Okta"]
     end
 
     subgraph infra["Infrastructure"]
-        TF["Terraform Provider<br/>Provisions Descope config"]
-        INF["Infisical<br/>Secrets management"]
+        TF["Terraform Provider<br/>Descope IaC"]
+        INF["Infisical<br/>Secrets"]
         HCP["HCP Terraform<br/>Remote state"]
     end
 
     subgraph planning["Planning & Orchestration"]
-        AP["identity-stack-planning<br/>PRDs, architecture, tasks"]
-        RALPH["Ralph Orchestrator<br/>Autonomous execution"]
-        REVIEW["Review Agents<br/>Independent adversarial review"]
+        AP["identity-stack-planning"]
+        RALPH["Ralph Orchestrator"]
+        REVIEW["Review Agents"]
     end
 
-    FE --> GW
-    GW --> BE
-    BE --> DB
-    GW -.-> DESC
-    GW -.-> OIDC
-    GW -.-> ORY
-    GW -.-> CLOUD
+    FE --> GW --> BE --> DB
+    GW -.-> DESC & OIDC & ORY & CLOUD
     BE --> DESC
-    TF --> DESC
-    TF --> HCP
+    TF --> DESC & HCP
     INF --> BE
-    AP --> RALPH
-    RALPH --> REVIEW
+    AP --> RALPH --> REVIEW
 ```
 
 ## The Repositories
@@ -56,6 +49,8 @@ graph TB
 ### py-identity-model
 
 Production OIDC/OAuth2.0 Python library with dual sync/async APIs. The token validation foundation for the entire platform.
+
+<details><summary>Protocol coverage</summary>
 
 | Category | Coverage |
 |----------|----------|
@@ -65,13 +60,16 @@ Production OIDC/OAuth2.0 Python library with dual sync/async APIs. The token val
 | Security | DPoP (RFC 9449), FAPI 2.0 Security Profile |
 | Advanced Requests | PAR (RFC 9126), JAR (RFC 9101) |
 
-**Status:** v2.17.1 published. All 16 protocol features shipped. 100+ merged PRs. Integration test harness deployed (node-oidc-provider). Review fix cycle complete (16 PRs re-reviewed and fixed).
+</details>
 
+**Status:** v2.17.1 published. All 16 protocol features shipped. 100+ merged PRs. Review fix cycle complete.
 **Repo:** [jamescrowley321/py-identity-model](https://github.com/jamescrowley321/py-identity-model)
 
 ### terraform-provider-descope
 
 Terraform provider for Descope (Go). Fork of `descope/terraform-provider-descope` extended with additional resources.
+
+<details><summary>Resources</summary>
 
 | Resource | Description |
 |----------|-------------|
@@ -88,13 +86,16 @@ Terraform provider for Descope (Go). Fork of `descope/terraform-provider-descope
 | `descope_list` | IP/text allow/deny lists |
 | `descope_project_export` (data source) | Project configuration export |
 
-**Status:** Published to Terraform Registry (v1.1.x). 15 resources, 4 data sources. 65+ merged PRs. All review fix cycles complete.
+</details>
 
+**Status:** Published to Terraform Registry (v1.1.x). 15 resources, 4 data sources. 65+ merged PRs. All review fix cycles complete.
 **Repo:** [jamescrowley321/terraform-provider-descope](https://github.com/jamescrowley321/terraform-provider-descope)
 
 ### identity-stack
 
 Full-stack SaaS starter with FastAPI backend, Vite/React frontend, and Terraform infrastructure.
+
+<details><summary>Features</summary>
 
 | Feature | Description |
 |---------|-------------|
@@ -109,27 +110,22 @@ Full-stack SaaS starter with FastAPI backend, Vite/React frontend, and Terraform
 | Health Checks | Descope API and database connectivity monitoring with retry logic |
 | UI Framework | shadcn/ui + Tailwind CSS v4, dark mode, responsive sidebar layout |
 
-**Status:** Core platform operational. 44+ merged PRs. All security hardening complete. UI migrated to shadcn/ui. Ready for PRD 5 (canonical identity domain model).
+</details>
 
+**Status:** Core platform operational. PRD 5 (canonical identity) complete. PRD 5b (design system + admin frontend) active. 44+ merged PRs.
 **Repo:** [jamescrowley321/identity-stack](https://github.com/jamescrowley321/identity-stack)
 
 ## The Roadmap
 
-Six PRDs define the platform evolution. See [docs/roadmap.md](docs/roadmap.md) for full details, sequencing, and cross-PRD dependencies.
+Six PRDs define the platform evolution. See [docs/roadmap.md](docs/roadmap.md) for full details and cross-PRD dependencies.
 
-**Current focus:**
-- **PRD 5** — Canonical identity domain model: Postgres-backed source of truth with 8 SCIM-aligned tables, write-through sync to Descope, webhook inbound sync, multi-IdP identity linking. 4 epics, 19 stories. [Ralph loop ready](docs/ralph-loop-process.md).
-- **Main PRD** — py-identity-model integration tests against live OIDC provider (node-oidc-provider).
+**Active:**
+- **PRD 5** (Done) — Canonical identity domain model: Postgres-backed source of truth with 8 SCIM-aligned tables, write-through sync to Descope, webhook inbound sync, multi-IdP identity linking.
+- **PRD 5b** (Active) — Design system & admin frontend: purple brand tokens, density system, 8 new components, 5 admin pages, responsive layout. Ralph loop running.
 
-**Next:**
-- **PRD 1** — Reduce N scattered `.env` secrets to 2 bootstrap credentials via Infisical + HCP Terraform
-- **PRD 2** — Tyk API gateway with dual deployment modes (standalone vs gateway), offloading JWT validation and rate limiting
+**Next:** PRD 1 (secrets pipeline), PRD 3 (multi-provider test infra)
 
-**Future:**
-- **PRD 6** — Transform py-identity-model into a multi-language OIDC/OAuth2 client library monorepo (Python, Node/TypeScript, Go, Rust). 15 epics, ~100 stories. See [product brief](_bmad-output/planning-artifacts/product-brief-identity-model-monorepo.md) and [competitive analysis](_bmad-output/planning-artifacts/competitive-analysis-identity-model.md).
-
-**Capstone:**
-- **PRD 4** — User authenticates with Descope, Ory, or a cloud IdP. Tyk normalizes divergent claims. Backend operates on canonical identity without knowing the provider.
+**Capstone:** PRD 4 (multi-IdP demo) — user authenticates with any provider, gateway normalizes claims, backend operates on canonical identity.
 
 ## Architecture
 
@@ -137,27 +133,22 @@ See [docs/system-architecture.md](docs/system-architecture.md) for the full tech
 
 ### Provider Abstraction Tiers
 
-Capabilities are classified by cross-provider mapping feasibility (see ADR-3):
+Capabilities are classified by cross-provider mapping feasibility (ADR-3):
 
-```
-+------------------------------------------------------------------+
-|                     Tier 1: Abstract                              |
-|  (similar shape across providers — common interface)              |
-|                                                                   |
-|   User CRUD    ReBAC/Authz    SSO/Federation    Session Mgmt     |
-|   M2M Keys     Token Validation                                  |
-+------------------------------------------------------------------+
-|                     Tier 2: Translate                             |
-|  (interface + provider-specific adapters)                         |
-|                                                                   |
-|   RBAC Roles/Permissions         Password Policy                 |
-+------------------------------------------------------------------+
-|                     Tier 3: Provider-Specific                     |
-|  (don't abstract — too divergent)                                |
-|                                                                   |
-|   Multi-Tenancy    Flows/Orchestration    Connectors    JWTs     |
-+------------------------------------------------------------------+
-```
+| Tier | Strategy | Capabilities |
+|------|----------|-------------|
+| **Tier 1: Abstract** | Common interface across providers | User CRUD, ReBAC/Authz, SSO/Federation, Session Mgmt, M2M Keys, Token Validation |
+| **Tier 2: Translate** | Interface + provider-specific adapters | RBAC Roles/Permissions, Password Policy |
+| **Tier 3: Provider-Specific** | Don't abstract — too divergent | Multi-Tenancy, Flows/Orchestration, Connectors, JWTs |
+
+### Two-Layer Authorization (RBAC + ReBAC)
+
+Every identity provider models authorization differently, and none are portable. The reference architecture splits authorization into two layers:
+
+- **RBAC in Postgres** — Roles, permissions, and tenant-scoped assignments owned by the application. Provider swap = zero RBAC migration.
+- **ReBAC proxied to Zanzibar engines** — Fine-grained resource relationships (Descope FGA, Ory Keto, OpenFGA) called through an abstraction layer. Swapping engines means changing one adapter.
+
+This is a pragmatic middle ground — not the only valid approach. See the [full IdP authorization comparison](docs/idp-rbac-comparison.md) for RBAC and ReBAC analysis across 9 providers, including when simpler models make more sense.
 
 ### Canonical Identity Domain Model
 
@@ -181,54 +172,29 @@ erDiagram
 
 ### Two-Layer Authorization Model (RBAC + ReBAC)
 
-The platform combines role-based and relationship-based access control, each at its natural layer:
+The platform combines role-based and relationship-based access control, each at its natural layer (ADR-2):
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  RBAC Layer (Canonical Postgres)                            │
-│  "Who are you and what role do you have in this tenant?"    │
-│                                                             │
-│  users ──→ user_tenant_roles ──→ roles ──→ permissions      │
-│  Enforced by: require_role() / require_permission()         │
-│  Tenant isolation: repository-level WHERE tenant_id = ?     │
-└─────────────────────────────────────────────────────────────┘
-                          +
-┌─────────────────────────────────────────────────────────────┐
-│  ReBAC/FGA Layer (Descope FGA — proxied, not owned)         │
-│  "What is your relationship to this specific resource?"     │
-│                                                             │
-│  Schema:  type document                                     │
-│             relation owner: user                            │
-│             relation editor: user                           │
-│             relation viewer: user                           │
-│             permission can_view: viewer | editor | owner    │
-│             permission can_edit: editor | owner             │
-│             permission can_delete: owner                    │
-│                                                             │
-│  Enforced by: require_fga("document", "can_view")           │
-│  Tenant isolation: resource_id prefixed with tenant_id      │
-└─────────────────────────────────────────────────────────────┘
-```
+| Layer | Question | Data Store | Enforcement | Tenant Isolation |
+|-------|----------|-----------|-------------|-----------------|
+| **RBAC** | Who are you, what role in this tenant? | Canonical Postgres | `require_role()` / `require_permission()` | `WHERE tenant_id = ?` |
+| **ReBAC/FGA** | What is your relationship to this resource? | Descope FGA (proxied, not owned) | `require_fga("document", "can_view")` | Resource ID prefixed with tenant ID |
 
-**Why two layers (ADR-2):** RBAC handles identity primitives (who you are, your role). FGA handles resource access (your relationship to a specific document). FGA relation tuples stay in provider engines (Descope FGA, Ory Keto) — they're purpose-built for graph evaluation at scale (Zanzibar architecture). The canonical DB owns RBAC; FGA is proxied, never stored locally. Both layers are fail-closed — any authorization check error results in denial, never a grant.
+RBAC handles identity primitives (who you are, your role). FGA handles resource access (your relationship to a specific document). FGA relation tuples stay in provider engines (Descope FGA, Ory Keto) — they're purpose-built for graph evaluation at scale (Zanzibar architecture). The canonical DB owns RBAC; FGA is proxied, never stored locally. Both layers are fail-closed.
 
 ### Data Flow
 
-```
-terraform-provider-descope            py-identity-model
-  (provisions Descope infra)            (validates tokens at runtime)
-         |                                       |
-         |  roles, permissions,                  |  OIDC discovery, JWKS,
-         |  tenants, SSO, keys                   |  JWT decode & validate
-         v                                       v
-                    identity-stack
-         +--------------------------------------------+
-         |  React frontend    |  FastAPI backend       |
-         |  react-oidc-context |  IdentityService      |
-         |  OAuth2 code flow  |  → PostgreSQL          |
-         |  Descope hosted    |  → DescopeSyncAdapter  |
-         |  login             |  → py-identity-model   |
-         +--------------------------------------------+
+```mermaid
+graph TB
+    TFP["terraform-provider-descope<br/><small>provisions Descope infra:<br/>roles, permissions, tenants, SSO, keys</small>"]
+    PIM["py-identity-model<br/><small>validates tokens at runtime:<br/>OIDC discovery, JWKS, JWT decode</small>"]
+
+    subgraph IS["identity-stack"]
+        FE["React frontend<br/><small>react-oidc-context · OAuth2 code flow<br/>Descope hosted login</small>"]
+        BE["FastAPI backend<br/><small>IdentityService → PostgreSQL<br/>→ DescopeSyncAdapter<br/>→ py-identity-model</small>"]
+    end
+
+    TFP --> IS
+    PIM --> IS
 ```
 
 ## Agentic Development
@@ -237,7 +203,9 @@ Three layers of AI-driven tooling plan, implement, and review code autonomously.
 
 ### Layer 1: BMAD-METHOD (Planning)
 
-[BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) v6 provides structured planning with 9 specialized agent personas:
+[BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) v6 provides structured planning with 9 specialized agent personas. Available as `/bmad-*` commands in Claude Code.
+
+<details><summary>Agent personas</summary>
 
 | Persona | Agent | Role |
 |---------|-------|------|
@@ -251,7 +219,7 @@ Three layers of AI-driven tooling plan, implement, and review code autonomously.
 | Paige | Tech Writer | Documentation, standards compliance |
 | Barry | Quick Flow Solo Dev | Rapid spec-to-implementation |
 
-Each persona has an activation protocol, interactive menu, and Claude Code skill integration. Available as `/bmad-*` commands.
+</details>
 
 ### Layer 2: Ralph Orchestrator (Execution)
 
@@ -259,9 +227,9 @@ Each persona has an activation protocol, interactive menu, and Claude Code skill
 
 ```mermaid
 flowchart LR
-    A[analyze] --> P[plan] --> AN[anchor] --> I[implement] --> T[test]
+    S[setup] --> A[analyze] --> I[implement] --> T[test]
     T --> R["review\n(blind · edge · acceptance · security)"]
-    R --> RF[review-fix] --> D[docs] --> CI[ci] --> DONE[complete]
+    R --> RF[review-fix] --> PR[pr] --> D[docs] --> CI[ci] --> DONE[complete]
 
     style R fill:#e76f51,color:#fff
 ```
@@ -293,7 +261,7 @@ Live status is tracked in the [task queue](_bmad-output/implementation-artifacts
 | Repo | Status | Links |
 |------|--------|-------|
 | terraform-provider-descope | Feature-complete. 1 blocked (SSO app requires enterprise license). | [PRs](https://github.com/jamescrowley321/terraform-provider-descope/pulls) · [Registry](https://registry.terraform.io/providers/jamescrowley321/descope/latest) |
-| identity-stack | Core platform operational. PRD 5 (canonical identity) active. | [PRs](https://github.com/jamescrowley321/identity-stack/pulls) |
+| identity-stack | PRD 5 complete. PRD 5b (design system) active — ralph loop running. | [PRs](https://github.com/jamescrowley321/identity-stack/pulls) |
 | py-identity-model | All 16 protocol features shipped. Review fix cycle complete. | [PRs](https://github.com/jamescrowley321/py-identity-model/pulls) · [PyPI](https://pypi.org/project/py-identity-model/) |
 
 ## Quick Start
@@ -331,55 +299,32 @@ Start with the [roadmap](docs/roadmap.md), then explore by topic:
 |----------|-------------|
 | **[Roadmap](docs/roadmap.md)** | PRD sequencing, dependencies, and implementation phases |
 | **[System Architecture](docs/system-architecture.md)** | C4 diagrams, ER models, request lifecycle, ADR index |
+| **[IdP Authorization Comparison](docs/idp-rbac-comparison.md)** | RBAC and ReBAC across 9 providers: why the reference architecture owns RBAC and proxies ReBAC |
 | **[Ralph Loop Process](docs/ralph-loop-process.md)** | How autonomous execution works end-to-end |
 | **[Review Process](docs/review-process.md)** | Independent review agents and quality gates |
 | **[Glossary](docs/glossary.md)** | Definitions for all terms used across planning docs |
 | [Descope Data Model](docs/descope-data-model.md) | OAuth 2.0/OIDC endpoint mapping, JWT claims, tenant model |
 | [OIDC Certification](docs/oidc-certification-analysis.md) | OpenID Foundation certification readiness for py-identity-model |
-| [Orchestrator Comparison](docs/ralph-planning/orchestrator-comparison.md) | Chief Wiggum vs Ralph Orchestrator analysis |
-| [BMAD Integration Plan](docs/ralph-planning/ralph-bmad-integration-plan.md) | Security agents, skills, and Ralph hat topology |
 
 ## Repository Structure
 
 ```
 identity-stack-planning/
-  _bmad/                          # BMAD-METHOD v6 installation
-    bmm/                          # Agents, workflows, config
+  _bmad/                          # BMAD-METHOD v6 (agents, workflows, config)
   _bmad-output/
-    planning-artifacts/           # PRDs, architecture docs, epics
-      prd.md                      # Main PRD — unified platform vision
-      prd-canonical-identity.md   # PRD 5 — canonical identity domain model
-      prd-api-gateway.md          # PRD 2 — Tyk API gateway
-      prd-infrastructure-secrets.md  # PRD 1 — HCP Terraform + Infisical
-      prd-multi-provider-test.md  # PRD 3 — node-oidc-provider test fixture
-      prd-multi-idp-demo.md       # PRD 4 — capstone multi-IdP demo
-      architecture*.md            # Per-PRD architecture + ADRs
-      epics*.md                   # Per-PRD story breakdowns (PRDs 1-5)
-      epics/                      # PRD 6 epic files (epic-0a through epic-15)
-      competitive-analysis-identity-model.md  # Cross-ecosystem library analysis
-      product-brief-identity-model-monorepo.md  # PRD 6 product brief
+    planning-artifacts/           # PRDs, architecture docs, epics, design system
     implementation-artifacts/
       task-queue.md               # Cross-repo task tracker
       sprint-plan.md              # Prioritized sprint plan
       ralph-prompts/              # Loop prompts for autonomous execution
-        review-agents/            # Independent reviewer templates
         phases/                   # Per-phase prompt templates
+        review-agents/            # Independent reviewer templates
       ralph-runner-guide.md       # Running and monitoring ralph loops
-    brainstorming/
-      research/                   # Technical research (Tyk, Infisical, HCP TF, node-oidc-provider)
-  docs/                           # Project knowledge base
-    roadmap.md                    # PRD sequencing and dependencies
-    system-architecture.md        # Unified technical overview
-    ralph-loop-process.md         # Autonomous execution explained
-    review-process.md             # Independent review agents
-    glossary.md                   # Unified terminology
-    descope-data-model.md         # Descope OAuth 2.0/OIDC mapping
-    oidc-certification-analysis.md
-    ralph-planning/               # Orchestrator analysis + integration plans
-  .claude/
-    skills/                       # 45 BMAD skills + ralph-status
+  docs/                           # Project knowledge base (see docs/index.md)
+  _archive/                       # Historical research and completed reviews
+  .claude/skills/                 # 45 BMAD skills + ralph-status
 ```
 
 ## License
 
-Planning artifacts only — no application code. See individual sibling repos for their licenses.
+Apache License 2.0. See [LICENSE](LICENSE) for full text.

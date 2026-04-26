@@ -51,9 +51,7 @@ Each ralph iteration completes exactly one phase, then exits. The next iteration
 
 ```mermaid
 flowchart TD
-    A[analyze] --> P[plan]
-    P --> AN[anchor]
-    AN --> I[implement]
+    A[analyze] --> I[implement]
     I --> T[test]
 
     subgraph review["Review Phase"]
@@ -65,11 +63,10 @@ flowchart TD
 
     T --> review
     review --> RF[review-fix]
-    RF --> D[docs]
+    RF --> PR[pr]
+    PR --> D[docs]
     D --> CI[ci]
-    CI --> CIF{passes?}
-    CIF -->|Yes| DONE[complete]
-    CIF -->|No| CIFIX[ci-fix] --> CI
+    CI --> DONE[complete]
 
     style RB fill:#e76f51,color:#fff
     style RE fill:#e76f51,color:#fff
@@ -80,9 +77,7 @@ flowchart TD
 
 | Phase | What Happens | Agent/Persona |
 |-------|-------------|---------------|
-| **analyze** | Read story spec, acceptance criteria, and related code. Identify scope and dependencies. | Winston (Architect) |
-| **plan** | Create detailed implementation plan: files to create/modify, AC-to-code mapping, edge cases. | Winston (Architect) |
-| **anchor** | Verify the plan matches actual file contents. Read every file mentioned in the plan and confirm the codebase state matches expectations. Halt on mismatch. | Amelia (Developer) |
+| **analyze** | Read story spec, acceptance criteria, and related code. Identify scope, plan implementation approach, and verify codebase state. | Winston (Architect) |
 | **implement** | Write the code according to the plan. Follow existing patterns, conventions, and CLAUDE.md instructions. | Amelia (Developer) |
 | **test** | Write and run tests. Unit tests for all new code, integration tests where applicable. All tests must pass with 80%+ coverage. | Quinn (QA) |
 | **review-blind** | Independent Blind Hunter review (diff only, fresh context). | Blind Hunter subagent |
@@ -90,9 +85,9 @@ flowchart TD
 | **review-acceptance** | Independent Acceptance Auditor review (spec + repo access, fresh context). | Acceptance Auditor subagent |
 | **review-security** | Independent Sentinel review (security lens, fresh context). Conditional Viper red team for auth changes. | Sentinel subagent |
 | **review-fix** | Triage all findings by priority. Fix blocking issues. Re-review. Max 3 iterations. | Amelia (Developer) |
+| **pr** | Push branch, create PR. | Automated |
 | **docs** | Update documentation if the story requires it. | Paige (Tech Writer) |
-| **ci** | Push branch, create PR, wait for CI checks. | Automated |
-| **ci-fix** | If CI fails: diagnose, fix, re-push, re-wait. | Amelia (Developer) |
+| **ci** | Wait for CI checks. If CI fails: diagnose, fix, re-push. | Amelia (Developer) |
 | **complete** | Mark task done in queue, delete task-state file, clean up worktree. | Automated |
 
 ### Fix Task Phases
@@ -103,14 +98,14 @@ Fix tasks (review finding fixes for existing PRs) use a shorter pipeline:
 checkout → fix → test → review-blind → review-edge → review-security → review-fix → ci → complete
 ```
 
-No analyze/plan/anchor phases — the fix scope is already defined by the review findings.
+No analyze phases — the fix scope is already defined by the review findings.
 
 ### Story Loop Phases
 
-Story-based loops (e.g., canonical identity) add worktree management:
+Story-based loops (e.g., canonical identity, design system) add worktree management:
 
 ```
-setup → analyze → anchor → implement → test → review → review-fix → pr → ci → ci-fix → complete
+setup → analyze → implement → test → review → review-fix → pr → docs → ci → complete
 ```
 
 The `setup` phase creates an isolated git worktree. The `complete` phase cleans it up.
@@ -282,10 +277,10 @@ Ralph loops running in different repos respect these dependencies — a task won
 Each ralph invocation runs **one phase per iteration**, then exits cleanly:
 
 ```
-Iteration 1:  Read queue → Pick task → analyze phase → write state → exit
-Iteration 2:  Read state → plan phase → update state → exit
-Iteration 3:  Read state → anchor phase → update state → exit
-Iteration 4:  Read state → implement phase → update state → exit
+Iteration 1:  Read queue → Pick task → setup phase → write state → exit
+Iteration 2:  Read state → analyze phase → update state → exit
+Iteration 3:  Read state → implement phase → update state → exit
+Iteration 4:  Read state → test phase → update state → exit
 ...
 Iteration N:  Read state → ci passes → mark done → delete state → exit
 Next task:    No state file → Read queue → Pick next task → repeat
