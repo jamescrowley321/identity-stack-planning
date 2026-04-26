@@ -61,7 +61,7 @@ If all stories are `done`: output `<promise>LOOP_COMPLETE</promise>`
 - ONE phase per iteration — never chain phases
 - Never skip phases, never commit to main
 - PRs are chained: each story branches from the previous story's branch
-- **Rebase merge only** — never squash merge (complete phase auto-merges)
+- **Rebase merge only** — never squash merge. Owner merges manually; ralph never calls `gh pr merge`
 - Follow existing code patterns
 - Review subagents MUST NOT read task-state.md or the plan
 - Use `gh` for GitHub ops, `git` for push/pull/fetch
