@@ -6,15 +6,15 @@ Independent PRs — each story branches from `main`, not from the previous story
 
 | Story | Task ID | Branch | Status |
 |-------|---------|--------|--------|
-| DS-1.1 | T210 | ds/tokens-purple-brand | pending |
-| DS-1.2 | T211 | ds/density-control-heights | pending |
-| DS-1.3 | T212 | ds/density-header-layout | pending |
-| DS-1.4 | T213 | ds/typography-scale | pending |
-| DS-2.1 | T214 | ds/badge-sync-variants | pending |
-| DS-2.2 | T215 | ds/responsive-breakpoints | pending |
-| DS-2.3 | T216 | ds/sidebar-nav-platform | pending |
+| DS-1.1 | T210 | ds/tokens-purple-brand | done |
+| DS-1.2 | T211 | ds/density-control-heights | partial |
+| DS-1.3 | T212 | ds/density-header-layout | partial |
+| DS-1.4 | T213 | ds/typography-scale | done |
+| DS-2.1 | T214 | ds/badge-sync-variants | done |
+| DS-2.2 | T215 | ds/responsive-breakpoints | done |
+| DS-2.3 | T216 | ds/sidebar-nav-platform | done |
 | DS-2.4 | T217 | ds/fix-e2e-density | pending |
-| DS-3.1 | T218 | ds/component-kpi-strip | pending |
+| DS-3.1 | T218 | ds/component-kpi-strip | done |
 | DS-3.2 | T219 | ds/component-provider-glyph | pending |
 | DS-3.3 | T220 | ds/component-spark | pending |
 | DS-3.4 | T221 | ds/component-stream-row | pending |
@@ -48,13 +48,15 @@ Independent PRs — each story branches from `main`, not from the previous story
 
 ### Execution Priority
 
-Process stories in this order:
-1. DS-1.1 (tokens — everything depends on this)
-2. DS-1.2, DS-1.4 (density + typography, parallel)
-3. DS-1.3 (layout density)
-4. DS-2.1, DS-2.2, DS-2.3 (component updates, parallel)
-5. DS-3.1 through DS-3.8 (new components, mostly parallel)
-6. DS-4.0 (backend endpoints)
+Stories DS-1.1, DS-1.4, DS-2.1, DS-2.2, DS-2.3, DS-3.1 are done. DS-1.2 and DS-1.3 are partial (tokens defined but not wired into components).
+
+Process remaining stories in this order:
+1. DS-3.2 (Provider Glyph — blocks DS-3.5, DS-4.1, DS-4.5, DS-4.7, DS-4.9)
+2. DS-3.4 (Stream Row — blocks DS-4.3, DS-4.5)
+3. DS-3.3, DS-3.8, DS-3.6, DS-3.7 (remaining components, parallel)
+4. DS-3.5 (Sync Flow — depends on DS-3.2)
+5. DS-1.2 finish, DS-1.3 finish (wire density tokens into components)
+6. DS-4.0 (backend admin endpoints — finish aggregation endpoints)
 7. DS-4.1 through DS-4.10 (pages, in pairs)
 8. DS-2.4, DS-5.1 through DS-5.4 (testing)
 
