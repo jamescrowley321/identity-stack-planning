@@ -11,8 +11,13 @@ Write and run tests. Coverage-first, pragmatic.
    - Happy paths, error paths, edge cases (empty inputs, missing fields, boundary values)
    - Auth enforcement and tenant isolation if applicable
    - Every test must verify behavior that could break independently — no shallow constructor/dataclass tests
-3. **For identity-stack:** Playwright E2E tests are REQUIRED if the story modifies any service, repository, middleware, dependency, or endpoint — even without changing router signatures. E2E tests may ONLY be skipped if the story adds pure type definitions (ABCs, models, dataclasses) with zero runtime behavior. Follow patterns in `backend/tests/e2e/`. 3-tier auth: unauthenticated, OIDC client credentials, admin session token.
-4. Run the repo's full local test suite (commands in CLAUDE.md)
-5. If failures: fix and re-run until green
-6. Run lint, commit test files
-7. **Advance to the next phase. End your response.**
+3. **Integration tests are REQUIRED** for any story modifying a service, repository, middleware, dependency, endpoint, or protocol handler. Tests must exercise real flows — real HTTP, real DB or testcontainer, real protocol roundtrip — **not mocks**. Locations by repo:
+   - `py-identity-model` → `src/tests/integration/`
+   - `identity-stack` → `backend/tests/integration/`
+   - `terraform-provider-descope` → `internal/**/*_test.go` against the live Descope API (acceptance + integration tests)
+4. **For identity-stack additionally:** Playwright E2E tests are REQUIRED if the story modifies any service, repository, middleware, dependency, or endpoint — even without changing router signatures. Follow patterns in `backend/tests/e2e/`. 3-tier auth: unauthenticated, OIDC client credentials, admin session token.
+5. Integration AND E2E tests may ONLY be skipped if the story adds pure type definitions (ABCs, models, dataclasses) with zero runtime behavior. Skipping requires `[skip-integration-tests: <reason>]` in a commit body — the Acceptance Auditor will scrutinize this.
+6. Run the repo's full local test suite (commands in CLAUDE.md)
+7. If failures: fix and re-run until green
+8. Run lint, commit test files
+9. **Advance to the next phase. End your response.**
