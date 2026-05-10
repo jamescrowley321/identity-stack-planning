@@ -6,7 +6,8 @@ Push branch and create PR.
 
 1. **Integration test gate.** Verify feature work has integration/e2e coverage before pushing:
    ```bash
-   BASE=$(jq -r '.base_branch // "main"' .ralph/task-state.json 2>/dev/null || echo main)
+   BASE=$(grep '^base_branch:' .claude/task-state.md 2>/dev/null | awk '{print $2}')
+   BASE=${BASE:-main}
    DIFF=$(git diff --name-only "origin/$BASE...HEAD")
    CODE=$(echo "$DIFF" | grep -E '^(backend/app/|src/py_identity_model/|internal/)' | grep -vE '(_test\.go$|/tests/)' | head -1)
    TESTS=$(echo "$DIFF" | grep -E '(tests/integration/|tests/e2e/|_test\.go$)' | head -1)
