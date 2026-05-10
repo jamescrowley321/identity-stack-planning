@@ -89,26 +89,13 @@ Full breakdown: `epics-design-system.md`. Ralph prompt: `ralph-prompts/design-sy
 
 **Requirements:** Every feature task MUST include integration tests (in `src/tests/integration/`) and usage examples (in `examples/`). Unit tests alone are not sufficient.
 
-All feature tasks (T32-T47) complete. All review fixes (T101-T116) complete — all 16 PRs #211-#237 merged 2026-03-30. Integration test chain (T120-T125) complete.
+All feature tasks (T32-T47) complete. All review fixes (T101-T116) complete — all 16 PRs #211-#237 merged 2026-03-30. Integration test chain (T120-T125) complete. OIDC conformance: Basic RP (13/13), Config RP (5/5), Form Post RP (13/13) all passing — certification submission is the top priority.
 
-### Security Re-Audit Fixes (Phase 2)
+### OIDC Conformance Certification (TOP PRIORITY — SUBMIT)
 
-Re-audit on 2026-04-14 verified Phase 1 fixes (PRs #364-#372) and found 8 new findings. See `security-fix-plan.md` for batch grouping.
+Target: OpenID Foundation Basic RP + Config RP + Form Post RP certification. All test profiles passing. **Next step: submit for certification.**
 
-| ID | Issue | Status | Description | Size | Depends |
-|----|-------|--------|-------------|------|---------|
-| T200 | 375 | pending | Deprecate `get_public_key_from_jwk` — stop mutating shared JWKS keys, add DeprecationWarning | small | — |
-| T201 | 376 | pending | Add JWKS response size limit — Content-Length check, max 512KB, max 100 keys | small | — |
-| T202 | 377 | pending | Fix dead `require_https` field — wire to DiscoveryPolicy or deprecate | small | — |
-| T203 | 378 | pending | Prevent cache stampede — single-flight refresh on TTL expiry | medium | — |
-| T204 | 379 | pending | Reject JWKS with missing Content-Type + guard `response_json["keys"]` KeyError | small | — |
-| T205 | 380 | pending | Add pre-flight URL scheme validation to `get_jwks()` | small | — |
-| T206 | 381 | pending | Escape HTML in conformance harness error responses | small | — |
-| T207 | 382 | pending | Fix async cleanup lock TOCTOU — eagerly initialize lock | small | — |
-
-### OIDC Conformance Certification (TOP PRIORITY)
-
-Target: OpenID Foundation Basic RP + Config RP certification. See `docs/oidc-certification-analysis.md` for full gap analysis.
+See `docs/oidc-certification-analysis.md` for full gap analysis. Tracking issue: [#242](https://github.com/jamescrowley321/py-identity-model/issues/242).
 
 | ID | Issue | Status | Description | Size | Depends |
 |----|-------|--------|-------------|------|---------|
@@ -117,9 +104,37 @@ Target: OpenID Foundation Basic RP + Config RP certification. See `docs/oidc-cer
 | T142 | 219 | done | JWKS cache TTL with forced refresh on signature failure — TTL cache + `_retry_with_refreshed_jwks` in sync/async token_validation | medium | — |
 | T143 | | done | Build conformance test harness — `conformance/app.py` RP + `run_tests.py` runner + Docker Compose + CI workflow | large | T140, T141, T142 |
 | T144 | | done | Pass Basic RP conformance tests — 13/13 PASS. SSL cert sharing, cache clearing, UserInfo fatal error, claims display. PR #362 merged 2026-04-12 | medium | T143 |
-| T145 | | pending | Pass Config RP conformance tests — 4/5 PASS, `signing-key-rotation` still times out. Needs double-flow key rotation fix | medium | T143 |
-| T146 | | pending | Fix any conformance test failures from T144/T145 — iterative fix-and-rerun cycle | medium | T144, T145 |
-| T147 | | pending | Expand to Implicit + Hybrid RP profiles — at_hash validation, c_hash validation, nonce enforcement | medium | T146 |
+| T145 | | done | Pass Config RP conformance tests — 5/5 PASS (signing-key-rotation now passes). All Config RP tests passing | medium | T143 |
+| T146 | | done | Fix any conformance test failures from T144/T145 — all Basic RP (13/13) + Config RP (5/5) + Form Post RP (13/13) passing | medium | T144, T145 |
+| T147 | | pending | Expand to Implicit + Hybrid RP profiles — at_hash validation, c_hash validation, nonce enforcement (nice-to-have, not blocking certification) | medium | T146 |
+
+### OIDC RP Certification Submission (ACTIVE — next actions)
+
+Tracking issue: [#242](https://github.com/jamescrowley321/py-identity-model/issues/242). All 3 profiles passing — submit for OIDF certification.
+
+| ID | Issue | Status | Description | Size |
+|----|-------|--------|-------------|------|
+| T160 | 326 | done | Switch conformance runner to certification.openid.net REST API — hosted workflow added, token auth, env var overrides | large |
+| T161 | 327 | done | Fix JWKS cache bypass — http_client= removal, SSL cert sharing via cert-init, cache clearing between tests | medium |
+| T162 | 329 | done | Document Config RP test count and variant config | small |
+| T163 | 330 | done | Add Form Post RP profile — 13/13 PASS in CI. Parser, multi-value callback, unit tests | medium |
+| **T164** | **331** | **pending** | **Apply for OIDF OSS certification fee waiver (owner-driven, manual) — NEXT ACTION** | **—** |
+| T165 | 342 | done | Refactor Makefile — consolidated targets, help, HOSTED=1 support. PR #361 merged 2026-04-12 | small |
+
+### Security Re-Audit Fixes (Phase 2) — Nearly Complete
+
+Re-audit on 2026-04-14 verified Phase 1 fixes (PRs #364-#372) and found 8 new findings. See `security-fix-plan.md` for batch grouping. 6/8 shipped via PRs #383-#387.
+
+| ID | Issue | Status | Description | Size | Depends |
+|----|-------|--------|-------------|------|---------|
+| T200 | 375 | done | Deprecate `get_public_key_from_jwk` — stop mutating shared JWKS keys, add DeprecationWarning. PR #383 merged | small | — |
+| T201 | 376 | done | Add JWKS response size limit — Content-Length check, max 512KB, max 100 keys. PR #384 merged | small | — |
+| T202 | 377 | done | Fix dead `require_https` field — wired to DiscoveryPolicy with cache key tuple. PR #385 merged | small | — |
+| T203 | 378 | done | Prevent cache stampede — single-flight refresh on TTL expiry. PR #386 merged | medium | — |
+| T204 | 379 | done | Reject JWKS with missing Content-Type + guard `response_json["keys"]` KeyError. PR #387 merged | small | — |
+| T205 | 380 | pending | Add pre-flight URL scheme validation to `get_jwks()` | small | — |
+| T206 | 381 | pending | Escape HTML in conformance harness error responses | small | — |
+| T207 | 382 | done | Fix async cleanup lock TOCTOU — eagerly initialize lock at module level | small | — |
 
 ### IdentityServer Fixture Expansion
 
@@ -161,19 +176,6 @@ Blocked on account setup — James needs to configure Cognito and Entra ID accou
 | T61 | 216 | pending | Dynamic Client Registration (RFC 7591) | medium |
 | T62 | 215 | pending | mTLS Client Auth and Certificate-Bound Tokens (RFC 8705) | large |
 | T63 | 218 | pending | JARM (JWT Secured Authorization Response Mode) | medium |
-
-### OIDC RP Certification (ACTIVE — separate session)
-
-Tracking issue: [#242](https://github.com/jamescrowley321/py-identity-model/issues/242). Certify py-identity-model as a library (same pattern as pyoidc/oidcrp). See #242 for the full phased plan.
-
-| ID | Issue | Status | Description | Size |
-|----|-------|--------|-------------|------|
-| T160 | 326 | done | Switch conformance runner to certification.openid.net REST API — hosted workflow added, token auth, env var overrides | large |
-| T161 | 327 | done | Fix JWKS cache bypass — http_client= removal, SSL cert sharing via cert-init, cache clearing between tests | medium |
-| T162 | 329 | done | Document Config RP test count and variant config | small |
-| T163 | 330 | done | Add Form Post RP profile — 13/13 PASS in CI. Parser, multi-value callback, unit tests | medium |
-| T164 | 331 | pending | Apply for OIDF OSS certification fee waiver (owner-driven, manual) | — |
-| T165 | 342 | done | Refactor Makefile — consolidated targets, help, HOSTED=1 support. PR #361 merged 2026-04-12 | small |
 
 ### Infrastructure & Secrets Automation
 

@@ -4,11 +4,11 @@
 
 The py-identity-model repo (`~/repos/auth/py-identity-model/`) has an OIDC RP conformance test harness in `conformance/` that runs the OpenID Foundation's Basic RP test suite against the library via a thin FastAPI RP app. The harness uses the hosted certification suite at `certification.openid.net`.
 
-Two open PRs build the infrastructure:
-- **#359** (`infra/hosted-runner`) — switches the conformance runner from local Docker to the hosted REST API
-- **#361** (`infra/makefile-refactor`) — consolidates Makefile targets
+Infrastructure PRs are merged:
+- **#359** (`infra/hosted-runner`) — closed (superseded by work merged directly to main)
+- **#361** (`infra/makefile-refactor`) — merged 2026-04-12
 
-Both PRs pass all core CI (lint, unit, integration, build, CodeQL, SonarCloud, Snyk) but **fail the conformance workflow** because 6 of 14 Basic RP tests return `[????]` (unknown/incomplete status):
+The conformance harness is operational. Previous state had 6 of 14 Basic RP tests returning `[????]` (unknown/incomplete status):
 
 ```
 [????] oidcc-client-test                          — basic auth code flow
@@ -45,12 +45,11 @@ The sprint plan identifies three library-level fixes that directly map to the fa
 
 ## Your Tasks
 
-### Phase 1: Merge the infrastructure PRs
+### Phase 1: Infrastructure (COMPLETE)
 
-1. Review PR #361 (`infra/makefile-refactor`) — it's a Makefile cleanup that consolidates conformance targets. If it looks correct, merge it (or rebase onto main and merge).
-2. Review PR #359 (`infra/hosted-runner`) — this is the bigger change that switches to the hosted certification API. The conformance workflow fails but that's expected — the 6 test failures are library bugs, not infrastructure bugs. Decide if the infrastructure itself is ready to merge (it enables the tests to run at all), or if you want the test fixes to land first.
+PRs #359 and #361 are resolved. The hosted conformance runner is operational on main.
 
-### Phase 2: Fix the library to pass the 6 failing tests
+### Phase 2: Fix the library to pass the 6 failing tests (COMPLETE — all now passing)
 
 Work on feature branches from `main`. Each fix should include unit tests.
 
@@ -88,7 +87,7 @@ After each fix:
 
 ### Phase 4: Clean up
 
-1. Close PR #359 and/or #361 if they've been superseded by the fixes
+1. ~~Close PR #359 and/or #361~~ — Done (#359 closed, #361 merged)
 2. Update the task-state file (`~/repos/auth/py-identity-model/.claude/task-state.md`) — mark completed tasks and advance to the next
 3. Clear stale branches: `chore/conformance-token-makefile`, `chore/test-infrastructure-cleanup`, `ci/conformance-suite-in-ci`, `fix/conformance-token-api-path`, `infra/cert-init-ssl-sharing` — check if any have unmerged work before deleting
 
