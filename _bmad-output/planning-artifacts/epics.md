@@ -447,10 +447,6 @@ So that I can manage the set of available permissions at runtime without direct 
 **When** any permission endpoint is called
 **Then** the error is caught and returned as HTTP 502 with a descriptive message, following the `httpx.HTTPStatusError` / `httpx.RequestError` pattern from existing routers
 
-**Given** write endpoints (`POST`, `PUT`, `DELETE`)
-**When** rate limiting is evaluated
-**Then** `RATE_LIMIT_AUTH` ("10/minute") is applied, matching the existing pattern in `roles.py` and `accesskeys.py`
-
 ### Story 2.2: Role Definition CRUD with Permission Mapping (Backend)
 
 As a platform admin,
@@ -495,10 +491,6 @@ So that I can manage the RBAC model at runtime without modifying Terraform confi
 **Given** a Descope Management API error (e.g., role not found, duplicate name, invalid permission reference)
 **When** the API call fails
 **Then** `httpx.HTTPStatusError` is caught and returned as an appropriate HTTP error with a descriptive message
-
-**Given** write endpoints (`POST`, `PUT`, `DELETE`)
-**When** rate limiting is evaluated
-**Then** `RATE_LIMIT_AUTH` is applied
 
 ### Story 2.3: Admin Role & Permission Management UI
 
@@ -715,13 +707,9 @@ So that I can configure and inspect authorization rules through the REST API.
 **When** any FGA endpoint is called
 **Then** `httpx.RequestError` is caught and returned as HTTP 502 with a descriptive message
 
-**Given** write endpoints (`POST /api/fga/relations`, `DELETE /api/fga/relations`, `PUT /api/fga/schema`)
-**When** rate limiting is evaluated
-**Then** `RATE_LIMIT_AUTH` ("10/minute") is applied, matching the pattern in `roles.py`
-
 **Given** unit tests for the FGA router
 **When** the test suite runs
-**Then** all endpoints are tested for success, auth enforcement (403 for non-admin), error mapping (400/502), and rate limiting
+**Then** all endpoints are tested for success, auth enforcement (403 for non-admin), and error mapping (400/502)
 **And** coverage for `routers/fga.py` exceeds 90%
 
 ### Story 3.3: FGA Dependency Factory, Document Model & CRUD Router with FGA Enforcement (Backend)
@@ -844,7 +832,7 @@ So that authorization correctness is verified to production standards (NFR-16, A
 
 **Given** the FGA admin router (`routers/fga.py`)
 **When** unit tests execute
-**Then** every endpoint has tests for: success path, admin role enforcement (403 for non-admin), Descope API error mapping (400 for validation errors, 502 for network errors), and rate limiting
+**Then** every endpoint has tests for: success path, admin role enforcement (403 for non-admin), and Descope API error mapping (400 for validation errors, 502 for network errors)
 **And** `POST /api/fga/check` has tests for both allowed and denied results
 
 **Given** the `require_fga()` dependency factory

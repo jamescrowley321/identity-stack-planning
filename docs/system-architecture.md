@@ -104,9 +104,8 @@ graph TB
 |  1. ProxyHeadersMiddleware    (X-Forwarded-For)               |
 |  2. CorrelationIdMiddleware   (X-Correlation-ID / traceparent)|
 |  3. SecurityHeadersMiddleware (CSP, HSTS, X-Frame-Options)    |
-|  4. SlowAPIMiddleware         (rate limiting) *               |
-|  5. TokenValidationMiddleware (py-identity-model) *           |
-|  6. CORSMiddleware                                            |
+|  4. TokenValidationMiddleware (py-identity-model) *           |
+|  5. CORSMiddleware                                            |
 |                                                                |
 |  * Offloaded to Tyk in gateway deployment mode                |
 |                                                                |

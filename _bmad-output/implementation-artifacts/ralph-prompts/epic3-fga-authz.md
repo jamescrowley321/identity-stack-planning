@@ -68,4 +68,3 @@ If all stories are `done`: output `<promise>LOOP_COMPLETE</promise>`
 - **Tenant isolation:** Every document/resource operation must verify `tenant_id` — cross-tenant access is a CONFIRMED security finding
 - **Transactional ordering (Story 3.3 documents):** Create FGA relation BEFORE DB commit; on FGA failure, roll back DB; on DB failure, delete the FGA relation (compensation)
 - **Admin endpoints:** Use `require_role("owner", "admin")` from `backend/app/dependencies/rbac.py`
-- **Rate limiting:** Write endpoints use `@limiter.limit(RATE_LIMIT_AUTH)` with `request: Request` as the first param

@@ -107,7 +107,7 @@ graph TD
 
 ### PRD 2 — API Gateway & Deployment Topology
 
-**Problem:** Authentication (JWT validation) and rate limiting are implemented in FastAPI middleware. This works but doesn't demonstrate the progressive adoption pattern of offloading cross-cutting concerns to a gateway.
+**Problem:** Authentication (JWT validation) is implemented in FastAPI middleware. This works but doesn't demonstrate the progressive adoption pattern of offloading cross-cutting concerns to a gateway.
 
 **Solution:** Integrate Tyk OSS as an optional API gateway with dual deployment modes (standalone vs gateway) toggled by `DEPLOYMENT_MODE` environment variable at startup. Docker Compose profiles control which services run.
 
@@ -115,7 +115,7 @@ graph TD
 - Tyk handles **authentication** — JWT signature verification, expiry, issuer validation
 - FastAPI handles **authorization** — tenant-scoped role/permission checks against nested JWT claims
 
-**MVP scope:** Tyk config directory, JWT validation offloading, rate limiting offloading, Docker Compose profiles, middleware factory pattern.
+**MVP scope:** Tyk config directory, JWT validation offloading, Docker Compose profiles, middleware factory pattern.
 
 **Growth scope:** Claim normalization plugin, multi-provider JWT validation, analytics pipeline.
 
