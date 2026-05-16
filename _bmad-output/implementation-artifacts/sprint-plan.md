@@ -16,7 +16,7 @@ Sprint plan across three repos. **Execution method:** Ralph loops — one task a
 All tasks done. T6 (SSO app) blocked on enterprise license. T7/T8 wontfix. Releases v1.1.0-v1.1.4 published to Terraform Registry. All review fixes (T85-T89, T99-T100) done.
 
 ### identity-stack — DESIGN SYSTEM ACTIVE
-All prior work complete (Phases 1-5, Epics 2-3, UI migration, E2E tests, all review fixes). PRD 5 (Canonical Identity Domain Model) **shipped 2026-04-09** — all 19 stories merged. PRD 2 (API Gateway) **shipped 2026-04-12**. Design System Integration — 5 epics, 31 stories. **6 done, 3 partial, 22 remaining.** Epic file: `epics-design-system.md`. Ralph prompt: `ralph-prompts/design-system.md`.
+All prior work complete (Phases 1-5, Epics 2-3, UI migration, E2E tests, all review fixes). PRD 5 (Canonical Identity Domain Model) **shipped 2026-04-09** — all 18 stories merged. PRD 2 (API Gateway) **shipped 2026-04-12**. Design System Integration — 5 epics, 31 stories. **6 done, 3 partial, 22 remaining.** Epic file: `epics-design-system.md`. Ralph prompt: `ralph-prompts/design-system.md`.
 
 ### py-identity-model — CERTIFICATION SUBMISSION READY
 All feature tasks (T32-T47) done. All review fixes (T101-T116) done — 16 PRs merged. Integration test chain (T120-T125) done. OIDC conformance: **all 3 profiles passing** — Basic RP (13/13), Config RP (5/5), Form Post RP (13/13). T140-T146 done, T147 (Implicit/Hybrid) pending as nice-to-have. Security re-audit Phase 2: 6/8 done (T200-T204, T207 shipped via PRs #383-#387), T205-T206 pending. **Next action: T164 — apply for OIDF fee waiver and submit for certification.** Products: T170-T172 pending (monorepo, CLI, middleware).
@@ -35,7 +35,7 @@ All feature tasks (T32-T47) done. All review fixes (T101-T116) done — 16 PRs m
 
 ## Tier 8: Identity Stack — Canonical Identity Domain Model (PRD 5) — COMPLETE
 
-Shipped 2026-04-09 via `ralph-prompts/canonical-identity.md`. 4 epics, 19 stories, all merged.
+Shipped 2026-04-09 via `ralph-prompts/canonical-identity.md`. 4 epics, 18 stories, all merged.
 
 #### Epic 1: Canonical Identity Foundation (6 stories)
 
@@ -58,14 +58,13 @@ Shipped 2026-04-09 via `ralph-prompts/canonical-identity.md`. 4 epics, 19 storie
 | 2.4 | [#147](https://github.com/jamescrowley321/identity-stack/issues/147) | Unit + Integration Tests | done | 2.3 |
 | 2.5 | [#148](https://github.com/jamescrowley321/identity-stack/issues/148) | E2E Tests + Regression | done | 2.4 |
 
-#### Epic 3: Inbound Sync & Reconciliation (4 stories)
+#### Epic 3: Inbound Sync & Reconciliation (3 stories)
 
 | Story | Issue | Description | Status | Depends On |
 |-------|-------|-------------|--------|------------|
 | 3.1 | [#149](https://github.com/jamescrowley321/identity-stack/issues/149) | Flow HTTP Connector + Webhook Handler | done | 2.5 |
 | 3.2 | [#150](https://github.com/jamescrowley321/identity-stack/issues/150) | Periodic Reconciliation Job | done | 3.1 |
-| 3.3 | [#151](https://github.com/jamescrowley321/identity-stack/issues/151) | Redis Pub/Sub + Cache Invalidation | done | 3.2 |
-| 3.4 | [#152](https://github.com/jamescrowley321/identity-stack/issues/152) | Inbound Sync Tests | done | 3.3 |
+| 3.4 | [#152](https://github.com/jamescrowley321/identity-stack/issues/152) | Inbound Sync Tests | done | 3.2 |
 
 #### Epic 4: Multi-IdP Identity Linking (4 stories)
 
@@ -73,7 +72,7 @@ Shipped 2026-04-09 via `ralph-prompts/canonical-identity.md`. 4 epics, 19 storie
 |-------|-------|-------------|--------|------------|
 | 4.1 | [#153](https://github.com/jamescrowley321/identity-stack/issues/153) | IdP Link + Provider Config Service | done | 3.4 |
 | 4.2 | [#154](https://github.com/jamescrowley321/identity-stack/issues/154) | Link Management + Provider Config Routers | done | 4.1 |
-| 4.3 | [#155](https://github.com/jamescrowley321/identity-stack/issues/155) | Internal Identity Resolution API + Redis Cache | done | 4.2 |
+| 4.3 | [#155](https://github.com/jamescrowley321/identity-stack/issues/155) | Internal Identity Resolution API | done | 4.2 |
 | 4.4 | [#156](https://github.com/jamescrowley321/identity-stack/issues/156) | Multi-IdP Tests | done | 4.3 |
 
 ---
