@@ -20,25 +20,25 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 
 **Functional Requirements:**
 
-32 FRs across 7 capability areas:
+30 FRs across 7 capability areas:
 - **User Management (FR1-4):** Canonical user CRUD, inbound IdP provisioning, search/filter, audit timestamps
 - **Role & Permission Management (FR5-9):** Definition CRUD (global + tenant-scoped), many-to-many mapping, per-tenant assignment with audit trail
 - **Tenant Management (FR10-12):** Tenant CRUD, domain management, user/role visibility within tenant
 - **IdP Link Management (FR13-16):** Link canonical users to external provider identities, view/delete links, provider-specific metadata (JSONB)
 - **Provider Configuration (FR17-19):** Register/activate/deactivate IdPs, expose capabilities for downstream decision-making
-- **Identity Resolution (FR20-22):** Internal API resolves canonical user from IdP subject + provider, Redis-cached responses
-- **Write-Through Sync & Reconciliation (FR23-29):** Postgres-first writes, sync adapter interface, Descope audit webhook handler, Flow HTTP Connector, periodic reconciliation, Redis pub/sub cache invalidation
+- **Identity Resolution (FR20-21):** Internal API resolves canonical user from IdP subject + provider
+- **Write-Through Sync & Reconciliation (FR23-28):** Postgres-first writes, sync adapter interface, Descope audit webhook handler, Flow HTTP Connector, periodic reconciliation
 - **Database & Migration (FR30-32):** Alembic migrations (upgrade + downgrade), seed migration from Descope, Postgres replaces SQLite
 
 **MVP-Critical vs. Deferrable:**
 - **MVP-critical:** FR1-12 (user/role/permission/tenant CRUD), FR23-25 (write-through sync + Descope adapter), FR30-32 (Postgres + Alembic)
 - **Should-have:** FR13-16 (IdP links), FR17-19 (provider config)
-- **Deferrable:** FR20-22 (identity resolution API — only needed for PRD 4 gateway), FR26-29 (inbound sync, reconciliation — only needed when handling out-of-band changes)
+- **Deferrable:** FR20-21 (identity resolution API — only needed for PRD 4 gateway), FR26-28 (inbound sync, reconciliation — only needed when handling out-of-band changes)
 
 **Non-Functional Requirements:**
 
 18 NFRs driving architectural decisions, plus 3 additions from architectural review:
-- **Performance:** < 100ms p95 canonical CRUD, < 500ms write-through sync, < 50ms cached identity resolution
+- **Performance:** < 100ms p95 canonical CRUD, < 500ms write-through sync, < 100ms p95 identity resolution (Postgres lookup)
 - **Security:** No IdP credentials in Postgres (Infisical refs), internal API not externally exposed, TLS in non-dev, HMAC webhook validation
 - **Reliability:** Descope outage doesn't block reads/writes, idempotent reconciliation, failed syncs retried via reconciliation
 - **Testing:** Real Postgres via testcontainers-python (no SQLite fallback), mocked sync adapters via NoOpSyncAdapter, reconciliation fixture data
@@ -140,7 +140,6 @@ backend/app/
 - **Access keys stay proxied:** Provider-specific M2M auth. Tier 3 concern per three-tier model.
 - **CorrelationIdMiddleware replaced by OTel:** `traceparent` header (W3C standard) replaces custom `X-Correlation-ID`. One less middleware.
 - **py-identity-model unaffected:** Token validation middleware stays unchanged — validates JWTs regardless of backing store.
-- **Redis not yet in stack:** Needed for cache + pub/sub. Add standalone in Docker Compose for now; merge with Tyk's Redis when gateway work begins.
 
 ### Cross-Cutting Concerns
 
@@ -191,7 +190,6 @@ This is a brownfield project with an established tech stack. No starter template
 |---------|-------|---------|
 | `postgres` | `postgres:16-alpine` | Canonical identity store |
 | `aspire-dashboard` | `mcr.microsoft.com/dotnet/aspire-dashboard:9.0` | Local OTel trace/log viewer |
-| `redis` | `redis:7-alpine` | Identity cache + pub/sub |
 
 **Note:** Version pinning will be determined at implementation time via `uv add` to get latest compatible versions.
 
@@ -216,7 +214,6 @@ This is a brownfield project with an established tech stack. No starter template
 
 | # | Decision | Choice | Rationale |
 |---|----------|--------|-----------|
-| D9 | Caching | Redis 7 for identity lookups + pub/sub | Standalone in Docker Compose. Merges with Tyk's Redis later. |
 | D10 | Testing | testcontainers-python with real Postgres | No SQLite test fallback. NoOpSyncAdapter isolates canonical logic. |
 | D11 | FGA/access keys | Proxied to provider | Not routed through IdentityService. Provider-specific. (ADR-2) |
 | D12 | Correlation | OTel `traceparent` replaces `X-Correlation-ID` | CorrelationIdMiddleware removed. W3C standard. |
@@ -226,9 +223,8 @@ This is a brownfield project with an established tech stack. No starter template
 
 | # | Decision | Deferral Rationale |
 |---|----------|--------------------|
-| D14 | Identity resolution API (FR20-22) | Only needed for PRD 4 gateway |
-| D15 | Inbound sync — webhooks, reconciliation (FR26-29) | Only needed for out-of-band change handling |
-| D16 | Redis cache TTL tuning | Determine from real usage patterns |
+| D14 | Identity resolution API (FR20-21) | Only needed for PRD 4 gateway |
+| D15 | Inbound sync — webhooks, reconciliation (FR26-28) | Only needed for out-of-band change handling |
 | D17 | Frontend changes | API contracts unchanged; frontend is unaffected |
 | D18 | SCIM server endpoint | Growth feature — schema aligned but endpoint deferred |
 
@@ -296,18 +292,12 @@ aspire-dashboard:
     - "4317:18889"
   environment:
     DASHBOARD__OTLP__AUTHMODE: Unsecured
-
-redis:
-  image: redis:7-alpine
-  ports:
-    - "6379:6379"
 ```
 
 **Backend environment additions:**
 - `DATABASE_URL=postgresql+asyncpg://identity:dev@postgres:5432/identity`
 - `OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18889`
 - `OTEL_SERVICE_NAME=identity-stack`
-- `REDIS_URL=redis://redis:6379/0`
 
 ### Decision Impact Analysis
 
@@ -320,7 +310,6 @@ redis:
 5. **Domain services (UserService, RoleService, etc.) + DescopeSyncAdapter** — domain logic orchestrates repositories + adapters
 6. **Router rewrites** — inject domain services via DI factories, replace direct Descope calls
 7. **Seed migration** — import Descope state into canonical tables
-8. **Redis cache** — identity lookup caching + pub/sub
 
 **Cross-Component Dependencies:**
 
@@ -776,8 +765,7 @@ The complete project structure is defined in the Structure Patterns section abov
 | OTel + Aspire Dashboard | NFR observability |
 | Pre-commit + quality gates | NFR maintainability |
 | `IdPLink` + `Provider` models | FR13-19 (should-have) |
-| Redis cache | FR22, deferred |
-| Inbound sync + reconciliation | FR26-29, deferred |
+| Inbound sync + reconciliation | FR26-28, deferred |
 
 ## Architecture Validation
 
@@ -791,7 +779,7 @@ The complete project structure is defined in the Structure Patterns section abov
 - `idp_links` and `providers` tables are in the schema
 - Service methods for these can follow the same patterns
 
-**Deferred FRs (FR20-22, FR26-29): EXPLICITLY DEFERRED**
+**Deferred FRs (FR20-21, FR26-28): EXPLICITLY DEFERRED**
 - Identity resolution API and inbound sync deferred with clear rationale
 
 ### NFR Coverage

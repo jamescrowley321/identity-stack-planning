@@ -11,7 +11,7 @@ This document is the master index for all planned work across the auth workspace
 | PRD 2 | API Gateway & Deployment Topology | identity-stack | Done | 17 stories / 4 epics |
 | PRD 3 | Multi-Provider Test Infrastructure | py-identity-model, identity-stack | Planned | ~25 stories / 3 epics |
 | PRD 4 | Multi-IdP Gateway Demo | identity-stack | Planned | ~20 stories / 4 epics |
-| PRD 5 | Canonical Identity Domain Model | identity-stack | Done | 19 stories / 4 epics |
+| PRD 5 | Canonical Identity Domain Model | identity-stack | Done | 18 stories / 4 epics |
 | PRD 5b | Design System & Admin Frontend | identity-stack | Active | 31 stories / 5 epics |
 | PRD 6 | identity-model Multi-Language Monorepo | identity-model (new repo) | Planned | ~100 stories / 15 epics |
 
@@ -175,7 +175,7 @@ graph TD
 **Epic breakdown:**
 1. **Foundation** (6 stories) — Postgres, Alembic, error model, OpenTelemetry, service interfaces
 2. **Identity & Access Admin** (5 stories) — User/Role/Permission/Tenant services, router rewire
-3. **Inbound Sync** (4 stories) — Descope seeding, webhook handler, reconciliation, Redis cache
+3. **Inbound Sync** (3 stories) — Descope seeding, webhook handler, reconciliation
 4. **Multi-IdP Linking** (4 stories) — Provider config, identity linking, provider management API
 
 **Artifacts:**
@@ -243,7 +243,7 @@ The main PRD defines 22 high-level FRs. Here's how the specialized PRDs implemen
 
 **Phase 1 — DONE:**
 - Main PRD: py-identity-model feature tasks, identity-stack features — all shipped
-- PRD 5: Canonical identity domain model (19 stories) — shipped 2026-04-09
+- PRD 5: Canonical identity domain model (18 stories) — shipped 2026-04-09
 - PRD 2: API gateway (17 stories) — shipped 2026-04-11/12
 
 **Phase 1b — ACTIVE (two parallel tracks):**

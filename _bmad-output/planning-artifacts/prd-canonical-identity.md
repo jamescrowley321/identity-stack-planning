@@ -47,7 +47,7 @@ PRD 5 inverts this relationship. The backend owns a canonical store of enterpris
 
 The schema is 8 tables aligned with SCIM Core User conventions: `users`, `idp_links`, `roles`, `permissions`, `role_permissions`, `user_tenant_roles`, `tenants`, and `provider_configs`. FGA/ReBAC stays proxied to provider engines (Descope FGA, Ory Keto) — relationship evaluation at scale is what those engines are built for. Auth state (passwords, MFA, sessions) stays with the IdP. The canonical model owns only what downstream domain APIs need: who the user is, what they can do, and which IdPs they're linked to.
 
-Sync architecture: write-through for API-originated operations (Postgres first, then IdP sync), Descope Flow HTTP Connector for self-service sign-up, audit webhook handler for out-of-band changes, periodic reconciliation as a safety net, Redis pub/sub (reusing Tyk's Redis) for cache invalidation. No outbox pattern, no event bus — sufficient for solo-developer scale, evolvable when needed.
+Sync architecture: write-through for API-originated operations (Postgres first, then IdP sync), Descope Flow HTTP Connector for self-service sign-up, audit webhook handler for out-of-band changes, periodic reconciliation as a safety net. No outbox pattern, no event bus — sufficient for solo-developer scale, evolvable when needed.
 
 Epic 4 (Multi-IdP Identity Linking) provides the internal identity API that PRD 4's Tyk claim normalization plugin queries to correlate users across providers. This is the bridge from "single-IdP app" to "multi-IdP platform."
 
@@ -96,7 +96,7 @@ This is not an identity provider. It's an identity *insulation layer*. The 8-tab
 
 - 8 canonical tables created with Alembic migrations, FK constraints enforced
 - `IdentityService` implementations for all existing CRUD operations (users, roles, permissions, tenants, access keys)
-- Internal identity API (`GET /api/internal/identity`) returns canonical user data with < 50ms p95 from Redis cache
+- Internal identity API (`GET /api/internal/identity`) returns canonical user data with < 100ms p95 (Postgres lookup)
 - Provider swap test: Descope sync adapter can be disabled, and all read operations continue to work from Postgres alone
 
 ## Product Scope
@@ -119,12 +119,10 @@ This is not an identity provider. It's an identity *insulation layer*. The 8-tab
 - Descope Flow HTTP Connector: call our API on self-service sign-up to create canonical record
 - Audit webhook handler: catch out-of-band Descope changes (role/permission/user modifications)
 - Periodic reconciliation job (configurable interval, default hourly)
-- Redis pub/sub events on canonical writes for cache invalidation
 
 **Epic 4: Multi-IdP Identity Linking**
 - `idp_links` and `provider_configs` table CRUD operations
 - Internal API: `GET /api/internal/identity?sub={sub}&provider={provider}`
-- Redis cache for identity lookups (keyed on `provider:sub`, TTL matches JWT TTL)
 - Link management API (view/create/delete IdP links for a canonical user)
 
 ### Growth Features (Post-MVP)
@@ -165,9 +163,9 @@ This is not an identity provider. It's an identity *insulation layer*. The 8-tab
 
 ### Journey 4: Reconciliation Catches Drift
 
-**An intern edits a role** directly in the Descope console, bypassing the canonical API. The audit webhook fires (throttled). Hours later, the periodic reconciliation job runs, diffs Descope's current state against Postgres, detects the role name change, and updates the canonical record. An event is published to Redis pub/sub. The admin dashboard (if built) shows "1 drift event reconciled."
+**An intern edits a role** directly in the Descope console, bypassing the canonical API. The audit webhook fires (throttled). Hours later, the periodic reconciliation job runs, diffs Descope's current state against Postgres, detects the role name change, and updates the canonical record. The admin dashboard (if built) shows "1 drift event reconciled."
 
-**Capabilities revealed:** Audit webhook handler, periodic reconciliation, drift detection, Redis pub/sub events, out-of-band change handling.
+**Capabilities revealed:** Audit webhook handler, periodic reconciliation, drift detection, out-of-band change handling.
 
 ### Journey 5: Developer Integrates with the Identity API
 
@@ -189,7 +187,6 @@ This is not an identity provider. It's an identity *insulation layer*. The 8-tab
 | Internal identity API | J3, J5 |
 | Audit webhook handler | J4 |
 | Periodic reconciliation | J4 |
-| Redis pub/sub events | J1, J4 |
 | Drift detection + resolution | J4 |
 
 ## Domain-Specific Requirements
@@ -213,7 +210,7 @@ This is not an identity provider. It's an identity *insulation layer*. The 8-tab
 | Risk | Mitigation |
 |---|---|
 | Descope API outage blocks all writes | Postgres-first write ordering. API continues to function for reads. Sync catches up when Descope recovers. |
-| Schema drift between canonical DB and IdP | Periodic reconciliation job detects and resolves. Redis pub/sub notifies on drift events. |
+| Schema drift between canonical DB and IdP | Periodic reconciliation job detects and resolves. |
 | Data loss during seed migration | Seed migration is idempotent and auditable. Dry-run mode before live import. |
 | IdP link collision (same email, different people) | Link creation requires explicit action, not automatic email matching (except in operator-controlled contexts). |
 
@@ -257,7 +254,6 @@ This is not an identity provider. It's an identity *insulation layer*. The 8-tab
 
 - FR20: The internal API can resolve a canonical user from an IdP-specific subject and provider identifier
 - FR21: The internal API returns canonical user data including roles, permissions, tenant memberships, and linked IdPs
-- FR22: The system caches identity resolution results in Redis with configurable TTL
 
 ### Write-Through Sync
 
@@ -270,7 +266,6 @@ This is not an identity provider. It's an identity *insulation layer*. The 8-tab
 - FR26: The system receives and processes Descope audit webhook events (user created, modified, deleted; role/permission changes)
 - FR27: The Descope Flow HTTP Connector can call the system to create/update a canonical user during sign-up
 - FR28: A periodic reconciliation job diffs canonical state against Descope state and resolves drift
-- FR29: The system publishes cache invalidation events to Redis pub/sub on canonical data changes
 
 ### Database & Migration
 
@@ -284,7 +279,7 @@ This is not an identity provider. It's an identity *insulation layer*. The 8-tab
 
 - NFR1: API response times for canonical CRUD operations < 100ms p95 (excluding sync latency)
 - NFR2: Write-through sync adds < 500ms per operation (Descope Management API round-trip)
-- NFR3: Internal identity API returns cached results in < 50ms p95
+- NFR3: Internal identity API returns canonical user data in < 100ms p95 (Postgres lookup)
 - NFR4: Reconciliation job completes a full diff of up to 10,000 users in < 60 seconds
 
 ### Security
@@ -319,8 +314,8 @@ This is not an identity provider. It's an identity *insulation layer*. The 8-tab
 |---|---|---|
 | **Epic 1: Database Foundation** | Postgres in Docker Compose, Alembic setup, 8-table schema, seed migration from Descope, testcontainers-python | None |
 | **Epic 2: Service Layer Extraction** | IdentityService Postgres-backed implementations, write-through sync via DescopeManagementClient, existing API contracts unchanged | Epic 1 |
-| **Epic 3: Inbound Sync** | Descope Flow HTTP Connector, audit webhook handler, periodic reconciliation job, Redis pub/sub | Epic 2 |
-| **Epic 4: Multi-IdP Identity Linking** | IdPLink + ProviderConfig CRUD, internal identity API, Redis cache, link management API | Epic 2 (Epic 3 optional) |
+| **Epic 3: Inbound Sync** | Descope Flow HTTP Connector, audit webhook handler, periodic reconciliation job | Epic 2 |
+| **Epic 4: Multi-IdP Identity Linking** | IdPLink + ProviderConfig CRUD, internal identity API, link management API | Epic 2 (Epic 3 optional) |
 
 ### Epic Dependency Graph
 
@@ -373,14 +368,6 @@ Epic 3         Epic 4
 **Rationale:** Consistency with existing `Document` and `TenantResource` models. SQLModel provides Pydantic validation on the model layer, reducing boilerplate for request/response serialization. The identity tables are straightforward CRUD — SQLModel's relationship handling is sufficient.
 
 **Consequences:** If complex query patterns emerge (recursive CTEs, window functions), raw SQLAlchemy can be used for specific queries while keeping SQLModel for the ORM layer.
-
-### ADR-5: Redis for Cache + Pub/Sub (No Dedicated Message Broker)
-
-**Decision:** Reuse Tyk's Redis instance for identity cache and pub/sub events. No dedicated message broker (RabbitMQ, Kafka, SQS).
-
-**Rationale:** Redis is already in the Docker Compose stack for Tyk. Pub/sub is fire-and-forget (acceptable — reconciliation is the durability guarantee). Solo-developer scale doesn't justify a separate broker.
-
-**Consequences:** Pub/sub messages are lost if no subscriber is listening. This is acceptable because the periodic reconciliation job is the durability safety net, and Redis pub/sub is used only for cache invalidation (performance optimization, not correctness).
 
 ### ADR-6: Result Types via Expression Library for Inter-Layer Error Handling
 

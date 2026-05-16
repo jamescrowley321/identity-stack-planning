@@ -33,7 +33,6 @@ graph TB
     is --> pim
     is --> descope
     is --> pg
-    is --> redis
     tfp --> descope
     tfp --> hcp
     infisical -.-> is
