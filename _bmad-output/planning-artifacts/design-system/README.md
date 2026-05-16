@@ -16,7 +16,7 @@ Everything in this design system was extracted from the public identity-stack re
   - `frontend/package.json` — font family (`@fontsource-variable/geist`), Tailwind v4, shadcn@4
   - `frontend/src/components/ui/*` — every shadcn primitive (button, card, badge, table, tabs, dialog, dropdown, select, sheet, sidebar, alert, input, label, avatar, skeleton, separator, tooltip, sonner)
   - `frontend/src/components/layout/*` — `AppSidebar`, `Header`, `PageHeader`, `TenantSwitcher`, `UserMenu`, `ThemeToggle`
-  - `frontend/src/pages/*` — `Dashboard`, `MemberManagement`, `AccessKeys`, `RoleManagement`, `UserProfile`, `TenantSettings`, `FGAManagement`
+  - `frontend/src/pages/*` — `Dashboard`, `MemberManagement`, `AccessKeys`, `RoleManagement`, `UserProfile`, `FGAManagement`
 
 The full imported source is mirrored in `_source/` as a read-only reference. Nothing in `_source/` is part of the published design system — it's there so future iterations can keep checking against the real code.
 
@@ -43,7 +43,6 @@ Key screens observed in the codebase:
 - **Access Keys** — create / revoke / activate API keys (with one-shot secret reveal)
 - **Roles** — RBAC role management
 - **FGA Management** — ReBAC relation tuples (Descope FGA / Zanzibar-style)
-- **Tenant Settings** — custom attributes per tenant
 - **Profile** — per-user custom attributes (`department`, `job_title`, `avatar_url`)
 
 ## Content fundamentals
