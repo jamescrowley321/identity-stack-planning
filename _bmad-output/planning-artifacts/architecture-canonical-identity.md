@@ -260,7 +260,7 @@ This is a brownfield project with an established tech stack. No starter template
 - NFR5: No IdP credentials in Postgres — Infisical `config_ref` on `providers` table
 - NFR6: Internal API (`/api/internal/*`) not externally exposed
 - NFR8: Audit webhook HMAC validation when configured
-- Existing middleware stack (security headers, rate limiting) unchanged
+- Existing middleware stack (security headers) unchanged
 
 ### API & Communication Patterns
 
@@ -272,8 +272,6 @@ This is a brownfield project with an established tech stack. No starter template
 - Content-Type: `application/problem+json`
 - Extension fields: `traceId` (OTel), `instance` (request path)
 - `SyncFailed` → HTTP 202 with Problem Detail warning (Postgres succeeded, sync pending)
-
-**Rate limiting:** Unchanged. `@limiter.limit(RATE_LIMIT_AUTH)` on write endpoints.
 
 ### Infrastructure & Deployment
 
@@ -355,7 +353,7 @@ redis:
 - Modules: snake_case (`user.py`, `descope.py`)
 - Classes: PascalCase (`UserService`, `UserRepository`, `DescopeSyncAdapter`)
 - Functions/methods: snake_case (`create_user`, `sync_role`)
-- Constants: UPPER_SNAKE (`RATE_LIMIT_AUTH`, `DEFAULT_CACHE_TTL`)
+- Constants: UPPER_SNAKE (`DEFAULT_CACHE_TTL`, `MAX_RETRY_ATTEMPTS`)
 - Type aliases: PascalCase (`UserResult = Result[User, IdentityError]`)
 
 ### Structure Patterns
@@ -553,7 +551,7 @@ async def create_role(
 **Key invariants:**
 - Domain services injected via `Depends(get_user_service)`, `Depends(get_role_service)`, etc.
 - `result_to_response()` maps `Ok` → JSON, `Error` → RFC 9457 Problem Detail
-- Rate limiting, role enforcement, tenant extraction unchanged from existing patterns
+- Role enforcement, tenant extraction unchanged from existing patterns
 - FGA/access key routes continue using `get_descope_client()` directly
 
 ### Sync Adapter Pattern
@@ -719,7 +717,7 @@ test-all: lint test-unit test-integration test-e2e
 6. Use Alembic for ALL schema changes — never `create_all()` or raw DDL.
 7. Write tests against real Postgres via testcontainers — never mock the database.
 8. Use `NoOpSyncAdapter` in service tests — never mock `IdentityProviderAdapter` methods individually.
-9. Follow existing router patterns (rate limiting, role enforcement) unchanged.
+9. Follow existing router patterns (role enforcement) unchanged.
 10. Keep FGA/access key routes on `DescopeManagementClient` — do not route through `IdentityService`.
 11. Run `make lint` before every commit — pre-commit hooks enforce ruff, pyrefly, and 80% coverage.
 

@@ -34,7 +34,7 @@ classification:
 
 This PRD defines the requirements for integrating a Tyk OSS API gateway into identity-stack (formerly identity-stack), offloading cross-cutting middleware concerns from the FastAPI backend to the gateway layer, and establishing a dual deployment topology (standalone vs. gateway) toggled by environment configuration. The work produces a reference architecture demonstrating the progressive adoption pattern: "build with application middleware first, then offload to a gateway without rewriting your app."
 
-The FastAPI backend currently implements six middleware layers: ProxyHeadersMiddleware, CorrelationIdMiddleware, SecurityHeadersMiddleware, SlowAPIMiddleware (rate limiting), TokenValidationMiddleware (JWT validation via py-identity-model), and CORSMiddleware. Five of these can be offloaded to Tyk. Authorization logic (`require_role()` / `require_permission()` dependency factories) remains in FastAPI because Descope's multi-tenant claims structure (`tenants.{tenant-id}.roles[]`) is domain-specific and not suited for gateway-level enforcement.
+The FastAPI backend currently implements five middleware layers: ProxyHeadersMiddleware, CorrelationIdMiddleware, SecurityHeadersMiddleware, TokenValidationMiddleware (JWT validation via py-identity-model), and CORSMiddleware. Four of these can be offloaded to Tyk. Authorization logic (`require_role()` / `require_permission()` dependency factories) remains in FastAPI because Descope's multi-tenant claims structure (`tenants.{tenant-id}.roles[]`) is domain-specific and not suited for gateway-level enforcement.
 
 The key architectural boundary: **Tyk answers "is this token valid?" while FastAPI answers "does this user have role Y in tenant Z?"** This separation is enforced by design — the gateway handles authentication, the application handles authorization.
 
@@ -60,7 +60,7 @@ Docker Compose profiles control which containers start (`standalone` = no gatewa
 ### User Success
 
 - **[IS]** A developer runs `docker compose up` (no `--profile` flag) and gets a fully working application — identical to today's experience
-- **[IS]** A developer runs `docker compose --profile gateway up` and gets the same application with JWT validation and rate limiting handled by Tyk, with no application code changes required
+- **[IS]** A developer runs `docker compose --profile gateway up` and gets the same application with JWT validation handled by Tyk, with no application code changes required
 - **[IS]** A solutions architect reviewing the repo can trace the authentication/authorization boundary between Tyk and FastAPI in under 10 minutes
 
 ### Business Success
@@ -71,8 +71,8 @@ Docker Compose profiles control which containers start (`standalone` = no gatewa
 
 ### Technical Success
 
-- **[IS]** Standalone mode: all 6 existing middleware layers execute, zero behavioral regression from pre-gateway state
-- **[IS]** Gateway mode: JWT validation and rate limiting offloaded to Tyk. Requests reaching FastAPI have already passed signature verification and rate limit checks.
+- **[IS]** Standalone mode: all 5 existing middleware layers execute, zero behavioral regression from pre-gateway state
+- **[IS]** Gateway mode: JWT validation offloaded to Tyk. Requests reaching FastAPI have already passed signature verification.
 - **[IS]** API definitions stored as version-controlled JSON files in `tyk/apps/` — no Tyk Dashboard required
 - **[IS]** Frontend API base URL is profile-driven via Docker Compose environment variable — no manual configuration when switching profiles
 - **[IS]** `DEPLOYMENT_MODE` environment variable drives middleware assembly at startup with exactly two valid values: `standalone` and `gateway`
@@ -83,7 +83,6 @@ Docker Compose profiles control which containers start (`standalone` = no gatewa
 
 - **[IS]** Tyk OSS + Redis integrated via Docker Compose with `gateway` profile
 - **[IS]** JWT validation offloaded to Tyk (Descope JWKS, dual-issuer support)
-- **[IS]** Rate limiting offloaded to Tyk (Redis-backed, replacing SlowAPI)
 - **[IS]** `DEPLOYMENT_MODE=standalone|gateway` environment variable controlling middleware factory
 - **[IS]** Docker Compose profiles: default (standalone), `gateway`, `full`
 - **[IS]** Frontend API base URL driven by compose profile environment variable
@@ -94,8 +93,7 @@ Docker Compose profiles control which containers start (`standalone` = no gatewa
 - **[IS]** Security headers offload to Tyk (`global_response_headers`)
 - **[IS]** Tyk Pump + Prometheus for gateway observability
 - **[IS]** Multi-provider OIDC validation (Descope + node-oidc-provider simultaneously)
-- **[IS]** OpenFeature SDK replacing plain env var — enables hot-toggle and per-feature flags (e.g., `rate_limiting_offloaded`, `jwt_offloaded` independently)
-- **[IS]** Per-endpoint rate limit configuration in Tyk policies
+- **[IS]** OpenFeature SDK replacing plain env var — enables hot-toggle and per-feature flags (e.g., `jwt_offloaded` independently of other offloads)
 
 ### Vision (Future, v3)
 
@@ -122,11 +120,9 @@ Docker Compose profiles control which containers start (`standalone` = no gatewa
 ### Epic 2 — Middleware Migration
 
 - FR-11: Create a middleware factory function (`app/middleware/factory.py`) that reads `DEPLOYMENT_MODE` at import time and assembles the middleware stack accordingly
-- FR-12: In `gateway` mode, the middleware factory must skip `TokenValidationMiddleware` and `SlowAPIMiddleware`. The remaining middleware (CORSMiddleware, SecurityHeadersMiddleware, CorrelationIdMiddleware, ProxyHeadersMiddleware) continues to execute in FastAPI.
+- FR-12: In `gateway` mode, the middleware factory must skip `TokenValidationMiddleware`. The remaining middleware (CORSMiddleware, SecurityHeadersMiddleware, CorrelationIdMiddleware, ProxyHeadersMiddleware) continues to execute in FastAPI.
 - FR-13: In `standalone` mode, the middleware factory must assemble the identical middleware stack to the current implementation — no behavioral change from the pre-gateway codebase
-- FR-14: Refactor `app/main.py` to call the middleware factory instead of inline `app.add_middleware()` calls. The middleware registration order must be preserved exactly (outermost: ProxyHeaders, CorrelationId, SecurityHeaders, SlowAPI, TokenValidation, CORS — innermost)
-- FR-15: Configure rate limiting in Tyk via the API definition or security policy: global rate limit of 60 requests/minute (matching current SlowAPI default) and 10 requests/minute for auth endpoints (`/api/validate-id-token`)
-- FR-16: In `gateway` mode, the FastAPI rate limiter state and exception handler must still be registered (no-op) to prevent import errors from `@limiter` decorators on route handlers, but the `SlowAPIMiddleware` must not be added to the stack
+- FR-14: Refactor `app/main.py` to call the middleware factory instead of inline `app.add_middleware()` calls. The middleware registration order must be preserved exactly (outermost: ProxyHeaders, CorrelationId, SecurityHeaders, TokenValidation, CORS — innermost)
 - FR-17: Authorization dependency factories (`require_role()`, `require_permission()`) must continue to function identically in both modes — they decode tenant claims from the forwarded `Authorization` header regardless of who validated the token's signature
 
 ### Epic 3 — OpenFeature / Deployment Mode Toggle
@@ -153,7 +149,6 @@ Docker Compose profiles control which containers start (`standalone` = no gatewa
 
 - NFR-1: **[IS]** Gateway mode must not add more than 10ms p95 latency to API requests compared to standalone mode (single-hop reverse proxy overhead)
 - NFR-2: **[IS]** Tyk JWT validation must cache JWKS internally — no per-request fetch to Descope's JWKS endpoint
-- NFR-3: **[IS]** Redis memory usage for rate limiting counters must remain under 50MB for typical development workloads
 
 ### Security
 
@@ -190,8 +185,8 @@ Docker Compose profiles control which containers start (`standalone` = no gatewa
 |---|---|---|---|
 | D1 | Tyk OSS + Redis is sufficient — no Dashboard license needed | Research | MPL 2.0, file-based API definitions, all needed features in OSS tier |
 | D2 | Auth/authz boundary: Tyk = authentication, FastAPI = authorization | Research + Party Mode | Descope's nested `tenants.{tenant-id}.roles[]` claims are domain-specific; gateway cannot enforce tenant-scoped RBAC |
-| D3 | 5 of 6 FastAPI middlewares can offload to Tyk | Research | JWT validation, rate limiting, CORS, security headers, proxy headers. Only CorrelationId has partial overlap. |
-| D4 | v1 offloads JWT validation + rate limiting only | Party Mode | Smallest blast radius. CORS + security headers deferred to v2 to limit scope. |
+| D3 | 4 of 5 FastAPI middlewares can offload to Tyk | Research | JWT validation, CORS, security headers, proxy headers. Only CorrelationId has partial overlap. |
+| D4 | v1 offloads JWT validation only | Party Mode | Smallest blast radius. CORS + security headers deferred to v2 to limit scope. |
 | D5 | v1 OpenFeature is plain env var (`DEPLOYMENT_MODE`) | Party Mode | SDK adds value for hot-toggle in v2. Plain env var gets 90% of value with zero dependencies. |
 | D6 | Default Docker Compose profile = standalone | Party Mode | No `--profile` flag = working app. New developers should never see a broken first experience. |
 | D7 | Frontend API URL is profile-driven via compose env var | Party Mode | Prevents developer confusion when switching profiles. No manual `.env` editing. |
