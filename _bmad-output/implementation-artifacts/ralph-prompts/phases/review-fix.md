@@ -16,7 +16,7 @@ Triage and fix review findings. Delta-only re-review. Max 3 iterations.
 3. If no P0 or P1 findings → write `## Review Summary` to task-state, **advance to next phase. End.**
 
 4. Fix all P0 (non-negotiable), then P1 where straightforward.
-   - Run lint + tests after fixes
+   - Run lint + the **full** test suite (`make test-all` for identity-stack, `make test` for py-identity-model and terraform-provider-descope) after fixes. Unit tests must pass — see test.md step 7. Do not advance if any unit test fails, regardless of whether the failure pre-exists on the base branch.
    - Commit: `git commit -m "fix: address review findings"`
 
 5. **Delta re-review** — re-run ONLY reviewers that had P0/P1 findings, scoped to fix commits:
