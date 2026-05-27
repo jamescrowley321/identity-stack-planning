@@ -16,7 +16,7 @@ Definitions for terms used across identity-stack-planning documents. Organized a
 
 **ClaimMapper** — Go interface in the Tyk claim normalization plugin. Each identity provider has a concrete implementation (`DescopeMapper`, `OryMapper`, `GenericOIDCMapper`) that extracts user identity from provider-specific JWT structures. Defined in the PRD 4 architecture.
 
-**DEPLOYMENT_MODE** — Environment variable (`standalone` | `gateway`) evaluated once at FastAPI startup. Controls which middleware is active: standalone mode runs JWT validation and rate limiting in FastAPI; gateway mode offloads these to Tyk. See ADR-GW-4 and ADR-GW-5.
+**DEPLOYMENT_MODE** — Environment variable (`standalone` | `gateway`) evaluated once at FastAPI startup. Controls which middleware is active: standalone mode runs JWT validation in FastAPI; gateway mode offloads it to Tyk. See ADR-GW-4 and ADR-GW-5.
 
 **Edge Case Hunter** — Review agent persona that traces every branching path and boundary condition. Reports only genuinely unhandled paths where code will fail, crash, or produce wrong results. See [review process](review-process.md).
 

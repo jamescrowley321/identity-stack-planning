@@ -17,7 +17,7 @@ date: '2026-03-29'
 
 ### Scope
 
-This architecture covers PRD 2: integrating Tyk OSS as an API gateway into identity-stack (identity-stack), offloading authentication and rate limiting from FastAPI middleware to the gateway, and establishing dual deployment topologies (standalone vs gateway) controlled by a single environment variable and Docker Compose profiles.
+This architecture covers PRD 2: integrating Tyk OSS as an API gateway into identity-stack (identity-stack), offloading authentication from FastAPI middleware to the gateway, and establishing dual deployment topologies (standalone vs gateway) controlled by a single environment variable and Docker Compose profiles.
 
 All changes are confined to the identity-stack repository. No modifications to py-identity-model, terraform-provider-descope, or identity-stack-planning application code.
 
@@ -132,7 +132,7 @@ When `use_db_app_configs: false`, Tyk reads API definitions from the filesystem 
 **Rationale:**
 - A plain env var gets 90% of the value with zero additional dependencies
 - The toggle is binary (two deployment modes) and evaluated once at startup — no per-request overhead
-- OpenFeature SDK adds value when there are: hot-toggle requirements, per-feature flags (e.g., `rate_limiting_offloaded` independently of `jwt_offloaded`), or per-tenant flag evaluation
+- OpenFeature SDK adds value when there are: hot-toggle requirements, per-feature flags (e.g., `jwt_offloaded` independently of other offloads), or per-tenant flag evaluation
 - v2 upgrade path: replace `os.getenv("DEPLOYMENT_MODE")` with `client.get_string_value("deployment_mode", "standalone")` — one-line change per evaluation site
 
 ### ADR-GW-5: Startup-Time Evaluation
@@ -176,11 +176,9 @@ Client Request
 ┌──────────────────────────────────────────────────────────┐
 │                    FastAPI (:8000)                        │
 │                                                          │
-│  6. ProxyHeadersMiddleware  ─── X-Forwarded-For → IP     │
-│  5. CorrelationIdMiddleware ─── X-Correlation-ID         │
-│  4. SecurityHeadersMiddleware ─ CSP, HSTS, X-Frame       │
-│  3. SlowAPIMiddleware ──────── 60/min default, 10/min    │
-│                                 auth endpoints           │
+│  5. ProxyHeadersMiddleware  ─── X-Forwarded-For → IP     │
+│  4. CorrelationIdMiddleware ─── X-Correlation-ID         │
+│  3. SecurityHeadersMiddleware ─ CSP, HSTS, X-Frame       │
 │  2. TokenValidationMiddleware ─ JWT sig check via        │
 │                                 py-identity-model        │
 │  1. CORSMiddleware ────────── allow_origins, credentials │
@@ -194,7 +192,7 @@ Client Request
 └──────────────────────────────────────────────────────────┘
 ```
 
-All 6 middleware layers execute. This is identical to the current production behavior — zero regression.
+All 5 middleware layers execute. This is identical to the current production behavior — zero regression.
 
 ### Gateway Mode
 
@@ -232,7 +230,6 @@ Client Request
 │  1. CORSMiddleware ────────── allow_origins, credentials │
 │                                                          │
 │  [TokenValidationMiddleware — SKIPPED, Tyk validated]    │
-│  [SlowAPIMiddleware — SKIPPED, Tyk rate-limited]         │
 │                                                          │
 │  ┌────────────────────────────────────────────────────┐  │
 │  │  Route Handler                                      │  │
@@ -243,7 +240,7 @@ Client Request
 └──────────────────────────────────────────────────────────┘
 ```
 
-In gateway mode, the backend still executes 4 of 6 middleware layers. Only `TokenValidationMiddleware` and `SlowAPIMiddleware` are removed from the stack. CORS and SecurityHeaders remain in FastAPI for v1 (deferred to Tyk in v2).
+In gateway mode, the backend still executes 4 of 5 middleware layers. Only `TokenValidationMiddleware` is removed from the stack. CORS and SecurityHeaders remain in FastAPI for v1 (deferred to Tyk in v2).
 
 ## 4. Middleware Migration Matrix
 
@@ -252,14 +249,13 @@ In gateway mode, the backend still executes 4 of 6 middleware layers. Only `Toke
 | **ProxyHeadersMiddleware** | FastAPI | FastAPI | FastAPI | Tyk natively sets `X-Forwarded-For` etc., but FastAPI still needs to read them. Stays in both modes. |
 | **CorrelationIdMiddleware** | FastAPI | FastAPI | FastAPI | Application-level concern. Tyk has `X-Request-ID` but CorrelationId is app-specific. Stays permanently. |
 | **SecurityHeadersMiddleware** | FastAPI | FastAPI | Tyk (`global_response_headers`) | v1: stays in FastAPI. v2: offload to Tyk API definition. |
-| **SlowAPIMiddleware** | FastAPI | **Tyk** (Redis rate limiting) | Tyk | v1 offload. Rate limiter state + exception handler still registered in FastAPI to prevent import errors from `@limiter` decorators, but middleware is not added to stack. |
 | **TokenValidationMiddleware** | FastAPI (py-identity-model) | **Tyk** (native JWT/OIDC) | Tyk | v1 offload. Backend receives only pre-validated requests. Authorization (`require_role`/`require_permission`) still decodes the forwarded JWT for tenant claims. |
 | **CORSMiddleware** | FastAPI | FastAPI | Tyk (`CORS` section) | v1: stays in FastAPI. v2: offload to Tyk API definition. |
 
 ### v1 Offload Summary
 
-- **Moved to Tyk:** TokenValidationMiddleware, SlowAPIMiddleware (2 of 6)
-- **Remain in FastAPI:** ProxyHeaders, CorrelationId, SecurityHeaders, CORS (4 of 6)
+- **Moved to Tyk:** TokenValidationMiddleware (1 of 5)
+- **Remain in FastAPI:** ProxyHeaders, CorrelationId, SecurityHeaders, CORS (4 of 5)
 - **Permanently in FastAPI:** Authorization (`require_role()`, `require_permission()`) — this is application logic, not middleware
 
 ## 5. Middleware Factory Architecture
@@ -305,13 +301,8 @@ def configure_middleware(app):
         # Token validation — skips public paths
         app.add_middleware(TokenValidationMiddleware, ...)
         logger.info("Middleware: TokenValidationMiddleware ENABLED (standalone)")
-
-        # Rate limiting
-        app.add_middleware(SlowAPIMiddleware)
-        logger.info("Middleware: SlowAPIMiddleware ENABLED (standalone)")
     else:
         logger.info("Middleware: TokenValidationMiddleware SKIPPED (gateway — Tyk validates)")
-        logger.info("Middleware: SlowAPIMiddleware SKIPPED (gateway — Tyk rate-limits)")
 
     # Always register: SecurityHeaders, CorrelationId, ProxyHeaders
     app.add_middleware(SecurityHeadersMiddleware, ...)
@@ -320,18 +311,6 @@ def configure_middleware(app):
 
     logger.info(f"Middleware stack assembled for DEPLOYMENT_MODE={DEPLOYMENT_MODE}")
 ```
-
-### Rate Limiter State in Gateway Mode
-
-In gateway mode, `SlowAPIMiddleware` is not added to the stack. However, the rate limiter state and exception handler must still be registered on the app to prevent import errors from `@limiter` decorators on route handlers:
-
-```python
-# Always registered in app/main.py regardless of mode
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
-```
-
-The decorators become no-ops when `SlowAPIMiddleware` is absent — they reference `request.state.limit` which is never populated, so the rate limit check silently passes.
 
 ## 6. Tyk Configuration Architecture
 
@@ -650,7 +629,7 @@ The backend never receives unauthenticated requests on protected endpoints (NFR-
 | Dual-issuer support | `use_openid` with two providers | `enable_jwt` with single source | `enable_jwt` supports only one `jwt_source`. Descope requires two issuer formats. `use_openid` with provider array handles this natively. |
 | Deployment toggle | `DEPLOYMENT_MODE` env var | OpenFeature SDK, header detection (`X-Tyk-Request-ID`), runtime flag service | Env var is simplest. Header detection is fragile (forgeable). OpenFeature deferred to v2 when hot-toggle and per-feature flags add value. |
 | Docker profiles | `gateway` and `full` profiles | Separate compose files, Docker contexts | Profiles are Docker Compose native. Single file, explicit opt-in. `full` placeholder for future services. |
-| v1 offload scope | JWT validation + rate limiting only | All 5 offloadable middlewares | Smallest blast radius. CORS and security headers offload deferred to v2 — less risk, easier rollback. |
+| v1 offload scope | JWT validation only | All 4 offloadable middlewares | Smallest blast radius. CORS and security headers offload deferred to v2 — less risk, easier rollback. |
 
 ## 10. Compatibility and Migration
 
@@ -671,11 +650,10 @@ Pre-Gateway (current)           Standalone (post-integration)    Gateway (post-i
 ProxyHeadersMiddleware    →     ProxyHeadersMiddleware      →    ProxyHeadersMiddleware
 CorrelationIdMiddleware   →     CorrelationIdMiddleware     →    CorrelationIdMiddleware
 SecurityHeadersMiddleware →     SecurityHeadersMiddleware   →    SecurityHeadersMiddleware
-SlowAPIMiddleware         →     SlowAPIMiddleware           →    [REMOVED — Tyk handles]
 TokenValidationMiddleware →     TokenValidationMiddleware   →    [REMOVED — Tyk handles]
 CORSMiddleware            →     CORSMiddleware              →    CORSMiddleware
 
-IDENTICAL to pre-gateway ────── IDENTICAL to pre-gateway ─────  2 middleware layers removed
+IDENTICAL to pre-gateway ────── IDENTICAL to pre-gateway ─────  1 middleware layer removed
 ```
 
 ## 11. Testing Strategy

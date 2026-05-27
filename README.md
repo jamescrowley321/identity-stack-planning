@@ -106,7 +106,7 @@ Full-stack SaaS starter with FastAPI backend, Vite/React frontend, and Terraform
 | Admin Portal | User management, role assignment, tenant administration |
 | Social Login | Google, GitHub authentication |
 | Passkeys | WebAuthn/FIDO2 passwordless authentication |
-| Security Hardening | CSP/HSTS/X-Frame headers, rate limiting, structured logging, audit logging |
+| Security Hardening | CSP/HSTS/X-Frame headers, structured logging, audit logging |
 | Health Checks | Descope API and database connectivity monitoring with retry logic |
 | UI Framework | shadcn/ui + Tailwind CSS v4, dark mode, responsive sidebar layout |
 

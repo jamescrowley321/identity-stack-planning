@@ -122,7 +122,7 @@ So that the layout matches the design system's spacious admin density.
 **When** the density is applied
 **Then** all page wrappers use `p-8` (32px)
 
-**Files:** `frontend/src/components/layout/Header.tsx`, `frontend/src/components/layout/PageHeader.tsx`, all page files (Dashboard, MemberManagement, AccessKeys, RoleManagement, FGAManagement, TenantSettings, UserProfile)
+**Files:** `frontend/src/components/layout/Header.tsx`, `frontend/src/components/layout/PageHeader.tsx`, all page files (Dashboard, MemberManagement, AccessKeys, RoleManagement, FGAManagement, UserProfile)
 **Size:** Medium
 **Task ID:** T212
 **Depends on:** DS-1.2
@@ -210,7 +210,7 @@ So that users can navigate to Providers, Sync, Events, and Provisional Users.
 **Then** nav items are grouped into 3 sections:
   - **Workspace:** Dashboard, Members, Roles, Access Keys, FGA
   - **Platform:** Providers (Globe), Sync Dashboard (RefreshCw), Events (Activity), Provisional Users (UserPlus)
-  - **Tenant:** Settings, Profile
+  - **Tenant:** Profile
 
 **Given** the Header has a `routeLabels` map
 **When** new routes are added

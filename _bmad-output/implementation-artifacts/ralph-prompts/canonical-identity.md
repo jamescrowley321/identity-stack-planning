@@ -13,12 +13,11 @@ Sequential, chained PRs (each branches from previous story's branch).
 | 2.5 | #148 | canonical/story-2.5-e2e-tests-regression | canonical/story-2.4-unit-integration-tests | pending |
 | 3.1 | #149 | canonical/story-3.1-flow-connector-webhook | canonical/story-2.5-e2e-tests-regression | pending |
 | 3.2 | #150 | canonical/story-3.2-reconciliation-job | canonical/story-3.1-flow-connector-webhook | pending |
-| 3.3 | #151 | canonical/story-3.3-redis-pubsub | canonical/story-3.2-reconciliation-job | pending |
-| 3.4 | #152 | canonical/story-3.4-inbound-sync-tests | canonical/story-3.3-redis-pubsub | pending |
+| 3.4 | #152 | canonical/story-3.4-inbound-sync-tests | canonical/story-3.2-reconciliation-job | pending |
 | 4.1 | #153 | canonical/story-4.1-idp-link-provider-service | canonical/story-3.4-inbound-sync-tests | pending |
 | 4.2 | #154 | canonical/story-4.2-link-provider-routers | canonical/story-4.1-idp-link-provider-service | pending |
-| 4.3 | #155 | canonical/story-4.3-identity-resolution-redis-cache | canonical/story-4.2-link-provider-routers | pending |
-| 4.4 | #156 | canonical/story-4.4-multi-idp-tests | canonical/story-4.3-identity-resolution-redis-cache | pending |
+| 4.3 | #155 | canonical/story-4.3-identity-resolution-api | canonical/story-4.2-link-provider-routers | pending |
+| 4.4 | #156 | canonical/story-4.4-multi-idp-tests | canonical/story-4.3-identity-resolution-api | pending |
 
 ## Routing
 

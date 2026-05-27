@@ -16,7 +16,7 @@ This document provides the complete epic and story breakdown for PRD 2: API Gate
 ### Functional Requirements
 
 - FR-1 through FR-10: Tyk Gateway Integration (Epic 1)
-- FR-11 through FR-17: Middleware Migration (Epic 2)
+- FR-11 through FR-14, FR-17: Middleware Migration (Epic 2)
 - FR-18 through FR-22: Deployment Mode Toggle (Epic 3)
 - FR-23 through FR-29: Docker Compose Profiles (Epic 4)
 
@@ -24,7 +24,6 @@ This document provides the complete epic and story breakdown for PRD 2: API Gate
 
 - NFR-1: Gateway mode < 10ms p95 added latency
 - NFR-2: Tyk JWKS cached internally
-- NFR-3: Redis < 50MB for dev workloads
 - NFR-4: TYK_GATEWAY_SECRET not hardcoded
 - NFR-5: Tyk rejects invalid JWTs with 401 before backend
 - NFR-6: Standalone mode JWT validation identical to pre-gateway
@@ -58,11 +57,9 @@ This document provides the complete epic and story breakdown for PRD 2: API Gate
 | FR-9 | Epic 1 | 1.2 | Forward Authorization header |
 | FR-10 | Epic 1 | 1.4 | Verify proxy header forwarding |
 | FR-11 | Epic 2 | 2.1 | Middleware factory function |
-| FR-12 | Epic 2 | 2.2 | Gateway mode skips TokenValidation + SlowAPI |
+| FR-12 | Epic 2 | 2.2 | Gateway mode skips TokenValidation |
 | FR-13 | Epic 2 | 2.2 | Standalone mode identical to current |
 | FR-14 | Epic 2 | 2.1 | Refactor main.py to use factory |
-| FR-15 | Epic 2 | 2.3 | Rate limiting config in Tyk |
-| FR-16 | Epic 2 | 2.2 | Rate limiter state registered in gateway mode |
 | FR-17 | Epic 2 | 2.4 | Authorization factories work in both modes |
 | FR-18 | Epic 3 | 3.1 | DEPLOYMENT_MODE env var with validation |
 | FR-19 | Epic 3 | 3.1 | Startup-time evaluation |
@@ -84,8 +81,8 @@ A developer can add the Tyk OSS API gateway to identity-stack with JWT validatio
 **FRs covered:** FR-1, FR-2, FR-3, FR-4, FR-5, FR-6, FR-7, FR-8, FR-9, FR-10
 
 ### Epic 2: Middleware Migration
-The FastAPI backend conditionally assembles its middleware stack based on deployment mode, offloading JWT validation and rate limiting to Tyk in gateway mode while preserving identical behavior in standalone mode.
-**FRs covered:** FR-11, FR-12, FR-13, FR-14, FR-15, FR-16, FR-17
+The FastAPI backend conditionally assembles its middleware stack based on deployment mode, offloading JWT validation to Tyk in gateway mode while preserving identical behavior in standalone mode.
+**FRs covered:** FR-11, FR-12, FR-13, FR-14, FR-17
 
 ### Epic 3: Deployment Mode Toggle
 A single `DEPLOYMENT_MODE` environment variable controls whether the application runs in standalone or gateway mode, evaluated once at startup with clear logging and validation.
@@ -179,7 +176,7 @@ So that health checks and readiness probes work without a JWT.
 
 ## Epic 2: Middleware Migration
 
-The FastAPI backend conditionally assembles its middleware stack based on deployment mode, offloading JWT validation and rate limiting to Tyk in gateway mode while preserving identical behavior in standalone mode.
+The FastAPI backend conditionally assembles its middleware stack based on deployment mode, offloading JWT validation to Tyk in gateway mode while preserving identical behavior in standalone mode.
 
 ### Story 2.1: Create Middleware Factory Module
 
@@ -191,7 +188,7 @@ So that deployment-mode-conditional logic is centralized in one location.
 
 - [ ] `app/middleware/factory.py` exists with a `configure_middleware(app)` function that reads `DEPLOYMENT_MODE` and assembles the middleware stack accordingly (FR-11)
 - [ ] `app/main.py` is refactored to call `configure_middleware(app)` instead of inline `app.add_middleware()` calls (FR-14)
-- [ ] The middleware registration order is preserved exactly: outermost (ProxyHeaders) → CorrelationId → SecurityHeaders → SlowAPI → TokenValidation → CORS (innermost) — matching the current implementation (FR-14)
+- [ ] The middleware registration order is preserved exactly: outermost (ProxyHeaders) → CorrelationId → SecurityHeaders → TokenValidation → CORS (innermost) — matching the current implementation (FR-14)
 - [ ] The factory is the sole location for deployment-mode-conditional logic — no scattered `if DEPLOYMENT_MODE == "gateway"` checks in individual middleware modules (NFR-19)
 - [ ] The factory module includes a docstring documenting the auth/authz boundary and the v2 OpenFeature upgrade path (FR-22, NFR-20)
 - [ ] All existing backend unit tests pass without modification after the refactor (NFR-10)
@@ -199,31 +196,16 @@ So that deployment-mode-conditional logic is centralized in one location.
 ### Story 2.2: Implement Conditional Middleware Assembly
 
 As a developer deploying in gateway mode,
-I want the middleware factory to skip `TokenValidationMiddleware` and `SlowAPIMiddleware` when `DEPLOYMENT_MODE=gateway`,
-So that Tyk handles authentication and rate limiting without duplicate enforcement.
+I want the middleware factory to skip `TokenValidationMiddleware` when `DEPLOYMENT_MODE=gateway`,
+So that Tyk handles authentication without duplicate enforcement.
 
 **Acceptance Criteria:**
 
-- [ ] In `gateway` mode, the middleware factory does NOT add `TokenValidationMiddleware` or `SlowAPIMiddleware` to the stack (FR-12)
+- [ ] In `gateway` mode, the middleware factory does NOT add `TokenValidationMiddleware` to the stack (FR-12)
 - [ ] In `gateway` mode, the remaining middleware (CORSMiddleware, SecurityHeadersMiddleware, CorrelationIdMiddleware, ProxyHeadersMiddleware) continues to execute in FastAPI (FR-12)
-- [ ] In `standalone` mode, the middleware factory assembles the identical stack to the current implementation — all 6 middleware layers active (FR-13)
-- [ ] In `gateway` mode, the rate limiter state (`app.state.limiter`) and exception handler (`RateLimitExceeded`) are still registered to prevent import errors from `@limiter` decorators on route handlers (FR-16)
+- [ ] In `standalone` mode, the middleware factory assembles the identical stack to the current implementation — all 5 middleware layers active (FR-13)
 - [ ] Unit tests verify correct middleware inclusion/exclusion for each mode (NFR-13)
 - [ ] Unit test confirms that standalone mode produces the exact same middleware stack as the pre-factory implementation
-
-### Story 2.3: Configure Rate Limiting in Tyk
-
-As a developer offloading rate limiting,
-I want rate limiting configured in the Tyk API definition matching the current FastAPI limits,
-So that the same rate limits are enforced at the gateway layer.
-
-**Acceptance Criteria:**
-
-- [ ] The Tyk API definition (`tyk/apps/saas-backend.json`) includes a global rate limit of 60 requests/minute (matching current SlowAPI default) (FR-15)
-- [ ] Auth endpoints (`/api/validate-id-token`) have a specific rate limit of 10 requests/minute in the API definition's `extended_paths.rate_limit` (FR-15)
-- [ ] Rate limit responses from Tyk return HTTP 429 (consistent with SlowAPI behavior)
-- [ ] Rate limiting uses Redis-backed distributed counters (automatic with Tyk + Redis)
-- [ ] Redis memory usage for rate limiting stays under 50MB for typical dev workloads (NFR-3)
 
 ### Story 2.4: Verify Authorization Independence from Deployment Mode
 
@@ -388,12 +370,10 @@ Epic 1: Tyk Gateway Integration
 
 Epic 2: Middleware Migration (depends on Epic 3 Story 3.1 — needs DEPLOYMENT_MODE)
   │
-  ├── Story 2.1: Create Middleware Factory (depends on 3.1)
-  │     └── Story 2.2: Conditional Assembly (depends on 2.1)
-  │           ├── Story 2.4: Authorization Independence (depends on 2.2)
-  │           └── Story 2.5: Standalone Regression (depends on 2.2)
-  │
-  └── Story 2.3: Rate Limiting in Tyk (depends on Epic 1 — needs API definition)
+  └── Story 2.1: Create Middleware Factory (depends on 3.1)
+        └── Story 2.2: Conditional Assembly (depends on 2.1)
+              ├── Story 2.4: Authorization Independence (depends on 2.2)
+              └── Story 2.5: Standalone Regression (depends on 2.2)
 
 Epic 3: Deployment Mode Toggle
   │
@@ -419,14 +399,13 @@ Epic 4: Docker Compose Profiles (depends on Epic 1 Story 1.3)
 4. **Story 1.3** — Docker Compose services for Tyk + Redis
 5. **Story 2.1** — Middleware factory module (refactor main.py)
 6. **Story 2.2** — Conditional middleware assembly
-7. **Story 2.3** — Rate limiting in Tyk API definition
-8. **Story 1.4** — Verify gateway proxy and header forwarding
-9. **Story 1.5** — Health check endpoint passthrough
-10. **Story 2.4** — Authorization independence verification
-11. **Story 2.5** — Standalone regression verification
-12. **Story 4.1** — Docker Compose profile structure
-13. **Story 4.2** — Gateway profile overrides
-14. **Story 4.3** — Frontend API URL resolution
-15. **Story 3.2** — Wire DEPLOYMENT_MODE into Docker Compose
-16. **Story 3.3** — Documentation
-17. **Story 4.4** — Integration tests for both profiles
+7. **Story 1.4** — Verify gateway proxy and header forwarding
+8. **Story 1.5** — Health check endpoint passthrough
+9. **Story 2.4** — Authorization independence verification
+10. **Story 2.5** — Standalone regression verification
+11. **Story 4.1** — Docker Compose profile structure
+12. **Story 4.2** — Gateway profile overrides
+13. **Story 4.3** — Frontend API URL resolution
+14. **Story 3.2** — Wire DEPLOYMENT_MODE into Docker Compose
+15. **Story 3.3** — Documentation
+16. **Story 4.4** — Integration tests for both profiles

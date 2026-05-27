@@ -22,10 +22,9 @@ Review through the identity-domain lens:
 4. **Authentication integrity** — JWT validation gaps, token confusion (access vs refresh), issuer validation, signature verification
 5. **Credential exposure** — Secrets in logs, error responses, version-controlled files, environment variable leaks
 6. **Input validation** — Unvalidated input reaching database queries, external API calls, or file system operations
-7. **Rate limiting** — Write endpoints without rate limits, auth endpoints brute-forceable
-8. **SSRF** — User-controlled URLs reaching backend HTTP clients
-9. **Sync/ordering** — If write-through pattern: can partial failures leave inconsistent auth state?
-10. **Internal API exposure** — Are internal endpoints accessible externally? Are admin APIs protected?
+7. **SSRF** — User-controlled URLs reaching backend HTTP clients
+8. **Sync/ordering** — If write-through pattern: can partial failures leave inconsistent auth state?
+9. **Internal API exposure** — Are internal endpoints accessible externally? Are admin APIs protected?
 
 ## Output Format
 

@@ -22,7 +22,6 @@ Self-referential implementation loop. Execute ONE phase of ONE story per iterati
 |-------|-------|--------|-------------|--------|
 | 2.1 | #166 | gateway/story-2.1-middleware-factory | main | pending |
 | 2.2 | #167 | gateway/story-2.2-conditional-middleware-assembly | main | pending |
-| 2.3 | #168 | gateway/story-2.3-tyk-rate-limiting | main | pending |
 
 ### Epic 1 (continued): Verification
 

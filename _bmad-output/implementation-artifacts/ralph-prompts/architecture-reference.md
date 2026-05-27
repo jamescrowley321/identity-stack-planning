@@ -14,7 +14,7 @@ Extracted from the full architecture doc. Read the full doc only during `analyze
 8. Domain service tests use mocked repositories + `NoOpSyncAdapter` — test orchestration logic, not SQL
 9. Repositories contain NO business logic, NO OTel spans, NO adapter calls — data access only
 10. Domain services contain NO direct SQLAlchemy imports — use repository methods only
-11. Follow existing router patterns (rate limiting, role enforcement) unchanged
+11. Follow existing router patterns (role enforcement) unchanged
 12. FGA/access key routes stay on `DescopeManagementClient` — not through domain services
 13. Run `make lint` before every commit
 
