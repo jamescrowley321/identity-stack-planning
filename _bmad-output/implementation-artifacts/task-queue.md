@@ -106,7 +106,7 @@ See `docs/oidc-certification-analysis.md` for full gap analysis. Tracking issue:
 | T144 | | done | Pass Basic RP conformance tests — 13/13 PASS. SSL cert sharing, cache clearing, UserInfo fatal error, claims display. PR #362 merged 2026-04-12 | medium | T143 |
 | T145 | | done | Pass Config RP conformance tests — 5/5 PASS (signing-key-rotation now passes). All Config RP tests passing | medium | T143 |
 | T146 | | done | Fix any conformance test failures from T144/T145 — all Basic RP (13/13) + Config RP (5/5) + Form Post RP (13/13) passing | medium | T144, T145 |
-| T147 | | pending | Expand to Implicit + Hybrid RP profiles — at_hash validation, c_hash validation, nonce enforcement (nice-to-have, not blocking certification) | medium | T146 |
+| T147 | 415 | pending | Expand to Implicit + Hybrid RP profiles — at_hash validation, c_hash validation, nonce enforcement (nice-to-have, not blocking certification) | medium | T146 |
 
 ### OIDC RP Certification Submission (ACTIVE — next actions)
 
@@ -140,21 +140,34 @@ Re-audit on 2026-04-14 verified Phase 1 fixes (PRs #364-#372) and found 8 new fi
 
 | ID | Issue | Status | Description | Size | Depends |
 |----|-------|--------|-------------|------|---------|
-| T130 | | pending | Enable introspection + revocation in IdentityServer fixture | small | — |
-| T131 | | pending | Add public PKCE client + enforce PKCE in IdentityServer fixture | small | — |
-| T132 | | pending | Run existing integration tests against IdentityServer (expand provider matrix) | medium | T130, T131 |
+| T130 | 412 | pending | Enable introspection + revocation in IdentityServer fixture | small | — |
+| T131 | 413 | pending | Add public PKCE client + enforce PKCE in IdentityServer fixture | small | — |
+| T132 | 414 | pending | Run existing integration tests against IdentityServer (expand provider matrix) | medium | T130, T131 |
 
-### Cloud Provider Integration Tests (cassette-based)
+### Testing Hygiene + jwks-cache Residue (GitHub-only, added to planning 2026-05-21)
 
-Blocked on account setup — James needs to configure Cognito and Entra ID accounts before these can start.
+Items previously tracked only on GitHub; surfaced here so planning reflects the full conformance/testing backlog. Each remains open after the conformance certification push.
+
+| ID | Issue | Status | Description | Size |
+|----|-------|--------|-------------|------|
+| T230 | 275 | pending | Reorganize test infrastructure under consistent directory structure | small |
+| T231 | 276 | pending | Centralize key/cert generation across test fixtures | small |
+| T232 | 280 | pending | Replace local-exec expired-token generation with a test fixture | small |
+| T233 | 398 | pending | Fix `test_per_uri_locks.py` ~3% flake on randomized `PYTHONHASHSEED` (jwks-cache M-1) | small |
+| T234 | 399 | pending | Address module-level `asyncio.Lock()` event-loop binding (jwks-cache M-3) | medium |
+| T235 | 403 | pending | Fix empty-keys refresh that raises on caller despite retained cache (jwks-cache M-5) | small |
+
+### Cloud Provider Integration Tests (cassette-based) — DEFERRED 2026-05-21
+
+GitHub Epic 11 (`epic-11` label, issues #267–#271). Deferred 2026-05-21 — labeled `deferred` on GitHub pending the conformance certification milestone (T164/#331). Still blocked on Cognito + Entra ID account setup as well. Revisit when current focus closes.
 
 | ID | Issue | Status | Description | Size | Depends |
 |----|-------|--------|-------------|------|---------|
-| T133 | | pending | Cassette test infrastructure — pytest-recording for httpx, live/replay mode, per-provider env templates | medium | — |
-| T134 | | blocked | AWS Cognito integration tests — discovery, token validation, `cognito:groups` claims, non-standard discovery URL | medium | T133, Cognito account |
-| T135 | | blocked | Microsoft Entra ID integration tests — v2.0 discovery, multi-tenant, `tid`/`oid` claims | medium | T133, Entra ID account |
-| T136 | | blocked | Auth0 integration tests — discovery, token validation, `permissions`/`org_id` claims, custom domains | medium | T133, Auth0 account |
-| T137 | | pending | Nightly CI workflow — scheduled run against live providers, auto-create issues on drift | small | T134, T135, T136 |
+| T133 | 267 | deferred | Cassette test infrastructure — pytest-recording for httpx, live/replay mode, per-provider env templates | medium | — |
+| T134 | 268 | deferred | AWS Cognito integration tests — discovery, token validation, `cognito:groups` claims, non-standard discovery URL | medium | T133, Cognito account |
+| T135 | 269 | deferred | Microsoft Entra ID integration tests — v2.0 discovery, multi-tenant, `tid`/`oid` claims | medium | T133, Entra ID account |
+| T136 | 270 | deferred | Auth0 integration tests — discovery, token validation, `permissions`/`org_id` claims, custom domains | medium | T133, Auth0 account |
+| T137 | 271 | deferred | Nightly CI workflow — scheduled run against live providers, auto-create issues on drift | small | T134, T135, T136 |
 
 ### Remaining Feature Work
 

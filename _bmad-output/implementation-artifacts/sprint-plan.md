@@ -10,26 +10,43 @@ Sprint plan across three repos. **Execution method:** Ralph loops — one task a
 
 ---
 
-## Current Status (as of 2026-04-19)
+## Current Status (as of 2026-05-21)
+
+**Workspace focus narrowed 2026-05-21:** conformance and testing only. Other workstreams (Design System, monorepo restructure, cloud-provider integration epic) are deferred until the conformance milestone closes.
 
 ### terraform-provider-descope — COMPLETE
 All tasks done. T6 (SSO app) blocked on enterprise license. T7/T8 wontfix. Releases v1.1.0-v1.1.4 published to Terraform Registry. All review fixes (T85-T89, T99-T100) done.
 
-### identity-stack — DESIGN SYSTEM ACTIVE
-All prior work complete (Phases 1-5, Epics 2-3, UI migration, E2E tests, all review fixes). PRD 5 (Canonical Identity Domain Model) **shipped 2026-04-09** — all 18 stories merged. PRD 2 (API Gateway) **shipped 2026-04-12**. Design System Integration — 5 epics, 31 stories. **6 done, 3 partial, 22 remaining.** Epic file: `epics-design-system.md`. Ralph prompt: `ralph-prompts/design-system.md`.
+### identity-stack — DEFERRED (per current focus)
+All prior code work complete (Phases 1-5, Epics 2-3, UI migration, E2E tests, all review fixes). PRD 5 (Canonical Identity Domain Model) **shipped 2026-04-09** — all 19 stories merged. PRD 2 (API Gateway) **shipped 2026-04-12**. Design System Integration — 5 epics, 31 stories, status unconfirmed (GitHub identity-stack tracker has 0 open issues; planning sprint plan from 2026-04-19 listed 6 done / 3 partial / 22 remaining). **Out of scope for current conformance/testing focus — to be reconciled separately.** Epic file: `epics-design-system.md`.
 
-### py-identity-model — CERTIFICATION SUBMISSION READY
-All feature tasks (T32-T47) done. All review fixes (T101-T116) done — 16 PRs merged. Integration test chain (T120-T125) done. OIDC conformance: **all 3 profiles passing** — Basic RP (13/13), Config RP (5/5), Form Post RP (13/13). T140-T146 done, T147 (Implicit/Hybrid) pending as nice-to-have. Security re-audit Phase 2: 6/8 done (T200-T204, T207 shipped via PRs #383-#387), T205-T206 pending. **Next action: T164 — apply for OIDF fee waiver and submit for certification.** Products: T170-T172 pending (monorepo, CLI, middleware).
+### py-identity-model — CERTIFICATION SUBMISSION READY + jwks-cache hardened to v3.0.0
+All feature tasks (T32-T47) done. All review fixes (T101-T116) done. Integration test chain (T120-T125) done. OIDC conformance: **all 3 profiles passing** — Basic RP (13/13), Config RP (5/5), Form Post RP (13/13). T140-T146 done, T147 (Implicit/Hybrid) pending as nice-to-have (now tracked at #415). Security re-audit Phase 2: 6/8 done (T200-T204, T207 shipped via PRs #383-#387), T205 (#380) + T206 (#381) pending.
+
+**jwks-cache hardening rounds done (PRs #394, #395, #406, #407, #408, #409)** — major bump to v3.0.0 published 2026-05-21 (async `clear_*_cache` helpers became async; monotonic clock + request_time inside fetch lock). Residual testing/tech-debt items #398, #399, #403 tracked in task-queue.
+
+**Next action: T164 — apply for OIDF fee waiver and submit for certification.** Products T170-T172 (monorepo, CLI, middleware) remain pending but out of current focus.
 
 ---
 
-## Active Work
+## Active Work (conformance + testing focus)
 
 | Track | Tasks | Notes |
 |-------|-------|-------|
-| **py-identity-model certification** | **T164** | **TOP PRIORITY — apply for OIDF fee waiver + submit (owner-driven)** |
-| **py-identity-model security tail** | T205, T206 (2 remaining) | JWKS URL scheme validation + harness XSS escaping |
-| **identity-stack Design System** | DS-1.1 through DS-5.4 (31 stories) | Purple brand, density, 8 new components, 5 new pages, responsive |
+| **py-identity-model certification** | **T164 (#331)** | **TOP PRIORITY — apply for OIDF fee waiver + submit (owner-driven)** |
+| **py-identity-model security tail** | T205 (#380), T206 (#381) | JWKS URL scheme validation + harness XSS escaping — small PR cluster |
+| **py-identity-model testing residue** | T233 (#398), T234 (#399), T235 (#403) | jwks-cache flake + event-loop lock binding + empty-keys edge — emerged from review rounds |
+| **py-identity-model testing hygiene** | T230 (#275), T231 (#276), T232 (#280) | Test directory reorg + key/cert centralization + token fixture |
+| **py-identity-model IdentityServer fixture** | T130 (#412), T131 (#413), T132 (#414) | Introspection/revocation + PKCE + multi-provider matrix expansion |
+| **py-identity-model conformance breadth** | T147 (#415) | Implicit + Hybrid RP profiles — nice-to-have, not blocking cert |
+
+### Deferred (still valid, revisit after current focus)
+
+| Track | Tasks | Notes |
+|-------|-------|-------|
+| Cloud provider integration tests | T133–T137 (#267–#271) | GitHub Epic 11 — cassettes + Auth0/Cognito/Entra + nightly CI. Labeled `deferred` 2026-05-21. Blocked on Cognito/Entra account setup. |
+| identity-stack Design System | DS-1.1 through DS-5.4 (31 stories) | Out of conformance/testing focus; needs reconciliation against current identity-stack GitHub state. |
+| py-identity-model products | T170 (#332), T171 (#333), T172 (#334) | Monorepo restructure, CLI, FastAPI middleware. |
 
 ---
 
