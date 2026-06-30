@@ -30,6 +30,7 @@ Each iteration completes one phase, persists state to `.claude/task-state.md`, a
 | `pim-integration-tests.md` | Integration test chain | py-identity-model |
 | `pim-fix-review-chain.md` | Chained PR fix loop | py-identity-model |
 | `pim-adversarial-review.md` | Full codebase security review (one-shot) | py-identity-model |
+| `pim-fapi2-hardening.md` | FAPI2 RP gating items (private_key_jwt, RFC 9207) + jwks-cache LRU | py-identity-model |
 
 ## Phase Pipeline
 

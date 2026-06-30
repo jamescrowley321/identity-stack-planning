@@ -121,6 +121,18 @@ Tracking issue: [#242](https://github.com/jamescrowley321/py-identity-model/issu
 | **T164** | **331** | **pending** | **Apply for OIDF OSS certification fee waiver (owner-driven, manual) — NEXT ACTION** | **—** |
 | T165 | 342 | done | Refactor Makefile — consolidated targets, help, HOSTED=1 support. PR #361 merged 2026-04-12 | small |
 
+### FAPI 2.0 RP Hardening + jwks-cache LRU (ralph workstream — ACTIVE)
+
+Ralph prompt: `ralph-prompts/pim-fapi2-hardening.md`. Single sequential workstream covering the items the 2026-06-29 issue audit prioritized. T57/T58 are the FAPI 2.0 RP gating pair; T236 is a multi-tenant security fix. Detailed per-task scope lives in the ralph prompt.
+
+| ID | Issue | Status | Description | Size |
+|----|-------|--------|-------------|------|
+| T57 | 213 | pending | private_key_jwt client authentication — `core/client_assertion.py` (reuse jar.py signing), `PrivateKeyJwt` config, inject into core prepare_* across token/PAR/introspection/revocation | medium |
+| T58 | 221 | pending | RFC 9207 issuer *validation* (parsing already done) — mix-up defense in `core/state_validation.py` | small |
+| T236 | 397 | pending | jwks-cache FIFO→LRU — `move_to_end()` on read hits (`core/jwks_cache.py`, sync/aio token_validation) | small |
+
+> Note: T57/T58/T236 also appear in their topical sections below (Remaining Feature Work, jwks-cache residue). This section is the canonical entry point for the active ralph loop.
+
 ### Security Re-Audit Fixes (Phase 2) — Nearly Complete
 
 Re-audit on 2026-04-14 verified Phase 1 fixes (PRs #364-#372) and found 8 new findings. See `security-fix-plan.md` for batch grouping. All 8 shipped (PRs #383-#387 + T205/T206 closed 2026-05-24). Original adversarial-review tracking issue #300 (2 critical, 4 high, 5 medium) re-audited 2026-06-29 — all critical/high/medium resolved, closed; two low-severity repr-guard items split to #431.
