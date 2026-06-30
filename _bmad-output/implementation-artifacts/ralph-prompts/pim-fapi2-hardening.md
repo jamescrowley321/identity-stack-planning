@@ -8,15 +8,15 @@ Run the loop from a **dedicated py-identity-model worktree**, never from the mai
 # One-time: create the orchestrator worktree off main
 cd ~/repos/auth/py-identity-model
 git fetch origin
-git worktree add ~/repos/auth/pim-fapi2-ralph -b ralph/fapi2-hardening origin/main
+git worktree add /tmp/pim-fapi2-ralph -b ralph/fapi2-hardening origin/main
 
 # Run the loop from inside that worktree
-cd ~/repos/auth/pim-fapi2-ralph
+cd /tmp/pim-fapi2-ralph
 cp ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/pim-fapi2-hardening.md PROMPT.md
 ralph run
 ```
 
-`ORCH_WORKTREE` below refers to `~/repos/auth/pim-fapi2-ralph`. Per-task implementation happens in its own short-lived worktree (`/tmp/pim-T5X`) created by the `setup` phase — the orchestrator worktree only hosts the loop, never task branches. When the loop finishes, remove it: `cd ~/repos/auth/py-identity-model && git worktree remove ~/repos/auth/pim-fapi2-ralph`.
+`ORCH_WORKTREE` below refers to `/tmp/pim-fapi2-ralph`. **The prompt must live inside the orchestrator worktree as `PROMPT.md` for the whole run** — ralph re-reads `PROMPT.md` from the worktree's CWD on every iteration, so it must be copied in (as above) before `ralph run` and must remain there until the loop completes. The planning-repo copy at `ralph-prompts/pim-fapi2-hardening.md` is the source of truth; edit it there and re-`cp` if you change the workstream mid-run. Per-task implementation happens in its own short-lived worktree (`/tmp/pim-T5X`) created by the `setup` phase — the orchestrator worktree only hosts the loop, never task branches. When the loop finishes, remove it: `cd ~/repos/auth/py-identity-model && git worktree remove /tmp/pim-fapi2-ralph`.
 
 ## Task Queue
 
@@ -30,9 +30,9 @@ Order is intentional: the two FAPI 2.0 RP gating items (#213, #221) first, then 
 
 ## Routing
 
-Repo: `~/repos/auth/py-identity-model` (the loop's CWD is `ORCH_WORKTREE` = `~/repos/auth/pim-fapi2-ralph`).
+Repo: `~/repos/auth/py-identity-model` (the loop's CWD is `ORCH_WORKTREE` = `/tmp/pim-fapi2-ralph`).
 
-Read `ORCH_WORKTREE/.claude/task-state.md` (i.e. `~/repos/auth/pim-fapi2-ralph/.claude/task-state.md`).
+Read `ORCH_WORKTREE/.claude/task-state.md` (i.e. `/tmp/pim-fapi2-ralph/.claude/task-state.md`).
 
 - **Does not exist** → Pick first `pending` task, create state, execute setup
 - **phase is `complete`** → Update status to `done` in this file, clean up the task worktree, delete state, pick next
@@ -42,7 +42,7 @@ Phase order (all three tasks use the feature pipeline): `setup → analyze → i
 
 ## New Task Setup
 
-Create `ORCH_WORKTREE/.claude/task-state.md` (`~/repos/auth/pim-fapi2-ralph/.claude/task-state.md`):
+Create `ORCH_WORKTREE/.claude/task-state.md` (`/tmp/pim-fapi2-ralph/.claude/task-state.md`):
 ```
 task_id: T5X
 branch: <branch from queue>
@@ -91,7 +91,7 @@ Include these notes when the analyze phase reads the issue. The #213 design was 
 ## Rules
 
 - ONE phase per iteration, then end.
-- Run the loop from `ORCH_WORKTREE` (`~/repos/auth/pim-fapi2-ralph`), never from the main checkout. Never commit to main — task work happens in `/tmp/pim-T5X` worktree branches.
+- Run the loop from `ORCH_WORKTREE` (`/tmp/pim-fapi2-ralph`), never from the main checkout. Never commit to main — task work happens in `/tmp/pim-T5X` worktree branches.
 - Run `make lint` as a single command before every commit; do NOT use `--no-verify`.
 - Feature tasks (T57, T58) MUST add integration tests (`src/tests/integration/`) AND a usage example (`examples/`) — unit tests alone are insufficient. Run integration tests locally (`make test-integration-node-oidc`) before the `pr` phase.
 - All unit AND integration tests must pass. Never rationalize a red test as pre-existing, environmental, or out-of-scope.
