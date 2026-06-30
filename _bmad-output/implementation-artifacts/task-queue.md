@@ -221,3 +221,21 @@ These are downstream of the OIDC certification work. They inherit credibility fr
 | T170 | 332 | pending | Monorepo restructure — uv workspace with member packages | large | — |
 | T171 | 333 | pending | py-identity-model-cli — RFC 8252 loopback CLI login tool | large | T170 |
 | T172 | 334 | pending | fastapi-identity-model — FastAPI middleware for OIDC auth | large | T170 |
+
+## identity-model
+
+Multi-language OIDC/OAuth2 client library (Go + Rust). Epic source: `planning-artifacts/epics/epic-3-core-go.md`.
+
+### Go Core Tier (ralph workstream — SET UP, launch gated on scaffold)
+
+Ralph prompt: `ralph-prompts/identity-model-go-core.md` (worktree-run — loop runs from `/tmp/im-go-orch`, not the main checkout). Stacked PRs: each story branches off the previous and PRs `--base <parent>`; owner merges bottom-up. Per-task scope + conformance contract live in the prompt + epic.
+
+> **Launch gate:** the 3.1 scaffold (`go/pkg/` skeleton + `spec/`) is **not yet on `main`** — it lives on `feat/foundation-scaffold` (actively in progress). G3.2 bases off that branch; the loop auto-prefers `main` once the scaffold merges. Don't launch until the scaffold branch is stable, or the loop builds on a moving foundation.
+
+| ID | Story | Branch | Base | Status | Description |
+|----|-------|--------|------|--------|-------------|
+| G3.2 | 3.2 | feat/go-discovery | feat/foundation-scaffold | pending | OIDC Discovery client — `pkg/discovery` |
+| G3.3 | 3.3 | feat/go-jwks | feat/go-discovery | pending | JWKS client + key resolution — `pkg/jwks` |
+| G3.4 | 3.4 | feat/go-jwt | feat/go-jwks | pending | JWT validation — `pkg/jwt` (authors `spec/conformance/jwt.json`) |
+| G3.5 | 3.5 | feat/go-token | feat/go-jwt | pending | Client credentials + auth code + PKCE — `pkg/token` (authors conformance) |
+| G3.6 | 3.6 | feat/go-userinfo | feat/go-token | pending | UserInfo endpoint — `pkg/userinfo` (authors conformance) |
