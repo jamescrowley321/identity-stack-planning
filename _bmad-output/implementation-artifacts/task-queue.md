@@ -123,7 +123,7 @@ Tracking issue: [#242](https://github.com/jamescrowley321/py-identity-model/issu
 
 ### FAPI 2.0 RP Hardening + jwks-cache LRU (ralph workstream — ACTIVE)
 
-Ralph prompt: `ralph-prompts/pim-fapi2-hardening.md` (worktree-run — loop runs from `~/repos/auth/pim-fapi2-ralph`, not the main checkout). Single sequential workstream covering the items the 2026-06-29 issue audit prioritized. T57/T58 are the FAPI 2.0 RP gating pair; T236 is a multi-tenant security fix. Detailed per-task scope lives in the ralph prompt.
+Ralph prompt: `ralph-prompts/pim-fapi2-hardening.md` (worktree-run — loop runs from `/tmp/pim-fapi2-ralph`, not the main checkout). Single sequential workstream covering the items the 2026-06-29 issue audit prioritized. T57/T58 are the FAPI 2.0 RP gating pair; T236 is a multi-tenant security fix. Detailed per-task scope lives in the ralph prompt.
 
 | ID | Issue | Status | Description | Size |
 |----|-------|--------|-------------|------|
