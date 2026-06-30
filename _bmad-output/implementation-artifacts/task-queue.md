@@ -106,7 +106,7 @@ See `docs/oidc-certification-analysis.md` for full gap analysis. Tracking issue:
 | T144 | | done | Pass Basic RP conformance tests — 13/13 PASS. SSL cert sharing, cache clearing, UserInfo fatal error, claims display. PR #362 merged 2026-04-12 | medium | T143 |
 | T145 | | done | Pass Config RP conformance tests — 5/5 PASS (signing-key-rotation now passes). All Config RP tests passing | medium | T143 |
 | T146 | | done | Fix any conformance test failures from T144/T145 — all Basic RP (13/13) + Config RP (5/5) + Form Post RP (13/13) passing | medium | T144, T145 |
-| T147 | 415 | pending | Expand to Implicit + Hybrid RP profiles — at_hash validation, c_hash validation, nonce enforcement (nice-to-have, not blocking certification) | medium | T146 |
+| T147 | 415 | wontfix | Expand to Implicit + Hybrid RP profiles — closed not-planned 2026-06-29: Implicit/Hybrid are OAuth 2.1-deprecated; code+PKCE already covered by Basic/Config/Form Post | medium | T146 |
 
 ### OIDC RP Certification Submission (ACTIVE — next actions)
 
@@ -123,7 +123,7 @@ Tracking issue: [#242](https://github.com/jamescrowley321/py-identity-model/issu
 
 ### Security Re-Audit Fixes (Phase 2) — Nearly Complete
 
-Re-audit on 2026-04-14 verified Phase 1 fixes (PRs #364-#372) and found 8 new findings. See `security-fix-plan.md` for batch grouping. 6/8 shipped via PRs #383-#387.
+Re-audit on 2026-04-14 verified Phase 1 fixes (PRs #364-#372) and found 8 new findings. See `security-fix-plan.md` for batch grouping. All 8 shipped (PRs #383-#387 + T205/T206 closed 2026-05-24). Original adversarial-review tracking issue #300 (2 critical, 4 high, 5 medium) re-audited 2026-06-29 — all critical/high/medium resolved, closed; two low-severity repr-guard items split to #431.
 
 | ID | Issue | Status | Description | Size | Depends |
 |----|-------|--------|-------------|------|---------|
@@ -132,8 +132,8 @@ Re-audit on 2026-04-14 verified Phase 1 fixes (PRs #364-#372) and found 8 new fi
 | T202 | 377 | done | Fix dead `require_https` field — wired to DiscoveryPolicy with cache key tuple. PR #385 merged | small | — |
 | T203 | 378 | done | Prevent cache stampede — single-flight refresh on TTL expiry. PR #386 merged | medium | — |
 | T204 | 379 | done | Reject JWKS with missing Content-Type + guard `response_json["keys"]` KeyError. PR #387 merged | small | — |
-| T205 | 380 | pending | Add pre-flight URL scheme validation to `get_jwks()` | small | — |
-| T206 | 381 | pending | Escape HTML in conformance harness error responses | small | — |
+| T205 | 380 | done | Add pre-flight URL scheme validation to `get_jwks()` — issue closed 2026-05-24 | small | — |
+| T206 | 381 | done | Escape HTML in conformance harness error responses — issue closed 2026-05-24 | small | — |
 | T207 | 382 | done | Fix async cleanup lock TOCTOU — eagerly initialize lock at module level | small | — |
 
 ### IdentityServer Fixture Expansion
@@ -153,9 +153,11 @@ Items previously tracked only on GitHub; surfaced here so planning reflects the 
 | T230 | 275 | pending | Reorganize test infrastructure under consistent directory structure | small |
 | T231 | 276 | pending | Centralize key/cert generation across test fixtures | small |
 | T232 | 280 | pending | Replace local-exec expired-token generation with a test fixture | small |
-| T233 | 398 | pending | Fix `test_per_uri_locks.py` ~3% flake on randomized `PYTHONHASHSEED` (jwks-cache M-1) | small |
-| T234 | 399 | pending | Address module-level `asyncio.Lock()` event-loop binding (jwks-cache M-3) | medium |
-| T235 | 403 | pending | Fix empty-keys refresh that raises on caller despite retained cache (jwks-cache M-5) | small |
+| T233 | 398 | done | Fix `test_per_uri_locks.py` ~3% flake on randomized `PYTHONHASHSEED` (jwks-cache M-1) — issue closed 2026-05-23 | small |
+| T234 | 399 | done | Address module-level `asyncio.Lock()` event-loop binding (jwks-cache M-3) — issue closed 2026-05-23 | medium |
+| T235 | 403 | done | Fix empty-keys refresh that raises on caller despite retained cache (jwks-cache M-5) — issue closed 2026-05-23 | small |
+| T236 | 397 | pending | jwks-cache H-3 — FIFO eviction is attacker-controllable (multi-tenant); switch to LRU via `move_to_end()` on read hits | small |
+| T237 | 401 | pending | jwks-cache — document per-process single-flight/cooldown scope + prefork worker amplification (docstrings + docs/) | small |
 
 ### Cloud Provider Integration Tests (cassette-based) — DEFERRED 2026-05-21
 
@@ -173,20 +175,20 @@ GitHub Epic 11 (`epic-11` label, issues #267–#271). Deferred 2026-05-21 — la
 
 | ID | Issue | Status | Description | Size |
 |----|-------|--------|-------------|------|
-| T48 | 83 | pending | Create Comprehensive API Documentation | large |
+| T48 | 83 | done | Create Comprehensive API Documentation — 21 reference pages under `docs/api/` via mkdocs-material + mkdocstrings; issue closed 2026-06-29 | large |
 | T49 | 39 | pending | Okta Example | small |
 | T50 | 38 | pending | Auth0 Example | small |
 | T51 | 37 | pending | Cognito Example | small |
 | T52 | 36 | pending | Google Example | small |
 | T53 | 35 | pending | Azure AD Example | small |
 | T54 | 33 | pending | Flask Middleware Example | small |
-| T55 | 219 | pending | Discovery Cache with Configurable TTL | medium |
+| T55 | 219 | done | Discovery Cache with Configurable TTL — TTL-based `DiscoCacheEntry` in `core/jwks_cache.py`; issue closed 2026-04-10 | medium |
 | T56 | 214 | pending | RP-Initiated Logout (End Session) | medium |
 | T57 | 213 | pending | JWT Client Authentication (private_key_jwt / client_secret_jwt) | medium |
-| T58 | 221 | pending | AS Issuer Identification (RFC 9207) | small |
+| T58 | 221 | pending | AS Issuer Identification (RFC 9207) — partial: response `iss` parsing done; remaining work is issuer *validation* (mix-up defense). Also a FAPI 2.0 RP gating item | small |
 | T59 | 217 | pending | CIBA (Client-Initiated Backchannel Authentication) | large |
 | T60 | 220 | pending | Rich Authorization Requests (RFC 9396) | medium |
-| T61 | 216 | pending | Dynamic Client Registration (RFC 7591) | medium |
+| T61 | 216 | pending | Dynamic Client Registration (RFC 7591) — partial: discovery `registration_endpoint` parsed; remaining is the register-client request/response models + sync/aio functions | medium |
 | T62 | 215 | pending | mTLS Client Auth and Certificate-Bound Tokens (RFC 8705) | large |
 | T63 | 218 | pending | JARM (JWT Secured Authorization Response Mode) | medium |
 
