@@ -14,10 +14,12 @@ Cross-language contract: `spec/capabilities.md` + `spec/conformance/*.json` (the
 Run the loop from a **dedicated orchestrator worktree in `/tmp`**, never from `~/repos/auth/identity-model` — the owner works in that checkout by hand, so the loop must stay isolated from it. `PROMPT.md` and `.claude/task-state.md` live in the orchestrator worktree for the whole run.
 
 ```bash
-# One-time: create the orchestrator worktree off main
+# One-time: create the orchestrator worktree.
+# Base off feat/foundation-scaffold, NOT main — main has no ralph.yml/go/spec yet
+# (the 3.1 scaffold has not been merged). Switch this to origin/main once it has.
 cd ~/repos/auth/identity-model
 git fetch origin
-git worktree add /tmp/im-go-orch -b ralph/go-core origin/main
+git worktree add /tmp/im-go-orch -b ralph/go-core feat/foundation-scaffold
 
 # Run the loop from inside that worktree
 cd /tmp/im-go-orch
