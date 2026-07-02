@@ -224,18 +224,41 @@ These are downstream of the OIDC certification work. They inherit credibility fr
 
 ## identity-model
 
-Multi-language OIDC/OAuth2 client library (Go + Rust). Epic source: `planning-artifacts/epics/epic-3-core-go.md`.
+Multi-language OIDC/OAuth2 client library (Go + Rust). Epic sources: `planning-artifacts/epics/epic-3-core-go.md`, `epic-4-core-rust.md`.
 
-### Go Core Tier (ralph workstream — SET UP, launch gated on scaffold)
+### Go Core Tier (ralph workstream — COMPLETE, merged 2026-07-02)
 
-Ralph prompt: `ralph-prompts/identity-model-go-core.md` (worktree-run — loop runs from `/tmp/im-go-orch`, not the main checkout). Stacked PRs: each story branches off the previous and PRs `--base <parent>`; owner merges bottom-up. Per-task scope + conformance contract live in the prompt + epic.
-
-> **Launch gate:** the 3.1 scaffold (`go/pkg/` skeleton + `spec/`) is **not yet on `main`** — it lives on `feat/foundation-scaffold` (actively in progress). G3.2 bases off that branch; the loop auto-prefers `main` once the scaffold merges. Don't launch until the scaffold branch is stable, or the loop builds on a moving foundation.
+Ralph prompt: `ralph-prompts/identity-model-go-core.md`. Loop completed all five stories; PRs #2–#6 merged bottom-up to `main` 2026-07-02, plus #7 (multi-provider integration test matrix: local compose gate with node-oidc-provider + Duende IdentityServer required on every PR; Ory + Descope cloud jobs run off repo secrets).
 
 | ID | Story | Branch | Base | Status | Description |
 |----|-------|--------|------|--------|-------------|
-| G3.2 | 3.2 | feat/go-discovery | feat/foundation-scaffold | pending | OIDC Discovery client — `pkg/discovery` |
-| G3.3 | 3.3 | feat/go-jwks | feat/go-discovery | pending | JWKS client + key resolution — `pkg/jwks` |
-| G3.4 | 3.4 | feat/go-jwt | feat/go-jwks | pending | JWT validation — `pkg/jwt` (authors `spec/conformance/jwt.json`) |
-| G3.5 | 3.5 | feat/go-token | feat/go-jwt | pending | Client credentials + auth code + PKCE — `pkg/token` (authors conformance) |
-| G3.6 | 3.6 | feat/go-userinfo | feat/go-token | pending | UserInfo endpoint — `pkg/userinfo` (authors conformance) |
+| G3.2 | 3.2 | feat/go-discovery | feat/foundation-scaffold | done | OIDC Discovery client — `pkg/discovery` (PR #2) |
+| G3.3 | 3.3 | feat/go-jwks | feat/go-discovery | done | JWKS client + key resolution — `pkg/jwks` (PR #3) |
+| G3.4 | 3.4 | feat/go-jwt | feat/go-jwks | done | JWT validation — `pkg/jwt` (PR #4) |
+| G3.5 | 3.5 | feat/go-token | feat/go-jwt | done | Client credentials + auth code + PKCE — `pkg/token` (PR #5) |
+| G3.6 | 3.6 | feat/go-userinfo | feat/go-token | done | UserInfo endpoint — `pkg/userinfo` (PR #6) |
+
+### Rust Core Tier (ralph workstream — READY to launch)
+
+Ralph prompt: `ralph-prompts/identity-model-rust-core.md` (worktree-run — loop runs from `/tmp/im-rust-orch` off `main`). Same stacked-PR model as the Go tier. R4.2 additionally wires the Rust integration harness (TEST_* env helper, Make targets, `rust-integration` CI job); R4.6 extends the cloud CI jobs to Rust. **R4.5 carve-out:** PKCE is the owner's learning task (issue #12) — the loop uses the owner's module if present, implements only if absent.
+
+| ID | Story | Branch | Base | Status | Description |
+|----|-------|--------|------|--------|-------------|
+| R4.2 | 4.2 | feat/rust-discovery | main | pending | OIDC Discovery client — `src/discovery` + Rust integration harness |
+| R4.3 | 4.3 | feat/rust-jwks | feat/rust-discovery | pending | JWKS client + key resolution — `src/jwks` |
+| R4.4 | 4.4 | feat/rust-jwt | feat/rust-jwks | pending | JWT validation — `src/jwt` |
+| R4.5 | 4.5 | feat/rust-token | feat/rust-jwt | pending | Client credentials + auth code + PKCE — `src/token` (owner PKCE carve-out, #12) |
+| R4.6 | 4.6 | feat/rust-userinfo | feat/rust-token | pending | UserInfo endpoint — `src/userinfo` + cloud CI jobs for Rust |
+
+### Owner Learning Tasks (reserved — ralph loops must NOT pick these up)
+
+Starter tasks for the owner to write Go and Rust by hand (a stated purpose of this project). Tracked as identity-model issues labeled `learning`. Suggested order: #8 → #12 → #9 → #13 → #10 → #11.
+
+| Issue | Lang | Status | Description |
+|-------|------|--------|-------------|
+| [#8](https://github.com/jamescrowley321/identity-model/issues/8) | go | pending | Full-flow example: discovery → token → validate → userinfo (composition warm-up, no new API) |
+| [#9](https://github.com/jamescrowley321/identity-model/issues/9) | go | pending | Refresh token grant (`pkg/token`) — first real feature, mirrors ClientCredentials |
+| [#10](https://github.com/jamescrowley321/identity-model/issues/10) | go | pending | Token revocation (RFC 7009) — fixture already enables it |
+| [#11](https://github.com/jamescrowley321/identity-model/issues/11) | go | pending | Token introspection (RFC 7662) — `test-opaque` client exists for this |
+| [#12](https://github.com/jamescrowley321/identity-model/issues/12) | rust | pending | PKCE module — pure functions, RFC 7636 Appendix B vector; **do before the rust loop reaches R4.5** |
+| [#13](https://github.com/jamescrowley321/identity-model/issues/13) | rust | pending | Port the discovery example to Rust (first async Rust; after R4.2 lands) |
