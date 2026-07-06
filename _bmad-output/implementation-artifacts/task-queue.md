@@ -203,6 +203,7 @@ GitHub Epic 11 (`epic-11` label, issues #267–#271). Deferred 2026-05-21 — la
 | T61 | 216 | pending | Dynamic Client Registration (RFC 7591) — partial: discovery `registration_endpoint` parsed; remaining is the register-client request/response models + sync/aio functions | medium |
 | T62 | 215 | pending | mTLS Client Auth and Certificate-Bound Tokens (RFC 8705) | large |
 | T63 | 218 | pending | JARM (JWT Secured Authorization Response Mode) | medium |
+| T250 | 436 | pending | Custom claims validation hook accepting a `ClaimsPrincipal` — add `principal_validator` to `TokenValidationConfig` (sync+async, mirrors `claims_validator`), invoked after standard validation via `to_principal()`; follow-up: expose principal-level hook in fastapi-identity-model middleware once PR #434 lands | medium |
 
 ### Infrastructure & Secrets Automation
 
