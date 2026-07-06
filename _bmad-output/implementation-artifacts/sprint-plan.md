@@ -25,7 +25,7 @@ All feature tasks (T32-T47) done. All review fixes (T101-T116) done. Integration
 
 **jwks-cache hardening rounds done (PRs #394, #395, #406, #407, #408, #409)** — major bump to v3.0.0 published 2026-05-21 (async `clear_*_cache` helpers became async; monotonic clock + request_time inside fetch lock). Residual testing/tech-debt items #398, #399, #403 tracked in task-queue.
 
-**Next action: T164 — apply for OIDF fee waiver and submit for certification.** Products T170-T172 (monorepo, CLI, middleware) remain pending but out of current focus.
+**Next action: T164 — apply for OIDF fee waiver and submit for certification.** Products: T170+T172 (monorepo layout + fastapi-identity-model package) are in review via PR #434, with the OIDF conformance regression stage (T173/#437) stacked on top; T171 (CLI) remains pending.
 
 ---
 
@@ -39,6 +39,7 @@ All feature tasks (T32-T47) done. All review fixes (T101-T116) done. Integration
 | **py-identity-model testing hygiene** | T230 (#275), T231 (#276), T232 (#280) | Test directory reorg + key/cert centralization + token fixture |
 | **py-identity-model IdentityServer fixture** | T130 (#412), T131 (#413), T132 (#414) | Introspection/revocation + PKCE + multi-provider matrix expansion |
 | **py-identity-model conformance breadth** | T147 (#415) | Implicit + Hybrid RP profiles — nice-to-have, not blocking cert |
+| **fastapi-identity-model package + regression** | T172 (#334, PR #434), T173 (#437) | Package (middleware + RP router) in review; OIDF conformance regression drives the real router through all 3 local plans (regression stage, not a second cert). Ralph prompt: `pim-fastapi-conformance-regression.md` |
 
 ### Deferred (still valid, revisit after current focus)
 
@@ -46,7 +47,7 @@ All feature tasks (T32-T47) done. All review fixes (T101-T116) done. Integration
 |-------|-------|-------|
 | Cloud provider integration tests | T133–T137 (#267–#271) | GitHub Epic 11 — cassettes + Auth0/Cognito/Entra + nightly CI. Labeled `deferred` 2026-05-21. Blocked on Cognito/Entra account setup. |
 | identity-stack Design System | DS-1.1 through DS-5.4 (31 stories) | Out of conformance/testing focus; needs reconciliation against current identity-stack GitHub state. |
-| py-identity-model products | T170 (#332), T171 (#333), T172 (#334) | Monorepo restructure, CLI, FastAPI middleware. |
+| py-identity-model products | T170 (#332), T171 (#333) | Monorepo restructure delivered by PR #434 (in review); CLI still pending. T172/T173 promoted to Active Work above. |
 
 ---
 
