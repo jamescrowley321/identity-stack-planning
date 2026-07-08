@@ -12,7 +12,9 @@ Sprint plan across three repos. **Execution method:** Ralph loops — one task a
 
 ## Current Status (as of 2026-05-21)
 
-**Workspace focus narrowed 2026-05-21:** conformance and testing only. Other workstreams (Design System, monorepo restructure, cloud-provider integration epic) are deferred until the conformance milestone closes.
+> **Update 2026-07-08:** py-identity-model is now **OpenID Certified** (3.1.0 — Basic + Config + Form Post Basic RP, 2 Jul 2026), so the conformance milestone has **closed**. Corrections to the 2026-05-21 snapshot below: T164/#331 (cert + fee waiver) is **done**; T147 is **`wontfix`** (Implicit/Hybrid dropped, #415); the security tail T205/T206 is **done**. Next cert round: Dynamic RP (#216), RP-Initiated Logout (#214), Back-Channel Logout (#442). The rest of this snapshot is historical.
+
+**Workspace focus narrowed 2026-05-21:** conformance and testing only. Other workstreams (Design System, monorepo restructure, cloud-provider integration epic) were deferred until the conformance milestone closed (now closed).
 
 ### terraform-provider-descope — COMPLETE
 All tasks done. T6 (SSO app) blocked on enterprise license. T7/T8 wontfix. Releases v1.1.0-v1.1.4 published to Terraform Registry. All review fixes (T85-T89, T99-T100) done.
@@ -20,12 +22,12 @@ All tasks done. T6 (SSO app) blocked on enterprise license. T7/T8 wontfix. Relea
 ### identity-stack — DEFERRED (per current focus)
 All prior code work complete (Phases 1-5, Epics 2-3, UI migration, E2E tests, all review fixes). PRD 5 (Canonical Identity Domain Model) **shipped 2026-04-09** — all 19 stories merged. PRD 2 (API Gateway) **shipped 2026-04-12**. Design System Integration — 5 epics, 31 stories, status unconfirmed (GitHub identity-stack tracker has 0 open issues; planning sprint plan from 2026-04-19 listed 6 done / 3 partial / 22 remaining). **Out of scope for current conformance/testing focus — to be reconciled separately.** Epic file: `epics-design-system.md`.
 
-### py-identity-model — CERTIFICATION SUBMISSION READY + jwks-cache hardened to v3.0.0
-All feature tasks (T32-T47) done. All review fixes (T101-T116) done. Integration test chain (T120-T125) done. OIDC conformance: **all 3 profiles passing** — Basic RP (13/13), Config RP (5/5), Form Post RP (13/13). T140-T146 done, T147 (Implicit/Hybrid) pending as nice-to-have (now tracked at #415). Security re-audit Phase 2: 6/8 done (T200-T204, T207 shipped via PRs #383-#387), T205 (#380) + T206 (#381) pending.
+### py-identity-model — ✅ CERTIFIED (Basic + Config + Form Post Basic RP) + jwks-cache hardened to v3.0.0
+All feature tasks (T32-T47) done. All review fixes (T101-T116) done. Integration test chain (T120-T125) done. OIDC conformance: **certified 2 Jul 2026 (v3.1.0)** — Basic RP (13/13), Config RP (5/5), Form Post RP (13/13). T140-T146 done, T164 (fee waiver/submission) done. T147 (Implicit/Hybrid) **wontfix** — dropped as OAuth 2.1-deprecated (#415). Security re-audit Phase 2: 8/8 done (T200-T207 shipped via PRs #383-#387; T205/#380 + T206/#381 done).
 
 **jwks-cache hardening rounds done (PRs #394, #395, #406, #407, #408, #409)** — major bump to v3.0.0 published 2026-05-21 (async `clear_*_cache` helpers became async; monotonic clock + request_time inside fetch lock). Residual testing/tech-debt items #398, #399, #403 tracked in task-queue.
 
-**Next action: T164 — apply for OIDF fee waiver and submit for certification.** Products: T170+T172 (monorepo layout + fastapi-identity-model package) are in review via PR #434, with the OIDF conformance regression stage (T173/#437) stacked on top; T171 (CLI) remains pending.
+**Certified 2 Jul 2026 (T164 done).** Next cert round: Dynamic RP (#216), RP-Initiated Logout (#214), Back-Channel Logout (#442). Products: T170+T172 (monorepo layout + fastapi-identity-model package) in review via PR #434, with the OIDF conformance regression stage (T173/#437) stacked on top; T171 (CLI, #333 — now includes device flow in v1) remains pending.
 
 ---
 
@@ -33,12 +35,12 @@ All feature tasks (T32-T47) done. All review fixes (T101-T116) done. Integration
 
 | Track | Tasks | Notes |
 |-------|-------|-------|
-| **py-identity-model certification** | **T164 (#331)** | **TOP PRIORITY — apply for OIDF fee waiver + submit (owner-driven)** |
+| **py-identity-model certification** | ✅ done (T164/#331) | **Certified 2 Jul 2026** — Basic + Config + Form Post Basic RP (v3.1.0). Next round: #216/#214/#442 |
 | **py-identity-model security tail** | T205 (#380), T206 (#381) | JWKS URL scheme validation + harness XSS escaping — small PR cluster |
 | **py-identity-model testing residue** | T233 (#398), T234 (#399), T235 (#403) | jwks-cache flake + event-loop lock binding + empty-keys edge — emerged from review rounds |
 | **py-identity-model testing hygiene** | T230 (#275), T231 (#276), T232 (#280) | Test directory reorg + key/cert centralization + token fixture |
 | **py-identity-model IdentityServer fixture** | T130 (#412), T131 (#413), T132 (#414) | Introspection/revocation + PKCE + multi-provider matrix expansion |
-| **py-identity-model conformance breadth** | T147 (#415) | Implicit + Hybrid RP profiles — nice-to-have, not blocking cert |
+| **py-identity-model conformance breadth** | T147 (#415) — wontfix | Implicit + Hybrid RP dropped (OAuth 2.1-deprecated). Next-round profiles instead: Dynamic RP (#216), RP-Initiated Logout (#214), Back-Channel Logout (#442) |
 | **fastapi-identity-model package + regression** | T172 (#334, PR #434), T173 (#437) | Package (middleware + RP router) in review; OIDF conformance regression drives the real router through all 3 local plans (regression stage, not a second cert). Ralph prompt: `pim-fastapi-conformance-regression.md` |
 
 ### Deferred (still valid, revisit after current focus)
@@ -167,6 +169,6 @@ Run via `ralph-prompts/design-system.md`. 5 epics, 31 stories. Full breakdown in
 
 1. **T6 blocked** (enterprise license E074106): Cascades to T18 (SSO), T21 (Step-Up), T22 (MFA), T25 (OIDC/SAML)
 2. **T7/T8 wontfix**: JWT Templates (T20) and Custom Flows (T23/T24) need alternative approaches or descoping
-3. **OIDF certification is top priority** for py-identity-model — all profiles passing, submit ASAP (T164)
+3. **OIDF certification is done** for py-identity-model — certified 2 Jul 2026 (Basic + Config + Form Post Basic RP, v3.1.0; T164). Next round: #216/#214/#442
 4. **Design system is top priority** for identity-stack — runs parallel with py-identity-model certification
 5. **Toolchain expansion**: Four PRDs planned. Should not start until design system + conformance are stable
