@@ -1,7 +1,22 @@
 # OIDC/OAuth 2.0 Certification Analysis for py-identity-model
 
-**Date:** 2026-03-26
-**Status:** Research Complete — Planning Required
+**Date:** 2026-03-26 · **Updated:** 2026-07-07
+**Status:** ✅ **Certified (Basic + Config + Form Post Basic RP)** — expanding to next profiles
+
+> ## ✅ Certification achieved — 2 July 2026
+>
+> `py-identity-model 3.1.0` is **OpenID Certified** by the OpenID Foundation as a
+> Relying Party for the **Basic RP**, **Config RP**, and **Form Post Basic RP**
+> profiles, published to the
+> [Certified OpenID Relying Parties](https://openid.net/certification/certified-openid-relying-parties-profiles/)
+> and [Certified OpenID Connect Implementations](https://openid.net/certification/certified-openid-connect-implementations/)
+> lists. This makes it one of only a handful of certified Python OIDC RP libraries
+> (alongside Roland Hedberg's `pyoidc` / `oidcrp`).
+>
+> Phases 1–3 of the plan in §6 are **complete**. The fee-waiver step
+> (py-identity-model #331) was resolved via the OIDF Open-Source Project
+> Certification Policy. Current focus is **§6 Phase 4 — expand profiles**
+> (see §8, added 2026-07-07). Tracking: py-identity-model #242.
 
 ## 1. Certification Program Overview
 
@@ -35,14 +50,22 @@ Getting py-identity-model certified would make it one of very few certified Pyth
 
 For py-identity-model as an RP/client library:
 
-| Profile | Test Plan | Priority | Current State |
-|---------|-----------|----------|---------------|
-| **Basic RP** | `oidcc-client-basic-certification-test-plan` | Must-have | Mostly covered — auth code + PKCE in open PRs |
-| **Config RP** | `oidcc-client-config-certification-test-plan` | Must-have | **Already implemented** — discovery + JWKS + issuer validation |
-| **Implicit RP** | `oidcc-client-implicit-certification-test-plan` | Nice-to-have | Partial — token validation works, flow not fully exercised |
-| **Hybrid RP** | `oidcc-client-hybrid-certification-test-plan` | Nice-to-have | Partial — at_hash/c_hash supported via PyJWT |
-| **Dynamic RP** | `oidcc-client-dynamic-certification-test-plan` | Stretch | **Missing** — Dynamic Client Registration (issue #216, no PR) |
-| **Form Post RP** | `oidcc-client-formpost-*-certification-test-plan` | Optional | Not addressed |
+For py-identity-model as an RP/client library (state as of 2026-07-07):
+
+| Profile | Test Plan | Current State |
+|---------|-----------|---------------|
+| **Basic RP** | `oidcc-client-basic-certification-test-plan` | ✅ **Certified** (2 Jul 2026, v3.1.0) |
+| **Config RP** | `oidcc-client-config-certification-test-plan` | ✅ **Certified** (2 Jul 2026, v3.1.0) |
+| **Form Post Basic RP** | `oidcc-client-formpost-basic-certification-test-plan` | ✅ **Certified** (2 Jul 2026, v3.1.0) |
+| **Dynamic RP** | `oidcc-client-dynamic-certification-test-plan` | ⏳ Next — needs RFC 7591/7592 registration (#216) |
+| **RP-Initiated Logout RP** | `oidcc-client-rp-initiated-logout-certification-test-plan` | ⏳ Next — `end_session` URL builder (#214) |
+| **Back-Channel Logout RP** | `oidcc-client-backchannel-logout-certification-test-plan` | ⏳ Next — `validate_logout_token` (#442) |
+| **Hybrid RP** | `oidcc-client-hybrid-certification-test-plan` | ⏳ Next (reinstated) — `c_hash`/`at_hash`/`s_hash` + nonce binding (#441) |
+| **Implicit RP** | `oidcc-client-implicit-certification-test-plan` | ❌ Dropped — deprecated in OAuth 2.1 |
+| **Front-Channel Logout RP** | `oidcc-client-frontchannel-logout-certification-test-plan` | ❌ Dropped — browser-iframe; not applicable to a server-side library |
+| **Session Management RP** | `oidcc-client-session-management-certification-test-plan` | ❌ Dropped — requires `check_session_iframe` + browser `postMessage` |
+
+See **§8** for the detailed next-profiles plan, epic mapping, and the core-library / middleware split.
 
 ---
 
@@ -204,29 +227,32 @@ py-identity-model/
 
 ## 6. Recommended Phased Plan
 
-### Phase 1 — Merge Foundations & Close Gaps
+### Phase 1 — Merge Foundations & Close Gaps ✅ DONE
 - Review and merge PRs #224, #222, #223, #225, #211, #236
 - Verify/fix missing `kid` handling in JWKS lookup
 - Add explicit UserInfo `sub` vs. ID token `sub` mismatch check
-- Implement JWKS cache TTL/forced refresh (issue #219)
+- Implement JWKS cache TTL/forced refresh (issue #219 — closed)
 
-### Phase 2 — Build Conformance Test Harness
+### Phase 2 — Build Conformance Test Harness ✅ DONE
 - Create `conformance/` directory in py-identity-model
 - Build thin FastAPI app as RP glue layer
 - Wire to local conformance suite via Docker Compose
 - Automate with the suite's `run-test-plan.py` approach
 - Target: **Basic RP** + **Config RP** profiles first
 
-### Phase 3 — Run & Certify
-- Run all tests locally, fix failures iteratively
-- Run on `certification.openid.net` for official results
-- Collect evidence (RP logs showing rejection of bad tokens)
-- Submit for certification ($700 as member / $3,500 as non-member)
+### Phase 3 — Run & Certify ✅ DONE (2 Jul 2026)
+- Ran all tests on `certification.openid.net`; collected RP-side evidence logs
+- Submitted Basic + Config + Form Post Basic; fee waived via the OIDF
+  Open-Source Project Certification Policy (#331)
+- **Certified `py-identity-model 3.1.0`** — published to the OIDF RP lists
 
-### Phase 4 — Expand Profiles
-- Implicit RP, Hybrid RP (at_hash/c_hash already partially supported)
-- Dynamic RP (requires Dynamic Client Registration — issue #216)
-- FAPI 2.0 (PR #235 exists, plus DPoP #229, PAR #230)
+### Phase 4 — Expand Profiles ⏳ IN PROGRESS
+Now the active phase. Full breakdown, epic mapping, and the core-library /
+middleware split are in **§8** below. Summary: pursue **Dynamic RP** (#216),
+**RP-Initiated Logout** (#214), **Back-Channel Logout** (#442), and
+**Hybrid RP** (#441); keep **Front-Channel Logout** and **Session Management**
+dropped (browser-iframe, not applicable to a server-side library). FAPI 2.0
+remains a separate track (its own certification type/fee).
 
 ---
 
@@ -241,3 +267,66 @@ py-identity-model/
 - [Certification Fee Schedule](https://openid.net/certification/fees/)
 - [erlef/oidcc_conformance (reference RP harness)](https://github.com/erlef/oidcc_conformance)
 - [Conformance Profiles v3.0 (PDF)](https://openid.net/wordpress-content/uploads/2018/06/OpenID-Connect-Conformance-Profiles.pdf)
+
+---
+
+## 8. Next Profiles Plan (Phase 4) — added 2026-07-07
+
+With Basic + Config + Form Post Basic RP certified, the next expansion targets are
+below. Each maps to an existing cross-language spec epic in this repo and to a
+py-identity-model tracking issue. **Certification is version-pinned** — the current
+listing is `3.1.0`; each new profile set requires a fresh hosted run + submission
+against a new deployment name.
+
+### 8.1 Core-library / middleware split
+
+The logout profiles are **not** purely a token-library concern. We split them:
+
+- **`py-identity-model` (core lib)** owns the protocol *primitives*: `validate_logout_token()`,
+  `build_end_session_url()`, `c_hash`/`at_hash`/`s_hash` validation, the RFC 7591/7592
+  dynamic-registration client, and the new discovery metadata fields.
+- **`fastapi-identity-model` (middleware package)** owns the *HTTP surface & session lifecycle*:
+  the `backchannel_logout_uri` POST receiver, the RP-initiated logout redirect, and
+  session termination keyed by `sid`/`sub`. This package is on the open branch
+  **`feat/fastapi-identity-model-package`** (`packages/fastapi-identity-model/`) — the
+  logout endpoint work should land there, consuming the core-lib primitives.
+
+The OIDF RP certification itself continues to be driven by the disposable `conformance/`
+harness (it exercises whichever primitives a profile needs); the middleware package is a
+downstream consumer, not the certified artifact.
+
+### 8.2 Target profiles
+
+| Profile | Epic (this repo) | Issue | Core-lib work | Middleware work |
+|---|---|---|---|---|
+| **Dynamic RP** | `epic-0e-spec-dynamic-registration.md` (S.9) | #216 | RFC 7591 register + RFC 7592 read/update; WebFinger discovery; `registration_endpoint` (already parsed) | — |
+| **RP-Initiated Logout RP** | `epic-0e-spec-logout.md` (S.10a) | #214 | `end_session_endpoint` discovery field + `build_end_session_url()` + `state` round-trip | trigger logout redirect |
+| **Back-Channel Logout RP** | `epic-0e-spec-logout.md` (S.10b) | #442 | `validate_logout_token()` (events/sid/sub/no-nonce/`typ`); `backchannel_logout_*` discovery fields | `backchannel_logout_uri` receiver + session kill by sid/sub |
+| **Hybrid RP** *(reinstated)* | `epic-0d-spec-token-flows.md` — **gap, needs a hybrid story** | #441 | hybrid `response_type` handling + `c_hash`/`at_hash`/`s_hash` validation + nonce binding | form_post/fragment callback |
+
+### 8.3 Dropped (documented decisions)
+
+- **Hybrid RP was previously dropped** in #242 as "deprecated in OAuth 2.1." It is now
+  **reinstated** for parity with `pyoidc`/`oidcrp` (both certify Hybrid) — pursued for
+  certification breadth only; new code should still use code + PKCE.
+- **Front-Channel Logout RP** — stays dropped. It is a browser-iframe mechanism; only a
+  thin `iss`/`sid` query-param validation helper is library-appropriate, and the actual
+  logout is app/session-store level. Not worth a certification push.
+- **Session Management RP** — stays dropped. Requires `check_session_iframe` and browser
+  `postMessage` polling; a server-side Python library has no browser to run it in, so it
+  is **not certifiable** here.
+
+### 8.4 Spec gap to close first
+
+`epic-0e-spec-logout.md` and `epic-0e-spec-dynamic-registration.md` already define the
+cross-language spec + conformance tests for logout and registration. **Hybrid flow has no
+dedicated spec story** — `epic-0d-spec-token-flows.md` covers only client-credentials (S.5)
+and auth-code + PKCE (S.6). Add a hybrid story (response types + hash validation + nonce
+binding, with `HYBRID-*` conformance cases) before implementing #441.
+
+### 8.5 Suggested sequence
+
+1. **Dynamic RP** (#216) and **Back-Channel Logout** (#442) — highest fit; both add
+   genuinely useful capabilities beyond certification.
+2. **RP-Initiated Logout** (#214) — small, complements Back-Channel for a full logout story.
+3. **Hybrid RP** (#441) — after the §8.4 spec story; certification breadth, legacy flow.
