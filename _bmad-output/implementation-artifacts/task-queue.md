@@ -219,9 +219,10 @@ These are downstream of the OIDC certification work. They inherit credibility fr
 
 | ID | Issue | Status | Description | Size | Depends |
 |----|-------|--------|-------------|------|---------|
-| T170 | 332 | pending | Monorepo restructure — uv workspace with member packages | large | — |
+| T170 | 332 | in review | Monorepo restructure — uv workspace with member packages. Delivered by PR #434's workspace layout (`packages/fastapi-identity-model` member + independent release workflow) | large | — |
 | T171 | 333 | pending | py-identity-model-cli — RFC 8252 loopback CLI login tool | large | T170 |
-| T172 | 334 | pending | fastapi-identity-model — FastAPI middleware for OIDC auth | large | T170 |
+| T172 | 334 | in review | fastapi-identity-model — FastAPI middleware + RP login router. PR #434 open (middleware, `build_oidc_router`, 60+ mocked unit tests, example app) | large | T170 |
+| T173 | 437 | in review | fastapi-identity-model OIDF conformance regression — form_post + fetch_userinfo + §4.3 issuer-mismatch check on the router, `app_fastapi.py` harness driving the real `build_oidc_router` through all 3 local plans, `rp-fastapi` service + `make conformance-test-fastapi` + CI job. Regression stage, not a second cert (#242) | medium | T172 |
 
 ## identity-model
 
