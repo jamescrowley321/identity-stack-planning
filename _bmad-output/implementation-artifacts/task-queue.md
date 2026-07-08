@@ -223,3 +223,21 @@ These are downstream of the OIDC certification work. They inherit credibility fr
 | T171 | 333 | pending | py-identity-model-cli — RFC 8252 loopback CLI login tool | large | T170 |
 | T172 | 334 | in review | fastapi-identity-model — FastAPI middleware + RP login router. PR #434 open (middleware, `build_oidc_router`, 60+ mocked unit tests, example app) | large | T170 |
 | T173 | 437 | in review | fastapi-identity-model OIDF conformance regression — form_post + fetch_userinfo + §4.3 issuer-mismatch check on the router, `app_fastapi.py` harness driving the real `build_oidc_router` through all 3 local plans, `rp-fastapi` service + `make conformance-test-fastapi` + CI job. Regression stage, not a second cert (#242) | medium | T172 |
+
+## identity-model
+
+Multi-language OIDC/OAuth2 client library (Go + Rust). Epic source: `planning-artifacts/epics/epic-3-core-go.md`.
+
+### Go Core Tier (ralph workstream — SET UP, launch gated on scaffold)
+
+Ralph prompt: `ralph-prompts/identity-model-go-core.md` (worktree-run — loop runs from `/tmp/im-go-orch`, not the main checkout). Stacked PRs: each story branches off the previous and PRs `--base <parent>`; owner merges bottom-up. Per-task scope + conformance contract live in the prompt + epic.
+
+> **Launch gate:** the 3.1 scaffold (`go/pkg/` skeleton + `spec/`) is **not yet on `main`** — it lives on `feat/foundation-scaffold` (actively in progress). G3.2 bases off that branch; the loop auto-prefers `main` once the scaffold merges. Don't launch until the scaffold branch is stable, or the loop builds on a moving foundation.
+
+| ID | Story | Branch | Base | Status | Description |
+|----|-------|--------|------|--------|-------------|
+| G3.2 | 3.2 | feat/go-discovery | feat/foundation-scaffold | pending | OIDC Discovery client — `pkg/discovery` |
+| G3.3 | 3.3 | feat/go-jwks | feat/go-discovery | pending | JWKS client + key resolution — `pkg/jwks` |
+| G3.4 | 3.4 | feat/go-jwt | feat/go-jwks | pending | JWT validation — `pkg/jwt` (authors `spec/conformance/jwt.json`) |
+| G3.5 | 3.5 | feat/go-token | feat/go-jwt | pending | Client credentials + auth code + PKCE — `pkg/token` (authors conformance) |
+| G3.6 | 3.6 | feat/go-userinfo | feat/go-token | pending | UserInfo endpoint — `pkg/userinfo` (authors conformance) |

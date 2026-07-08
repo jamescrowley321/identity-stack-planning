@@ -31,6 +31,7 @@ Each iteration completes one phase, persists state to `.claude/task-state.md`, a
 | `pim-fix-review-chain.md` | Chained PR fix loop | py-identity-model |
 | `pim-adversarial-review.md` | Full codebase security review (one-shot) | py-identity-model |
 | `pim-fapi2-hardening.md` | FAPI2 RP gating items (private_key_jwt, RFC 9207) + jwks-cache LRU (worktree-run) | py-identity-model |
+| `identity-model-go-core.md` | Go Core Tier (Epic 3, stories 3.2–3.6) — stacked PRs, conformance-gated (worktree-run) | identity-model |
 
 ## Phase Pipeline
 
