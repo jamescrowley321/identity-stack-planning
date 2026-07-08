@@ -322,3 +322,11 @@ no new spec story is needed before implementation.
 1. **Dynamic RP** (#216) and **Back-Channel Logout** (#442) — highest fit; both add
    genuinely useful capabilities beyond certification.
 2. **RP-Initiated Logout** (#214) — small, complements Back-Channel for a full logout story.
+
+### 8.6 Out of certification scope (not a cert profile)
+
+- **Device flow (RFC 8628)** and the **CLI product** (py-identity-model #333) are **not**
+  certification targets — the OIDF OIDC RP suite has no device-flow test module, and no
+  vendor CLI is OIDF-certified as an RP. Device flow is already implemented in the library
+  (#91); the CLI inherits credibility from the library cert, not its own. (CIBA, #217, is
+  separate — it has FAPI-CIBA cert; RFC 8628 does not.)
