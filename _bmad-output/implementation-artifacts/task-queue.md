@@ -89,13 +89,13 @@ Full breakdown: `epics-design-system.md`. Ralph prompt: `ralph-prompts/design-sy
 
 **Requirements:** Every feature task MUST include integration tests (in `src/tests/integration/`) and usage examples (in `examples/`). Unit tests alone are not sufficient.
 
-All feature tasks (T32-T47) complete. All review fixes (T101-T116) complete — all 16 PRs #211-#237 merged 2026-03-30. Integration test chain (T120-T125) complete. OIDC conformance: Basic RP (13/13), Config RP (5/5), Form Post RP (13/13) all passing — certification submission is the top priority.
+All feature tasks (T32-T47) complete. All review fixes (T101-T116) complete — all 16 PRs #211-#237 merged 2026-03-30. Integration test chain (T120-T125) complete. OIDC conformance: Basic RP (13/13), Config RP (5/5), Form Post RP (13/13) all passing. **✅ Certified 2 Jul 2026** (py-identity-model 3.1.0: Basic + Config + Form Post Basic RP). Next cert round: Dynamic RP (#216), RP-Initiated Logout (#214), Back-Channel Logout (#442).
 
-### OIDC Conformance Certification (TOP PRIORITY — SUBMIT)
+### OIDC Conformance Certification ✅ CERTIFIED (2 Jul 2026)
 
-Target: OpenID Foundation Basic RP + Config RP + Form Post RP certification. All test profiles passing. **Next step: submit for certification.**
+OpenID Foundation Basic RP + Config RP + Form Post Basic RP — **certified 2 Jul 2026** (py-identity-model 3.1.0). Fee waived via the OIDF OSS policy.
 
-See `docs/oidc-certification-analysis.md` for full gap analysis. Tracking issue: [#242](https://github.com/jamescrowley321/py-identity-model/issues/242).
+See `docs/oidc-certification-analysis.md` (§8 = next-profiles plan). Tracking issue: [#242](https://github.com/jamescrowley321/py-identity-model/issues/242).
 
 | ID | Issue | Status | Description | Size | Depends |
 |----|-------|--------|-------------|------|---------|
@@ -108,9 +108,9 @@ See `docs/oidc-certification-analysis.md` for full gap analysis. Tracking issue:
 | T146 | | done | Fix any conformance test failures from T144/T145 — all Basic RP (13/13) + Config RP (5/5) + Form Post RP (13/13) passing | medium | T144, T145 |
 | T147 | 415 | wontfix | Expand to Implicit + Hybrid RP profiles — closed not-planned 2026-06-29: Implicit/Hybrid are OAuth 2.1-deprecated; code+PKCE already covered by Basic/Config/Form Post | medium | T146 |
 
-### OIDC RP Certification Submission (ACTIVE — next actions)
+### OIDC RP Certification Submission ✅ DONE (certified 2 Jul 2026)
 
-Tracking issue: [#242](https://github.com/jamescrowley321/py-identity-model/issues/242). All 3 profiles passing — submit for OIDF certification.
+Tracking issue: [#242](https://github.com/jamescrowley321/py-identity-model/issues/242). All 3 profiles certified 2 Jul 2026 (Basic + Config + Form Post Basic RP, v3.1.0).
 
 | ID | Issue | Status | Description | Size |
 |----|-------|--------|-------------|------|
@@ -118,8 +118,16 @@ Tracking issue: [#242](https://github.com/jamescrowley321/py-identity-model/issu
 | T161 | 327 | done | Fix JWKS cache bypass — http_client= removal, SSL cert sharing via cert-init, cache clearing between tests | medium |
 | T162 | 329 | done | Document Config RP test count and variant config | small |
 | T163 | 330 | done | Add Form Post RP profile — 13/13 PASS in CI. Parser, multi-value callback, unit tests | medium |
-| **T164** | **331** | **pending** | **Apply for OIDF OSS certification fee waiver (owner-driven, manual) — NEXT ACTION** | **—** |
+| T164 | 331 | done | OIDF OSS certification fee waiver — granted; certification approved & published 2 Jul 2026 (#331 closed) | — |
 | T165 | 342 | done | Refactor Makefile — consolidated targets, help, HOSTED=1 support. PR #361 merged 2026-04-12 | small |
+
+### OIDC RP Certification — Next Round (Phase 4)
+
+Expand the cert to three more profiles. Primitives land in py-identity-model core; the logout HTTP endpoints land in the `fastapi-identity-model` package (branch `feat/fastapi-identity-model-package`). See `docs/oidc-certification-analysis.md` §8. (RP-Initiated Logout = T56/#214 and Dynamic RP = T61/#216, both listed under Remaining Feature Work below.)
+
+| ID | Issue | Status | Description | Size |
+|----|-------|--------|-------------|------|
+| T251 | 442 | pending | Back-Channel Logout RP — `validate_logout_token` (OIDC Back-Channel Logout 1.0 §2.4); `backchannel_logout_*` discovery fields | medium |
 
 ### FAPI 2.0 RP Hardening + jwks-cache LRU (ralph workstream — ACTIVE)
 
@@ -173,7 +181,7 @@ Items previously tracked only on GitHub; surfaced here so planning reflects the 
 
 ### Cloud Provider Integration Tests (cassette-based) — DEFERRED 2026-05-21
 
-GitHub Epic 11 (`epic-11` label, issues #267–#271). Deferred 2026-05-21 — labeled `deferred` on GitHub pending the conformance certification milestone (T164/#331). Still blocked on Cognito + Entra ID account setup as well. Revisit when current focus closes.
+GitHub Epic 11 (`epic-11` label, issues #267–#271). Deferred 2026-05-21 — labeled `deferred` on GitHub. The conformance-certification gate has since **closed (certified 2 Jul 2026)**, so the remaining blocker is just Cognito + Entra ID account setup.
 
 | ID | Issue | Status | Description | Size | Depends |
 |----|-------|--------|-------------|------|---------|
@@ -195,12 +203,12 @@ GitHub Epic 11 (`epic-11` label, issues #267–#271). Deferred 2026-05-21 — la
 | T53 | 35 | pending | Azure AD Example | small |
 | T54 | 33 | pending | Flask Middleware Example | small |
 | T55 | 219 | done | Discovery Cache with Configurable TTL — TTL-based `DiscoCacheEntry` in `core/jwks_cache.py`; issue closed 2026-04-10 | medium |
-| T56 | 214 | pending | RP-Initiated Logout (End Session) | medium |
+| T56 | 214 | pending | RP-Initiated Logout (End Session) — **next cert round** (Phase 4); `end_session` URL builder + `state` round-trip | medium |
 | T57 | 213 | pending | JWT Client Authentication (private_key_jwt / client_secret_jwt) | medium |
 | T58 | 221 | pending | AS Issuer Identification (RFC 9207) — partial: response `iss` parsing done; remaining work is issuer *validation* (mix-up defense). Also a FAPI 2.0 RP gating item | small |
 | T59 | 217 | pending | CIBA (Client-Initiated Backchannel Authentication) | large |
 | T60 | 220 | pending | Rich Authorization Requests (RFC 9396) | medium |
-| T61 | 216 | pending | Dynamic Client Registration (RFC 7591) — partial: discovery `registration_endpoint` parsed; remaining is the register-client request/response models + sync/aio functions | medium |
+| T61 | 216 | pending | Dynamic Client Registration (RFC 7591/7592) — **next cert round** (Phase 4, Dynamic RP); partial: discovery `registration_endpoint` parsed; remaining is the register-client request/response models + sync/aio functions | medium |
 | T62 | 215 | pending | mTLS Client Auth and Certificate-Bound Tokens (RFC 8705) | large |
 | T63 | 218 | pending | JARM (JWT Secured Authorization Response Mode) | medium |
 | T250 | 436 | pending | Custom claims validation hook accepting a `ClaimsPrincipal` — add `principal_validator` to `TokenValidationConfig` (sync+async, mirrors `claims_validator`), invoked after standard validation via `to_principal()`; follow-up: expose principal-level hook in fastapi-identity-model middleware once PR #434 lands | medium |

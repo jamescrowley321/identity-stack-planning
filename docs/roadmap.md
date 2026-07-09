@@ -220,7 +220,7 @@ graph TD
 **Artifacts:**
 - Product Brief: [`product-brief-identity-model-monorepo.md`](../_bmad-output/planning-artifacts/product-brief-identity-model-monorepo.md)
 - Competitive Analysis: [`competitive-analysis-identity-model.md`](../_bmad-output/planning-artifacts/competitive-analysis-identity-model.md)
-- Epics: [`epics/epic-0a-monorepo-setup.md`](../_bmad-output/planning-artifacts/epics/epic-0a-monorepo-setup.md) through [`epic-15-modern-auth-extensions.md`](../_bmad-output/planning-artifacts/epics/epic-15-modern-auth-extensions.md) (24 files)
+- Epics: [`epics/epic-0a-monorepo-setup.md`](../_bmad-output/planning-artifacts/epics/epic-0a-monorepo-setup.md) through [`epic-15-modern-auth-extensions.md`](../_bmad-output/planning-artifacts/epics/epic-15-modern-auth-extensions.md) (25 files)
 
 ---
 
@@ -249,8 +249,8 @@ The main PRD defines 22 high-level FRs. Here's how the specialized PRDs implemen
 **Phase 1b — ACTIVE (two parallel tracks):**
 
 *Track 1: py-identity-model (certification + security + products)*
-- Security re-audit Phase 2 (T200-T207) — 8 findings from 2026-04-14 re-audit
-- OIDC RP Certification ([#242](https://github.com/jamescrowley321/py-identity-model/issues/242)) — Config RP (T145), fix cycle (T146), Implicit/Hybrid (T147)
+- Security re-audit Phase 2 (T200-T207) — 8 findings from 2026-04-14 re-audit (done)
+- OIDC RP Certification ([#242](https://github.com/jamescrowley321/py-identity-model/issues/242)) — ✅ **Certified 2 Jul 2026** (v3.1.0: Basic + Config + Form Post Basic RP). Next round: Dynamic RP (#216), RP-Initiated Logout (#214), Back-Channel Logout (#442). Implicit/Hybrid dropped (OAuth 2.1-deprecated, #415)
 - Monorepo restructure ([#332](https://github.com/jamescrowley321/py-identity-model/issues/332)) — uv workspace with member packages
 - CLI tool ([#333](https://github.com/jamescrowley321/py-identity-model/issues/333)) — `py-identity-model-cli`, RFC 8252 loopback login
 - FastAPI middleware ([#334](https://github.com/jamescrowley321/py-identity-model/issues/334)) — `fastapi-identity-model`, drop-in OIDC auth

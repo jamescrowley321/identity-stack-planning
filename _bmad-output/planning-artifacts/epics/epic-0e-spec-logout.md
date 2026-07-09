@@ -21,7 +21,9 @@ This epic defines the cross-language conformance specification and test definiti
 The logout specification is split into two stories:
 
 - **S.10a** — RP-Initiated Logout and Front-Channel Logout (browser-facing mechanisms): end-session URL construction, state validation, and front-channel iframe logout.
-- **S.10b** — Back-Channel Logout and Session Management (server-side mechanisms): logout token validation, rejection of malformed tokens, and session state polling.
+- **S.10b** — Back-Channel Logout (server-side) and Session Management (browser-iframe): logout token validation, rejection of malformed tokens, and session state polling.
+
+> **Certification scope (py-identity-model, 2026-07-07):** This epic is the **cross-language capability spec** — it authors the spec + conformance tests for all four logout mechanisms; it is **not** the OIDF certification target list. For the Python library, only **RP-Initiated Logout (#214)** and **Back-Channel Logout (#442)** are pursued for certification. **Front-Channel Logout** and **Session Management** are **dropped** for the Python cert: both are browser-iframe mechanisms (Session Management relies on `check_session_iframe` + `postMessage`, a browser mechanism — *not* "server-side"), and a server-side library has no browser to run them in.
 
 Each story produces three deliverables:
 

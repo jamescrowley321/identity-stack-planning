@@ -35,7 +35,7 @@ Admins can manage access keys with IP restrictions and custom claims, configure 
 **FRs covered:** FR-SSS-20, FR-SSS-21, FR-SSS-22, FR-SSS-23, FR-SSS-24, FR-SSS-25, FR-SSS-26
 
 ### Epic 7: Advanced Protocol Support & Feature Parity
-Developers get FastAPI middleware for drop-in token validation, Hybrid RP certification, and FAPI 2.0 support — achieving feature parity with Duende IdentityModel.
+Developers get FastAPI middleware for drop-in token validation and FAPI 2.0 support — achieving feature parity with Duende IdentityModel. (Hybrid RP certification was dropped — OAuth 2.1-deprecated; Basic + Config + Form Post Basic RP certified 2 Jul 2026 instead.)
 **FRs covered:** FR-PIM-10, FR-PIM-11, FR-PIM-12, FR-PIM-13
 
 ### Epic 8: Platform Publication & Project Health
@@ -1412,7 +1412,7 @@ So that security controls are verified end-to-end.
 
 ## Epic 7: Advanced Protocol Support & Feature Parity
 
-Developers get FastAPI middleware for drop-in token validation, Hybrid RP certification, and FAPI 2.0 support — achieving feature parity with Duende IdentityModel.
+Developers get FastAPI middleware for drop-in token validation and FAPI 2.0 support — achieving feature parity with Duende IdentityModel. (Hybrid RP certification was dropped — OAuth 2.1-deprecated; Basic + Config + Form Post Basic RP certified 2 Jul 2026 instead.)
 
 **FRs covered:** FR-PIM-10, FR-PIM-11, FR-PIM-12, FR-PIM-13
 
@@ -1455,7 +1455,9 @@ So that I can protect endpoints with a single line of configuration.
 **When** the middleware is released
 **Then** no backwards compatibility is broken (NFR-10)
 
-### Story 7.2: Hybrid RP Profile Conformance
+### Story 7.2: Hybrid RP Profile Conformance — ❌ DROPPED (2026-07-07)
+
+> **Dropped:** Hybrid RP is not a certification target — deprecated in OAuth 2.1; code + PKCE (Basic + Config + Form Post Basic RP, all certified 2 Jul 2026) is the path forward. Retained for history. See py-identity-model #242 and #441 (closed). Next-round profiles instead: Dynamic RP (#216), RP-Initiated Logout (#214), Back-Channel Logout (#442).
 
 As a library maintainer,
 I want py-identity-model to pass the OIDC Hybrid RP conformance profile,

@@ -38,11 +38,11 @@ One payment covers all profiles within a certification type for a calendar year 
 
 ### Market Position
 
-Only **two Python RP libraries** are currently certified (both by Roland Hedberg):
+Before py-identity-model, only **two Python RP libraries** were certified (both by Roland Hedberg):
 - `pyoidc 0.9.4` — Basic, Implicit, Hybrid, Config, Dynamic RP
 - `oidcrp/OidcRP 2.1.0` — Basic, Implicit, Hybrid, Config, Dynamic, Form Post RP
 
-Getting py-identity-model certified would make it one of very few certified Python OIDC RP libraries.
+**py-identity-model 3.1.0 joined this list on 2 July 2026** (Basic + Config + Form Post Basic RP) — one of the very few certified Python OIDC RP libraries.
 
 ---
 
