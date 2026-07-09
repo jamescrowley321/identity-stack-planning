@@ -15,7 +15,7 @@ GREENFIELD implementation of an OIDC/OAuth2.0 client library in Rust, published 
 | Decision | Choice |
 |----------|--------|
 | Edition | Rust 2024 |
-| MSRV | 1.75+ |
+| MSRV | 1.91 (edition 2024 requires ≥1.85; the shipped scaffold `Cargo.toml` pins 1.91) |
 | HTTP client | reqwest (async) with rustls |
 | JWT | jsonwebtoken crate |
 | Async runtime | tokio |
@@ -62,7 +62,7 @@ So that I can begin implementing OIDC/OAuth2 features on a solid foundation.
 
 - [ ] **Given** a new Rust project is initialized
   **When** `Cargo.toml` is reviewed
-  **Then** it declares `name = "identity-model"`, `edition = "2024"`, `rust-version = "1.75"`, and lists `reqwest` (with `rustls-tls` feature), `jsonwebtoken`, `tokio`, `thiserror`, `serde`, and `serde_json` as dependencies
+  **Then** it declares `name = "identity-model"`, `edition = "2024"`, `rust-version = "1.91"` (edition 2024 requires ≥1.85; the scaffold pins 1.91), and lists `reqwest` (with `rustls-tls` feature), `jsonwebtoken`, `tokio`, `thiserror`, `serde`, and `serde_json` as dependencies
 
 - [ ] **Given** the `src/` directory is created
   **When** the module structure is reviewed
