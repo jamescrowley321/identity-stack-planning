@@ -236,16 +236,37 @@ These are downstream of the OIDC certification work. They inherit credibility fr
 
 Multi-language OIDC/OAuth2 client library (Go + Rust). Epic source: `planning-artifacts/epics/epic-3-core-go.md`.
 
-### Go Core Tier (ralph workstream — SET UP, launch gated on scaffold)
+### Go Core Tier (Epic 3) — DONE (merged 2026-07-02)
 
-Ralph prompt: `ralph-prompts/identity-model-go-core.md` (worktree-run — loop runs from `/tmp/im-go-orch`, not the main checkout). Stacked PRs: each story branches off the previous and PRs `--base <parent>`; owner merges bottom-up. Per-task scope + conformance contract live in the prompt + epic.
+Ralph prompt: `ralph-prompts/identity-model-go-core.md`. Foundation scaffold (PR #1) + all five core stories merged bottom-up to `main` 2026-07-02 (PRs #2–#7, incl. the multi-provider integration matrix). Main CI green.
 
-> **Launch gate:** the 3.1 scaffold (`go/pkg/` skeleton + `spec/`) is **not yet on `main`** — it lives on `feat/foundation-scaffold` (actively in progress). G3.2 bases off that branch; the loop auto-prefers `main` once the scaffold merges. Don't launch until the scaffold branch is stable, or the loop builds on a moving foundation.
+| ID | Story | Status | Description |
+|----|-------|--------|-------------|
+| G3.2 | 3.2 | done | OIDC Discovery client — `pkg/discovery` (PR #2) |
+| G3.3 | 3.3 | done | JWKS client + key resolution — `pkg/jwks` (PR #3) |
+| G3.4 | 3.4 | done | JWT validation — `pkg/jwt` (PR #4) |
+| G3.5 | 3.5 | done | Client credentials + auth code + PKCE — `pkg/token` (PR #5) |
+| G3.6 | 3.6 | done | UserInfo endpoint — `pkg/userinfo` (PR #6) |
 
-| ID | Story | Branch | Base | Status | Description |
-|----|-------|--------|------|--------|-------------|
-| G3.2 | 3.2 | feat/go-discovery | feat/foundation-scaffold | pending | OIDC Discovery client — `pkg/discovery` |
-| G3.3 | 3.3 | feat/go-jwks | feat/go-discovery | pending | JWKS client + key resolution — `pkg/jwks` |
-| G3.4 | 3.4 | feat/go-jwt | feat/go-jwks | pending | JWT validation — `pkg/jwt` (authors `spec/conformance/jwt.json`) |
-| G3.5 | 3.5 | feat/go-token | feat/go-jwt | pending | Client credentials + auth code + PKCE — `pkg/token` (authors conformance) |
-| G3.6 | 3.6 | feat/go-userinfo | feat/go-token | pending | UserInfo endpoint — `pkg/userinfo` (authors conformance) |
+### Rust Core Tier (Epic 4) — DONE (merged 2026-07-21)
+
+Ralph prompt: `ralph-prompts/identity-model-rust-core.md`. Stack R4.2–R4.6 completed and merged bottom-up to `main` 2026-07-21 after a fresh-context adversarial re-review (zero blockers). Main CI green. Non-blocking review nits tracked as identity-model issues #22 (redirect-downgrade hardening), #23 (`azp` + clock-skew), #24 (token Debug redaction).
+
+| ID | Story | Status | Description |
+|----|-------|--------|-------------|
+| R4.2 | 4.2 | done | OIDC Discovery client — `rust/src/discovery` (PR #16) |
+| R4.3 | 4.3 | done | JWKS client + key resolution — `rust/src/jwks` (PR #21, replaced #17) |
+| R4.4 | 4.4 | done | JWT validation — `rust/src/jwt` (PR #18) |
+| R4.5 | 4.5 | done | Token client (CC + auth code + PKCE) — `rust/src/token` (PR #19) |
+| R4.6 | 4.6 | done | UserInfo endpoint — `rust/src/userinfo` (PR #20) |
+
+### Go Extended Tier (Epic 5 + 0F spec) — ACTIVE (ralph loop launched 2026-07-21)
+
+Ralph prompt: `ralph-prompts/identity-model-go-extended.md` (merged via PR #46). Loop runs from the `/tmp/im-goext-orch` orchestrator worktree (branch `ralph/go-extended`), `--no-auto-merge` — owner reviews and merges every PR. Base-branch chained off `main` (each task `--base <previous>`); owner merges bottom-up. Each task first authors its Epic 0F spec story (S.7/S.8/S.12/S.13 — the four extended conformance JSONs don't exist yet) then implements Go against it.
+
+| ID | Story | Base | Status | Description |
+|----|-------|------|--------|-------------|
+| G5.1 | 5.1-go | main | in_progress | Token Introspection (RFC 7662) — `pkg/introspection` |
+| G5.2 | 5.2-go | G5.1 | pending | Token Revocation (RFC 7009) — `pkg/revocation` |
+| G5.3 | 5.3-go | G5.2 | pending | Token Exchange (RFC 8693) — extends `pkg/token` |
+| G5.4 | 5.4-go | G5.3 | pending | DPoP (RFC 9449) — `pkg/dpop` |
