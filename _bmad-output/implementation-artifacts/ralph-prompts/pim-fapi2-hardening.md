@@ -22,11 +22,12 @@ ralph run
 
 | Task | Branch | Description | Status |
 |------|--------|-------------|--------|
-| T57 | feat/private-key-jwt-client-auth | #213 private_key_jwt client authentication (token + PAR + introspection + revocation) | pending |
+| T57 | feat/private-key-jwt-client-auth | #213 private_key_jwt client authentication (token + PAR + introspection + revocation) | done |
 | T58 | feat/rfc9207-issuer-validation | #221 RFC 9207 authorization-response issuer validation | pending |
 | T236 | fix/jwks-cache-lru-eviction | #397 jwks-cache FIFO→LRU (move_to_end on read hits) | pending |
+| T252 | fix/response-repr-redaction | #431 repr/eq guard on RefreshTokenResponse + PushedAuthorizationResponse (redact secrets) | pending |
 
-Order is intentional: the two FAPI 2.0 RP gating items (#213, #221) first, then the jwks-cache security fix (#397). They are mutually independent — no cross-task dependencies.
+**Reconciled 2026-07-23:** T57 (private_key_jwt) shipped in #433 — marked done, do not re-implement. Three items remain: #221 (RFC 9207 issuer validation, the FAPI 2.0 RP gate), #397 (jwks-cache LRU security fix), and #431 (repr redaction, low-severity). All mutually independent — pick in listed order. Start with T58 (#221).
 
 ## Routing
 
