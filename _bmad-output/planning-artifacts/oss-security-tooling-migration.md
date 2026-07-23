@@ -27,7 +27,7 @@ no coverage regression, one shared `security.yml` pattern.**
 | Secrets | — | **gitleaks** |
 | Code quality / smells | SonarCloud | **native linters** — `golangci-lint` (enable `goconst`,`dupl`,`gocyclo`,`gocritic`), `ruff`, `eslint`, `clippy`. No dashboard. |
 | Coverage | SonarCloud | existing CI gates — `pytest-cov` (80% in py-identity-model), `go test -cover`. Codecov optional. |
-| Continuous monitoring | Snyk Monitor | **Dependabot** (already on all repos) + **scheduled OSV-Scanner** (weekly cron) |
+| Continuous monitoring | Snyk Monitor | **Dependabot** (already on all repos) + **scheduled OSV-Scanner** (daily cron) |
 
 **Related decision:** `identity-model` will be **made public** (owner approved
 2026-07-21). Once public, CodeQL is free there too, so CodeQL + Semgrep can be the
@@ -50,7 +50,7 @@ repo or added below.
 
 ### 1. py-identity-model — **urgent** (broken Sonar)
 - **Remove:** `.github/workflows/sonarcloud.yml`, `sonar-project.properties`.
-- **Add:** OSV-Scanner (reusable workflow, PR + weekly cron); gitleaks job; (optional) Semgrep OSS.
+- **Add:** OSV-Scanner (reusable workflow, PR + daily cron); gitleaks job; (optional) Semgrep OSS.
 - **Keep:** CodeQL, Dependabot, ruff, pytest-cov 80% gate.
 - **Verify:** CI green with no `SONAR_TOKEN`; SCA now actively scanning Python deps (was Dependabot-only).
 
@@ -84,7 +84,7 @@ name: Security
 on:
   push: { branches: [main] }
   pull_request:
-  schedule: [{ cron: '0 6 * * 1' }]   # weekly monitor (replaces Snyk Monitor)
+  schedule: [{ cron: '0 6 * * *' }]   # daily monitor (replaces Snyk Monitor)
 permissions:
   contents: read
   security-events: write              # for CodeQL/SARIF upload (public repos)
