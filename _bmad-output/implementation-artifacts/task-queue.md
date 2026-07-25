@@ -3,6 +3,12 @@
 Tasks are picked up in order. Update status as you go.
 Statuses: pending | in_progress | done | blocked
 
+> **Last refreshed 2026-07-25** against merged PRs. Note: the per-workstream
+> ralph prompts (`ralph-prompts/*.md`) carry the authoritative live status for
+> their tasks (each loop updates its own embedded queue every iteration). The
+> tables here are a periodic snapshot — reconcile against the ralph prompt and
+> GitHub before assuming a task is open.
+
 ## terraform-provider-descope
 
 All tasks complete except blocked/wontfix. Releases v1.1.0-v1.1.4 published.
@@ -19,30 +25,37 @@ All prior phases complete (T14-T26, T64-T75, T80-T84, T90-T98, T117-T119 — all
 
 Full breakdown: `epics-design-system.md`. Ralph prompt: `ralph-prompts/design-system.md`.
 
+> **Live tracker:** `ralph-prompts/design-system.md` holds the authoritative
+> per-story status (updated by the loop each iteration). This snapshot was
+> refreshed 2026-07-25: DS-1.1–DS-1.4, DS-2.1–DS-2.3, DS-3.1 are merged
+> (PRs #288–#295); DS-3.2 is in progress via the active design-system loop
+> (relaunched 2026-07-25). DS-1.2/DS-1.3 tokens are merged but component
+> wiring follow-up remains (tracked in the ralph prompt as "partial").
+
 #### Epic DS-1: Design Token Migration
 
 | ID | Status | Description | Size | Depends |
 |----|--------|-------------|------|---------|
-| T210 | pending | Purple brand color scale + semantic tokens in index.css | small | — |
-| T211 | pending | Density increase — control heights + button sizes | small | T210 |
-| T212 | pending | Header + page layout density (60px header, 32px padding) | medium | T211 |
-| T213 | pending | Typography scale + base styles (15px body, semantic h1-h4) | small | T210 |
+| T210 | done | Purple brand color scale + semantic tokens in index.css — PR #288 | small | — |
+| T211 | done | Density increase — control heights + button sizes — PR #289 (token wiring follow-up remains) | small | T210 |
+| T212 | done | Header + page layout density (60px header, 32px padding) — PR #291 (token wiring follow-up remains) | medium | T211 |
+| T213 | done | Typography scale + base styles (15px body, semantic h1-h4) — PR #290 | small | T210 |
 
 #### Epic DS-2: Component & Layout Updates
 
 | ID | Status | Description | Size | Depends |
 |----|--------|-------------|------|---------|
-| T214 | pending | Badge sync-state variants (success, warning) | small | T210 |
-| T215 | pending | Responsive breakpoints (useBreakpoint hook, tablet 1024px) | medium | T210 |
-| T216 | pending | Sidebar nav items for new pages (Platform group) | small | T210 |
+| T214 | done | Badge sync-state variants (success, warning) — PR #292 | small | T210 |
+| T215 | done | Responsive breakpoints (useBreakpoint hook, tablet 1024px) — PR #293 | medium | T210 |
+| T216 | done | Sidebar nav items for new pages (Platform group) — PR #294 | small | T210 |
 | T217 | pending | Update existing E2E tests for density changes | small | T212 |
 
 #### Epic DS-3: New Shared Components
 
 | ID | Status | Description | Size | Depends |
 |----|--------|-------------|------|---------|
-| T218 | pending | KPI Strip component (4-col metric cards) | small | T210 |
-| T219 | pending | Provider Glyph component (8 provider color schemes) | small | T210 |
+| T218 | done | KPI Strip component (4-col metric cards) — PR #295 | small | T210 |
+| T219 | in_progress | Provider Glyph component (8 provider color schemes) — active design-system loop (2026-07-25) | small | T210 |
 | T220 | pending | Spark (inline sparkline bars) | small | T210 |
 | T221 | pending | Stream Row (monospace event log entry) | small | T210 |
 | T222 | pending | Sync Flow Diagram (3-col topology) | small | T219 |
@@ -89,7 +102,7 @@ Full breakdown: `epics-design-system.md`. Ralph prompt: `ralph-prompts/design-sy
 
 **Requirements:** Every feature task MUST include integration tests (in `src/tests/integration/`) and usage examples (in `examples/`). Unit tests alone are not sufficient.
 
-All feature tasks (T32-T47) complete. All review fixes (T101-T116) complete — all 16 PRs #211-#237 merged 2026-03-30. Integration test chain (T120-T125) complete. OIDC conformance: Basic RP (13/13), Config RP (5/5), Form Post RP (13/13) all passing. **✅ Certified 2 Jul 2026** (py-identity-model 3.1.0: Basic + Config + Form Post Basic RP). Next cert round: Dynamic RP (#216), RP-Initiated Logout (#214), Back-Channel Logout (#442).
+All feature tasks (T32-T47) complete. All review fixes (T101-T116) complete — all 16 PRs #211-#237 merged 2026-03-30. Integration test chain (T120-T125) complete. OIDC conformance: Basic RP (13/13), Config RP (5/5), Form Post RP (13/13) all passing. **✅ Certified 2 Jul 2026** (py-identity-model 3.1.0: Basic + Config + Form Post Basic RP). Next cert round: Dynamic RP (#216), RP-Initiated Logout (#214). Back-Channel Logout (#442) primitive shipped (PR #450 merged).
 
 ### OIDC Conformance Certification ✅ CERTIFIED (2 Jul 2026)
 
@@ -127,16 +140,16 @@ Expand the cert to three more profiles. Primitives land in py-identity-model cor
 
 | ID | Issue | Status | Description | Size |
 |----|-------|--------|-------------|------|
-| T251 | 442 | pending | Back-Channel Logout RP — `validate_logout_token` (OIDC Back-Channel Logout 1.0 §2.4); `backchannel_logout_*` discovery fields | medium |
+| T251 | 442 | done | Back-Channel Logout RP — `validate_logout_token` (OIDC Back-Channel Logout 1.0 §2.4); `backchannel_logout_*` discovery fields. PR #450 merged | medium |
 
 ### FAPI 2.0 RP Hardening + jwks-cache LRU (ralph workstream — ACTIVE)
 
-Ralph prompt: `ralph-prompts/pim-fapi2-hardening.md` (worktree-run — loop runs from `/tmp/pim-fapi2-ralph`, not the main checkout). Single sequential workstream covering the items the 2026-06-29 issue audit prioritized. T57/T58 are the FAPI 2.0 RP gating pair; T236 is a multi-tenant security fix. Detailed per-task scope lives in the ralph prompt.
+Ralph prompt: `ralph-prompts/pim-fapi2-hardening.md` (worktree-run — loop runs from `/tmp/pim-fapi2-ralph`, not the main checkout). Single sequential workstream covering the items the 2026-06-29 issue audit prioritized. T57 (private_key_jwt) merged via PR #433; the loop (relaunched 2026-07-25) is now on T58 → T236. T57/T58 are the FAPI 2.0 RP gating pair; T236 is a multi-tenant security fix. Detailed per-task scope lives in the ralph prompt.
 
 | ID | Issue | Status | Description | Size |
 |----|-------|--------|-------------|------|
-| T57 | 213 | pending | private_key_jwt client authentication — `core/client_assertion.py` (reuse jar.py signing), `PrivateKeyJwt` config, inject into core prepare_* across token/PAR/introspection/revocation | medium |
-| T58 | 221 | pending | RFC 9207 issuer *validation* (parsing already done) — mix-up defense in `core/state_validation.py` | small |
+| T57 | 213 | done | private_key_jwt client authentication — `core/client_assertion.py` (reuse jar.py signing), `PrivateKeyJwt` config, inject into core prepare_* across token/PAR/introspection/revocation. PR #433 merged | medium |
+| T58 | 221 | in_progress | RFC 9207 issuer *validation* (parsing already done) — mix-up defense in `core/state_validation.py` | small |
 | T236 | 397 | pending | jwks-cache FIFO→LRU — `move_to_end()` on read hits (`core/jwks_cache.py`, sync/aio token_validation) | small |
 
 > Note: T57/T58/T236 also appear in their topical sections below (Remaining Feature Work, jwks-cache residue). This section is the canonical entry point for the active ralph loop.
@@ -204,8 +217,8 @@ GitHub Epic 11 (`epic-11` label, issues #267–#271). Deferred 2026-05-21 — la
 | T54 | 33 | pending | Flask Middleware Example | small |
 | T55 | 219 | done | Discovery Cache with Configurable TTL — TTL-based `DiscoCacheEntry` in `core/jwks_cache.py`; issue closed 2026-04-10 | medium |
 | T56 | 214 | pending | RP-Initiated Logout (End Session) — **next cert round** (Phase 4); `end_session` URL builder + `state` round-trip | medium |
-| T57 | 213 | pending | JWT Client Authentication (private_key_jwt / client_secret_jwt) | medium |
-| T58 | 221 | pending | AS Issuer Identification (RFC 9207) — partial: response `iss` parsing done; remaining work is issuer *validation* (mix-up defense). Also a FAPI 2.0 RP gating item | small |
+| T57 | 213 | done | JWT Client Authentication (private_key_jwt) — PR #433 merged | medium |
+| T58 | 221 | in_progress | AS Issuer Identification (RFC 9207) — parsing done; issuer *validation* (mix-up defense) in progress via the FAPI 2.0 loop | small |
 | T59 | 217 | pending | CIBA (Client-Initiated Backchannel Authentication) | large |
 | T60 | 220 | pending | Rich Authorization Requests (RFC 9396) | medium |
 | T61 | 216 | pending | Dynamic Client Registration (RFC 7591/7592) — **next cert round** (Phase 4, Dynamic RP); partial: discovery `registration_endpoint` parsed; remaining is the register-client request/response models + sync/aio functions | medium |
@@ -260,13 +273,13 @@ Ralph prompt: `ralph-prompts/identity-model-rust-core.md`. Stack R4.2–R4.6 com
 | R4.5 | 4.5 | done | Token client (CC + auth code + PKCE) — `rust/src/token` (PR #19) |
 | R4.6 | 4.6 | done | UserInfo endpoint — `rust/src/userinfo` (PR #20) |
 
-### Go Extended Tier (Epic 5 + 0F spec) — ACTIVE (ralph loop launched 2026-07-21)
+### Go Extended Tier (Epic 5 + 0F spec) — ✅ DONE (all merged 2026-07-24)
 
-Ralph prompt: `ralph-prompts/identity-model-go-extended.md` (merged via PR #46). Loop runs from the `/tmp/im-goext-orch` orchestrator worktree (branch `ralph/go-extended`), `--no-auto-merge` — owner reviews and merges every PR. Base-branch chained off `main` (each task `--base <previous>`); owner merges bottom-up. Each task first authors its Epic 0F spec story (S.7/S.8/S.12/S.13 — the four extended conformance JSONs don't exist yet) then implements Go against it.
+Ralph prompt: `ralph-prompts/identity-model-go-extended.md` (merged via PR #46). All four stories completed via the `/tmp/im-goext-orch` orchestrator (branch `ralph/go-extended`), `--no-auto-merge`, base-branch chained then merged bottom-up to `main`. Each task authored its Epic 0F spec story (S.7/S.8/S.12/S.13) then the Go implementation. Main CI green. **Next identity-model tier (Rust Extended / Advanced PAR+RAR) not yet planned — no ralph prompt exists yet.**
 
 | ID | Story | Base | Status | Description |
 |----|-------|------|--------|-------------|
-| G5.1 | 5.1-go | main | in_progress | Token Introspection (RFC 7662) — `pkg/introspection` |
-| G5.2 | 5.2-go | G5.1 | pending | Token Revocation (RFC 7009) — `pkg/revocation` |
-| G5.3 | 5.3-go | G5.2 | pending | Token Exchange (RFC 8693) — extends `pkg/token` |
-| G5.4 | 5.4-go | G5.3 | pending | DPoP (RFC 9449) — `pkg/dpop` |
+| G5.1 | 5.1-go | main | done | Token Introspection (RFC 7662) — `pkg/introspection` (PR #25) |
+| G5.2 | 5.2-go | G5.1 | done | Token Revocation (RFC 7009) — `pkg/revocation` (PR #26) |
+| G5.3 | 5.3-go | G5.2 | done | Token Exchange (RFC 8693) — `pkg/token` (PR #27) |
+| G5.4 | 5.4-go | G5.3 | done | DPoP (RFC 9449) — `pkg/dpop` (PR #28) |
