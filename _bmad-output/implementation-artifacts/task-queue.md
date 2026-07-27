@@ -3,10 +3,16 @@
 Tasks are picked up in order. Update status as you go.
 Statuses: pending | in_progress | done | blocked
 
-> **Reconciled 2026-07-23.** The Jul 21 feature batch (py-identity-model Phase-4 protocols; identity-model Go-extended tier) and the FOSS security migration have all landed; this file now reflects `main`. **Candidate next loops, by leverage:**
-> 1. **identity-stack — DS-3 components + DS-4 admin pages** (T219–T236): largest greenfield backlog; frontend-heavy; backend already shipped. Prompt: `ralph-prompts/design-system.md`.
-> 2. **py-identity-model — FAPI2 security remainder** (#221 RFC 9207, #397 jwks LRU, #431 repr guard): small, well-scoped, security. Prompt: `ralph-prompts/pim-fapi2-hardening.md`.
-> 3. **identity-model — Rust hardening + jsonwebtoken-10 migration** (#22/#23/#24, #32): small hardening + one verified-breaking dep migration. Needs a new prompt.
+> **Reconciled 2026-07-23, loop-state updated 2026-07-27.** The Jul 21 feature batch and the FOSS security migration have landed; this file reflects `main`.
+>
+> **The per-workstream ralph prompts (`ralph-prompts/*.md`) are the authoritative live status** — each running loop updates its own embedded queue every iteration. These tables are a periodic snapshot; reconcile against the prompt + GitHub before assuming a task is open.
+>
+> **Loops are launched by the owner in a separate session, never from an agent session and never in the background.** The agent prepares prompts and hands over the launch recipe.
+>
+> **Loop state (2026-07-27):**
+> - **identity-stack — design system** (`ralph-prompts/design-system.md`): **LIVE** — running in a separate session (orchestrator `/tmp/is-designsystem-orch`, branch `ralph/design-system`). Has shipped DS-3.1 and is working through DS-3.2 (provider glyph #330), DS-3.4 (StreamRow #332). **Do not relaunch or push competing PRs to identity-stack.**
+> - **py-identity-model — FAPI2 remainder** (`ralph-prompts/pim-fapi2-hardening.md`): **PREPARED, not launched** — #221 RFC 9207, #397 jwks LRU, #431 repr guard. Ready for the owner to launch.
+> - **identity-model — Rust hardening** (`ralph-prompts/identity-model-rust-hardening.md`): **PREPARED, not launched** — #24/#22/#23 hardening + #32 jsonwebtoken-10 migration (verified breaking). Ready for the owner to launch.
 >
 > Per workspace rule: **one ralph workstream per repo at a time**; loops run from `/tmp` worktrees, `--no-auto-merge` (owner reviews/merges).
 
