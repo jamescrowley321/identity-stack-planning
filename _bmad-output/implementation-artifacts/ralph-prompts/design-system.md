@@ -7,8 +7,8 @@ Independent PRs — each story branches from `main`, not from the previous story
 | Story | Task ID | Branch | Status |
 |-------|---------|--------|--------|
 | DS-1.1 | T210 | ds/tokens-purple-brand | done |
-| DS-1.2 | T211 | ds/density-control-heights | partial |
-| DS-1.3 | T212 | ds/density-header-layout | partial |
+| DS-1.2 | T211 | ds/density-control-heights | done |
+| DS-1.3 | T212 | ds/density-header-layout | done |
 | DS-1.4 | T213 | ds/typography-scale | done |
 | DS-2.1 | T214 | ds/badge-sync-variants | done |
 | DS-2.2 | T215 | ds/responsive-breakpoints | done |
@@ -22,7 +22,7 @@ Independent PRs — each story branches from `main`, not from the previous story
 | DS-3.6 | T223 | ds/component-matrix-grid | pending |
 | DS-3.7 | T224 | ds/component-audit-row | pending |
 | DS-3.8 | T225 | ds/component-confidence-score | pending |
-| DS-4.0 | T226 | ds/backend-admin-endpoints | pending |
+| DS-4.0 | T226 | ds/backend-admin-endpoints | done |
 | DS-4.1 | T227 | ds/page-providers-list | pending |
 | DS-4.2 | T228 | ds/page-providers-detail | pending |
 | DS-4.3 | T229 | ds/page-sync-dashboard | pending |
@@ -48,17 +48,15 @@ Independent PRs — each story branches from `main`, not from the previous story
 
 ### Execution Priority
 
-Stories DS-1.1, DS-1.4, DS-2.1, DS-2.2, DS-2.3, DS-3.1 are done. DS-1.2 and DS-1.3 are partial (tokens defined but not wired into components).
+**Reconciled 2026-07-23.** Done and merged to `main`: DS-1.* (all), DS-2.1/2.2/2.3, DS-3.1 (KPI strip, `ui/kpi-strip.tsx`), and DS-4.0 (backend admin endpoints + integration tests, #300). Do **not** rebuild these. The remaining actionable work is the DS-3 components, the DS-4 pages, and DS-5 testing.
 
 Process remaining stories in this order:
 1. DS-3.2 (Provider Glyph — blocks DS-3.5, DS-4.1, DS-4.5, DS-4.7, DS-4.9)
 2. DS-3.4 (Stream Row — blocks DS-4.3, DS-4.5)
 3. DS-3.3, DS-3.8, DS-3.6, DS-3.7 (remaining components, parallel)
 4. DS-3.5 (Sync Flow — depends on DS-3.2)
-5. DS-1.2 finish, DS-1.3 finish (wire density tokens into components)
-6. DS-4.0 (backend admin endpoints — finish aggregation endpoints)
-7. DS-4.1 through DS-4.10 (pages, in pairs)
-8. DS-2.4, DS-5.1 through DS-5.4 (testing)
+5. DS-4.1 through DS-4.10 (pages, in pairs — backend DS-4.0 already shipped)
+6. DS-2.4, DS-5.1 through DS-5.4 (testing)
 
 ## Routing
 

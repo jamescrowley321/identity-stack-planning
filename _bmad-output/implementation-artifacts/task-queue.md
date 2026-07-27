@@ -3,13 +3,21 @@
 Tasks are picked up in order. Update status as you go.
 Statuses: pending | in_progress | done | blocked
 
+> **Reconciled 2026-07-23.** The Jul 21 feature batch (py-identity-model Phase-4 protocols; identity-model Go-extended tier) and the FOSS security migration have all landed; this file now reflects `main`. **Candidate next loops, by leverage:**
+> 1. **identity-stack — DS-3 components + DS-4 admin pages** (T219–T236): largest greenfield backlog; frontend-heavy; backend already shipped. Prompt: `ralph-prompts/design-system.md`.
+> 2. **py-identity-model — FAPI2 security remainder** (#221 RFC 9207, #397 jwks LRU, #431 repr guard): small, well-scoped, security. Prompt: `ralph-prompts/pim-fapi2-hardening.md`.
+> 3. **identity-model — Rust hardening + jsonwebtoken-10 migration** (#22/#23/#24, #32): small hardening + one verified-breaking dep migration. Needs a new prompt.
+>
+> Per workspace rule: **one ralph workstream per repo at a time**; loops run from `/tmp` worktrees, `--no-auto-merge` (owner reviews/merges).
+
 ## terraform-provider-descope
 
-All tasks complete except blocked/wontfix. Releases v1.1.0-v1.1.4 published.
+Feature-complete. Released through v1.2.1. Security tooling migrated to FOSS 2026-07-22 (Snyk job + orphan Sonar config removed in #181; govulncheck runs daily; CodeQL + gitleaks + Scorecard retained). Only the items below remain.
 
 | ID | Issue | Status | Description |
 |----|-------|--------|-------------|
 | T6 | 8 | blocked | Add descope_sso_application resource — requires enterprise license (E074106) |
+| T7 | 109 | pending | Standardize Go file naming to snake_case (mechanical rename sweep) | small |
 
 ## identity-stack
 
@@ -19,29 +27,31 @@ All prior phases complete (T14-T26, T64-T75, T80-T84, T90-T98, T117-T119 — all
 
 Full breakdown: `epics-design-system.md`. Ralph prompt: `ralph-prompts/design-system.md`.
 
-#### Epic DS-1: Design Token Migration
+**Status (reconciled 2026-07-23):** DS-1 + DS-2 shipped (PRs #290–#294), T218 KPI Strip shipped (#295), DS-4 **backend** shipped (T226, #300 + integration backfill). **Remaining actionable frontend work = DS-3 components T219–T225, DS-4 pages T227–T236, DS-5 testing.** This is the largest greenfield backlog in the workspace and the natural next identity-stack loop.
+
+#### Epic DS-1: Design Token Migration — DONE (PRs #290–#291)
 
 | ID | Status | Description | Size | Depends |
 |----|--------|-------------|------|---------|
-| T210 | pending | Purple brand color scale + semantic tokens in index.css | small | — |
-| T211 | pending | Density increase — control heights + button sizes | small | T210 |
-| T212 | pending | Header + page layout density (60px header, 32px padding) | medium | T211 |
-| T213 | pending | Typography scale + base styles (15px body, semantic h1-h4) | small | T210 |
+| T210 | done | Purple brand color scale + semantic tokens in index.css | small | — |
+| T211 | done | Density increase — control heights + button sizes | small | T210 |
+| T212 | done | Header + page layout density (60px header, 32px padding) — #291 | medium | T211 |
+| T213 | done | Typography scale + base styles (15px body, semantic h1-h4) — #290 | small | T210 |
 
-#### Epic DS-2: Component & Layout Updates
-
-| ID | Status | Description | Size | Depends |
-|----|--------|-------------|------|---------|
-| T214 | pending | Badge sync-state variants (success, warning) | small | T210 |
-| T215 | pending | Responsive breakpoints (useBreakpoint hook, tablet 1024px) | medium | T210 |
-| T216 | pending | Sidebar nav items for new pages (Platform group) | small | T210 |
-| T217 | pending | Update existing E2E tests for density changes | small | T212 |
-
-#### Epic DS-3: New Shared Components
+#### Epic DS-2: Component & Layout Updates — DONE (PRs #292–#294)
 
 | ID | Status | Description | Size | Depends |
 |----|--------|-------------|------|---------|
-| T218 | pending | KPI Strip component (4-col metric cards) | small | T210 |
+| T214 | done | Badge sync-state variants (success, warning) — #292 | small | T210 |
+| T215 | done | Responsive breakpoints (useBreakpoint hook, tablet 1024px) — #293 | medium | T210 |
+| T216 | done | Sidebar nav items for new pages (Platform group) — #294 | small | T210 |
+| T217 | pending | Update existing E2E tests for density changes (verify coverage) | small | T212 |
+
+#### Epic DS-3: New Shared Components — T218 done, rest PENDING (next loop)
+
+| ID | Status | Description | Size | Depends |
+|----|--------|-------------|------|---------|
+| T218 | done | KPI Strip component (4-col metric cards) — `ui/kpi-strip.tsx` (#295) | small | T210 |
 | T219 | pending | Provider Glyph component (8 provider color schemes) | small | T210 |
 | T220 | pending | Spark (inline sparkline bars) | small | T210 |
 | T221 | pending | Stream Row (monospace event log entry) | small | T210 |
@@ -50,11 +60,11 @@ Full breakdown: `epics-design-system.md`. Ralph prompt: `ralph-prompts/design-sy
 | T224 | pending | Audit Row (4-col log entry) | small | T210 |
 | T225 | pending | Confidence Score (color-gradient percentage) | small | T210 |
 
-#### Epic DS-4: PRD 5 Admin Pages
+#### Epic DS-4: PRD 5 Admin Pages — backend done, pages PENDING (next loop)
 
 | ID | Status | Description | Size | Depends |
 |----|--------|-------------|------|---------|
-| T226 | pending | Backend endpoints (sync status, events, provisional users) | large | — |
+| T226 | done | Backend endpoints (sync status, events, provisional users) — #300 + integration backfill | large | — |
 | T227 | pending | Providers page — list + KPI strip | medium | T218, T219, T226 |
 | T228 | pending | Providers page — detail drill-down (tabs) | medium | T227 |
 | T229 | pending | Sync Dashboard — flow variant + event stream | medium | T221, T222, T226 |
@@ -89,7 +99,9 @@ Full breakdown: `epics-design-system.md`. Ralph prompt: `ralph-prompts/design-sy
 
 **Requirements:** Every feature task MUST include integration tests (in `src/tests/integration/`) and usage examples (in `examples/`). Unit tests alone are not sufficient.
 
-All feature tasks (T32-T47) complete. All review fixes (T101-T116) complete — all 16 PRs #211-#237 merged 2026-03-30. Integration test chain (T120-T125) complete. OIDC conformance: Basic RP (13/13), Config RP (5/5), Form Post RP (13/13) all passing. **✅ Certified 2 Jul 2026** (py-identity-model 3.1.0: Basic + Config + Form Post Basic RP). Next cert round: Dynamic RP (#216), RP-Initiated Logout (#214), Back-Channel Logout (#442).
+All feature tasks (T32-T47) complete. All review fixes (T101-T116) complete — all 16 PRs #211-#237 merged 2026-03-30. Integration test chain (T120-T125) complete. OIDC conformance: Basic RP (13/13), Config RP (5/5), Form Post RP (13/13) all passing. **✅ Certified 2 Jul 2026** (py-identity-model 3.1.0: Basic + Config + Form Post Basic RP). Now at **v3.3.0**.
+
+**Reconciled 2026-07-23:** the whole Phase-4 protocol batch **shipped 2026-07-21** — private_key_jwt (#213/#433), RP-Initiated Logout (#214/#451), Dynamic Client Registration (#216/#452), Back-Channel Logout (#442/#450). SonarCloud removed (#455); the monorepo restructure + `fastapi-identity-model` package are on main (#434). **Live remainder = #221 (RFC 9207 issuer validation), #397 (jwks-cache LRU), #431 (repr/eq guard), IdentityServer fixture #412–414, test hygiene #275/#276/#280, and the unstarted RFCs (CIBA #217, RAR #220, JARM #218, mTLS #215).**
 
 ### OIDC Conformance Certification ✅ CERTIFIED (2 Jul 2026)
 
@@ -127,19 +139,20 @@ Expand the cert to three more profiles. Primitives land in py-identity-model cor
 
 | ID | Issue | Status | Description | Size |
 |----|-------|--------|-------------|------|
-| T251 | 442 | pending | Back-Channel Logout RP — `validate_logout_token` (OIDC Back-Channel Logout 1.0 §2.4); `backchannel_logout_*` discovery fields | medium |
+| T251 | 442 | done | Back-Channel Logout RP — `validate_logout_token` (OIDC Back-Channel Logout 1.0 §2.4); `backchannel_logout_*` discovery fields. Shipped #450 (issue closed 2026-07-22) | medium |
 
-### FAPI 2.0 RP Hardening + jwks-cache LRU (ralph workstream — ACTIVE)
+### FAPI 2.0 RP Hardening + jwks-cache LRU (ralph workstream — NEXT LOOP)
 
-Ralph prompt: `ralph-prompts/pim-fapi2-hardening.md` (worktree-run — loop runs from `/tmp/pim-fapi2-ralph`, not the main checkout). Single sequential workstream covering the items the 2026-06-29 issue audit prioritized. T57/T58 are the FAPI 2.0 RP gating pair; T236 is a multi-tenant security fix. Detailed per-task scope lives in the ralph prompt.
+Ralph prompt: `ralph-prompts/pim-fapi2-hardening.md` (worktree-run — loop runs from `/tmp/pim-fapi2-ralph`, not the main checkout). **Reconciled 2026-07-23:** T57 (private_key_jwt) shipped #433. Two items remain — the RFC 9207 issuer-validation gate and the jwks-cache LRU security fix — plus the repr/eq guard #431. This is a small, well-scoped security workstream and a good next py-identity-model loop.
 
 | ID | Issue | Status | Description | Size |
 |----|-------|--------|-------------|------|
-| T57 | 213 | pending | private_key_jwt client authentication — `core/client_assertion.py` (reuse jar.py signing), `PrivateKeyJwt` config, inject into core prepare_* across token/PAR/introspection/revocation | medium |
+| T57 | 213 | done | private_key_jwt client authentication — shipped #433 (`core/client_assertion.py`, `PrivateKeyJwt` config) | medium |
 | T58 | 221 | pending | RFC 9207 issuer *validation* (parsing already done) — mix-up defense in `core/state_validation.py` | small |
 | T236 | 397 | pending | jwks-cache FIFO→LRU — `move_to_end()` on read hits (`core/jwks_cache.py`, sync/aio token_validation) | small |
+| T252 | 431 | pending | Add repr/eq guard to `RefreshTokenResponse` + `PushedAuthorizationResponse` (redact secrets in repr) — low-severity, split from #300 re-audit | small |
 
-> Note: T57/T58/T236 also appear in their topical sections below (Remaining Feature Work, jwks-cache residue). This section is the canonical entry point for the active ralph loop.
+> Note: T58/T236/T252 also appear in their topical sections below. This section is the canonical entry point for the next security ralph loop.
 
 ### Security Re-Audit Fixes (Phase 2) — Nearly Complete
 
@@ -203,12 +216,12 @@ GitHub Epic 11 (`epic-11` label, issues #267–#271). Deferred 2026-05-21 — la
 | T53 | 35 | pending | Azure AD Example | small |
 | T54 | 33 | pending | Flask Middleware Example | small |
 | T55 | 219 | done | Discovery Cache with Configurable TTL — TTL-based `DiscoCacheEntry` in `core/jwks_cache.py`; issue closed 2026-04-10 | medium |
-| T56 | 214 | pending | RP-Initiated Logout (End Session) — **next cert round** (Phase 4); `end_session` URL builder + `state` round-trip | medium |
-| T57 | 213 | pending | JWT Client Authentication (private_key_jwt / client_secret_jwt) | medium |
+| T56 | 214 | done | RP-Initiated Logout (End Session) — `build_end_session_url` + `state` round-trip. Shipped #451 | medium |
+| T57 | 213 | done | JWT Client Authentication (private_key_jwt) — shipped #433 | medium |
 | T58 | 221 | pending | AS Issuer Identification (RFC 9207) — partial: response `iss` parsing done; remaining work is issuer *validation* (mix-up defense). Also a FAPI 2.0 RP gating item | small |
 | T59 | 217 | pending | CIBA (Client-Initiated Backchannel Authentication) | large |
 | T60 | 220 | pending | Rich Authorization Requests (RFC 9396) | medium |
-| T61 | 216 | pending | Dynamic Client Registration (RFC 7591/7592) — **next cert round** (Phase 4, Dynamic RP); partial: discovery `registration_endpoint` parsed; remaining is the register-client request/response models + sync/aio functions | medium |
+| T61 | 216 | done | Dynamic Client Registration (RFC 7591/7592) — register-client models + sync/aio functions. Shipped #452 | medium |
 | T62 | 215 | pending | mTLS Client Auth and Certificate-Bound Tokens (RFC 8705) | large |
 | T63 | 218 | pending | JARM (JWT Secured Authorization Response Mode) | medium |
 | T250 | 436 | pending | Custom claims validation hook accepting a `ClaimsPrincipal` — add `principal_validator` to `TokenValidationConfig` (sync+async, mirrors `claims_validator`), invoked after standard validation via `to_principal()`; follow-up: expose principal-level hook in fastapi-identity-model middleware once PR #434 lands | medium |
@@ -227,14 +240,16 @@ These are downstream of the OIDC certification work. They inherit credibility fr
 
 | ID | Issue | Status | Description | Size | Depends |
 |----|-------|--------|-------------|------|---------|
-| T170 | 332 | in review | Monorepo restructure — uv workspace with member packages. Delivered by PR #434's workspace layout (`packages/fastapi-identity-model` member + independent release workflow) | large | — |
-| T171 | 333 | pending | py-identity-model-cli — RFC 8252 loopback CLI login tool | large | T170 |
-| T172 | 334 | in review | fastapi-identity-model — FastAPI middleware + RP login router. PR #434 open (middleware, `build_oidc_router`, 60+ mocked unit tests, example app) | large | T170 |
-| T173 | 437 | in review | fastapi-identity-model OIDF conformance regression — form_post + fetch_userinfo + §4.3 issuer-mismatch check on the router, `app_fastapi.py` harness driving the real `build_oidc_router` through all 3 local plans, `rp-fastapi` service + `make conformance-test-fastapi` + CI job. Regression stage, not a second cert (#242) | medium | T172 |
+| T170 | 332 | done | Monorepo restructure — uv workspace; `packages/fastapi-identity-model` member on main (PR #434 merged) | large | — |
+| T171 | 333 | pending | py-identity-model-cli — RFC 8252 loopback CLI login tool. **Only unstarted product; candidate next loop after the monorepo landed** | large | T170 |
+| T172 | 334 | done | fastapi-identity-model — FastAPI middleware + RP login router; package on main, released 0.1.0 (PR #434, issue closed 2026-07-22) | large | T170 |
+| T173 | 437 | done | fastapi-identity-model OIDF conformance regression — form_post + fetch_userinfo + §4.3 issuer-mismatch harness + `make conformance-test-fastapi` + CI job. On main | medium | T172 |
 
 ## identity-model
 
 Multi-language OIDC/OAuth2 client library (Go + Rust). Epic source: `planning-artifacts/epics/epic-3-core-go.md`.
+
+**Reconciled 2026-07-23:** repo is now **public** (2026-07-22, secret-scanned clean). FOSS security baseline merged (#29 — govulncheck + cargo-audit/deny + gitleaks + semgrep, daily). Go core + Go **extended** + Rust core **all shipped**. Crate name kept as clean `identity-model` (Duende is .NET-only; the `-rs` idea was dropped, PR #30 closed). **Remaining actionable work = Rust hardening (#22/#23/#24), the jsonwebtoken 9→10 migration (#32, verified breaking), and Rust extended-tier parity with Go (introspection/revocation/exchange/DPoP).** Learning issues #8–#13 are intentional starter tasks, not loop work.
 
 ### Go Core Tier (Epic 3) — DONE (merged 2026-07-02)
 
@@ -260,13 +275,25 @@ Ralph prompt: `ralph-prompts/identity-model-rust-core.md`. Stack R4.2–R4.6 com
 | R4.5 | 4.5 | done | Token client (CC + auth code + PKCE) — `rust/src/token` (PR #19) |
 | R4.6 | 4.6 | done | UserInfo endpoint — `rust/src/userinfo` (PR #20) |
 
-### Go Extended Tier (Epic 5 + 0F spec) — ACTIVE (ralph loop launched 2026-07-21)
+### Go Extended Tier (Epic 5 + 0F spec) — DONE (merged 2026-07-21)
 
-Ralph prompt: `ralph-prompts/identity-model-go-extended.md` (merged via PR #46). Loop runs from the `/tmp/im-goext-orch` orchestrator worktree (branch `ralph/go-extended`), `--no-auto-merge` — owner reviews and merges every PR. Base-branch chained off `main` (each task `--base <previous>`); owner merges bottom-up. Each task first authors its Epic 0F spec story (S.7/S.8/S.12/S.13 — the four extended conformance JSONs don't exist yet) then implements Go against it.
+Ralph prompt: `ralph-prompts/identity-model-go-extended.md`. All four extended stories shipped bottom-up to `main` (PRs #25–#28), each with its Epic 0F spec story. Main CI green.
 
-| ID | Story | Base | Status | Description |
-|----|-------|------|--------|-------------|
-| G5.1 | 5.1-go | main | in_progress | Token Introspection (RFC 7662) — `pkg/introspection` |
-| G5.2 | 5.2-go | G5.1 | pending | Token Revocation (RFC 7009) — `pkg/revocation` |
-| G5.3 | 5.3-go | G5.2 | pending | Token Exchange (RFC 8693) — extends `pkg/token` |
-| G5.4 | 5.4-go | G5.3 | pending | DPoP (RFC 9449) — `pkg/dpop` |
+| ID | Story | Status | Description |
+|----|-------|--------|-------------|
+| G5.1 | 5.1-go | done | Token Introspection (RFC 7662) — `pkg/introspection` (#25) |
+| G5.2 | 5.2-go | done | Token Revocation (RFC 7009) — `pkg/revocation` (#26) |
+| G5.3 | 5.3-go | done | Token Exchange (RFC 8693) — extends `pkg/token` (#27) |
+| G5.4 | 5.4-go | done | DPoP (RFC 9449) — `pkg/dpop` (#28) |
+
+### Rust Hardening + Extended Tier — PENDING (next identity-model loop)
+
+Reconciled 2026-07-23. Rust core is done; these are the remaining Rust items. The hardening trio are small non-blocking nits from the R4 fresh-review; the extended tier brings Rust to parity with Go's extended packages; the jsonwebtoken migration is a verified-breaking dependency bump (tracking PR #32).
+
+| ID | Issue | Status | Description | Size |
+|----|-------|--------|-------------|------|
+| R.H1 | 22 | pending | Forbid https→http redirect downgrade in discovery/jwks fetch | small |
+| R.H2 | 23 | pending | Verify `azp` for multi-audience ID tokens + clock-skew (OIDC Core §3.1.3.7) | small |
+| R.H3 | 24 | pending | Redact bearer tokens + client secrets from Debug/error output | small |
+| R.M1 | 32 | pending | Migrate jsonwebtoken 9→10 — **verified breaking** (6 JWT-validation tests fail; v10 changed crypto/key handling). Needs `rust/src/jwt/mod.rs` rework, tests kept green | medium |
+| R5.1 | — | pending | Rust extended tier — introspection/revocation/exchange/DPoP to parity with Go Epic 5 | large |
