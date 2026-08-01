@@ -8,7 +8,7 @@ project_name: 'py-identity-model'
 date: '2026-07-31'
 ---
 
-# E2E Token-Blaster Harness & PIM Feature-Proof — Epic Breakdown
+# Token Validation Harness & PIM Feature-Proof — Epic Breakdown
 
 ## Overview
 
@@ -18,7 +18,13 @@ date: '2026-07-31'
 
 **Execution method:** Ralph loop — prompt `ralph-prompts/token-harness.md` (authored separately). One story per PR off `main`, standard `setup→…→complete` pipeline. Owner merges.
 
-**Goal:** A production-style FastAPI server mounting the `fastapi-identity-model` middleware, driven by a **token-blaster** that mints many real tokens from the wired IdP matrix (node-oidc-provider, Keycloak, Ory Network, Descope multi-tenant) and fires them at the server, asserting accept/reject and exercising each runtime feature under real load. Every recent unproven feature is then proven through it, and every conformance-relevant change is gated on the OIDF suite.
+**Goal:** A production-style FastAPI server mounting the `fastapi-identity-model` middleware, exercised by two complementary suites over the wired IdP matrix (node-oidc-provider, Keycloak, Ory Network, Descope multi-tenant):
+- a **pytest correctness matrix** (+ deterministic behavior proofs) that mints real tokens and asserts accept/reject per class, and
+- a **Locust load/soak suite** that swarms the server with a pre-minted token pool to prove behavior under concurrency.
+
+Every recent unproven feature is then proven through it, and every conformance-relevant change is gated on the OIDF suite.
+
+**Tooling split (deliberate):** correctness and the behavior proofs (LRU survival, issuer mix-up, private_key_jwt) are **pytest** — they need exact assertions and *controlled* access patterns. Volume/throughput/soak is **Locust** — Python-native so it reuses the same `TokenSource` minters, with a pre-minted token pool (mint once, replay many; real IdPs rate-limit per-request minting and JWT validation is stateless, so replay is valid).
 
 **Definition of Done (applies to every story below, per `ralph-prompts/phases/test.md` + `phases/pr.md`):**
 - Integration tests under `src/tests/integration/` that hit a **real** IdP/HTTP server (not mocks); unit tests are necessary but not sufficient.
@@ -29,8 +35,8 @@ date: '2026-07-31'
 
 ## Epic List
 
-### Epic TH-1: Token-Blaster Harness Foundation
-A reusable driver that boots the `fastapi-identity-model` resource server and fires many real tokens across the wired IdP matrix, asserting accept/reject. **Repo:** py-identity-model.
+### Epic TH-1: Token Validation Harness Foundation
+The FastAPI resource server plus the two test suites — a pytest correctness matrix and a Locust load/soak suite — over the wired IdP matrix. **Repo:** py-identity-model.
 
 ### Epic TH-2: Feature-Proof Backfill
 Prove each recently-merged runtime feature end-to-end through the harness, closing the trust gap — starting with #461's multi-tenant LRU. **Repo:** py-identity-model.
@@ -40,13 +46,13 @@ Ensure conformance tests pass wherever a change is conformance-relevant, and wir
 
 ---
 
-## Epic TH-1: Token-Blaster Harness Foundation
+## Epic TH-1: Token Validation Harness Foundation
 
 ### Story TH-1.1: Unified multi-provider token minter
 
 As a test author,
 I want one `TokenSource` interface that mints real tokens from any wired IdP,
-So that the blaster and backfill tests obtain tokens the same way regardless of provider.
+So that both the correctness matrix and the load suite obtain tokens the same way regardless of provider.
 
 **Acceptance Criteria:**
 
@@ -81,25 +87,25 @@ So that tokens are validated by the actual production code path, not an in-proce
 **Size:** Medium
 **Task ID:** T301
 
-### Story TH-1.3: Token-blaster driver + assertion matrix
+### Story TH-1.3: Token correctness assertion matrix (pytest)
 
 As a maintainer,
-I want to fire many valid and deliberately-invalid tokens at the server and assert the outcomes,
-So that runtime validation is proven under real, high-volume conditions.
+I want to send valid and deliberately-invalid tokens from each provider and assert exact outcomes,
+So that runtime validation correctness is proven deterministically.
 
 **Acceptance Criteria:**
 
 **Given** the minter (TH-1.1) and server fixture (TH-1.2)
-**When** the blaster runs for a provider
-**Then** it fires a configurable volume/concurrency of tokens across classes — valid, expired, wrong-issuer, wrong-audience, tampered-signature, unknown-`kid`, wrong-alg, and (where supported) DPoP-bound
-**And** valid tokens receive `200`, every invalid class receives `401`, and no class is silently accepted
+**When** the matrix runs for a provider
+**Then** it sends one token per class — valid, expired, wrong-issuer, wrong-audience, tampered-signature, unknown-`kid`, wrong-alg, and (where supported) DPoP-bound
+**And** valid tokens receive `200`, every invalid class receives `401` with the expected error, and no class is silently accepted
 
-**Given** the run completes
-**When** results are collected
-**Then** throughput and JWKS/discovery cache hit-rate are reported, and the run fails if any assertion in the matrix is violated
+**Given** the matrix is deterministic
+**When** it runs
+**Then** it uses a fixed, controlled set of tokens (not a random swarm) so failures are reproducible; the load/soak swarm is the separate TH-1.5 suite
 
-**Files:** `src/tests/integration/harness/blaster.py` (new), `src/tests/integration/test_harness_blast.py` (new)
-**Size:** Large
+**Files:** `src/tests/integration/test_harness_matrix.py` (new), `src/tests/integration/harness/`
+**Size:** Medium
 **Task ID:** T302
 **Depends on:** TH-1.1, TH-1.2
 
@@ -107,13 +113,13 @@ So that runtime validation is proven under real, high-volume conditions.
 
 As a maintainer,
 I want the harness runnable via make and wired into CI,
-So that it runs on the right providers per environment and lays the groundwork for nightly validation.
+So that both suites run on the right providers per environment and lay the groundwork for nightly validation.
 
 **Acceptance Criteria:**
 
-**Given** the blaster (TH-1.3)
+**Given** the correctness matrix (TH-1.3) and the Locust load suite (TH-1.5)
 **When** `make test-harness` is invoked
-**Then** it boots the required local fixtures (node-oidc, keycloak) and runs the blast, and accepts `--env-file` to target Ory/Descope when creds are present
+**Then** it boots the required local fixtures (node-oidc, keycloak), runs the pytest matrix + the Locust CI load profile, and accepts `--env-file` to target Ory/Descope when creds are present
 
 **Given** CI
 **When** the workflow runs
@@ -122,7 +128,28 @@ So that it runs on the right providers per environment and lays the groundwork f
 **Files:** `Makefile`, `.github/workflows/ci.yml`
 **Size:** Medium
 **Task ID:** T303
-**Depends on:** TH-1.3
+**Depends on:** TH-1.3, TH-1.5
+
+### Story TH-1.5: Load/soak suite (Locust)
+
+As a maintainer,
+I want to swarm the resource server with many concurrent tokens under sustained load,
+So that throughput, cache behavior, and stability are proven — not just single-request correctness.
+
+**Acceptance Criteria:**
+
+**Given** a pre-minted token pool spanning issuers/tenants (mint once via TH-1.1, replay many — real IdPs rate-limit per-request minting; JWT validation is stateless so replay is valid)
+**When** the Locust suite swarms `/protected` at configurable users / spawn-rate
+**Then** it reports RPS, latency percentiles, error rate, and JWKS/discovery cache hit-rate, and fails if the error rate exceeds a threshold or throughput regresses
+
+**Given** a short CI profile and a longer nightly soak profile
+**When** each runs headless
+**Then** the CI profile completes in bounded time and the soak profile surfaces leaks/regressions over sustained load (feeds the nightly hook, #271)
+
+**Files:** `src/tests/load/locustfile.py` (new), `src/tests/load/README.md`, `pyproject.toml` (locust dev-dep)
+**Size:** Medium
+**Task ID:** T311
+**Depends on:** TH-1.1, TH-1.2
 
 ---
 
@@ -137,7 +164,7 @@ So that a merged security change is trusted — or reverted if it cannot be show
 **Acceptance Criteria:**
 
 **Given** a small `max_cache_entries` and a legitimately-hot issuer/tenant whose JWKS is read frequently
-**When** the blaster drives reads from many distinct attacker-influenced issuers (distinct `disco_doc_address`→`jwks_uri`, and distinct Descope `dct` tenants) to force eviction pressure
+**When** a **deterministic** test (controlled access pattern, not the random load suite) drives reads from many distinct attacker-influenced issuers (distinct `disco_doc_address`→`jwks_uri`, and distinct Descope `dct` tenants) to force eviction pressure
 **Then** the hot entry is **not** evicted (LRU-by-access holds) and its tokens keep validating without a re-fetch storm
 **And** the same test on the pre-#461 (FIFO) code path fails — proving the test actually discriminates the behavior
 
@@ -265,27 +292,28 @@ So that logout features (RP-initiated / back-channel, e.g. #442) carry conforman
 ## Implementation Order / Dependency Graph
 
 ```
-TH-1.1 ─┐
-        ├─> TH-1.3 ─┬─> TH-1.4
-TH-1.2 ─┘           ├─> TH-2.1  (FIRST after foundation — the #461 proof/revert gate)
-                    └─> TH-2.4
-TH-1.1 ───────────────> TH-2.2
-TH-1.2 ───────────────> TH-2.3
+TH-1.1 ─┬─> TH-1.3 (correctness matrix) ─┐
+        ├─> TH-1.5 (Locust load/soak) ───┼─> TH-1.4 (CI gate over both suites)
+TH-1.2 ─┘                                │
+TH-1.3 ─┬─> TH-2.1  (FIRST — the #461 prove/revert gate; deterministic, not the load suite)
+        └─> TH-2.4
+TH-1.1 ───> TH-2.2
+TH-1.2 ───> TH-2.3
 TH-3.1 ─┬─> TH-3.2
         └─> TH-3.3
 ```
 
 ### Execution Priority
-1. **TH-1.1 + TH-1.2** (foundation) → **TH-1.3** (blaster).
-2. **TH-2.1** immediately after TH-1.3 — it decides #461's fate (prove or revert).
-3. **TH-1.4**, then **TH-2.2 / TH-2.3 / TH-2.4** (remaining backfill).
+1. **TH-1.1 + TH-1.2** (foundation) → **TH-1.3** (correctness matrix) + **TH-1.5** (Locust load/soak).
+2. **TH-2.1** immediately after TH-1.3 — it decides #461's fate (prove or revert; deterministic pytest, not the load suite).
+3. **TH-1.4** (CI gate over both suites), then **TH-2.2 / TH-2.3 / TH-2.4** (remaining backfill).
 4. **TH-3.1** → **TH-3.2 / TH-3.3** (conformance gates).
 
 ## Story Count Summary
 
 | Epic | Stories | Sizes |
 |------|---------|-------|
-| TH-1 Harness Foundation | 4 | M, M, L, M |
+| TH-1 Harness Foundation | 5 | M, M, M, M, M |
 | TH-2 Feature-Proof Backfill | 4 | M, S, M, M |
 | TH-3 Conformance Coverage & Gates | 3 | S, L, M |
-| **Total** | **11** | 2×S · 6×M · 3×L |
+| **Total** | **12** | 2×S · 9×M · 1×L |
