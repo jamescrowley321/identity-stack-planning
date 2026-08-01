@@ -13,7 +13,7 @@ This document is the master index for all planned work across the auth workspace
 | PRD 4 | Multi-IdP Gateway Demo | identity-stack | Planned | ~20 stories / 4 epics |
 | PRD 5 | Canonical Identity Domain Model | identity-stack | Done | 18 stories / 4 epics |
 | PRD 5b | Design System & Admin Frontend | identity-stack | Active | 31 stories / 5 epics |
-| PRD 6 | identity-model Multi-Language Monorepo | identity-model (new repo) | Planned | ~100 stories / 15 epics |
+| PRD 6 | identity-model Multi-Language Monorepo | identity-model | Active | ~100 stories / 15 epics |
 
 ## Dependency Graph
 
@@ -215,7 +215,9 @@ graph TD
 
 **Scope:** 15 epics covering: monorepo setup, cross-language conformance specs, Core Tier (all 4 languages), Extended Tier (Introspection, Revocation, Token Exchange, DPoP), Advanced Tier (PAR, RAR), OpenTelemetry, security pipeline, documentation site, benchmarks, contributor DX, competitive analysis, naming/versioning, improvement spikes, and modern auth extensions.
 
-**Depends on:** Main PRD (py-identity-model protocol features complete), PRD 3 (node-oidc-provider test infrastructure for shared conformance tests).
+**Status:** Public repo live. Go core + extended tiers (discovery, jwks, jwt, token, userinfo, dpop, introspection, revocation) and Rust core tier (discovery, jwks, jwt, token, userinfo) merged. The monorepo, shared conformance `spec/`, and shared `infra/` (node-oidc-provider + IdentityServer) are stood up. Node/TS planned; Python (`py-identity-model`) merges into `python/` later. Active workstream: Rust security hardening (secret redaction, https→http redirect-downgrade defense, `azp`/clock-skew validation, jsonwebtoken 9→10).
+
+**Depends on:** Main PRD (py-identity-model protocol features complete). Ships its own shared `infra/`, so no longer gated on PRD 3.
 
 **Artifacts:**
 - Product Brief: [`product-brief-identity-model-monorepo.md`](../_bmad-output/planning-artifacts/product-brief-identity-model-monorepo.md)
@@ -246,7 +248,7 @@ The main PRD defines 22 high-level FRs. Here's how the specialized PRDs implemen
 - PRD 5: Canonical identity domain model (18 stories) — shipped 2026-04-09
 - PRD 2: API gateway (17 stories) — shipped 2026-04-11/12
 
-**Phase 1b — ACTIVE (two parallel tracks):**
+**Phase 1b — ACTIVE (three parallel tracks):**
 
 *Track 1: py-identity-model (certification + security + products)*
 - Security re-audit Phase 2 (T200-T207) — 8 findings from 2026-04-14 re-audit (done)
@@ -264,6 +266,10 @@ The main PRD defines 22 high-level FRs. Here's how the specialized PRDs implemen
   - DS-4: 5 new admin pages (Providers, Sync Dashboard, Events, Identity Correlation, Provisional Users)
   - DS-5: Integration testing (unit, E2E, responsive, visual regression)
 
+*Track 3: identity-model (multi-language monorepo)*
+- PRD 6: Go core + extended tiers and Rust core tier merged; monorepo, shared conformance spec, and shared test infra live
+- Active: Rust security hardening (R1–R4 — secret redaction, redirect-downgrade defense, `azp`/skew validation, jsonwebtoken 9→10)
+
 *These tracks are 100% independent — different repos, zero dependency.*
 
 **Phase 2 (parallel, after Phase 1b foundations):**
@@ -272,4 +278,5 @@ The main PRD defines 22 high-level FRs. Here's how the specialized PRDs implemen
 
 **Phase 3 (capstone, depends on Phase 2):**
 - PRD 4: Multi-IdP gateway demo (needs PRD 3 test infra + PRD 5 canonical identity + PRD 5b frontend)
-- PRD 6: identity-model multi-language monorepo (depends on Main PRD + PRD 3)
+
+*(PRD 6 — identity-model monorepo — is now an active Phase 1b track, see above.)*

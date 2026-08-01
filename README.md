@@ -1,6 +1,6 @@
 # identity-stack-planning
 
-Planning and orchestration hub for a multi-repo identity platform. This repo contains zero application code — only the planning artifacts, architecture decisions, task tracking, and autonomous execution prompts that drive development across three sibling repositories.
+Planning and orchestration hub for a multi-repo identity platform. This repo contains zero application code — only the planning artifacts, architecture decisions, task tracking, and autonomous execution prompts that drive development across four sibling repositories.
 
 The workspace is also a case study in **agentic software development**: AI agents plan the work (BMAD-METHOD), execute it autonomously (Ralph Orchestrator), and review it adversarially with independent agents that have zero access to the implementation context.
 
@@ -62,7 +62,7 @@ Production OIDC/OAuth2.0 Python library with dual sync/async APIs. The token val
 
 </details>
 
-**Status:** v2.17.1 published. All 16 protocol features shipped. 100+ merged PRs. Review fix cycle complete.
+**Status:** v3.4.2 published. **OpenID Certified** — Basic + Config + Form Post Basic RP (2 Jul 2026). FAPI 2.0 RP hardening complete (private_key_jwt client auth, RFC 9207 issuer validation, JWKS-cache LRU eviction). All 16 protocol features shipped.
 **Repo:** [jamescrowley321/py-identity-model](https://github.com/jamescrowley321/py-identity-model)
 
 ### terraform-provider-descope
@@ -88,7 +88,7 @@ Terraform provider for Descope (Go). Fork of `descope/terraform-provider-descope
 
 </details>
 
-**Status:** Published to Terraform Registry (v1.1.x). 15 resources, 4 data sources. 65+ merged PRs. All review fix cycles complete.
+**Status:** Published to Terraform Registry (v1.2.1). 15 resources, 4 data sources. All review fix cycles complete.
 **Repo:** [jamescrowley321/terraform-provider-descope](https://github.com/jamescrowley321/terraform-provider-descope)
 
 ### identity-stack
@@ -112,8 +112,28 @@ Full-stack SaaS starter with FastAPI backend, Vite/React frontend, and Terraform
 
 </details>
 
-**Status:** Core platform operational. PRD 5 (canonical identity) complete. PRD 5b (design system + admin frontend) active. 44+ merged PRs.
+**Status:** Core platform operational. PRD 5 (canonical identity backend) complete. PRD 5b (design system + admin frontend) active — purple brand tokens, density system, and shared components (KPI strip, provider glyph, stream row) merged; admin pages in progress.
 **Repo:** [jamescrowley321/identity-stack](https://github.com/jamescrowley321/identity-stack)
+
+### identity-model
+
+Multi-language, RFC-compliant OIDC/OAuth2 **client** library monorepo — one cross-language conformance spec, idiomatic implementations per language. Inspired by (not affiliated with) Duende's IdentityModel (.NET). This is the long-term evolution of py-identity-model into a multi-language ecosystem (PRD 6).
+
+<details><summary>Language matrix</summary>
+
+| Language | Package | Status |
+|----------|---------|--------|
+| Go | `github.com/jamescrowley321/identity-model/go` | Core + Extended tiers merged — discovery, jwks, jwt, token, userinfo, dpop, introspection, revocation |
+| Rust | crate `identity-model` (edition 2024, MSRV 1.91) | Core tier merged — discovery, jwks, jwt, token, userinfo; security-hardening loop queued |
+| Python | `py-identity-model` (PyPI) | Reference implementation — separate repo today, merges into `python/` later |
+| Node/TS | `@identity-model/node` (npm) | Planned |
+
+</details>
+
+A shared `spec/` defines language-agnostic conformance tests; each binding runs them against shared `infra/` providers (node-oidc-provider + IdentityServer). CI enforces that a "capability implemented" claim passes the shared conformance suite.
+
+**Status:** Public repo. Go core + extended tiers and Rust core tier merged. Next: Rust security hardening (secret redaction, https→http redirect-downgrade defense, `azp`/clock-skew validation, jsonwebtoken 9→10).
+**Repo:** [jamescrowley321/identity-model](https://github.com/jamescrowley321/identity-model)
 
 ## The Roadmap
 
@@ -121,7 +141,8 @@ Six PRDs define the platform evolution. See [docs/roadmap.md](docs/roadmap.md) f
 
 **Active:**
 - **PRD 5** (Done) — Canonical identity domain model: Postgres-backed source of truth with 8 SCIM-aligned tables, write-through sync to Descope, webhook inbound sync, multi-IdP identity linking.
-- **PRD 5b** (Active) — Design system & admin frontend: purple brand tokens, density system, 8 new components, 5 admin pages, responsive layout. Ralph loop running.
+- **PRD 5b** (Active) — Design system & admin frontend: purple brand tokens, density system, 8 new components, 5 admin pages, responsive layout. Components landing; admin pages in progress.
+- **PRD 6** (Active) — identity-model multi-language monorepo: Go (core + extended) and Rust (core) tiers merged; Rust security hardening next.
 
 **Next:** PRD 1 (secrets pipeline), PRD 3 (multi-provider test infra)
 
@@ -237,7 +258,7 @@ flowchart LR
 **Key properties:**
 - One phase per iteration with state persisted to disk (crash-recoverable)
 - Story loops use git worktrees for filesystem isolation (parallel execution)
-- 147+ tasks tracked across 3 repos with cross-repo dependencies
+- 147+ tasks tracked across 4 repos with cross-repo dependencies
 - See [docs/ralph-loop-process.md](docs/ralph-loop-process.md)
 
 ### Layer 3: Independent Review Agents (Quality)
@@ -260,9 +281,10 @@ Live status is tracked in the [task queue](_bmad-output/implementation-artifacts
 
 | Repo | Status | Links |
 |------|--------|-------|
-| terraform-provider-descope | Feature-complete. 1 blocked (SSO app requires enterprise license). | [PRs](https://github.com/jamescrowley321/terraform-provider-descope/pulls) · [Registry](https://registry.terraform.io/providers/jamescrowley321/descope/latest) |
-| identity-stack | PRD 5 complete. PRD 5b (design system) active — ralph loop running. | [PRs](https://github.com/jamescrowley321/identity-stack/pulls) |
-| py-identity-model | All 16 protocol features shipped. Review fix cycle complete. | [PRs](https://github.com/jamescrowley321/py-identity-model/pulls) · [PyPI](https://pypi.org/project/py-identity-model/) |
+| py-identity-model | v3.4.2. OpenID Certified (Basic/Config/Form Post RP). FAPI 2.0 RP hardening complete. | [PRs](https://github.com/jamescrowley321/py-identity-model/pulls) · [PyPI](https://pypi.org/project/py-identity-model/) |
+| terraform-provider-descope | v1.2.1. Feature-complete. 1 blocked (SSO app requires enterprise license). | [PRs](https://github.com/jamescrowley321/terraform-provider-descope/pulls) · [Registry](https://registry.terraform.io/providers/jamescrowley321/descope/latest) |
+| identity-stack | PRD 5 (canonical identity) complete. PRD 5b (design system) active — components merged, admin pages in progress. | [PRs](https://github.com/jamescrowley321/identity-stack/pulls) |
+| identity-model | Public. Go (core + extended) and Rust (core) tiers merged. Rust hardening queued. | [Repo](https://github.com/jamescrowley321/identity-model) |
 
 ## Quick Start
 
