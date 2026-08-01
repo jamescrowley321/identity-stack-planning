@@ -109,6 +109,26 @@ All feature tasks (T32-T47) complete. All review fixes (T101-T116) complete — 
 
 **Reconciled 2026-07-23:** the whole Phase-4 protocol batch **shipped 2026-07-21** — private_key_jwt (#213/#433), RP-Initiated Logout (#214/#451), Dynamic Client Registration (#216/#452), Back-Channel Logout (#442/#450). SonarCloud removed (#455); the monorepo restructure + `fastapi-identity-model` package are on main (#434). **Live remainder = #221 (RFC 9207 issuer validation), #397 (jwks-cache LRU), #431 (repr/eq guard), IdentityServer fixture #412–414, test hygiene #275/#276/#280, and the unstarted RFCs (CIBA #217, RAR #220, JARM #218, mTLS #215).**
 
+### E2E Token-Blaster Harness & Feature-Proof (TH — NEW, top priority)
+
+Prompted by #461 (jwks-cache LRU) merging on unit-green with **no integration proof**. Build a prod FastAPI server on the `fastapi-identity-model` middleware, blast it with real tokens from the wired IdP matrix (node-oidc, Keycloak, Ory, Descope multi-tenant), then prove every recent feature through it. **DoD per story: real-IdP integration test + conformance run where the change touches a certified/suite-backed profile.** Epics: `planning-artifacts/epics-token-harness.md`. Ralph prompt: `ralph-prompts/token-harness.md` (TBD). Tracking issue: [#462](https://github.com/jamescrowley321/py-identity-model/issues/462).
+
+| ID | Issue | Status | Description | Size | Depends |
+|----|-------|--------|-------------|------|---------|
+| T300 | 463 | pending | TH-1.1 Unified multi-provider `TokenSource` minter (node-oidc/Keycloak/Ory/Descope multi-tenant) | medium | — |
+| T301 | 464 | pending | TH-1.2 Boot `fastapi-identity-model` middleware as a real resource server (uvicorn + httpx) | medium | — |
+| T302 | 465 | pending | TH-1.3 Token-blaster driver + valid/invalid assertion matrix (200/401) at volume | large | T300, T301 |
+| T303 | 466 | pending | TH-1.4 `make test-harness` + CI gating (local always, cloud on secrets; nightly #271 hook) | medium | T302 |
+| T304 | 467 | pending | TH-2.1 **Prove multi-tenant LRU or revert #461** (must fail on the FIFO path). Ref #397/#461 | medium | T302 |
+| T305 | 468 | pending | TH-2.2 Prove RFC 9207 issuer mix-up rejection. Ref #221/#457 | small | T300 |
+| T306 | 469 | pending | TH-2.3 Prove private_key_jwt end-to-end via resource server. Ref #213/#433 | medium | T301 |
+| T307 | 470 | pending | TH-2.4 Backfill integration coverage for the recent batch (#401, refresh-on-sig, DPoP/PAR/JAR, #459) | medium | T302 |
+| T308 | 471 | pending | TH-3.1 Feature → OIDF conformance-profile coverage matrix | small | — |
+| T309 | 472 | pending | TH-3.2 Make fastapi RP OIDF conformance a required regression gate. Ref #437 | large | T308 |
+| T310 | 473 | pending | TH-3.3 RP-initiated + back-channel logout conformance (Keycloak). Ref #442/#214 | medium | T308 |
+
+**Execution order:** T300 + T301 → T302 → **T304 (the #461 prove-or-revert gate)** → T303 → T305 / T306 / T307 → T308 → T309 / T310.
+
 ### OIDC Conformance Certification ✅ CERTIFIED (2 Jul 2026)
 
 OpenID Foundation Basic RP + Config RP + Form Post Basic RP — **certified 2 Jul 2026** (py-identity-model 3.1.0). Fee waived via the OIDF OSS policy.
