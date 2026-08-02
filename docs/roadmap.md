@@ -215,7 +215,11 @@ graph TD
 
 **Scope:** 15 epics covering: monorepo setup, cross-language conformance specs, Core Tier (all 4 languages), Extended Tier (Introspection, Revocation, Token Exchange, DPoP), Advanced Tier (PAR, RAR), OpenTelemetry, security pipeline, documentation site, benchmarks, contributor DX, competitive analysis, naming/versioning, improvement spikes, and modern auth extensions.
 
-**Status:** Public repo live. Go core + extended tiers (discovery, jwks, jwt, token, userinfo, dpop, introspection, revocation) and Rust core tier (discovery, jwks, jwt, token, userinfo) merged. The monorepo, shared conformance `spec/`, and shared `infra/` (node-oidc-provider + IdentityServer) are stood up. Node/TS planned; Python (`py-identity-model`) merges into `python/` later. Active workstream: Rust security hardening (secret redaction, https→http redirect-downgrade defense, `azp`/clock-skew validation, jsonwebtoken 9→10).
+**Status:** Public repo live. Go core + extended tiers (discovery, jwks, jwt, token, userinfo, dpop, introspection, revocation) and Rust core tier (discovery, jwks, jwt, token, userinfo) merged. The monorepo, shared conformance `spec/`, and shared `infra/` (node-oidc-provider + IdentityServer) are stood up. Node/TS planned; Python (`py-identity-model`) merges into `python/` later.
+
+**identity-model workstreams (one ralph loop per repo at a time — run sequentially, never concurrently):**
+1. *Rust security hardening* — R1–R4: secret redaction (#24), https→http redirect-downgrade defense (#22), `azp`/clock-skew validation (#23), jsonwebtoken 9→10 (#32). Prompt: `ralph-prompts/identity-model-rust-hardening.md`. Prepared; not yet run to completion.
+2. *OIDF conformance harness + integration matrix* — build Go + Rust OpenID Foundation Relying-Party conformance harnesses driven through the official OIDF certification suite (mirroring the OIDF-certified `py-identity-model` `conformance/` — ported runner + plan configs + Docker suite/mongo/nginx, per-language RP app), then bring the integration provider matrix (node-oidc, IdentityServer, Ory, Descope) to Go/Rust parity. The cross-language JSON-vector conformance model (unmerged `feat/conformance-runner-jwt` seed) is **parked** in favor of matching py-identity-model's OIDF approach. Prompt: `ralph-prompts/identity-model-conformance-harness.md` (K1–K6). Prepared 2026-08-02; queued behind (or in place of) the hardening loop per owner's call.
 
 **Depends on:** Main PRD (py-identity-model protocol features complete). Ships its own shared `infra/`, so no longer gated on PRD 3.
 
@@ -268,7 +272,7 @@ The main PRD defines 22 high-level FRs. Here's how the specialized PRDs implemen
 
 *Track 3: identity-model (multi-language monorepo)*
 - PRD 6: Go core + extended tiers and Rust core tier merged; monorepo, shared conformance spec, and shared test infra live
-- Active: Rust security hardening (R1–R4 — secret redaction, redirect-downgrade defense, `azp`/skew validation, jsonwebtoken 9→10)
+- Prepared workstreams (sequential — one loop per repo at a time): (1) Rust security hardening (R1–R4 — secret redaction, redirect-downgrade defense, `azp`/skew validation, jsonwebtoken 9→10); (2) OIDF conformance harness — Go + Rust OpenID Foundation RP conformance harnesses (mirroring py-identity-model's OIDF `conformance/`) + integration provider-matrix parity (K1–K6). See `ralph-prompts/identity-model-conformance-harness.md`.
 
 *These tracks are 100% independent — different repos, zero dependency.*
 
