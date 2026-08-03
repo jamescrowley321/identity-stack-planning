@@ -22,6 +22,20 @@ Push branch and create PR.
    ```
    If the gate fails, **return to the test phase** — do not push, do not skip. Re-running this phase without adding tests is a hard error.
 
+1b. **Mechanical security gate.** A filename check is NOT a gate (an empty test file passes it). If the diff touches security-control code, run the deterministic gate — mutation testing on the changed security modules (a surviving mutant = a control whose removal no test catches, the exact FAPI2 failure), the custom Semgrep ruleset, the stranded-control reachability check, and the conformance evidence-integrity check:
+   ```bash
+   BASE=$(grep '^base_branch:' .claude/task-state.md 2>/dev/null | awk '{print $2}'); BASE=${BASE:-main}
+   DIFF=$(git diff --name-only "origin/$BASE...HEAD")
+   if echo "$DIFF" | grep -qE 'token_validation|parsers|jwt_helpers|mtls|dpop|jarm|client_auth|jwks|par|fapi|conformance'; then
+     make security-gate BASE="origin/$BASE" || {
+       echo "SECURITY GATE FAILED — do not push. Fix surviving mutants / Semgrep findings / stranded controls / evidence gaps."
+       echo "See RED-BLUE-GATE.md and Epic 19 (Mechanical Security Gates)."
+       exit 1
+     }
+   fi
+   ```
+   `make security-gate` is delivered by **Epic 19 (Mechanical Security Gates)**; until it exists, a security-control PR MUST NOT advance on a filename/self-attestation check — treat a missing gate as a hard block, not a pass. If it fails, **return to the test phase**.
+
 2. Push: `git push -u origin <branch>`
 
 3. Create PR — base is `main` unless the router prompt specifies chained PRs (use `base_branch` from task-state):
