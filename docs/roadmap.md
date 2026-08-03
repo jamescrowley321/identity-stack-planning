@@ -215,7 +215,7 @@ graph TD
 
 **Scope:** 15 epics covering: monorepo setup, cross-language conformance specs, Core Tier (all 4 languages), Extended Tier (Introspection, Revocation, Token Exchange, DPoP), Advanced Tier (PAR, RAR), OpenTelemetry, security pipeline, documentation site, benchmarks, contributor DX, competitive analysis, naming/versioning, improvement spikes, and modern auth extensions.
 
-**Status:** Public repo live. Go core + extended tiers (discovery, jwks, jwt, token, userinfo, dpop, introspection, revocation) and Rust core tier (discovery, jwks, jwt, token, userinfo) merged. The monorepo, shared conformance `spec/`, and shared `infra/` (node-oidc-provider + IdentityServer) are stood up. Node/TS planned; Python (`py-identity-model`) merges into `python/` later. Active workstream: Rust security hardening (secret redaction, https→http redirect-downgrade defense, `azp`/clock-skew validation, jsonwebtoken 9→10).
+**Status:** Public repo live. Go core + extended tiers (discovery, jwks, jwt, token, userinfo, dpop, introspection, revocation) and Rust core tier **+ security hardening** (discovery, jwks, jwt, token, userinfo; secret redaction, redirect-downgrade defence, `azp`/clock-skew, jsonwebtoken 10) merged. Toolchains: Go 1.26, Rust MSRV 1.96. The monorepo, shared conformance `spec/`, and shared `infra/` (node-oidc-provider + IdentityServer) are stood up. **Conformance:** the OIDF RP-harness (`conformance/`) is in-flight — the Go RP passes `oidcc-client-basic-certification-test-plan` (K1 PR #43 merged, K2 PR #44). Node/TS planned; Python (`py-identity-model`) merges into `python/` later. **Next workstream:** priorities reconciliation + planning (`ralph-prompts/identity-model-priorities-planning.md`) across conformance, PIM parity, cross-platform serializer, performance, integration harness, and framework middlewares — Rust extended-tier parity is the biggest open implementation gap.
 
 **Depends on:** Main PRD (py-identity-model protocol features complete). Ships its own shared `infra/`, so no longer gated on PRD 3.
 
@@ -268,7 +268,7 @@ The main PRD defines 22 high-level FRs. Here's how the specialized PRDs implemen
 
 *Track 3: identity-model (multi-language monorepo)*
 - PRD 6: Go core + extended tiers and Rust core tier merged; monorepo, shared conformance spec, and shared test infra live
-- Active: Rust security hardening (R1–R4 — secret redaction, redirect-downgrade defense, `azp`/skew validation, jsonwebtoken 9→10)
+- Rust security hardening (R1–R4) **DONE** (merged PRs #37/#39); conformance OIDF RP-harness in-flight (Go RP passes `basic-rp` — K1 #43 / K2 #44). **Active: priorities reconciliation + planning** (`ralph-prompts/identity-model-priorities-planning.md`); next implementation = Rust extended-tier parity (introspection/revocation/exchange/DPoP)
 
 *These tracks are 100% independent — different repos, zero dependency.*
 

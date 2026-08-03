@@ -12,7 +12,7 @@ Statuses: pending | in_progress | done | blocked
 > **Loop state (2026-07-27):**
 > - **identity-stack — design system** (`ralph-prompts/design-system.md`): **LIVE** — running in a separate session (orchestrator `/tmp/is-designsystem-orch`, branch `ralph/design-system`). Has shipped DS-3.1 and is working through DS-3.2 (provider glyph #330), DS-3.4 (StreamRow #332). **Do not relaunch or push competing PRs to identity-stack.**
 > - **py-identity-model — FAPI2 remainder** (`ralph-prompts/pim-fapi2-hardening.md`): **PREPARED, not launched** — #221 RFC 9207, #397 jwks LRU, #431 repr guard. Ready for the owner to launch.
-> - **identity-model — Rust hardening** (`ralph-prompts/identity-model-rust-hardening.md`): **PREPARED, not launched** — #24/#22/#23 hardening + #32 jsonwebtoken-10 migration (verified breaking). Ready for the owner to launch.
+> - **identity-model — Rust hardening** (`ralph-prompts/identity-model-rust-hardening.md`): **DONE 2026-08-02** — done in-session (not the loop): #24/#22/#23 hardening (PR #37) + jsonwebtoken 9→10 (PR #39); both merged, CI green. Next identity-model track = the priorities reconciliation + planning session (`ralph-prompts/identity-model-priorities-planning.md`).
 >
 > Per workspace rule: **one ralph workstream per repo at a time**; loops run from `/tmp` worktrees, `--no-auto-merge` (owner reviews/merges).
 
@@ -255,7 +255,7 @@ These are downstream of the OIDC certification work. They inherit credibility fr
 
 Multi-language OIDC/OAuth2 client library (Go + Rust). Epic source: `planning-artifacts/epics/epic-3-core-go.md`.
 
-**Reconciled 2026-07-23:** repo is now **public** (2026-07-22, secret-scanned clean). FOSS security baseline merged (#29 — govulncheck + cargo-audit/deny + gitleaks + semgrep, daily). Go core + Go **extended** + Rust core **all shipped**. Crate name kept as clean `identity-model` (Duende is .NET-only; the `-rs` idea was dropped, PR #30 closed). **Remaining actionable work = Rust hardening (#22/#23/#24), the jsonwebtoken 9→10 migration (#32, verified breaking), and Rust extended-tier parity with Go (introspection/revocation/exchange/DPoP).** Learning issues #8–#13 are intentional starter tasks, not loop work.
+**Reconciled 2026-08-02:** repo public (2026-07-22, secret-scanned clean). FOSS security baseline merged (#29). Go core + Go **extended** + Rust core **all shipped**. **Rust hardening (#22/#23/#24) + jsonwebtoken 9→10 (#32) DONE** — done in-session, merged PRs #37/#39 (issues #23/#24 were stale-open and closed 2026-08-02). Toolchains bumped to Go 1.26 / Rust 1.96 (#38). **Conformance:** OIDF RP-harness in-flight — Go RP passes `basic-rp` (K1 #43 merged, K2 #44). **Remaining actionable work = Rust extended-tier parity with Go (introspection/revocation/exchange/DPoP — biggest gap), plus the six-priority backlog scoped by the priorities reconciliation + planning session** (`ralph-prompts/identity-model-priorities-planning.md`): conformance harness (K3–K6), PIM parity, cross-platform serializer, performance, integration harness, framework middlewares. Learning issues #8–#13 are intentional starter tasks, not loop work.
 
 ### Go Core Tier (Epic 3) — DONE (merged 2026-07-02)
 
@@ -271,7 +271,7 @@ Ralph prompt: `ralph-prompts/identity-model-go-core.md`. Foundation scaffold (PR
 
 ### Rust Core Tier (Epic 4) — DONE (merged 2026-07-21)
 
-Ralph prompt: `ralph-prompts/identity-model-rust-core.md`. Stack R4.2–R4.6 completed and merged bottom-up to `main` 2026-07-21 after a fresh-context adversarial re-review (zero blockers). Main CI green. Non-blocking review nits tracked as identity-model issues #22 (redirect-downgrade hardening), #23 (`azp` + clock-skew), #24 (token Debug redaction).
+Ralph prompt: retired post-completion (the former `ralph-prompts/identity-model-rust-core.md` no longer exists). Stack R4.2–R4.6 completed and merged bottom-up to `main` 2026-07-21 after a fresh-context adversarial re-review (zero blockers). Main CI green. The non-blocking review nits #22 (redirect-downgrade), #23 (`azp` + clock-skew), #24 (token Debug redaction) were all shipped in the Rust hardening work (PR #37, 2026-08-02).
 
 | ID | Story | Status | Description |
 |----|-------|--------|-------------|
