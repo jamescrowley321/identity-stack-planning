@@ -64,3 +64,23 @@ Every confirmed red-team finding produces, in the target repo:
 
 "Green conformance" is necessary but **never sufficient** — the control matrix + fail-closed tests are
 the durable proof.
+
+## Mechanical enforcement (the real gate)
+
+Reviewer prose and a filename check are **not** gates — they rely on the same judgment that already failed,
+and a grep is gameable. The primary defense is deterministic machinery that fails on the defect class
+itself, with no agent in the loop, built in **Epic 19 (Mechanical Security Gates)** and invoked by the
+phases above via `make security-gate`:
+
+1. **Mutation testing** (mutmut) on the security modules — a surviving mutant means a control you can delete
+   with no test noticing (the stranded alg-guard / mTLS-SSLContext bug), caught automatically.
+2. **Custom Semgrep rules** encoding each audit anti-pattern (`algorithms=[alg]` widening, alg-from-header,
+   `verify_*` disabled, trusting a header `jwk`/`x5c`/`jku`, conformance `continue-on-error`) — a tireless
+   red team.
+3. **Reachability check** — every declared control must be invoked from `validate_token`; a stranded
+   control fails the build.
+4. **Evidence-integrity check** — conformance "green" that no gating CI job produced fails.
+
+Each gate is proven by reintroducing the exact audit finding and watching it turn red. The LLM red team
+(the `review` phase, `pim-shipped-audit.md`) is the **second** layer that triages and extends the
+mechanical findings — it never overrides a failing gate, and a missing gate on a security diff is a BLOCK.
