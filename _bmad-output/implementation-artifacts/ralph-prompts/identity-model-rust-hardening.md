@@ -1,3 +1,5 @@
+> **STATUS: COMPLETE — 2026-08-02. This loop was NOT run; all four tasks were done in-session and merged.** R1 #24 (secret redaction), R2 #22 (redirect-downgrade), R3 #23 (`azp`/clock-skew) shipped in **PR #37**; R4 jsonwebtoken 9→10 shipped in **PR #39** (feature `rust_crypto`). Both merged, CI green; issues #23/#24 closed 2026-08-02. The embedded task table below is historical and its `pending` markers / "MSRV 1.91" text are stale (MSRV is now 1.96). Kept for provenance; the next identity-model track is `identity-model-priorities-planning.md`.
+
 Self-referential loop. ONE phase of ONE task per iteration, then end. Fresh context each iteration — persist all state to files.
 
 ## Running
