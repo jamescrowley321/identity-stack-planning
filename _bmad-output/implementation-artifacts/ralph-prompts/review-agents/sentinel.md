@@ -26,6 +26,16 @@ Review through the identity-domain lens:
 8. **Sync/ordering** — If write-through pattern: can partial failures leave inconsistent auth state?
 9. **Internal API exposure** — Are internal endpoints accessible externally? Are admin APIs protected?
 
+### Library / protocol controls (identity libraries: py-identity-model)
+
+Apply these when reviewing an OIDC/OAuth library, not just an app. They target the exact failure classes the 2026-08-02 audit found shipped:
+
+10. **Fail-open / stranded control** — Is each security control actually INVOKED by the public API a normal caller uses (`validate_token`, middleware, the client request path)? A control that exists only as an opt-in helper nothing calls is fail-open by default. **Grep the entrypoint to confirm invocation against the SHIPPED code, not just the diff.** (This is how mTLS `cnf` binding shipped fail-open — `validate_certificate_binding` existed but `validate_token` never called it.)
+11. **RS-side sender-constraint enforcement** — For a token validator: are certificate-binding (`cnf.x5t#S256`), DPoP (`cnf.jkt`), the caller's `algorithms` allowlist, and strict audience actually ENFORCED inside `validate_token`, or merely offered as standalone helpers? Silently accepting a token that violates a configured restriction is a fail-open.
+12. **Algorithm confusion / downgrade** — Is the signing alg pinned to the caller's/OP's allowlist and never taken from the attacker-controlled token header? Are `none` and symmetric↔asymmetric (RS↔HS) confusion rejected by THIS code, not left to the JWT dependency? Is a caller-supplied `algorithms` restriction honored in discovery mode?
+13. **Completeness** — Is the control wired across ALL relevant grants/flows (auth-code, refresh, client-credentials) and BOTH sync + async? A half-wired control is a downgrade vector.
+14. **Evidence integrity ("green theater")** — If the change claims conformance/test green, is that green produced by a GATING CI job or a hosted-suite run with provenance? Static committed result artifacts, `continue-on-error` steps, and `WARNING`/`SKIPPED`-as-pass are NOT evidence — report them.
+
 ## Output Format
 
 Write your findings to the file path specified by the caller. Use this exact format:
@@ -65,4 +75,6 @@ Write your findings to the file path specified by the caller. Use this exact for
 - Read the actual codebase to understand the full auth flow — don't judge the diff in isolation
 - If the code uses an ORM (SQLAlchemy/SQLModel), don't flag SQL injection unless raw queries are used
 - Check for both the vulnerability AND existing mitigations before reporting
+- **Review the SHIPPED/wired state, not just the diff.** A control that reads correctly in the diff but is never called by the public entrypoint is still fail-open — grep the entrypoint to confirm it is actually invoked.
+- **For every security control you pass, verify a fail-closed test exists** (one that breaks if the control is deleted). If none does, that is at least a WARN — an unverified control regresses silently.
 - If you find zero issues, write "No security findings." and set Overall: PASS

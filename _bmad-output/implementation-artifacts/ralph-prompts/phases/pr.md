@@ -22,6 +22,20 @@ Push branch and create PR.
    ```
    If the gate fails, **return to the test phase** — do not push, do not skip. Re-running this phase without adding tests is a hard error.
 
+1b. **Fail-closed test gate (security controls).** If the diff touches security-control code, a mutation-style fail-closed test must accompany it (see `phases/test.md` + `RED-BLUE-GATE.md`):
+   ```bash
+   BASE=$(grep '^base_branch:' .claude/task-state.md 2>/dev/null | awk '{print $2}'); BASE=${BASE:-main}
+   DIFF=$(git diff --name-only "origin/$BASE...HEAD")
+   SEC=$(echo "$DIFF" | grep -E 'token_validation|mtls|dpop|jarm|client_auth|jwt|jwks|par|fapi' | grep -vE '/tests/' | head -1)
+   SECTEST=$(echo "$DIFF" | grep -E 'tests/security/' | head -1)
+   if [ -n "$SEC" ] && [ -z "$SECTEST" ]; then
+     echo "GATE FAIL: security-control code changed but no tests/security/ fail-closed test added."
+     echo "Add a mutation-style test that fails if the control is removed. Return to the test phase."
+     exit 1
+   fi
+   ```
+   If it fails, **return to the test phase** — a shipped security control with no fail-closed test is exactly how the FAPI2 batch regressed.
+
 2. Push: `git push -u origin <branch>`
 
 3. Create PR — base is `main` unless the router prompt specifies chained PRs (use `base_branch` from task-state):

@@ -22,16 +22,16 @@ ralph run
 
 ## Task Queue
 
-| Task | Branch | Description | Status |
-|------|--------|-------------|--------|
-| T252 | fix/response-repr-redaction | #431 repr/eq guard on `RefreshTokenResponse` + `PushedAuthorizationResponse` (redact secrets) | pending |
-| T253 | feat/mtls-cert-bound-tokens | #215 mTLS client auth + certificate-bound access tokens (RFC 8705) | pending |
-| T254 | feat/jarm-response-mode | #218 JARM — JWT-Secured Authorization Response Mode | pending |
-| T255 | test/fapi2-conformance-profile | #475 FAPI 2.0 Security Profile RP conformance run + cert evidence | pending |
+| Task | PR · Release | Description | Status |
+|------|--------------|-------------|--------|
+| T252 | #479 · v3.4.3 | #431 repr/eq guard on `RefreshTokenResponse` + `PushedAuthorizationResponse` | ✅ done (shipped) — audited clean |
+| T253 | #480 · v3.6.0 | #215 mTLS client auth + certificate-bound access tokens (RFC 8705) | ✅ shipped — ⚠ RS-side `cnf` binding fail-open (audit RT1-F1) → T256 |
+| T254 | #481 · v3.7.0 | #218 JARM — JWT-Secured Authorization Response Mode | ✅ done (shipped) — audited clean |
+| T255 | #482 #483 · v3.8.0 | #475 FAPI 2.0 Security Profile RP conformance | ⚠ code shipped; conformance green NOT CI-gated/reproducible (audit F13–F17); hosted cert pending → T262 |
 
 **Already shipped — do NOT re-implement** (FAPI2 groundwork already on `main`): T57 #213 private_key_jwt (PR #433), T58 #221 RFC 9207 issuer validation (PR #457), T236 #397 jwks-cache FIFO→LRU (PR #461). PAR (RFC 9126), JAR request objects, DPoP (`core/dpop.py`), and the FAPI2 constants/validators (`core/fapi.py`) also already exist.
 
-**Reconciled 2026-08-01:** the previous queue mislabeled #221 and #397 as `pending` — both are merged. This workstream is now the FAPI 2.0 hardening epic #476: close the low-sev leftover (#431), add the two missing FAPI2 features (mTLS #215, JARM #218), then prove the whole stack against the OIDF FAPI 2.0 Security Profile (#475). All four are independent **except** ordering below.
+**Reconciled 2026-08-02:** T252–T255 have all **shipped** (v3.4.3 → v3.8.0). The original epic's *implementation* is done, but a fresh-context red/blue audit on 2026-08-02 (see `RED-BLUE-GATE.md`) found its *assurance* was not: a stranded algorithm-downgrade guard, a fail-open mTLS `cnf` binding, algorithm-confusion left to PyJWT, and conformance "green" that no CI job runs. The feature loop reviewed the task branch, never the code that shipped to `origin/main`. Those findings are queued as **Post-Audit Follow-ups** below and are the live work; the detection loop `pim-shipped-audit.md` now guards shipped `main` going forward.
 
 ### Sequencing
 
@@ -39,6 +39,28 @@ Pick in listed order: **T252 → T253 → T254 → T255.**
 - T252 (#431) is a low-severity, self-contained fix — good warm-up.
 - T253 (#215) and T254 (#218) are independent features.
 - **T255 (#475) MUST be last** — it is the capstone that drives the OIDF suite against the full stack. It passes today on the **DPoP** sender-constraining path (already shipped), so it does not hard-depend on T253; running it after T253/T254 simply widens coverage (mTLS path + JARM response mode).
+
+## Post-Audit Follow-ups (blue team — 2026-08-02 red/blue audit)
+
+These are the CONFIRMED findings from the shipped-`main` audit. Each REQUIRES a fail-closed test under
+`src/tests/security/` (mutation-style — fails if the fix is reverted) and a row in `docs/security/control-matrix.md`
+(see `RED-BLUE-GATE.md`). Prefer in-session stacked PRs for the well-scoped ones; run the larger cluster via
+`pim-shipped-audit.md`. Priority order: T257 → T256 → T258 → T262 → T261 → T259 → T260.
+
+| Task | Sev | Description | Audit ref |
+|------|-----|-------------|-----------|
+| T256 | HIGH | Enforce RS-side sender-constraints in `validate_token` (opt-in, fail-closed): cert-binding `cnf.x5t#S256`, DPoP `cnf.jkt` (#478), honor caller `algorithms` allowlist in discovery mode, reject untrusted secondary `aud` | RT1-F1, RT4-F1, RT5-F18, #478 |
+| T257 | HIGH | Algorithm-confusion hardening: add HS256/384/512→`oct` and `none` to `_ALG_TO_KTY`; never resolve alg from the token header; wrap `InvalidKeyError`/`NotImplementedError` in `TokenValidationException` | RT4-F2 |
+| T258 | MED | Add `verify_aud` to `_ENFORCED_VERIFICATION_OPTIONS`; set PyJWT `require=['exp']` (reject tokens with no `exp`) | RT4-F3, RT4-F4 |
+| T259 | MED | Thread DPoP proofs through refresh-token and client-credentials grants (RFC 9449 §5) | RT3-F7, RT3-F8 |
+| T260 | MED | Basic-auth percent-encoding: prove round-trip against a non-form-decoding AS via integration test; gate the behavior change | RT3-F9 |
+| T261 | MED | mTLS: auto-apply `mtls_endpoint_aliases` in the request path; add a real cert-presentation fail-closed test (current test passes if `load_cert_chain` is deleted) | RT1-F2, RT1-F3 |
+| T262 | HIGH (process) | Make new-profile conformance real: CI-gate FAPI2/logout/dynamic profiles, remove `config-rp` `continue-on-error`, drop `WARNING`/`SKIPPED` from `PASSING_STATUSES`, stop counting harness-side skips as pass, and move harness-only checks (secondary-`aud`) into the library | RT5-F13–F18 |
+| T263 | — | Establish the blue-team artifacts: `src/tests/security/` fail-closed suite + `docs/security/control-matrix.md` (created incrementally by T256–T262) | — |
+
+**Forward workstreams (planned separately, not in this loop):** FAPI 2.0 Attacker-Model adversarial test suite +
+new controls (guided by the FAPI 2.0 Attacker Model A1–A5); serious load/soak testing (ties to epic #462–#474, esp.
+#474 Locust — validate JWKS-cache concurrency, audit RT4-F6, under real load).
 
 ## Routing
 
@@ -115,6 +137,8 @@ Include these notes when the analyze phase reads the issue.
 - Feature tasks (T253, T254) MUST add integration tests (`src/tests/integration/`) AND a usage example (`examples/`) — unit tests alone are insufficient. Run integration tests locally (`make test-integration-node-oidc`) before the `pr` phase.
 - T255 (conformance) MUST attach real OIDF suite evidence — a green local unit run is NOT proof; the OIDF test-plan result is.
 - All unit AND integration tests must pass. Never rationalize a red test as pre-existing, environmental, or out-of-scope.
+- **Red/blue gate (`RED-BLUE-GATE.md`):** every security control needs a fail-closed test under `src/tests/security/` that breaks if the control is deleted; the `review` phase reviews the SHIPPED entrypoint (grep that `validate_token`/middleware actually invokes the control), not just the diff; "conformance green" counts only if a gating CI job or a hosted run produced it. After merges, run `pim-shipped-audit.md` against `origin/main`.
+- **Reconcile the queue against reality before picking a task:** cross-check each `pending` row against merged PRs (`gh pr list --state merged`) and shipped `origin/main` — a task already on `main` is `done`, not `pending`.
 - Conventional-commit PRs against `main`, each linking its issue and the epic #476. Never auto-merge — the owner reviews and merges every PR manually (no `gh pr merge`, `--auto`, or merge-queue commands).
 - If stuck 3+ iterations on one task: set it to `blocked`, clean up the worktree, move on.
 - If all tasks done: `<promise>LOOP_COMPLETE</promise>`
