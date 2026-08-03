@@ -61,13 +61,10 @@ For **each** priority: (i) confirm current state with fresh reads, (ii) write/re
 
 ## Session tasks (in order)
 
-1. **Reconcile.** Read the live `gh issue list` for both repos, `docs/roadmap.md`, `task-queue.md`, every `epic-*.md`, the ralph prompts, and the merged git history (off fresh `origin/main`). Produce a reconciliation report and apply the low-risk fixes via a planning PR. **Known drift to fix (confirm each, don't trust blindly):**
-   - Close stale-open GH issues **#23** and **#24** (shipped in PR #37). Leave the `#8–#13` `learning` issues alone unless the owner says otherwise.
-   - Every one of the 25 `epic-*.md` files still carries `status: 'draft'` — advance the merged ones (epic-3-core-go, epic-4-core-rust, and the Go half of epic-5-extended-tier) to done/partial.
-   - `docs/roadmap.md` (PRD 6, ~lines 218 & 271) still lists "Active workstream: Rust security hardening (R1–R4)" — that's done; the live track is Rust extended-tier parity + the conformance harness.
-   - `task-queue.md` (~lines 15, 295–305) marks Rust hardening R.H1–R.M1 `pending` and references a non-existent `ralph-prompts/identity-model-rust-core.md` — reconcile to shipped, fix/remove the dangling reference.
-   - `identity-model-rust-hardening.md`'s embedded task table still shows all four tasks `pending` and its text says "MSRV 1.91" (now 1.96) — mark done or archive the prompt.
-   - The **OIDF K-series has no epic/issue/prompt** — it's been driven ad-hoc through PRs #43/#44. Create tracking for it (an epic or reconcile PR #56's prompt) as part of priority 1.
+1. **Reconcile.** Read the live `gh issue list` for both repos, `docs/roadmap.md`, `task-queue.md`, every `epic-*.md`, the ralph prompts, and the merged git history (off fresh `origin/main`). **Most top-level drift was already reconciled in planning PR #59** (roadmap active-workstream, task-queue Rust-hardening status + the dangling `identity-model-rust-core.md` reference, and a COMPLETE banner on `identity-model-rust-hardening.md`) and **GH issues #23/#24 were closed** (shipped in #37). Verify those landed, then handle the **remaining** drift:
+   - **Per-epic `status:` reconciliation** — 22 `epic-*.md` files carry a `status:` field, mostly stale. Advance the merged ones (`epic-3-core-go`, `epic-4-core-rust` → done; `epic-5-extended-tier` → Go-done/Rust-pending) and assess the spec epics against what's actually authored in `spec/conformance/` (core + extended vectors exist; dynamic-reg/fapi2/logout/PAR/RAR specs do not).
+   - **OIDF K-series tracking** — the harness (PRs #43/#44) still has no epic/issue; create one (or reconcile PR #56's `identity-model-conformance-harness.md` prompt) as part of priority 1.
+   - Leave the `#8–#13` `learning` issues alone unless the owner says otherwise.
 2. **Scope each priority** into epic(s) + issues per the section above. Prefer updating existing epics (0f extended-spec, 5 extended, 6 advanced, 10 benchmarks, PRD 3) over new ones; create new epics only for genuine gaps (cross-platform serializer, framework middlewares, PIM-parity matrix).
 3. **Sequence.** Produce a single prioritized execution plan across all six, honoring one-workstream-per-repo, and mark each item **in-session PR** vs **ralph loop** (loops only for large multi-task epics — e.g. Rust Extended tier, the serializer). Update `docs/roadmap.md` PRD 6 section to reflect it.
 4. **Hand off.** Summarize the plan and the recommended next concrete task. You MAY start that single top task if it is well-scoped and in-session-sized; otherwise stop at the plan.
