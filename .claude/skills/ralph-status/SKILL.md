@@ -8,12 +8,36 @@ allowed-tools: Bash, Read, Glob, Grep
 
 Show the current state of all ralph loops running across the auth workspace (`~/repos/auth/`).
 
-## Step 1: Discover active task-state files
+The workspace has five git repos: `identity-stack`, `py-identity-model`,
+`terraform-provider-descope`, `identity-stack-planning`, and `identity-model`.
 
-Search for all task-state files across the three application repos:
+## Step 1: Enumerate every worktree across all repos
+
+Ralph loops almost always run in an isolated worktree under `/tmp/`, and the
+loop's `task-state*.md` lives in **that worktree's** `.claude/` — NOT in the
+primary checkout. So discovery must be worktree-driven: searching only the
+primary checkouts' `.claude/` misses every `/tmp` loop and reports a false
+"no active loop".
+
+List all worktrees (primary checkout + `/tmp/` isolation worktrees) for every repo:
 
 ```bash
-find ~/repos/auth/identity-stack/.claude/ ~/repos/auth/py-identity-model/.claude/ ~/repos/auth/terraform-provider-descope/.claude/ -name 'task-state*.md' 2>/dev/null
+for repo in identity-stack py-identity-model terraform-provider-descope identity-stack-planning identity-model; do
+  git -C ~/repos/auth/$repo worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2}'
+done | sort -u
+```
+
+## Step 2: Discover active task-state files (in EVERY worktree)
+
+For each worktree path from Step 1, search its `.claude/` for task-state files.
+This is the step that catches loops running in `/tmp`:
+
+```bash
+for repo in identity-stack py-identity-model terraform-provider-descope identity-stack-planning identity-model; do
+  git -C ~/repos/auth/$repo worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2}'
+done | sort -u | while read -r wt; do
+  find "$wt/.claude" -maxdepth 2 -name 'task-state*.md' 2>/dev/null
+done
 ```
 
 For each file found, read it and extract the metadata header fields:
@@ -24,26 +48,25 @@ For each file found, read it and extract the metadata header fields:
 - `worktree` (filesystem path, if using worktree isolation)
 - `phase` (current execution phase)
 
-## Step 2: Check git worktrees
-
-For each application repo, list active worktrees:
-
-```bash
-git -C ~/repos/auth/identity-stack worktree list 2>/dev/null
-git -C ~/repos/auth/py-identity-model worktree list 2>/dev/null
-git -C ~/repos/auth/terraform-provider-descope worktree list 2>/dev/null
-```
-
-Match worktrees to task-state files (the `worktree` field in task-state points to the worktree path). Flag any worktrees that don't have a corresponding task-state (orphaned) or task-states referencing worktrees that don't exist (stale).
+Match each task-state to the worktree it was found in **and** to its `worktree:`
+field — a loop's home worktree (which holds the task-state) may differ from the
+per-task code worktree it points at (e.g. loop home `/tmp/pim-fapi2-ralph`
+tracks the current task while the code lives in `/tmp/pim-T252`). Flag:
+- **orphaned** worktree — a `/tmp/` worktree with no task-state (an orchestrator
+  base between stories, or a manual/abandoned worktree);
+- **stale** task-state — its `worktree:` path no longer exists (a completed or
+  abandoned loop; often also `phase: complete`).
 
 ## Step 3: Check open PRs
 
-For each application repo, check for open PRs:
+For each repo, check for open PRs:
 
 ```bash
-gh pr list --repo jamescrowley321/identity-stack --state open --json number,title,headRefName,statusCheckRollup --limit 20 2>/dev/null
-gh pr list --repo jamescrowley321/py-identity-model --state open --json number,title,headRefName,statusCheckRollup --limit 20 2>/dev/null
-gh pr list --repo jamescrowley321/terraform-provider-descope --state open --json number,title,headRefName,statusCheckRollup --limit 20 2>/dev/null
+for repo in identity-stack py-identity-model terraform-provider-descope identity-stack-planning identity-model; do
+  echo "== $repo =="
+  gh pr list --repo jamescrowley321/$repo --state open \
+    --json number,title,headRefName,isDraft,mergeStateStatus,statusCheckRollup --limit 20 2>/dev/null
+done
 ```
 
 Cross-reference PR branches with active task-state branches to identify which PRs are associated with active loops.
@@ -64,6 +87,9 @@ For each repo section (terraform-provider-descope, identity-stack, py-identity-m
 - `wontfix` — intentionally skipped
 
 Also count review fix tasks separately (they appear in "Review Fix Tasks" subsections).
+
+Note: `identity-model` (and `identity-stack-planning` itself) are not tracked in
+this `task-queue.md`; their loops surface via Steps 1–3 only.
 
 ## Step 5: Display the dashboard
 
@@ -122,8 +148,14 @@ Valid phases in order of execution:
 
 ## Notes
 
-- Task-state files are the primary indicator of an active loop. No task-state = no active loop for that repo.
-- Multiple task-state files per repo indicate parallel loops (e.g., `task-state.md` + `task-state-gateway.md`).
-- Worktrees in `/tmp/` are created by story loops for filesystem isolation.
+- Task-state files are the primary indicator of an active loop — but they live in
+  the worktree that is running the loop, so search **every worktree's** `.claude/`
+  (Steps 1–2), not just the primary checkouts, or you will miss every `/tmp` loop.
+- Multiple task-state files (in different worktrees, or `task-state.md` +
+  `task-state-gateway.md`) indicate parallel loops.
+- Loops run in `/tmp/` worktrees for filesystem isolation; an orchestrator loop
+  may hold the task-state in its home worktree while spawning a separate per-task
+  code worktree.
 - The `phase` field tells you exactly where the loop is in its workflow cycle.
-- If a task-state exists but the ralph process is not running, the loop is paused/crashed — the state file allows resumption.
+- If a task-state exists but the ralph process is not running, the loop is
+  paused/crashed — the state file allows resumption.
