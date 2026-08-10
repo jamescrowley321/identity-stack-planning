@@ -1,9 +1,14 @@
 # Security Fix Plan — py-identity-model
 
 **Created:** 2026-04-12
-**Updated:** 2026-04-14 (re-audit results)
+**Updated:** 2026-08-10 (closed out)
 **Tracking issue:** #300 (umbrella)
-**Status:** Phase 1 complete, Phase 2 open
+**Status:** ✅ COMPLETE — Phase 1 and Phase 2 both done; umbrella #300 and all batch issues (#375–#382) closed.
+
+> **Historical.** This plan covers the April 2026 audit + re-audit (findings #347–#382). It is retained for provenance. Security-control status is now tracked live in
+> [`py-identity-model/docs/security/control-matrix.md`](../../../py-identity-model/docs/security/control-matrix.md).
+>
+> **Later remediation (the 2026-08-02 red/blue audit, shipped 2026-08-09/10):** the mutation `security-gate` was made real + changed-function-scoped (#510); F-18 uniform-401 → `fastapi-identity-model 0.2.1` (#508); F-01 alg-confusion → `3.8.6` (#507); F-05/F-06 SSRF → `3.8.7` (#506); SC2 multi-tenant issuer pinning → `3.9.0` (#512). Still open in the control matrix: SC3–SC9 (sender-constraint, verify-enforcement, `sub`-required, duplicate-`kid`, conformance-integrity, mTLS-routing, DPoP-grants) and gate follow-up #511 (add `response_processors.py`, move to changed-line scoping).
 
 ## Overview
 
