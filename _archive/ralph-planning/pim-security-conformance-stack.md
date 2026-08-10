@@ -1,3 +1,5 @@
+> ⚠️ **SUPERSEDED / ARCHIVED (2026-08-10).** This stacked-PR bottom-up loop produced PR #489 (SC0–SC3), which was **closed as an unreviewable tangle**. The gate foundation (Epic 19), SC1 alg-confusion, and SC2 issuer pinning were instead re-cut clean and merged in-session (#510, #507, #512); the mutation gate is now real + changed-function-scoped. Remaining SC work (SC3–SC9) is tracked live in `py-identity-model/docs/security/control-matrix.md` and should be done as **standalone in-session PRs off `main`**, not this stacked loop (which the audit showed accretes fail-open/unreviewed residue). Retained for provenance only — do not run.
+
 Self-referential loop. ONE phase of ONE task per iteration, then end. Fresh context each iteration — persist all state to files.
 
 **Workstream:** py-identity-model audit remediation — **security + conformance fixes** from the 2026-08-02 red/blue audit. Implements **Epic 16** (audit remediation) + the **Epic 19** gate foundation, in dependency order.
