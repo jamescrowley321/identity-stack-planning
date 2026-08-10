@@ -26,6 +26,8 @@ Every recent unproven feature is then proven through it, and every conformance-r
 
 **Tooling split (deliberate):** correctness and the behavior proofs (LRU survival, issuer mix-up, private_key_jwt) are **pytest** — they need exact assertions and *controlled* access patterns. Volume/throughput/soak is **Locust** — Python-native so it reuses the same `TokenSource` minters, with a pre-minted token pool (mint once, replay many; real IdPs rate-limit per-request minting and JWT validation is stateless, so replay is valid).
 
+**Load/soak design:** the concrete design for TH-1.2 (RS boot) + TH-1.5 (Locust) — scenario suite, forged-token corpus, mock-OP failure injection, cache-hit instrumentation, SLOs, and the resolved single-issuer-RS topology — lives in [`architecture-token-harness-load-soak.md`](./architecture-token-harness-load-soak.md).
+
 **Definition of Done (applies to every story below, per `ralph-prompts/phases/test.md` + `phases/pr.md`):**
 - Integration tests under `src/tests/integration/` that hit a **real** IdP/HTTP server (not mocks); unit tests are necessary but not sufficient.
 - A usage example under `examples/` when the change adds public API surface.
@@ -145,6 +147,8 @@ So that throughput, cache behavior, and stability are proven — not just single
 **Given** a short CI profile and a longer nightly soak profile
 **When** each runs headless
 **Then** the CI profile completes in bounded time and the soak profile surfaces leaks/regressions over sustained load (feeds the nightly hook, #271)
+
+**Design:** scenario suite S1–S12, forged-token corpus, controllable mock OP, cache-hit instrumentation, SLO gates, and the single-issuer-RS topology are specified in [`architecture-token-harness-load-soak.md`](./architecture-token-harness-load-soak.md).
 
 **Files:** `src/tests/load/locustfile.py` (new), `src/tests/load/README.md`, `pyproject.toml` (locust dev-dep)
 **Size:** Medium
