@@ -6,6 +6,13 @@
 
 ---
 
+## 0. Guiding principles (owner-set)
+
+- **PIM (`py-identity-model`) is the source of truth — for both the feature set and the implementation.** The Go and Rust ports mirror PIM's capabilities and behavior; when a spec is ambiguous, "what PIM does" is canonical. The only deliberate divergence is *structural* (idiomatic Go/Rust shape vs Python's `core/sync/aio` layout — see the ADR in §4), never behavioral.
+- **Consolidation is deferred, on purpose.** PIM will eventually merge into this monorepo (as `python/`) to stop duplicating the conformance/integration test infrastructure that now lives in two places. That merge happens **only when identity-model is more mature** — until then PIM stays its own repo and remains the reference. See §6.1.
+
+---
+
 ## 1. Verified current state
 
 ### Capability inventory (source-verified)
@@ -139,6 +146,10 @@ Priority 5 is not a separate workstream — it is conformance step K6. Priority 
 - **OIDF RP harness (`conformance/`)** → the **certification track** (K3–K6). This is what earns the OIDF RP mark, mirroring PIM.
 
 This supersedes the older "recommend closing `feat/conformance-runner-jwt` unmerged" note in the conformance-harness prompt — that branch already **merged** (#36), so the runner stays and is repurposed rather than removed.
+
+### 6.1 Consolidation with PIM (deferred)
+
+The duplicated conformance/integration infra (PIM's `conformance/` + identity-model's `conformance/`, both driving the OIDF suite; two integration matrices) is a known, accepted cost. The plan of record is to **absorb PIM into this monorepo as `python/`** — collapsing to one shared test/conformance harness across `{python, go, rust}` — but **not yet**: it happens once identity-model reaches maturity (stable APIs, Extended-tier + conformance landed). Until then, PIM remains its own repo and the source of truth (§0). This defers, not cancels, the polyglot consolidation — so new test/conformance infra in this repo should be built to *converge* with PIM's shape (already the K-series design goal), not diverge from it.
 
 ---
 

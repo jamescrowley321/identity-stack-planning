@@ -15,13 +15,17 @@ inputDocuments:
 
 ## Overview
 
-`py-identity-model` (PIM) is the OIDF-certified reference implementation and the source of truth for correct behavior. This epic brings the Go and Rust ports of `identity-model` to **behavioral** parity with PIM — the same capability set, the same normative security checks, the same provider quirks — measured by an explicit capability matrix and a normative-behavior audit, decomposed into per-language implementation gaps.
+`py-identity-model` (PIM) is the OIDF-certified reference implementation and **the source of truth — for both the feature set and the implementation**. This epic brings the Go and Rust ports of `identity-model` to **behavioral** parity with PIM — the same capability set, the same normative security checks, the same provider quirks — measured by an explicit capability matrix and a normative-behavior audit, decomposed into per-language implementation gaps.
+
+> **Consolidation (deferred):** PIM will eventually merge into this monorepo as `python/` to avoid duplicating conformance/integration test infra, collapsing to one harness across `{python, go, rust}`. That is deliberately deferred until identity-model is more mature; until then PIM stays its own repo and remains the reference.
 
 It does **not** mandate mirroring PIM's Python file layout (see the Architecture Decision below). Full verified state, the matrix, and the audit live in [`docs/identity-model-reconciliation-2026-08-12.md`](../../../docs/identity-model-reconciliation-2026-08-12.md); this epic is the actionable decomposition.
 
 ## Architecture Decision (ADR) — keep the flat idiomatic shape
 
 **Decision:** adopt PIM's *behavioral* parity, not its *structural* layering. Do **not** port PIM's `core/` + `sync/` + `aio/` three-layer split or its runtime `is_successful`-guarded `X(XRequest)→XResponse` response contract into Go/Rust.
+
+This decision is **narrow and structural only** — PIM remains the source of truth for features and implementation behavior (see Overview). The ports diverge from PIM *solely* in file/module layout, never in what they do or which checks they enforce.
 
 **Rationale:**
 - PIM's `sync/`+`aio/` split exists only because Python has two disjoint runtimes. Go has one concurrency model; Rust is async-native (tokio). A sync/async split would be un-idiomatic churn.
