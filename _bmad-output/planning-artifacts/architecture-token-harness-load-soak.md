@@ -108,8 +108,10 @@
 
 ## 9. Middleware improvements the harness will surface (candidate issues)
 
-- Wire **`allowed_issuers`** into the middleware (SC2 shipped it to `TokenValidationConfig` in 3.9.0; middleware doesn't use it).
-- Default **`leeway > 0`** (currently 0 → boundary-`exp` tokens intermittently 401 under soak with any clock drift).
-- **503-vs-401 on upstream outage** (a provider outage likely surfaces as 401 today → clients won't back off).
-- Offload signature verify to a **thread pool** (event-loop crypto is the single-worker ceiling), or document worker-count guidance.
-- **F-02:** enforce `cnf`/DPoP/mTLS binding on the middleware (still xfail).
+Filed 2026-08-12 as **opt-in / default-off / backward-compatible**, **sequenced harness-first** (each lands with an end-to-end proof from TH-1.2/1.3/1.5, not blind). Not blockers for the TH build. All verified against `origin/main` (py-identity-model).
+
+- **[#513]** Wire **`allowed_issuers`** into the middleware — the field shipped to `TokenValidationConfig` in **#512 / 3.9.0** but the middleware `__init__` never accepts or passes it, so an RS cannot pin its trusted issuer(s). *(Justified by S6/S7/S12.)*
+- **[#514]** Expose **`leeway`** (hardcoded to `0` today → boundary-`exp` tokens intermittently 401 under soak with any clock drift). *(Justified by S4/S11.)*
+- **[#515]** **503-vs-401 on upstream outage** — the `NetworkException`→503 branch *exists* (`middleware.py`); the open question is **reachability** (an outage may collapse to 401 earlier → clients won't back off). Measure in S5/S8, then fix if unreachable.
+- **[#516]** Offload signature verify to a **thread pool** (event-loop crypto is the single-worker ceiling), **or** document worker-count guidance — decide from the S1/S2 numbers.
+- **F-02:** enforce `cnf`/DPoP/mTLS binding on the middleware (still xfail) — tracked separately under **#478** (RS-side DPoP proof + `cnf.jkt`).

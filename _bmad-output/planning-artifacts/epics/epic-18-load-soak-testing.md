@@ -4,13 +4,39 @@ project_name: 'py-identity-model'
 epic_id: 'EPIC-18-LOAD-SOAK'
 epic_title: 'Load & Soak Testing — Prove Behavior Under Real Concurrency'
 date: '2026-08-02'
-status: 'draft'
+status: 'superseded'
+superseded_by:
+  - _bmad-output/planning-artifacts/architecture-token-harness-load-soak.md
+  - _bmad-output/planning-artifacts/epics-token-harness.md  # TH-1.5 (#474), TH-1.4 (#466), TH-2.1 (#467)
 inputDocuments:
   - _bmad-output/planning-artifacts/epics/epic-10-benchmarks.md
   - _bmad-output/planning-artifacts/epics/epic-16-audit-remediation.md
 ---
 
 # Epic 18: Load & Soak Testing
+
+> **⚠️ SUPERSEDED (2026-08-12).** This draft (2026-08-02) predates the consolidation of all load/soak work
+> into the **Token Validation Harness** epic. The canonical, buildable plan is now:
+> - **Design:** [`architecture-token-harness-load-soak.md`](../architecture-token-harness-load-soak.md) — the
+>   S1–S12 scenario suite, forged-token corpus, controllable mock OP, cache-hit instrumentation, SLO bars, and
+>   the resolved single-issuer-RS topology.
+> - **Epic/stories:** [`epics-token-harness.md`](../epics-token-harness.md) — **TH-1.5 (#474)** Locust load/soak,
+>   **TH-1.4 (#466)** `make test-harness` + CI gate, **TH-2.1 (#467)** the JWKS-cache LRU prove-or-revert.
+> - **Loop:** [`ralph-prompts/token-harness.md`](../../implementation-artifacts/ralph-prompts/token-harness.md).
+>
+> Every L-story below is absorbed — nothing is dropped. Kept for traceability (esp. the RT4-F6 audit linkage in
+> L.2 and the residual noted in L.3). **Build from the docs above, not this file.**
+>
+> **L-story → canonical location**
+>
+> | Epic-18 story | Now lives in |
+> |---|---|
+> | **L.1** Harness & baseline | design §8 (P3 baseline) + TH-1.2 (#464) RS boot + TH-1.5 (#474) Locust + T299 micro-suite (design §6.1) |
+> | **L.2** JWKS/disco cache under concurrency (RT4-F6) | design **S3** stampede · **S4** TTL refresh · **S6** rotation · **S12** multi-tenant LRU + TH-2.1 (#467) prove-or-revert |
+> | **L.3** `validate_token` throughput & sync/async parity | design **S1/S2** + T299 warm-path micro. **Residual:** sync-vs-async *parity* is async-middleware-centric in the design — fold the sync bench into the T299 micro-suite or drop explicitly |
+> | **L.4** Soak — memory/leaks/LRU | design **S11** (memory/FD soak) |
+> | **L.5** Middleware under load, real tokens | design §2/§3 corpus + TH-1.5 (#474); this *is* epic #462 |
+> | **L.6** SLOs + nightly perf gate | design §5 SLO bars + TH-1.4 (#466) CI + nightly hook #271 |
 
 ## Overview
 
