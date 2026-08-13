@@ -220,17 +220,12 @@ git worktree list
 
 ### Available Prompts
 
-| Prompt | Purpose | Target Repos |
-|--------|---------|-------------|
-| `run-next-task.md` | General task execution from queue | All 3 repos |
-| `fix-review-findings.md` | Fix review findings on existing PRs | All 3 repos |
-| `canonical-identity.md` | PRD 5 story execution (worktree-based) | identity-stack |
-| `api-gateway.md` | PRD 2 story execution (worktree-based) | identity-stack |
-| `pim-integration-tests.md` | Integration test chain | py-identity-model |
-| `pim-fix-review-chain.md` | Chained PR fix loop | py-identity-model |
-| `pim-adversarial-review.md` | Full codebase security review | py-identity-model |
-| `epic2-rbac-admin.md` | RBAC admin epic (completed) | identity-stack |
-| `epic3-fga-authz.md` | FGA/ReBAC epic (completed) | identity-stack |
+The prompt set is the source of truth — see [`_bmad-output/implementation-artifacts/ralph-prompts/`](../_bmad-output/implementation-artifacts/ralph-prompts/) (~28 prompts spanning all four code repos, plus `phases/` and `review-agents/`). The directory listing is authoritative; this list is not enumerated here because it drifts. Representative prompts by target:
+
+- **General:** `run-next-task.md`, `fix-review-findings.md`, `repository-base-refactor.md`
+- **identity-stack:** `canonical-identity.md`, `api-gateway.md`, `design-system.md`, `epic3-fga-authz.md`
+- **py-identity-model:** `pim-integration-tests.md`, `pim-fix-review-chain.md`, `pim-adversarial-review.md`, `pim-conformance-finish.md`, `pim-fapi2-hardening.md`, `token-harness.md`, `RED-BLUE-GATE.md`
+- **identity-model:** `identity-model-go-core.md`, `identity-model-go-extended.md`, `identity-model-rust-extended.md`, `identity-model-rust-hardening.md`, `identity-model-conformance-harness.md`
 
 ### Stopping a loop
 

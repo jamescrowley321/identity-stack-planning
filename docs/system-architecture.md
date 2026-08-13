@@ -14,6 +14,7 @@ graph TB
         pim["py-identity-model<br/>OIDC/OAuth2 Python library"]
         tfp["terraform-provider-descope<br/>Terraform provider"]
         is["identity-stack<br/>FastAPI + React SaaS app"]
+        im["identity-model<br/>Polyglot OIDC/OAuth2 client libs (Go/Rust)"]
     end
 
     subgraph external["External Services"]
@@ -28,9 +29,11 @@ graph TB
     dev --> ap
     dev --> tfp
     dev --> is
+    dev --> im
     user --> is
 
     is --> pim
+    im -.->|mirrors| pim
     is --> descope
     is --> pg
     tfp --> descope
@@ -83,6 +86,10 @@ graph TB
 ```
 
 **Protocol coverage:** Discovery (RFC 8414), JWKS (RFC 7517), JWT Validation (RFC 7519), Auth Code + PKCE (RFC 7636), DPoP (RFC 9449), PAR (RFC 9126), JAR (RFC 9101), Device Auth (RFC 8628), Token Exchange (RFC 8693), Introspection (RFC 7662), Revocation (RFC 7009), Refresh (RFC 6749 §6), FAPI 2.0 Security Profile.
+
+### identity-model
+
+The polyglot evolution of `py-identity-model` (PRD 6): one cross-language OIDC/OAuth2 client-library monorepo with a shared conformance `spec/`. **Go** ships the Core + Extended tiers; **Rust** ships the Core tier (hardened). `py-identity-model` is the reference implementation the Go/Rust ports mirror, and folds in as `python/` once the monorepo matures. Toolchains: Go 1.26, Rust MSRV 1.96. Current source-verified state and the sequenced plan live in [`identity-model-reconciliation-2026-08-12.md`](identity-model-reconciliation-2026-08-12.md).
 
 ### identity-stack
 
