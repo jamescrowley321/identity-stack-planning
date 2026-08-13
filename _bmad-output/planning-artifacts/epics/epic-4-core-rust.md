@@ -1,4 +1,5 @@
 ---
+status: 'done'  # reconciled 2026-08-12 — Rust Core Tier shipped & merged (PRs #16–#21, 2026-07-21)
 inputDocuments:
   - _bmad-output/planning-artifacts/prd.md
   - _bmad-output/planning-artifacts/architecture.md

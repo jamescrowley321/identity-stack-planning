@@ -278,6 +278,8 @@ Multi-language OIDC/OAuth2 client library (Go + Rust). Epic source: `planning-ar
 
 **Reconciled 2026-08-02:** repo public (2026-07-22, secret-scanned clean). FOSS security baseline merged (#29). Go core + Go **extended** + Rust core **all shipped**. **Rust hardening (#22/#23/#24) + jsonwebtoken 9→10 (#32) DONE** — done in-session, merged PRs #37/#39 (issues #23/#24 were stale-open and closed 2026-08-02). Toolchains bumped to Go 1.26 / Rust 1.96 (#38). **Conformance:** OIDF RP-harness in-flight — Go RP passes `basic-rp` (K1 #43 merged, K2 #44). **Remaining actionable work = Rust extended-tier parity with Go (introspection/revocation/exchange/DPoP — biggest gap), plus the six-priority backlog scoped by the priorities reconciliation + planning session** (`ralph-prompts/identity-model-priorities-planning.md`): conformance harness (K3–K6), PIM parity, cross-platform serializer, performance, integration harness, framework middlewares. Learning issues #8–#13 are intentional starter tasks, not loop work.
 
+**Reconciled 2026-08-12** (priorities session complete): see [`docs/identity-model-reconciliation-2026-08-12.md`](../../docs/identity-model-reconciliation-2026-08-12.md) for the source-verified state, PIM parity matrix, normative-behavior audit, and the sequenced execution plan. New epics: `epic-20-pim-parity`, `epic-21-cross-platform-serializer`, `epic-22-framework-middlewares`. Recommended next = the Parity-Hardening Sweep (in-session, security-normative), then the Rust Extended-tier loop (`ralph-prompts/identity-model-rust-extended.md`). Of #8–#13, #10/#11/#12/#13 are shipped and are owner close-candidates (left open per the `learning` label).
+
 ### Go Core Tier (Epic 3) — DONE (merged 2026-07-02)
 
 Ralph prompt: `ralph-prompts/identity-model-go-core.md`. Foundation scaffold (PR #1) + all five core stories merged bottom-up to `main` 2026-07-02 (PRs #2–#7, incl. the multi-provider integration matrix). Main CI green.
@@ -313,14 +315,47 @@ Ralph prompt: `ralph-prompts/identity-model-go-extended.md`. All four extended s
 | G5.3 | 5.3-go | done | Token Exchange (RFC 8693) — extends `pkg/token` (#27) |
 | G5.4 | 5.4-go | done | DPoP (RFC 9449) — `pkg/dpop` (#28) |
 
-### Rust Hardening + Extended Tier — PENDING (next identity-model loop)
+### Rust Hardening — DONE (merged 2026-08-02)
 
-Reconciled 2026-07-23. Rust core is done; these are the remaining Rust items. The hardening trio are small non-blocking nits from the R4 fresh-review; the extended tier brings Rust to parity with Go's extended packages; the jsonwebtoken migration is a verified-breaking dependency bump (tracking PR #32).
+Reconciled 2026-08-12 against merged PRs. The R4 fresh-review hardening trio + the jsonwebtoken migration all shipped **in-session** (not via a loop) and merged; issues #22/#23/#24 closed 2026-08-02/03. jsonwebtoken is now at v11 (`rust_crypto`).
 
-| ID | Issue | Status | Description | Size |
+| ID | Issue | Status | Description |
+|----|-------|--------|-------------|
+| R.H1 | 22 | done | Forbid https→http redirect downgrade — PR #37 |
+| R.H2 | 23 | done | Verify `azp` for multi-audience ID tokens + clock-skew — PR #37 |
+| R.H3 | 24 | done | Redact bearer tokens + client secrets from Debug/error — PR #37 |
+| R.M1 | 32 | done | jsonwebtoken migration (9→10→11, rust_crypto) — PR #39 + cargo group |
+
+### Rust Extended Tier — PENDING (recommended next large loop)
+
+Reconciled 2026-08-12 against merged PRs + source. Rust is Core-only; the entire Extended tier is the biggest capability gap. Loop prompt authored: `ralph-prompts/identity-model-rust-extended.md` (base-chained RE5.1→RE5.4, mirrors the shipped `go/pkg/*`). Per "security-normative first", do the Parity-Hardening Sweep (below) before this. Detail: `docs/identity-model-reconciliation-2026-08-12.md` + `epics/epic-5-extended-tier.md`.
+
+| ID | Story | Status | Description | Size |
 |----|-------|--------|-------------|------|
-| R.H1 | 22 | pending | Forbid https→http redirect downgrade in discovery/jwks fetch | small |
-| R.H2 | 23 | pending | Verify `azp` for multi-audience ID tokens + clock-skew (OIDC Core §3.1.3.7) | small |
-| R.H3 | 24 | pending | Redact bearer tokens + client secrets from Debug/error output | small |
-| R.M1 | 32 | pending | Migrate jsonwebtoken 9→10 — **verified breaking** (6 JWT-validation tests fail; v10 changed crypto/key handling). Needs `rust/src/jwt/mod.rs` rework, tests kept green | medium |
-| R5.1 | — | pending | Rust extended tier — introspection/revocation/exchange/DPoP to parity with Go Epic 5 | large |
+| RE5.1 | 5.1-rust | pending | Token Introspection (RFC 7662) — `rust/src/introspection`, mirrors `go/pkg/introspection` | medium |
+| RE5.2 | 5.2-rust | pending | Token Revocation (RFC 7009) — `rust/src/revocation` | small |
+| RE5.3 | 5.3-rust | pending | Token Exchange (RFC 8693) — extends `rust/src/token` | medium |
+| RE5.4 | 5.4-rust | pending | DPoP (RFC 9449) — `rust/src/dpop` | large |
+
+### Parity-Hardening Sweep (Go + Rust) — PENDING (recommended next, in-session)
+
+New 2026-08-12 from the PIM normative-behavior audit (`epics/epic-20-pim-parity.md` Story 20.2). Four shipped-code gaps present in BOTH languages; security-normative, so sequenced first. In-session PR stack; opt-in / backward-compatible where a default-on check could break a legitimate integration.
+
+| ID | Status | Description | Size |
+|----|--------|-------------|------|
+| PH.1 | pending | JWKS/discovery cache max-entries LRU bound (all 4 caches) + Rust JWKS single-flight dedup | small |
+| PH.2 | pending | Discovery endpoint-authority binding (anti-mix-up/SSRF) + IP-literal hardening, mTLS-alias exemptions | medium |
+| PH.3 | pending | RFC 9207 authorization-response `iss` + constant-time callback `state` validation helpers (adds callback surface) | medium |
+
+### Conformance — OIDF RP harness (K-series)
+
+Reconciled 2026-08-12. K1 (#43) + K2 (#44) MERGED — Go RP passes `oidcc-client-basic-certification-test-plan`. K3–K6 open. Prompt: `ralph-prompts/identity-model-conformance-harness.md` (its embedded per-K markers were fixed 2026-08-12 so a launch won't re-do #43/#44). Also on `main`: the JSON-vector runner (#36) — kept as the fast in-CI parity/serializer check (repurposed under `epics/epic-21-cross-platform-serializer.md`), NOT retired.
+
+| Task | Status | Description |
+|------|--------|-------------|
+| K1 | done | OIDF suite scaffold + runner — PR #43 |
+| K2 | done | Go RP harness, basic-rp green — PR #44 |
+| K3 | pending | Rust RP harness (`conformance/rp-rust`) — basic-rp green |
+| K4 | pending | config-rp + form-post-basic-rp plans, both langs |
+| K5 | pending | CI `conformance.yml` + hosted evidence workflow |
+| K6 | pending | Integration-matrix parity — Rust → Go provider parity |
