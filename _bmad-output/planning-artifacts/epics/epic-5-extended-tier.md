@@ -1,4 +1,5 @@
 ---
+status: 'in-progress'  # reconciled 2026-08-12 — Go extended DONE (PRs #25–#28); Rust extended PENDING
 stepsCompleted: ["step-01-validate-prerequisites", "step-02-design-epics", "step-03-all-stories", "step-04-final-validation"]
 inputDocuments:
   - _bmad-output/planning-artifacts/product-brief-identity-model-monorepo.md
@@ -20,6 +21,21 @@ Implement Token Introspection (RFC 7662), Token Revocation (RFC 7009), Token Exc
 ## Story Decomposition
 
 Each protocol capability below is described as a single cross-language story for specification clarity. During sprint planning, each MUST be decomposed into per-language implementation stories (e.g., 5.1-py, 5.1-node, 5.1-go, 5.1-rust) following the same pattern established in the Core Tier epics (Epics 1-4). Each per-language story should be independently estimable and deliverable.
+
+## Status (reconciled 2026-08-12)
+
+**Go extended tier — DONE** (merged, PRs #25–#28): 5.1-go introspection, 5.2-go revocation, 5.3-go token-exchange, 5.4-go DPoP — all on `main`, CI green.
+
+**Rust extended tier — PENDING** — the biggest open capability gap. Decomposed as the base-chained stack **5.1-rust … 5.4-rust**, mirroring the shipped `go/pkg/*` reference:
+
+| Story | Rust module | Mirrors | Status |
+|-------|-------------|---------|--------|
+| 5.1-rust | `rust/src/introspection` | `go/pkg/introspection` | pending |
+| 5.2-rust | `rust/src/revocation` | `go/pkg/revocation` | pending |
+| 5.3-rust | `rust/src/token` (RFC 8693) | `go/pkg/token` exchange | pending |
+| 5.4-rust | `rust/src/dpop` | `go/pkg/dpop` | pending |
+
+Loop prompt: [`identity-model-rust-extended.md`](../../implementation-artifacts/ralph-prompts/identity-model-rust-extended.md). Python/Node columns remain future work (Python merges from `py-identity-model` later). Per "security-normative first", do the Parity-Hardening Sweep (`epic-20-pim-parity.md` Story 20.2) before this loop.
 
 ## Story 5.1: Token Introspection (RFC 7662) — All Languages
 
