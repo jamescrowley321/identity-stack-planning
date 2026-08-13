@@ -167,5 +167,5 @@ This prompt is designed to run in a **completely fresh Claude Code session** wit
 ## Review Findings History
 
 Past review findings are tracked in:
-- [`review-findings-identity-stack.md`](../_bmad-output/implementation-artifacts/review-findings-identity-stack.md) — 44 MUST FIX, 85 SHOULD FIX, 51 DEFER across 12 PRs (all resolved)
+- [`review-findings-identity-stack.md`](../_archive/review-findings-identity-stack.md) — 44 MUST FIX, 85 SHOULD FIX, 51 DEFER across 12 PRs (all resolved)
 - Individual task-state files record per-PR findings during ralph loop execution

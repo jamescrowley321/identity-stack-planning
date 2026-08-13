@@ -8,7 +8,7 @@ This repo is the BMAD-METHOD planning hub for the auth workspace. It contains pr
 
 ## Workspace Layout
 
-This repo lives at `~/repos/auth/identity-stack-planning/` alongside three sibling repositories that form a pseudo-monorepo:
+This repo lives at `~/repos/auth/identity-stack-planning/` alongside four sibling repositories that form a pseudo-monorepo:
 
 | Repo | Path | Description |
 |------|------|-------------|
@@ -16,10 +16,11 @@ This repo lives at `~/repos/auth/identity-stack-planning/` alongside three sibli
 | `py-identity-model` | `~/repos/auth/py-identity-model/` | Production OIDC/OAuth2.0 Python library (JWT, token validation, discovery) |
 | `terraform-provider-descope` | `~/repos/auth/terraform-provider-descope/` | Terraform provider for Descope (Go). Fork of `descope/terraform-provider-descope` |
 | `identity-stack` | `~/repos/auth/identity-stack/` | SaaS starter kit — FastAPI backend + Vite/React frontend + Terraform infra |
+| `identity-model` | `~/repos/auth/identity-model/` | Polyglot OIDC/OAuth2 client library monorepo (Go core+extended, Rust core) with a shared cross-language conformance spec (PRD 6) |
 
 ### Cross-Repo Relationships
 
-- `identity-stack/backend` depends on `py-identity-model` (>= 2.1.0) for token validation
+- `identity-stack/backend` depends on `py-identity-model` (>= 3.8.5) for token validation
 - `terraform-provider-descope` manages Descope project infrastructure that the SaaS starter connects to
 - `py-identity-model/examples/descope/` contains Descope-specific integration examples
 
@@ -50,7 +51,7 @@ This repo uses [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) v6 fo
 
 When BMAD workflows reference implementation details, architecture, or existing code:
 
-1. **Read sibling repos directly** — You have full access to `~/repos/auth/py-identity-model/`, `~/repos/auth/terraform-provider-descope/`, and `~/repos/auth/identity-stack/`. Read their code, tests, configs, and CLAUDE.md files to inform planning.
+1. **Read sibling repos directly** — You have full access to `~/repos/auth/py-identity-model/`, `~/repos/auth/terraform-provider-descope/`, `~/repos/auth/identity-stack/`, and `~/repos/auth/identity-model/`. Read their code, tests, configs, and CLAUDE.md files to inform planning.
 2. **Never modify sibling repos from this context** — Planning artifacts live here; code changes happen in the target repos.
 3. **Reference by repo name** — In planning docs, refer to repos by name (e.g., "py-identity-model") rather than absolute paths.
 
