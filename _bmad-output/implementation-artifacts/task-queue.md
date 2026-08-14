@@ -111,15 +111,15 @@ All feature tasks (T32-T47) complete. All review fixes (T101-T116) complete — 
 
 ### Token Validation Harness & Feature-Proof (TH — NEW, top priority)
 
-Prompted by #461 (jwks-cache LRU) merging on unit-green with **no integration proof**. A prod FastAPI server on the `fastapi-identity-model` middleware, exercised by a **pytest correctness matrix** + a **Locust load/soak suite** across the wired IdP matrix (node-oidc, Keycloak, Ory, Descope multi-tenant), then every recent feature proven through it. **DoD per story: real-IdP integration test + conformance run where the change touches a certified/suite-backed profile.** Epics: `planning-artifacts/epics-token-harness.md`. Ralph prompt: `ralph-prompts/token-harness.md` (TBD). Tracking issue: [#462](https://github.com/jamescrowley321/py-identity-model/issues/462).
+Prompted by #461 (jwks-cache LRU) merging on unit-green with **no integration proof**. A prod FastAPI server on the `fastapi-identity-model` middleware, exercised by a **pytest correctness matrix** + a **Locust load/soak suite** across the wired IdP matrix (node-oidc, Keycloak, Ory, Descope multi-tenant), then every recent feature proven through it. **DoD per story: real-IdP integration test + conformance run where the change touches a certified/suite-backed profile.** Epics: `planning-artifacts/epics-token-harness.md` (TH-1..TH-4). Ralph prompts: `ralph-prompts/token-harness.md` (TH-1..TH-3) + `ralph-prompts/pim-capacity-breakpoint.md` (TH-4 capacity & breakpoint). Tracking issue: [#462](https://github.com/jamescrowley321/py-identity-model/issues/462). **TH-1.1/1.2/1.3/1.5 + T299 foundation MERGED (PRs #520–#524, on `origin/main`).**
 
 | ID | Issue | Status | Description | Size | Depends |
 |----|-------|--------|-------------|------|---------|
-| T300 | 463 | pending | TH-1.1 Unified multi-provider `TokenSource` minter (node-oidc/Keycloak/Ory/Descope multi-tenant) | medium | — |
-| T301 | 464 | pending | TH-1.2 Boot `fastapi-identity-model` middleware as a real resource server (uvicorn + httpx) | medium | — |
-| T302 | 465 | pending | TH-1.3 Token correctness assertion matrix — pytest (valid/invalid → 200/401) | medium | T300, T301 |
+| T300 | 463 | done #521 | TH-1.1 Unified multi-provider `TokenSource` minter (node-oidc/Keycloak/Ory/Descope multi-tenant) | medium | — |
+| T301 | 464 | done #522 | TH-1.2 Boot `fastapi-identity-model` middleware as a real resource server (uvicorn + httpx) | medium | — |
+| T302 | 465 | done #523 | TH-1.3 Token correctness assertion matrix — pytest (valid/invalid → 200/401) | medium | T300, T301 |
 | T303 | 466 | pending | TH-1.4 `make test-harness` + CI gating over both suites (local always, cloud on secrets; nightly #271 hook) | medium | T302, T311 |
-| T311 | 474 | pending | TH-1.5 Load/soak suite — Locust (pre-minted token pool, throughput/soak, cache hit-rate) | medium | T300, T301 |
+| T311 | 474 | done #524 | TH-1.5 Load/soak suite — Locust (pre-minted token pool, throughput/soak, cache hit-rate) | medium | T300, T301 |
 | T304 | 467 | pending | TH-2.1 **Prove multi-tenant LRU or revert #461** (must fail on the FIFO path). Ref #397/#461 | medium | T302 |
 | T305 | 468 | pending | TH-2.2 Prove RFC 9207 issuer mix-up rejection. Ref #221/#457 | small | T300 |
 | T306 | 469 | pending | TH-2.3 Prove private_key_jwt end-to-end via resource server. Ref #213/#433 | medium | T301 |
@@ -127,8 +127,14 @@ Prompted by #461 (jwks-cache LRU) merging on unit-green with **no integration pr
 | T308 | 471 | pending | TH-3.1 Feature → OIDF conformance-profile coverage matrix | small | — |
 | T309 | 472 | pending | TH-3.2 Make fastapi RP OIDF conformance a required regression gate. Ref #437 | large | T308 |
 | T310 | 473 | pending | TH-3.3 RP-initiated + back-channel logout conformance (Keycloak). Ref #442/#214 | medium | T308 |
+| T312 | — | pending | TH-4.1 Ramp + open-model + RS worker knobs (Locust `LoadTestShape`, decoupled spawn-rate, `workers=N`) | medium | T311 |
+| T313 | — | pending | TH-4.2 RSS/FD instrumentation + long-soak token refresh (S11 leak gate; pool refresh >300s) | medium | T312 |
+| T314 | — | pending | TH-4.3 Baseline + activate the dormant SLO gates (`GATES` thresholds from a calibrated baseline) | medium | T312 |
+| T315 | — | pending | TH-4.4 Breakpoint scenarios + `Profile.CAPACITY` (ramp-to-SLO-breach, cross-worker sweep, knee report) | large | T312, T314 |
+| T316 | — | pending | TH-4.5 Larger-runner nightly full sweep + capacity-report artifact + perf-regression gate | medium | T313, T315 |
 
-**Execution order:** T300 + T301 → T302 + T311 → **T304 (the #461 prove-or-revert gate)** → T303 → T305 / T306 / T307 → T308 → T309 / T310.
+**Execution order (TH-1..3):** ~~T300 + T301 → T302 + T311~~ (done, #521–#524) → **T304 (the #461 prove-or-revert gate)** → T303 → T305 / T306 / T307 → T308 → T309 / T310.
+**Execution order (TH-4 — separate loop `pim-capacity-breakpoint.md`):** T312 → T313 + T314 → T315 → T316.
 
 ### OIDC Conformance Certification ✅ CERTIFIED (2 Jul 2026)
 

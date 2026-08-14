@@ -257,6 +257,7 @@ The main PRD defines 22 high-level FRs. Here's how the specialized PRDs implemen
 - CLI tool ([#333](https://github.com/jamescrowley321/py-identity-model/issues/333)) — `py-identity-model-cli`, RFC 8252 loopback login
 - FastAPI middleware ([#334](https://github.com/jamescrowley321/py-identity-model/issues/334)) — `fastapi-identity-model`, drop-in OIDC auth
 - Secrets rotation automation ([#346](https://github.com/jamescrowley321/py-identity-model/issues/346)) — GH + HCP Vault Secrets sync
+- Token-validation harness & feature-proof ([#462](https://github.com/jamescrowley321/py-identity-model/issues/462)) — prod FastAPI RS + pytest correctness matrix + Locust load/soak (TH-1..TH-3); TH-1 foundation **merged** (PRs #520–#524). **TH-4 Capacity & Breakpoint** — ramp-to-breakpoint, cross-worker scaling, nightly perf-regression gate (bigger-runner-only, co-located; deployed-target lab deferred) — queued as loop `pim-capacity-breakpoint.md`
 
 *Track 2: identity-stack (Design System Integration — TOP PRIORITY)*
 - PRD 5b: Design System & Admin Frontend — 31 stories / 5 epics

@@ -115,3 +115,21 @@ Filed 2026-08-12 as **opt-in / default-off / backward-compatible**, **sequenced 
 - **[#515]** **503-vs-401 on upstream outage** — the `NetworkException`→503 branch *exists* (`middleware.py`); the open question is **reachability** (an outage may collapse to 401 earlier → clients won't back off). Measure in S5/S8, then fix if unreachable.
 - **[#516]** Offload signature verify to a **thread pool** (event-loop crypto is the single-worker ceiling), **or** document worker-count guidance — decide from the S1/S2 numbers.
 - **F-02:** enforce `cnf`/DPoP/mTLS binding on the middleware (still xfail) — tracked separately under **#478** (RS-side DPoP proof + `cnf.jkt`).
+
+## 10. Capacity & Breakpoint Methodology (Epic TH-4)
+
+Extends §4/§5 from **fixed-load correctness/soak** into **capacity**: ramp until an SLO gate trips, find the knee, prove cross-worker scaling, and gate regressions nightly. Cuts the §5 "calibrate from a baseline" + §8 P3/P4 work that was never staged as its own story.
+
+**Infra (owner decision): bigger CI runner only, co-located.** The Locust generator, the in-process mock OP, and the RS-under-test share one *larger* GitHub-hosted runner — no deployed target, no distributed generator. Consequences, stated on every figure:
+- Numbers are **directional** — where the *co-located config* knees + a nightly regression signal — **not** the RS's absolute isolated ceiling. A deployed-target lab (RS as a real service + distributed generator over a network) is the only path to the true ceiling and is **deferred**.
+- To make **RS crypto the bottleneck**: a lean replay generator (no client-side crypto — it replays the pre-minted pool), minimal mock-OP traffic (single-flight caches keep upstream near-zero after warmup), and **RS `workers ≈ cores−2`** so the generator + mock OP get the rest.
+
+**Load model — open, not closed.** The TH-1.5 `ReplayUser` is closed-loop (no `wait_time`): as the RS slows, offered load self-throttles and the knee is invisible. TH-4 adds (a) a stepped Locust `LoadTestShape` and (b) a constant-arrival (open-model) option (`constant_throughput`/`constant_pacing` or a target-RPS shape) so arrival rate holds while latency/queue blow up.
+
+**Breakpoint detection.** Ramp arrival rate (or users) in stages until the **first `GATES` bar trips** — `max_p99_ms` exceeded, `max_error_rate` exceeded, or RPS plateaus while offered load rises. Record the **knee**: sustained RPS, concurrency, p99, and worker count at the trip. The cross-worker sweep repeats this for `workers ∈ {1..cores}` and reports the scaling factor (target ≥0.8× linear, §5).
+
+**SLO gates go live (T314).** `GATES = {"warm": Gate(), "cold": Gate()}` are dormant (all-`None`). Calibrate `max_p99_ms`/`min_rps`/`max_error_rate`/`min_cache_hit_rate` from a baseline run on the target runner + headroom (§5 starting bars), write them into `src/tests/load/README.md`, and prove they FIRE on an injected regression.
+
+**New profile & cadence.** A new `Profile.CAPACITY` holds the ramp/sweep scenarios (kept off the fast `CI_SHORT` PR gate). The **full sweep runs nightly** on the larger runner, uploads a capacity-report artifact (per-worker max-sustainable RPS + knee), and gates perf regressions vs the baseline. Feeds the §9 **#516** decision (thread-pool crypto offload vs worker-count guidance — the S1/S2 + sweep numbers decide it).
+
+**RSS/FD (T313).** §5 lists RSS/FD but nothing samples them today; S11's only leak signal is a 5xx. Add `psutil` sampling of the RS subprocess into `LoadResult` + a bounded-trend leak gate. Handle the §1 300s-TTL constraint (re-mint cadence) so soaks longer than the pool lifetime don't 401 on expired tokens.
