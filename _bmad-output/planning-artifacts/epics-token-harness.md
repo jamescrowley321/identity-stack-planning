@@ -46,6 +46,9 @@ Prove each recently-merged runtime feature end-to-end through the harness, closi
 ### Epic TH-3: Conformance Coverage & Gates
 Ensure conformance tests pass wherever a change is conformance-relevant, and wire the FastAPI RP conformance run as a regression gate. **Repo:** py-identity-model.
 
+### Epic TH-4: Capacity & Breakpoint
+Turn the landed TH-1.5 Locust harness from a fixed-load correctness/soak rig into a capacity rig: ramp load until an SLO gate trips, find the knee, prove cross-worker scaling, and gate perf regressions nightly. **Repo:** py-identity-model.
+
 ---
 
 ## Epic TH-1: Token Validation Harness Foundation
@@ -293,6 +296,97 @@ So that logout features (RP-initiated / back-channel, e.g. #442) carry conforman
 
 ---
 
+## Epic TH-4: Capacity & Breakpoint
+
+Extends the landed TH-1.5 Locust harness (PR #524) — a fixed-load correctness/soak rig — into a **capacity & breakpoint rig**. Cuts the baseline + SLO-calibration + breakpoint work the design left open (§5 SLO bars marked "calibrate from a baseline run"; §8 P3/P4). **Infra (owner decision): bigger CI runner only, co-located** — the generator, in-process mock OP, and RS share one larger runner, so numbers are **directional** (the co-located knee + a nightly regression signal), **not** the RS's absolute isolated ceiling; a deployed-target lab is deferred. **Design:** `architecture-token-harness-load-soak.md` §4/§5/§10. **Repo:** py-identity-model.
+
+### Story TH-4.1: Ramp, open-model, and worker-scaling knobs
+
+As a maintainer,
+I want the load runner to ramp load (not just hold a fixed level) and drive the RS across worker counts,
+So that a scenario can search for the saturation knee instead of measuring one arbitrary fixed point.
+
+**Acceptance Criteria:**
+
+**Given** `_run_locust` pins `-r == -u` (instant constant-load) and `_scenario_stack` boots the RS at `workers=1`
+**When** a scenario declares a ramp shape and/or a target worker count
+**Then** Locust runs a stepped `LoadTestShape` (ramp N→M across stages) with an optional constant-arrival (open-model) mode, the RS boots at the requested `workers=N`, and per-worker `/metrics` counters are aggregated
+**And** a real short ramp run captures per-stage RPS/latency (a green unit run is not proof)
+
+**Files:** `src/tests/load/runner.py`, `src/tests/load/locustfile.py`, `src/tests/load/scenarios.py`, `src/tests/harness/rs_server.py`
+**Size:** Medium
+**Task ID:** T312
+
+### Story TH-4.2: RSS/FD instrumentation + long-soak token refresh
+
+As a maintainer,
+I want the soak to actually measure memory/FD trend and survive past the 300s token TTL,
+So that S11 detects leaks mechanically (not only via a 5xx) and long runs don't 401 on expired tokens.
+
+**Acceptance Criteria:**
+
+**Given** nothing samples RSS/FD today (S11 is titled for it but measures nothing) and `LoadPool.refresh()` is never called mid-run
+**When** a soak scenario runs
+**Then** the RS subprocess RSS/FD are sampled into `LoadResult`, S11 asserts a bounded trend (a synthetic leak trips the gate), and a re-mint cadence keeps the replay pool valid past 300s (or post-expiry 401s are classified as expected, not error budget)
+
+**Files:** `src/tests/load/runner.py`, `src/tests/load/scenarios.py`, `src/tests/load/pool.py`, `src/tests/load/test_load_nightly.py`
+**Size:** Medium
+**Task ID:** T313
+**Depends on:** TH-4.1
+
+### Story TH-4.3: Baseline + SLO-gate calibration
+
+As a maintainer,
+I want the dormant SLO gates calibrated from a real baseline and activated,
+So that latency/throughput/error/cache-hit regressions actually fail instead of being documentation.
+
+**Acceptance Criteria:**
+
+**Given** `GATES = {"warm": Gate(), "cold": Gate()}` are all-`None` and only 5xx + status-correctness fire
+**When** the design §8 P3 baseline run completes on the target runner
+**Then** `max_p99_ms`/`min_rps`/`max_error_rate`/`min_cache_hit_rate` are set from baseline + headroom, the calibrated table is written into `src/tests/load/README.md`, `docs/performance.md` is reconciled, and the gates FIRE on an injected regression (a self-asserted green is not proof)
+
+**Files:** `src/tests/load/runner.py`, `src/tests/load/README.md`, `docs/performance.md`
+**Size:** Medium
+**Task ID:** T314
+**Depends on:** TH-4.1
+
+### Story TH-4.4: Capacity/breakpoint scenarios + `CAPACITY` profile
+
+As a maintainer,
+I want ramp-to-breakpoint scenarios that find max sustainable load and the cross-worker scaling factor,
+So that we know where the co-located system knees and how near-linearly it scales with workers.
+
+**Acceptance Criteria:**
+
+**Given** the ramp/worker knobs (TH-4.1) and the calibrated gates (TH-4.3)
+**When** the new `Profile.CAPACITY` runs
+**Then** warm ramp-to-SLO-breach, cold ramp, and a cross-worker sweep (workers 1→physical cores) run; max-sustainable-load detection records the knee (RPS, users, p99, worker count) at the first gate trip; a capacity curve/report is emitted; and cross-worker scaling ≥0.8× linear is measured (per §5/S1)
+
+**Files:** `src/tests/load/scenarios.py`, `src/tests/load/runner.py`, `src/tests/load/test_load_nightly.py`, `src/tests/load/README.md`
+**Size:** Large
+**Task ID:** T315
+**Depends on:** TH-4.1, TH-4.3
+
+### Story TH-4.5: Larger-runner nightly full sweep + report artifact + regression gate
+
+As a maintainer,
+I want the full breakpoint sweep to run nightly on a larger runner and gate perf regressions,
+So that capacity numbers are the best co-located approximation and regressions are caught between releases.
+
+**Acceptance Criteria:**
+
+**Given** a larger GitHub-hosted runner label (owner-provisioned; `ubuntu-latest` fallback documented)
+**When** the nightly runs
+**Then** the full `CAPACITY` sweep + `NIGHTLY` soak run on the larger runner with cores allocated (RS `workers≈cores−2`, lean generator + mock OP), the capacity report is uploaded as an artifact, and a perf-regression gate fails on p99/RPS/error deltas vs the T314 baseline
+
+**Files:** `.github/workflows/nightly.yml`, `Makefile`, `src/tests/load/test_load_nightly.py`, `src/tests/load/README.md`
+**Size:** Medium
+**Task ID:** T316
+**Depends on:** TH-4.2, TH-4.4
+
+---
+
 ## Implementation Order / Dependency Graph
 
 ```
@@ -305,6 +399,8 @@ TH-1.1 ───> TH-2.2
 TH-1.2 ───> TH-2.3
 TH-3.1 ─┬─> TH-3.2
         └─> TH-3.3
+TH-1.5 ───> TH-4.1 ─┬─> TH-4.2 ──────────────┐
+                    └─> TH-4.3 ─> TH-4.4 ─────┴─> TH-4.5
 ```
 
 ### Execution Priority
@@ -312,6 +408,7 @@ TH-3.1 ─┬─> TH-3.2
 2. **TH-2.1** immediately after TH-1.3 — it decides #461's fate (prove or revert; deterministic pytest, not the load suite).
 3. **TH-1.4** (CI gate over both suites), then **TH-2.2 / TH-2.3 / TH-2.4** (remaining backfill).
 4. **TH-3.1** → **TH-3.2 / TH-3.3** (conformance gates).
+5. **TH-4.1** (ramp/worker knobs) → **TH-4.2 + TH-4.3** (RSS-FD/refresh + baseline-gates) → **TH-4.4** (breakpoint sweep) → **TH-4.5** (nightly on a larger runner). Extends TH-1.5; co-located, bigger-runner-only.
 
 ## Story Count Summary
 
@@ -320,4 +417,5 @@ TH-3.1 ─┬─> TH-3.2
 | TH-1 Harness Foundation | 5 | M, M, M, M, M |
 | TH-2 Feature-Proof Backfill | 4 | M, S, M, M |
 | TH-3 Conformance Coverage & Gates | 3 | S, L, M |
-| **Total** | **12** | 2×S · 9×M · 1×L |
+| TH-4 Capacity & Breakpoint | 5 | M, M, M, L, M |
+| **Total** | **17** | 2×S · 13×M · 2×L |
