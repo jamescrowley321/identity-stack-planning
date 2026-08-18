@@ -4,10 +4,12 @@ project_name: 'identity-model'
 epic_id: 'EPIC-0A'
 epic_title: 'Monorepo Setup'
 date: '2026-04-04'
-status: 'draft'
+status: 'superseded'  # 2026-08-17 — see sprint-change-proposal-2026-08-17.md; replaced by CONS-1/2/3
 inputDocuments:
   - _bmad-output/planning-artifacts/product-brief-identity-model-monorepo.md
 ---
+
+> **⚠️ SUPERSEDED (2026-08-17).** The consolidation direction was reversed: `identity-model` (Go/Rust) now merges **into** `py-identity-model` (which survives with its git history), orchestrated by **`moon`** (not a root `uv` workspace), with layout `/py /go /rust` (+ reserved `/node`) and the repo rename performed **last**. See `sprint-change-proposal-2026-08-17.md`. This epic is replaced by **CONS-1** (`epic-cons1-im-merge-testinfra.md`), **CONS-2** (`epic-cons2-reorg-publishing.md`), **CONS-3** (`epic-cons3-rename-retire.md`). Story 0A.1 (relocate PIM→`python/` via `filter-repo`) no longer applies; the reusable stories 0A.3 (CI), 0A.4 (shared node-oidc infra), 0A.5 (authz-code automation) are carried forward into CONS-1/CONS-2.
 
 # Epic 0A: Monorepo Setup
 
