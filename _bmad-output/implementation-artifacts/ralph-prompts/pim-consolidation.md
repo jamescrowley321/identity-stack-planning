@@ -6,20 +6,13 @@ Self-referential loop. ONE phase of ONE task per iteration, then end. Fresh cont
 
 ## Running
 
-Run from a **dedicated py-identity-model worktree**, never the primary `~/repos/auth/py-identity-model` checkout — keeps `PROMPT.md`/`.claude/task-state.md` out of it and `main` pristine.
+One command — `run.sh` (in this dir) does the worktree + prompt copy + launch. **One PIM loop at a time** (no other PIM loop running):
 
 ```bash
-# One-time: orchestrator worktree off main
-cd ~/repos/auth/py-identity-model
-git fetch origin
-git worktree add /tmp/pim-consolidation-ralph -b ralph/consolidation origin/main
-
-cd /tmp/pim-consolidation-ralph
-cp ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/pim-consolidation.md PROMPT.md
-ralph run --idle-timeout 0        # 0 = don't SIGTERM long-quiet phases (docker fixture boots, cargo/go builds go quiet for minutes)
+ralph-prompts/run.sh pim-consolidation
 ```
 
-`ORCH_WORKTREE` = `/tmp/pim-consolidation-ralph`. The prompt must live there as `PROMPT.md` for the whole run (ralph re-reads it each iteration); the planning-repo copy is source of truth — edit there and re-`cp` to change mid-run. Per-task work happens in its own `/tmp/pim-CONS-1x` worktree. When done: `cd ~/repos/auth/py-identity-model && git worktree remove /tmp/pim-consolidation-ralph`.
+It creates `/tmp/pim-consolidation-ralph` off `origin/main`, copies this prompt to `PROMPT.md`, and runs `ralph run --idle-timeout 0`. Per-task work happens in its own `/tmp/pim-CONS-1x` worktree. Cleanup: `git -C ~/repos/auth/py-identity-model worktree remove /tmp/pim-consolidation-ralph`.
 
 **ONE PIM loop at a time.** Do NOT run concurrently with `token-harness.md`, `pim-capacity-breakpoint.md`, `pim-fapi2-hardening.md`, or any other PIM loop — they share `py-identity-model` and would collide. Remove stale orchestrator worktrees first (`git worktree list`).
 
