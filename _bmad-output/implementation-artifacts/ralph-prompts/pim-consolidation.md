@@ -4,6 +4,17 @@ Self-referential loop. ONE phase of ONE task per iteration, then end. Fresh cont
 **Design (source of truth):** `identity-stack-planning` → `_bmad-output/planning-artifacts/epics/epic-cons1-im-merge-testinfra.md` (the 5 stories + Given/When/Then ACs) and `_bmad-output/planning-artifacts/sprint-change-proposal-2026-08-17.md` (the pivot). Full technical design: **py-identity-model PR #533** (`docs/polyglot-consolidation-plan.md`).
 **Import source:** the `~/repos/auth/identity-model` checkout (its `go/`, `rust/`, `spec/`, `infra/`). Its git history is **expendable** (0 tags, never released) — bring trees in as ordinary new-file commits; do NOT `git filter-repo`/subtree.
 
+## BASE MODEL — off-main (updated 2026-08-18) — SUPERSEDES all "stacked / base off previous branch" wording below
+
+The owner reviews and **squash-merges each story's PR bottom-up as it passes** (CONS-1.1 already merged, #538). A squash makes a fresh commit, so basing a later story on an earlier story's *branch* breaks. Therefore:
+- **Branch EVERY story off `origin/main`** (`git fetch` first). `origin/main` accumulates each merged story, so it already contains all prior merged work.
+- **Open each PR with base `main`.** No stacked / base-off-previous PRs.
+- **Reconcile against MERGED PRs** (`gh pr list --repo jamescrowley321/py-identity-model --state merged --search 'CONS-1'`) + `origin/main` content — NOT open branches.
+- **Dependencies:** a story may start only once the stories it depends on are **merged into `origin/main`** (verify their content is on main — `/go`, `/rust`, `/spec`, `/infra`). If a dependency isn't merged yet, set the task `blocked` and end; wait for the owner to merge it. Order: 1.1 → 1.2, 1.3 (independent imports) → 1.4 (needs /go+/rust+/spec on main) → 1.5 (needs /spec+/infra on main).
+- On `complete`: clean up the task worktree, delete task-state, pick the next story **whose dependencies are merged**.
+
+Everywhere below that says "stacked", "base off the previous story's branch", or `--base consolidation/...`, read it as **base off `origin/main`**.
+
 ## Running
 
 One command — `run.sh` (in this dir) does the worktree + prompt copy + launch. **One PIM loop at a time** (no other PIM loop running):
