@@ -36,6 +36,17 @@ Push branch and create PR.
    ```
    `make security-gate` is delivered by **Epic 19 (Mechanical Security Gates)**; until it exists, a security-control PR MUST NOT advance on a filename/self-attestation check — treat a missing gate as a hard block, not a pass. If it fails, **return to the test phase**.
 
+1c. **Review-evidence gate (hard) — confirmation the reviews took place.** A PR MUST carry independent-reviewer evidence, or it is not created:
+   ```bash
+   FILES=$(ls .claude/review-*.md 2>/dev/null)
+   SKIP=$(grep -Ei '## Review (Summary|Gate):.*(empty diff|skipped|docs/config only)' .claude/task-state.md 2>/dev/null)
+   if [ -z "$FILES" ] && [ -z "$SKIP" ]; then
+     echo "REVIEW GATE FAIL: no .claude/review-*.md and no recorded skip — the review phase did not run. Return to the review phase; do NOT push or open a PR."
+     exit 1
+   fi
+   ```
+   If the gate fails, **return to the review phase**. Never self-attest "reviewed" without reviewer files.
+
 2. Push: `git push -u origin <branch>`
 
 3. Create PR — base is `main` unless the router prompt specifies chained PRs (use `base_branch` from task-state):
@@ -56,7 +67,7 @@ Push branch and create PR.
    - [x] Integration tests pass (or `[skip-integration-tests: <reason>]` justified below)
    - [x] E2E tests pass (identity-stack only, when applicable)
    - [x] Lint passes
-   - [x] Independent review agents passed
+   - [x] Independent review agents ran (findings posted as PR comments below)
    - [ ] CI passes
 
    🤖 Generated with [Claude Code](https://claude.com/claude-code)
@@ -64,6 +75,6 @@ Push branch and create PR.
    )" --repo jamescrowley321/<repo>
    ```
 
-4. If review files exist (`.claude/review-*.md`), post each as a PR comment.
+4. **Post the review evidence (mandatory).** Post EVERY `.claude/review-*.md` as a PR comment (`gh pr comment <pr> -R jamescrowley321/<repo> --body-file <file>`), and edit the PR body's "## Review Findings Addressed" to name **which reviewer personas ran** (blind / edge-case / acceptance / sentinel / viper) with per-persona finding counts. If a docs/config-only skip was recorded, state that instead. A feature PR with no reviewer comments is invalid — if you reach here without them, return to the review phase.
 5. Record PR number in task-state under `## PR`
 6. **Advance to the next phase. End your response.**
