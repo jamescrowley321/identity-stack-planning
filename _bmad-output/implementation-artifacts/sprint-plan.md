@@ -29,6 +29,30 @@ All feature tasks (T32-T47) done. All review fixes (T101-T116) done. Integration
 
 **Certified 2 Jul 2026 (T164 done).** Next cert round: Dynamic RP (#216), RP-Initiated Logout (#214), Back-Channel Logout (#442). Products: T170+T172 (monorepo layout + fastapi-identity-model package) in review via PR #434, with the OIDF conformance regression stage (T173/#437) stacked on top; T171 (CLI, #333 — now includes device flow in v1) remains pending.
 
+> **Update 2026-08-17 — Polyglot Consolidation ACTIVATED (correct-course):** The deferred monorepo consolidation is now active, with **direction reversed** — `identity-model` (Go/Rust) merges **into** py-identity-model (which survives w/ history + cert + PyPI), orchestrated by **`moon`** (superseding the T170 root `uv` workspace; per-package uv retained under `/py`), layout `/py /go /rust` (+ reserved `/node`), rename **last**. See `sprint-change-proposal-2026-08-17.md`; epics **CONS-1/2/3** (`epics/epic-cons{1,2,3}-*.md`); `epic-0a` superseded. Design of record: py-identity-model PR #533. Execution = stacked in-session PRs, owner-reviewed (not a loop).
+
+### Tier: py-identity-model — Polyglot Consolidation (CONS-1/2/3) — PLANNED
+
+Merge identity-model into the surviving repo; kill duplicated conformance/fixture infra; moon orchestration; independent per-language release tags. Stacked PRs, merge bottom-up.
+
+| Story | Epic | Description | Status | Depends On |
+|-------|------|-------------|--------|------------|
+| CONS-1.1 | CONS-1 | Import identity-model Go → `/go` | planned | — |
+| CONS-1.2 | CONS-1 | Import identity-model Rust → `/rust` | planned | — |
+| CONS-1.3 | CONS-1 | Import neutral conformance `/spec` | planned | 1.1, 1.2 |
+| CONS-1.4 | CONS-1 | Consolidate IdP fixtures → one `/infra` | planned | 1.1, 1.2 |
+| CONS-1.5 | CONS-1 | Python executor on `/spec` + coverage gate | planned | 1.3, 1.4 |
+| CONS-2.1 | CONS-2 | Relocate Python core → `/py` (drop root uv workspace) | planned | CONS-1 |
+| CONS-2.2 | CONS-2 | semantic-release → `/py`; tag `py-v{ver}`; seed `py-v3.10.0` | planned | 2.1 |
+| CONS-2.3 | CONS-2 | moon workspace + tasks; reserve `/node` scaffold | planned | 2.1 |
+| CONS-2.4 | CONS-2 | Go (`go/vX.Y.Z`) + Rust (`rust-vX.Y.Z`) release + CI | planned | 2.3 |
+| CONS-2.5 | CONS-2 | Publishing-parity dry-run gate | planned | 2.2, 2.4 |
+| CONS-3.1 | CONS-3 | Archive old `identity-model` (free name) | planned | CONS-1 |
+| CONS-3.2 | CONS-3 | Rename py-identity-model → `identity-model` | planned | 3.1, CONS-2 |
+| CONS-3.3 | CONS-3 | Re-config PyPI Trusted Publishing | planned | 3.2 |
+| CONS-3.4 | CONS-3 | Fix references (urls/badges/go-module/crates) | planned | 3.2 |
+| CONS-3.5 | CONS-3 | Reconcile stale planning artifacts | planned | 3.2 |
+
 ---
 
 ## Active Work (conformance + testing focus)
