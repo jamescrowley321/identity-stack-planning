@@ -300,6 +300,17 @@ So that logout features (RP-initiated / back-channel, e.g. #442) carry conforman
 
 Extends the landed TH-1.5 Locust harness (PR #524) — a fixed-load correctness/soak rig — into a **capacity & breakpoint rig**. Cuts the baseline + SLO-calibration + breakpoint work the design left open (§5 SLO bars marked "calibrate from a baseline run"; §8 P3/P4). **Infra (owner decision): bigger CI runner only, co-located** — the generator, in-process mock OP, and RS share one larger runner, so numbers are **directional** (the co-located knee + a nightly regression signal), **not** the RS's absolute isolated ceiling; a deployed-target lab is deferred. **Design:** `architecture-token-harness-load-soak.md` §4/§5/§10. **Repo:** py-identity-model.
 
+> **⚠ CORRECT-COURSE 2026-08-19 — `sprint-change-proposal-2026-08-19.md`.** Post-crash
+> re-diagnosis found the perf gates **vacuous** (`GATES` all-`None`, never populated) and the
+> capacity assertions **structurally flaky** on the co-located runner. The epic is re-framed from
+> "one absolute-SLO gate, calibration pending" into a **two-tier model**: **Track A** = machine-
+> independent *invariant* gates on shared CI (T314a, active) · **Track B** = absolute RPS/p99/knee
+> *reported* as artifacts, never a shared-CI pass/fail (de-flaked TH-4.4) · **Track C** = absolute
+> SLO gates on an *isolated* runner only (T314b → TH-4.5, owner-gated). Execution: stacked PRs
+> LP-1…LP-4 into `py-identity-model`. **S10** (blocking-validator scaffold, `scenarios.py:355-367`)
+> is formally **de-scoped** from the S1–S12 coverage matrix — relabelled tracked backlog (needs a
+> blocking custom-validator RS app, a separate feature) — so coverage claims stay honest.
+
 ### Story TH-4.1: Ramp, open-model, and worker-scaling knobs
 
 As a maintainer,
@@ -336,37 +347,66 @@ So that S11 detects leaks mechanically (not only via a 5xx) and long runs don't 
 
 ### Story TH-4.3: Baseline + SLO-gate calibration
 
+> **⚠ CORRECT-COURSE 2026-08-19 (`sprint-change-proposal-2026-08-19.md`).** As originally
+> written this story is **unachievable on shared CI**: it calibrates absolute
+> `max_p99_ms`/`min_rps` "from a baseline run **on the target runner**," but the target
+> runner is a **co-located** box where absolute p99/RPS are contention noise — any threshold
+> is either useless (loose) or flaky (tight). That is why `GATES` is still empty. **Split into
+> T314a + T314b.**
+
+#### Story TH-4.3a: Machine-independent invariant gates (shared CI) — **active**
+
 As a maintainer,
-I want the dormant SLO gates calibrated from a real baseline and activated,
-So that latency/throughput/error/cache-hit regressions actually fail instead of being documentation.
+I want the load gates to fail on regressions that are *machine-independent*,
+So that shared CI can catch a real perf/cache regression without ever flaking on runner noise.
 
 **Acceptance Criteria:**
 
 **Given** `GATES = {"warm": Gate(), "cold": Gate()}` are all-`None` and only 5xx + status-correctness fire
-**When** the design §8 P3 baseline run completes on the target runner
-**Then** `max_p99_ms`/`min_rps`/`max_error_rate`/`min_cache_hit_rate` are set from baseline + headroom, the calibrated table is written into `src/tests/load/README.md`, `docs/performance.md` is reconciled, and the gates FIRE on an injected regression (a self-asserted green is not proof)
+**When** the invariant gates are activated
+**Then** a **wide-band S2 alg-cost ratio** gate (ES256/RS256, calibrated wide — catches an order-of-magnitude regression, not runner noise) and a per-warm-scenario **cache-hit-by-count** invariant are added to `evaluate_gates`
+**And** an **injected-regression test** proves each new gate FIRES (a self-asserted green is not proof)
+**And** no *absolute* p99/RPS threshold is set on shared CI
 
-**Files:** `src/tests/load/runner.py`, `src/tests/load/README.md`, `docs/performance.md`
-**Size:** Medium
-**Task ID:** T314
+**Files:** `src/tests/load/runner.py`, `src/tests/load/test_load_ci_short.py`, `src/tests/load/README.md`
+**Size:** Small-Medium
+**Task ID:** T314a
 **Depends on:** TH-4.1
+
+#### Story TH-4.3b: Absolute SLO calibration — **deferred into TH-4.5**
+
+Absolute `max_p99_ms`/`min_rps`/`max_error_rate` calibration from a baseline + headroom is only
+honest on an **isolated runner**. Folded into **TH-4.5 (T316)** and gated on the owner
+provisioning that runner. Not on shared CI.
+
+**Task ID:** T314b
+**Depends on:** TH-4.5 infra (isolated runner)
 
 ### Story TH-4.4: Capacity/breakpoint scenarios + `CAPACITY` profile
 
+> **⚠ CORRECT-COURSE 2026-08-19.** As landed, `test_load_capacity.py` asserts the ramp *must*
+> find a breakpoint inside the 500→8000 ladder and `max_sustainable_rps > 0` — a **structural
+> false-fail** on a noisy co-located runner where step-1 can plateau below `sustain_ratio`. The
+> knee is **reported** (Track B), not asserted-present. De-flake: assert the *mechanism* (goodput
+> plateau **when** a knee is found, zero 5xx under saturation, monotonic offered rate, curve
+> renders); a ladder exhausted clean is a reported outcome, not a failure. Absolute knee numbers
+> are directional-only until TH-4.5's isolated runner.
+
 As a maintainer,
-I want ramp-to-breakpoint scenarios that find max sustainable load and the cross-worker scaling factor,
-So that we know where the co-located system knees and how near-linearly it scales with workers.
+I want ramp-to-breakpoint scenarios that report max sustainable load and the cross-worker scaling factor without flaking on shared CI,
+So that we get a directional knee + regression signal, not a false-failing nightly.
 
 **Acceptance Criteria:**
 
-**Given** the ramp/worker knobs (TH-4.1) and the calibrated gates (TH-4.3)
+**Given** the ramp/worker knobs (TH-4.1) and the **invariant** gates (TH-4.3a)
 **When** the new `Profile.CAPACITY` runs
-**Then** warm ramp-to-SLO-breach, cold ramp, and a cross-worker sweep (workers 1→physical cores) run; max-sustainable-load detection records the knee (RPS, users, p99, worker count) at the first gate trip; a capacity curve/report is emitted; and cross-worker scaling ≥0.8× linear is measured (per §5/S1)
+**Then** warm ramp, cold ramp, and a cross-worker sweep run; the knee (RPS, users, p99, worker count) is **recorded and reported** in the capacity artifact when found; the suite fails only on 5xx under load, non-monotonic offered rate, or an un-rendered report — **never** on "no breakpoint within the ladder"
+**And** cross-worker scaling is **reported** (≥0.8× linear is a Track-B observation, not a shared-CI gate)
 
-**Files:** `src/tests/load/scenarios.py`, `src/tests/load/runner.py`, `src/tests/load/test_load_nightly.py`, `src/tests/load/README.md`
+**Files:** `src/tests/load/scenarios.py`, `src/tests/load/runner.py`, `src/tests/load/test_load_capacity.py`, `src/tests/load/README.md`
 **Size:** Large
 **Task ID:** T315
-**Depends on:** TH-4.1, TH-4.3
+**Depends on:** TH-4.1, TH-4.3a
 
 ### Story TH-4.5: Larger-runner nightly full sweep + report artifact + regression gate
 
@@ -378,12 +418,17 @@ So that capacity numbers are the best co-located approximation and regressions a
 
 **Given** a larger GitHub-hosted runner label (owner-provisioned; `ubuntu-latest` fallback documented)
 **When** the nightly runs
-**Then** the full `CAPACITY` sweep + `NIGHTLY` soak run on the larger runner with cores allocated (RS `workers≈cores−2`, lean generator + mock OP), the capacity report is uploaded as an artifact, and a perf-regression gate fails on p99/RPS/error deltas vs the T314 baseline
+**Then** the full `CAPACITY` sweep + `NIGHTLY` soak run on the larger runner with cores allocated (RS `workers≈cores−2`, lean generator + mock OP), the capacity report is uploaded as an artifact, and a perf-regression gate fails on p99/RPS/error deltas vs the T314b baseline
 
-**Files:** `.github/workflows/nightly.yml`, `Makefile`, `src/tests/load/test_load_nightly.py`, `src/tests/load/README.md`
+> **CORRECT-COURSE 2026-08-19.** This story now **absorbs T314b** (absolute-SLO calibration): the
+> isolated larger runner is the *only* honest home for absolute `max_p99_ms`/`min_rps` gates.
+> Owner-gated on provisioning the larger-runner label. Shared-CI keeps only the Track-A invariant
+> gates (T314a); this story is where absolute numbers become a real gate.
+
+**Files:** `.github/workflows/nightly.yml`, `Makefile`, `src/tests/load/test_load_nightly.py`, `src/tests/load/runner.py`, `src/tests/load/README.md`
 **Size:** Medium
-**Task ID:** T316
-**Depends on:** TH-4.2, TH-4.4
+**Task ID:** T316 (absorbs T314b)
+**Depends on:** TH-4.2, TH-4.4, owner-provisioned isolated runner
 
 ---
 
