@@ -22,7 +22,9 @@ inputDocuments:
 > | CONS-1.2 Import Rust → `/rust` | **DONE** | PR #541 merged — crate `rs-identity-model`; tests bind `../spec/test-fixtures` |
 > | CONS-1.3 Import `/spec` | **DONE** | PR #540 merged — `spec/conformance/*.json` (10 capabilities) + `spec/test-fixtures/` |
 > | CONS-1.4 One `/infra` | **NOT DONE** | `/infra` holds only pre-existing PIM **Terraform** (`infra/descope/`). PIM IdP docker fixtures still at root `test-fixtures/{keycloak,node-oidc-provider}` (Makefile points there); identity-model `infra/{docker-compose.yml,identityserver,node-oidc-provider}` never imported; Go integration docs reference an `infra/` compose layout that doesn't exist in PIM. **Note:** the merged `/infra` must coexist with (not displace) `infra/descope/` Terraform. |
-> | CONS-1.5 Python executor + coverage gate | **NOT STARTED** | No Python test references `/spec`; no coverage gate in any workflow or Makefile. Also: **no PIM CI workflow builds/tests Go or Rust at all yet** (full change-detected CI is CONS-2.4, but the coverage gate lands here). |
+> | CONS-1.5 Python executor + coverage gate | **NOT STARTED** | No Python test references `/spec`; no `/spec` **vector**-coverage gate in any workflow or Makefile (the existing 80% *code*-coverage gate is a different thing and present). Also: **no PIM CI workflow builds/tests Go or Rust at all yet** (full change-detected CI is CONS-2.4, but the vector-coverage gate lands here). |
+>
+> Residual import loose end (fold into CONS-1.4/1.5 or CONS-3.4): `rust/Cargo.toml` `repository` still points at the retired `jamescrowley321/identity-model` repo.
 
 ## Overview
 

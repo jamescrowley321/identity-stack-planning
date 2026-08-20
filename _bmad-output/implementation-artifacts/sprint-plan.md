@@ -35,7 +35,7 @@ All feature tasks (T32-T47) done. All review fixes (T101-T116) done. Integration
 
 Merge identity-model into the surviving repo; kill duplicated conformance/fixture infra; moon orchestration; independent per-language release tags. Stacked PRs, merge bottom-up.
 
-> **Reconciled 2026-08-19 against py-identity-model `origin/main`:** CONS-1.1/1.2/1.3 merged (PRs #538/#541/#540). CONS-1.4 not done — `/infra` still holds only the pre-existing Descope Terraform; IdP docker fixtures remain duplicated (root `test-fixtures/` + unimported identity-model `infra/`). CONS-1.5 not started — no Python `/spec` executor, no coverage gate, and no PIM CI job builds Go/Rust yet. Detail in `epics/epic-cons1-im-merge-testinfra.md`.
+> **Reconciled 2026-08-19 against py-identity-model `origin/main`:** CONS-1.1/1.2/1.3 merged (PRs #538/#541/#540). CONS-1.4 not done — `/infra` still holds only the pre-existing Descope Terraform; IdP docker fixtures remain duplicated (root `test-fixtures/` + unimported identity-model `infra/`). CONS-1.5 not started — no Python `/spec` executor, no `/spec` vector-coverage gate, and no PIM CI job builds Go/Rust yet. Detail in `epics/epic-cons1-im-merge-testinfra.md`.
 
 | Story | Epic | Description | Status | Depends On |
 |-------|------|-------------|--------|------------|
