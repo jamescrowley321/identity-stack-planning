@@ -19,6 +19,8 @@ Start with the **[Roadmap](roadmap.md)** to understand the 6 PRDs and their sequ
 - **[IdP Authorization Comparison](idp-rbac-comparison.md)** — RBAC and ReBAC across 9 providers: why the reference architecture owns RBAC and proxies ReBAC.
 - **[Descope Data Model](descope-data-model.md)** — Descope-to-OAuth2/OIDC mapping: JWT claims (`dct`, `tenants`), grant types, session management, cross-repo resources.
 - **[OIDC Certification Analysis](oidc-certification-analysis.md)** — py-identity-model OpenID certification status (✅ certified 2 Jul 2026: Basic + Config + Form Post Basic RP) and next-profile expansion plan (§8).
+- **[Ory as SSO Provider — Context](ory-sso-provider-context.md)** — Feeder doc: making identity-stack's IdP configurable so Ory Network can be configured and run (provider-agnostic wiring, not a Descope swap-out); locked scope, current-state facts, resolved decisions.
+- **[Ory IaC & Automation Plan](ory-iac-automation-plan.md)** — Concrete `ory/ory` Terraform track (project JWT strategy, public SPA client, identity schema), credential model, secrets/state, and CI automation. Backs Epic 1 of `epics-ory-sso-provider.md`.
 
 ## Planning Artifacts
 
