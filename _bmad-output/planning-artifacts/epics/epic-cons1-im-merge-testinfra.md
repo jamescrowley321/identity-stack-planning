@@ -4,7 +4,7 @@ project_name: 'py-identity-model'
 epic_id: 'CONS-1'
 epic_title: 'Merge identity-model in & Collapse Duplicated Test Infrastructure'
 date: '2026-08-17'
-status: 'draft'
+status: 'in-progress'
 inputDocuments:
   - _bmad-output/planning-artifacts/sprint-change-proposal-2026-08-17.md
   - _bmad-output/planning-artifacts/product-brief-identity-model-monorepo.md
@@ -13,6 +13,16 @@ inputDocuments:
 ---
 
 # Epic CONS-1: Merge identity-model in & Collapse Duplicated Test Infrastructure
+
+> **Status reconcile 2026-08-19 (verified against py-identity-model `origin/main`):**
+>
+> | Story | Status | Evidence |
+> |---|---|---|
+> | CONS-1.1 Import Go → `/go` | **DONE** | PR #538 merged — module `github.com/jamescrowley321/py-identity-model/go`; includes the `internal/conformance` vector executor (binds `../../../spec/conformance`) |
+> | CONS-1.2 Import Rust → `/rust` | **DONE** | PR #541 merged — crate `rs-identity-model`; tests bind `../spec/test-fixtures` |
+> | CONS-1.3 Import `/spec` | **DONE** | PR #540 merged — `spec/conformance/*.json` (10 capabilities) + `spec/test-fixtures/` |
+> | CONS-1.4 One `/infra` | **NOT DONE** | `/infra` holds only pre-existing PIM **Terraform** (`infra/descope/`). PIM IdP docker fixtures still at root `test-fixtures/{keycloak,node-oidc-provider}` (Makefile points there); identity-model `infra/{docker-compose.yml,identityserver,node-oidc-provider}` never imported; Go integration docs reference an `infra/` compose layout that doesn't exist in PIM. **Note:** the merged `/infra` must coexist with (not displace) `infra/descope/` Terraform. |
+> | CONS-1.5 Python executor + coverage gate | **NOT STARTED** | No Python test references `/spec`; no coverage gate in any workflow or Makefile. Also: **no PIM CI workflow builds/tests Go or Rust at all yet** (full change-detected CI is CONS-2.4, but the coverage gate lands here). |
 
 ## Overview
 
