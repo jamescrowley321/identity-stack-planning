@@ -13,6 +13,16 @@ inputDocuments:
 
 # Epic CONS-2: Reorg to `/py|/go|/rust`, moon Orchestration & Keep Publishing Green
 
+> **Implementation reconcile 2026-08-19 (verified against py-identity-model `origin/main` after the CONS-1 stack).** Read before starting — these correct stale assumptions in the stories below and in the design-of-record:
+>
+> - **Seed tag is `py-v3.11.1`, NOT `py-v3.10.0`.** `pyproject.toml:project.version` is now **3.11.1** (the plan/handoff predates several releases). CONS-2.2 must seed `py-v3.11.1` at current HEAD, and its dry-run AC (2.2.1) computes from that.
+> - **`tools/release_parsers.py` path gotcha.** BOTH semantic-release configs reference the parser by a **repo-root-relative** path: core `pyproject.toml` → `commit_parser = "tools/release_parsers.py:CoreCommitParser"`; `packages/fastapi-identity-model/pyproject.toml` → `"tools/release_parsers.py:FastapiCommitParser"`. `version_toml` is likewise root-relative (`"pyproject.toml:project.version"`, `"packages/fastapi-identity-model/pyproject.toml:project.version"`). When `pyproject.toml`/`packages/` move under `/py`, either move `tools/` under `/py` too, or update every parser + version_toml path. Getting this wrong silently breaks commit routing (the load-bearing `(fastapi)`-scope split).
+> - **Movable Python tree (git mv → `/py`):** `src/`, `packages/`, `pyproject.toml`, `uv.lock`, and `tools/` (see above). **`examples/` is mixed** — `examples/fastapi` + `examples/descope` are uv-workspace members (Python) but `examples/` also holds the non-Python Duende IdentityServer example stack + `run-tests.sh` (driven by `make test-examples`, ports 5000/5001, separate from `/infra`). Decide per-subdir; do not blindly move all of `examples/`.
+> - **Root uv workspace members** = `[".", "packages/fastapi-identity-model", "examples/fastapi", "examples/descope"]` → becomes `/py/pyproject.toml`-owned; member paths re-relative to `/py`.
+> - **release.yml**: job `release` uses the `python-semantic-release@v10.6.1` action (root pyproject config) + a `uv lock` sync step + `publish-action`; job `release-fastapi-version` runs `uvx --from python-semantic-release==10.6.1 semantic-release -c packages/fastapi-identity-model/pyproject.toml version`. Both need `/py`-relative config paths after the move. `2` workflows key caches on `hashFiles('uv.lock')` → `hashFiles('py/uv.lock')`.
+> - **CI already re-pointed by CONS-1.4**: `ci.yml` fixture jobs use `infra/docker-compose.yml`; the new `integration-tests-go`/`-rust` + `spec-vector-coverage` jobs exist. CONS-2.1 must keep those green from the new paths.
+> - **conformance/** scripts use `uv run` (cwd-sensitive) and docs reference `src/py_identity_model/` — update after the move (AC-CONS-2.5.2 keeps the OIDF harness working).
+
 ## Overview
 
 **Step 2** of the consolidation. With Go/Rust/spec/infra landed (CONS-1), this epic performs the **in-place reorg**: relocate the Python core into `/py`, drop the root `uv` workspace, introduce **`moon`** as the polyglot orchestrator, change the tag scheme, and add Go/Rust release pipelines — all while proving PIM **publishes exactly as it does today**.

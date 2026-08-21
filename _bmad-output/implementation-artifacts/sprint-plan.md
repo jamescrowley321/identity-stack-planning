@@ -31,17 +31,19 @@ All feature tasks (T32-T47) done. All review fixes (T101-T116) done. Integration
 
 > **Update 2026-08-17 — Polyglot Consolidation ACTIVATED (correct-course):** The deferred monorepo consolidation is now active, with **direction reversed** — `identity-model` (Go/Rust) merges **into** py-identity-model (which survives w/ history + cert + PyPI), orchestrated by **`moon`** (superseding the T170 root `uv` workspace; per-package uv retained under `/py`), layout `/py /go /rust` (+ reserved `/node`), rename **last**. See `sprint-change-proposal-2026-08-17.md`; epics **CONS-1/2/3** (`epics/epic-cons{1,2,3}-*.md`); `epic-0a` superseded. Design of record: py-identity-model PR #533. Execution = stacked in-session PRs, owner-reviewed (not a loop).
 
-### Tier: py-identity-model — Polyglot Consolidation (CONS-1/2/3) — PLANNED
+### Tier: py-identity-model — Polyglot Consolidation (CONS-1/2/3) — IN PROGRESS
 
 Merge identity-model into the surviving repo; kill duplicated conformance/fixture infra; moon orchestration; independent per-language release tags. Stacked PRs, merge bottom-up.
 
+> **Reconciled 2026-08-19 against py-identity-model `origin/main`:** CONS-1.1/1.2/1.3 merged (PRs #538/#541/#540). CONS-1.4 + CONS-1.5 **executed in-session as a stacked pair, PRs open awaiting owner bottom-up merge** — CONS-1.4 = py-identity-model **#548** (CI green; one `/infra`, root `test-fixtures/` removed, first Go/Rust CI jobs, headless authz-code+PKCE e2e in all three languages, `TEST_REQUIRE_LIVE` mechanical gate), CONS-1.5 = **#549** (stacked on #548; Python + new Rust `/spec` vector runners + `spec-vector-coverage` cross-language gate, 12/12/12). Both carry 2-reviewer adversarial evidence in the PR. Detail in `epics/epic-cons1-im-merge-testinfra.md`.
+
 | Story | Epic | Description | Status | Depends On |
 |-------|------|-------------|--------|------------|
-| CONS-1.1 | CONS-1 | Import identity-model Go → `/go` | planned | — |
-| CONS-1.2 | CONS-1 | Import identity-model Rust → `/rust` | planned | — |
-| CONS-1.3 | CONS-1 | Import neutral conformance `/spec` | planned | 1.1, 1.2 |
-| CONS-1.4 | CONS-1 | Consolidate IdP fixtures → one `/infra` | planned | 1.1, 1.2 |
-| CONS-1.5 | CONS-1 | Python executor on `/spec` + coverage gate | planned | 1.3, 1.4 |
+| CONS-1.1 | CONS-1 | Import identity-model Go → `/go` | **done** (PR #538) | — |
+| CONS-1.2 | CONS-1 | Import identity-model Rust → `/rust` | **done** (PR #541) | — |
+| CONS-1.3 | CONS-1 | Import neutral conformance `/spec` | **done** (PR #540) | 1.1, 1.2 |
+| CONS-1.4 | CONS-1 | Consolidate IdP fixtures → one `/infra` | **in review** (PR #548) | 1.1, 1.2 |
+| CONS-1.5 | CONS-1 | Python executor on `/spec` + coverage gate | **in review** (PR #549, stacked) | 1.3, 1.4 |
 | CONS-2.1 | CONS-2 | Relocate Python core → `/py` (drop root uv workspace) | planned | CONS-1 |
 | CONS-2.2 | CONS-2 | semantic-release → `/py`; tag `py-v{ver}`; seed `py-v3.10.0` | planned | 2.1 |
 | CONS-2.3 | CONS-2 | moon workspace + tasks; reserve `/node` scaffold | planned | 2.1 |

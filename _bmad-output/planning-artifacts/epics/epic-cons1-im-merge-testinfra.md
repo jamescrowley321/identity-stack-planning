@@ -4,7 +4,7 @@ project_name: 'py-identity-model'
 epic_id: 'CONS-1'
 epic_title: 'Merge identity-model in & Collapse Duplicated Test Infrastructure'
 date: '2026-08-17'
-status: 'draft'
+status: 'in-progress'
 inputDocuments:
   - _bmad-output/planning-artifacts/sprint-change-proposal-2026-08-17.md
   - _bmad-output/planning-artifacts/product-brief-identity-model-monorepo.md
@@ -13,6 +13,18 @@ inputDocuments:
 ---
 
 # Epic CONS-1: Merge identity-model in & Collapse Duplicated Test Infrastructure
+
+> **Status reconcile 2026-08-19 (verified against py-identity-model `origin/main`):**
+>
+> | Story | Status | Evidence |
+> |---|---|---|
+> | CONS-1.1 Import Go → `/go` | **DONE** | PR #538 merged — module `github.com/jamescrowley321/py-identity-model/go`; includes the `internal/conformance` vector executor (binds `../../../spec/conformance`) |
+> | CONS-1.2 Import Rust → `/rust` | **DONE** | PR #541 merged — crate `rs-identity-model`; tests bind `../spec/test-fixtures` |
+> | CONS-1.3 Import `/spec` | **DONE** | PR #540 merged — `spec/conformance/*.json` (10 capabilities) + `spec/test-fixtures/` |
+> | CONS-1.4 One `/infra` | **IN REVIEW** | PR **#548** (CI green) — `test-fixtures/{keycloak,node-oidc-provider}` + IM `identityserver` merged into one `/infra/docker-compose.yml` (coexists with `infra/descope/` Terraform); node-oidc kept on `:9010` (Python unchanged), Go defaults moved 9000→9010; new `integration-tests-go`/`integration-tests-rust` CI jobs; headless authz-code+PKCE e2e in all 3 languages; `TEST_REQUIRE_LIVE` mechanical gate. |
+> | CONS-1.5 Python executor + coverage gate | **IN REVIEW** | PR **#549** (stacked on #548) — Python `test_spec_conformance.py` + new Rust `spec_conformance.rs` declarative runners; Go runner emits report; `tools/spec_coverage_gate.py` + `spec-vector-coverage` CI job (in `ci-complete`) fail naming missing (lang, vector-id) pairs; 12/12/12 per language; iat-presence parity documented (Go/Rust native vs PIM opt-in). |
+>
+> Residual import loose end (**RESOLVED in #548**): `rust/Cargo.toml` `repository` re-pointed to `jamescrowley321/py-identity-model` (was the retired `identity-model` repo).
 
 ## Overview
 
