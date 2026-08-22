@@ -62,7 +62,7 @@ Production OIDC/OAuth2.0 Python library with dual sync/async APIs. The token val
 
 </details>
 
-**Status:** v3.8.5 published. **OpenID Certified** — Basic + Config + Form Post Basic RP (2 Jul 2026). FAPI 2.0 RP hardening complete (private_key_jwt client auth, RFC 9207 issuer validation, JWKS-cache LRU eviction). All 16 protocol features shipped.
+**Status:** v3.11.3 published. **OpenID Certified® by the OpenID Foundation as a Relying Party** — Basic + Config + Form Post Basic RP (2 Jul 2026). This is the **certified reference the family's Go and Rust native libraries are built to match**; conformance is an ongoing program (next profiles: Dynamic RP, RP-Initiated Logout, Back-Channel Logout). FAPI 2.0 RP hardening complete (private_key_jwt client auth, RFC 9207 issuer validation, JWKS-cache LRU eviction). All 16 protocol features shipped.
 **Repo:** [jamescrowley321/py-identity-model](https://github.com/jamescrowley321/py-identity-model)
 
 ### terraform-provider-descope
@@ -125,12 +125,12 @@ Multi-language, RFC-compliant OIDC/OAuth2 **client** library monorepo — one cr
 |----------|---------|--------|
 | Go | `github.com/jamescrowley321/identity-model/go` | Core + Extended tiers merged — discovery, jwks, jwt, token, userinfo, dpop, introspection, revocation |
 | Rust | crate `identity-model` (edition 2024, MSRV 1.96) | Core tier merged + hardened — discovery, jwks, jwt, token, userinfo; secret redaction, redirect-downgrade defence, `azp`/clock-skew, jsonwebtoken 11. Next: Extended-tier parity |
-| Python | `py-identity-model` (PyPI) | Reference implementation — separate repo today, merges into `python/` later |
+| Python | `py-identity-model` (PyPI) | **OpenID Certified® RP** — the certified reference the other native libraries match; the surviving repo the family consolidates into (CONS-1/2/3) |
 | Node/TS | `@identity-model/node` (npm) | Planned |
 
 </details>
 
-A shared `spec/` defines language-agnostic conformance tests; each binding runs them against shared `infra/` providers (node-oidc-provider + IdentityServer). CI enforces that a "capability implemented" claim passes the shared conformance suite.
+A shared `spec/` defines language-agnostic conformance tests; each native library runs them against shared `infra/` providers (node-oidc-provider + IdentityServer). CI enforces that a "capability implemented" claim passes the shared conformance suite.
 
 **Status:** Public repo. Go core + extended tiers merged; Rust core tier merged + hardened (secret redaction, https→http redirect-downgrade defence, `azp`/clock-skew validation, jsonwebtoken 11). Toolchains: Go 1.26, Rust MSRV 1.96. Next: Rust Extended-tier parity (introspection, revocation, token exchange, DPoP).
 **Repo:** [jamescrowley321/identity-model](https://github.com/jamescrowley321/identity-model)
@@ -281,9 +281,9 @@ Live status is tracked in the [task queue](_bmad-output/implementation-artifacts
 
 | Repo | Status | Links |
 |------|--------|-------|
-| py-identity-model | v3.8.5. OpenID Certified (Basic/Config/Form Post RP). FAPI 2.0 RP hardening complete. | [PRs](https://github.com/jamescrowley321/py-identity-model/pulls) · [PyPI](https://pypi.org/project/py-identity-model/) |
+| py-identity-model | v3.11.3. OpenID Certified® RP (Basic/Config/Form Post) — the reference the family matches. FAPI 2.0 RP hardening complete. | [PRs](https://github.com/jamescrowley321/py-identity-model/pulls) · [PyPI](https://pypi.org/project/py-identity-model/) |
 | terraform-provider-descope | v1.2.2. Feature-complete. 1 blocked (SSO app requires enterprise license). | [PRs](https://github.com/jamescrowley321/terraform-provider-descope/pulls) · [Registry](https://registry.terraform.io/providers/jamescrowley321/descope/latest) |
-| identity-stack | PRD 5 (canonical identity) complete. PRD 5b (design system) active — components merged, admin pages in progress. | [PRs](https://github.com/jamescrowley321/identity-stack/pulls) |
+| identity-stack | PRD 5 (canonical identity) complete. **Ory SSO provider active** — Epics 1–3 merged (Epic 1 applied live), Epics 4–5 next. Design system components merged, admin pages in progress. | [PRs](https://github.com/jamescrowley321/identity-stack/pulls) |
 | identity-model | Public. Go (core + extended) and Rust (core, hardened) tiers merged. Next: Rust Extended tier. | [Repo](https://github.com/jamescrowley321/identity-model) |
 
 ## Quick Start

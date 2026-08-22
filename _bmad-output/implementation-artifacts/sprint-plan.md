@@ -12,6 +12,11 @@ Sprint plan across three repos. **Execution method:** Ralph loops — one task a
 
 ## Current Status (as of 2026-05-21)
 
+> **Update 2026-08-22 — reconciled to reality (housekeeping):**
+> - **identity-stack is active again.** The *Ory as a Configurable SSO Provider* initiative shipped Epics 1–3: Epic 1 (Ory Network IaC, **applied live** — project `identity-stack-dev`, issuer `inspiring-nash-yli2uiwmcw`, PR #370), Epic 2 (provider-driven backend token validation + Ory as a configured OIDC provider, PR #371), Epic 3 (canonical wiring + JIT provisioning + `GET /api/identity`, PR #372). Epics 4 (provider-agnostic frontend) and 5 (provider-aware logout + end-to-end Ory test) are next. The "identity-stack — DEFERRED" line below is superseded — see the new **Ory SSO Provider** tier. Feeder doc `docs/ory-sso-provider-context.md`; epics `_bmad-output/planning-artifacts/epics-ory-sso-provider.md`; IaC plan `docs/ory-iac-automation-plan.md`.
+> - **Consolidation correction:** CONS-1.4 **merged** (PR #548, 2026-08-21). CONS-1.5 (PR #549) was **closed unmerged** — the `/spec` Python/Rust executor + cross-language coverage gate is **not yet landed** and needs a fresh PR.
+> - **Certification framing:** **py-identity-model is the OpenID Certified® Relying Party the rest of the family (Go, Rust) is built to match.** Conformance is an ongoing program (next profiles: Dynamic RP #216, RP-Initiated Logout #214, Back-Channel Logout #442), not a one-time milestone.
+
 > **Update 2026-07-08:** py-identity-model is now **OpenID Certified** (3.1.0 — Basic + Config + Form Post Basic RP, 2 Jul 2026), so the conformance milestone has **closed**. Corrections to the 2026-05-21 snapshot below: T164/#331 (cert + fee waiver) is **done**; T147 is **`wontfix`** (Implicit/Hybrid dropped, #415); the security tail T205/T206 is **done**. Next cert round: Dynamic RP (#216), RP-Initiated Logout (#214), Back-Channel Logout (#442). The rest of this snapshot is historical.
 
 **Workspace focus narrowed 2026-05-21:** conformance and testing only. Other workstreams (Design System, monorepo restructure, cloud-provider integration epic) were deferred until the conformance milestone closed (now closed).
@@ -19,10 +24,10 @@ Sprint plan across three repos. **Execution method:** Ralph loops — one task a
 ### terraform-provider-descope — COMPLETE
 All tasks done. T6 (SSO app) blocked on enterprise license. T7/T8 wontfix. Releases v1.1.0-v1.1.4 published to Terraform Registry. All review fixes (T85-T89, T99-T100) done.
 
-### identity-stack — DEFERRED (per current focus)
-All prior code work complete (Phases 1-5, Epics 2-3, UI migration, E2E tests, all review fixes). PRD 5 (Canonical Identity Domain Model) **shipped 2026-04-09** — all 19 stories merged. PRD 2 (API Gateway) **shipped 2026-04-12**. Design System Integration — 5 epics, 31 stories, status unconfirmed (GitHub identity-stack tracker has 0 open issues; planning sprint plan from 2026-04-19 listed 6 done / 3 partial / 22 remaining). **Out of scope for current conformance/testing focus — to be reconciled separately.** Epic file: `epics-design-system.md`.
+### identity-stack — ACTIVE (Ory SSO provider)
+Canonical work complete (Phases 1-5, Epics 2-3, UI migration, E2E tests, all review fixes). PRD 5 (Canonical Identity Domain Model) **shipped 2026-04-09** — all 19 stories merged. PRD 2 (API Gateway) **shipped 2026-04-12**. **Now active:** *Ory as a Configurable SSO Provider* — Epics 1–3 merged (PRs #370/#371/#372; Epic 1 applied live), Epics 4–5 next. See the **Ory SSO Provider** tier below. Design System Integration (5 epics, 31 stories) remains partially done and outside the current Ory focus — status unconfirmed against the identity-stack GitHub tracker; epic file `epics-design-system.md`.
 
-### py-identity-model — ✅ CERTIFIED (Basic + Config + Form Post Basic RP) + jwks-cache hardened to v3.0.0
+### py-identity-model — ✅ OpenID Certified® RP (the reference the family matches) + jwks-cache hardened to v3.0.0
 All feature tasks (T32-T47) done. All review fixes (T101-T116) done. Integration test chain (T120-T125) done. OIDC conformance: **certified 2 Jul 2026 (v3.1.0)** — Basic RP (13/13), Config RP (5/5), Form Post RP (13/13). T140-T146 done, T164 (fee waiver/submission) done. T147 (Implicit/Hybrid) **wontfix** — dropped as OAuth 2.1-deprecated (#415). Security re-audit Phase 2: 8/8 done (T200-T207 shipped via PRs #383-#387; T205/#380 + T206/#381 done).
 
 **jwks-cache hardening rounds done (PRs #394, #395, #406, #407, #408, #409)** — major bump to v3.0.0 published 2026-05-21 (async `clear_*_cache` helpers became async; monotonic clock + request_time inside fetch lock). Residual testing/tech-debt items #398, #399, #403 tracked in task-queue.
@@ -35,15 +40,15 @@ All feature tasks (T32-T47) done. All review fixes (T101-T116) done. Integration
 
 Merge identity-model into the surviving repo; kill duplicated conformance/fixture infra; moon orchestration; independent per-language release tags. Stacked PRs, merge bottom-up.
 
-> **Reconciled 2026-08-19 against py-identity-model `origin/main`:** CONS-1.1/1.2/1.3 merged (PRs #538/#541/#540). CONS-1.4 + CONS-1.5 **executed in-session as a stacked pair, PRs open awaiting owner bottom-up merge** — CONS-1.4 = py-identity-model **#548** (CI green; one `/infra`, root `test-fixtures/` removed, first Go/Rust CI jobs, headless authz-code+PKCE e2e in all three languages, `TEST_REQUIRE_LIVE` mechanical gate), CONS-1.5 = **#549** (stacked on #548; Python + new Rust `/spec` vector runners + `spec-vector-coverage` cross-language gate, 12/12/12). Both carry 2-reviewer adversarial evidence in the PR. Detail in `epics/epic-cons1-im-merge-testinfra.md`.
+> **Reconciled 2026-08-19 against py-identity-model `origin/main`:** CONS-1.1/1.2/1.3 merged (PRs #538/#541/#540). CONS-1.4 + CONS-1.5 **executed in-session as a stacked pair, PRs open awaiting owner bottom-up merge** — CONS-1.4 = py-identity-model **#548** (CI green; one `/infra`, root `test-fixtures/` removed, first Go/Rust CI jobs, headless authz-code+PKCE e2e in all three languages, `TEST_REQUIRE_LIVE` mechanical gate), CONS-1.5 = **#549** (stacked on #548; Python + new Rust `/spec` vector runners + `spec-vector-coverage` cross-language gate, 12/12/12). Both carried 2-reviewer adversarial evidence in the PR. **Correction (2026-08-22):** CONS-1.4 (#548) **merged 2026-08-21**; **CONS-1.5 (#549) was closed unmerged** — the `/spec` Python/Rust executor + `spec-vector-coverage` gate is **not yet landed** and must be re-opened as a fresh PR. Detail in `epics/epic-cons1-im-merge-testinfra.md`.
 
 | Story | Epic | Description | Status | Depends On |
 |-------|------|-------------|--------|------------|
 | CONS-1.1 | CONS-1 | Import identity-model Go → `/go` | **done** (PR #538) | — |
 | CONS-1.2 | CONS-1 | Import identity-model Rust → `/rust` | **done** (PR #541) | — |
 | CONS-1.3 | CONS-1 | Import neutral conformance `/spec` | **done** (PR #540) | 1.1, 1.2 |
-| CONS-1.4 | CONS-1 | Consolidate IdP fixtures → one `/infra` | **in review** (PR #548) | 1.1, 1.2 |
-| CONS-1.5 | CONS-1 | Python executor on `/spec` + coverage gate | **in review** (PR #549, stacked) | 1.3, 1.4 |
+| CONS-1.4 | CONS-1 | Consolidate IdP fixtures → one `/infra` | **done** (PR #548, merged 2026-08-21) | 1.1, 1.2 |
+| CONS-1.5 | CONS-1 | Python executor on `/spec` + coverage gate | **not done** — PR #549 closed unmerged; needs a fresh PR | 1.3, 1.4 |
 | CONS-2.1 | CONS-2 | Relocate Python core → `/py` (drop root uv workspace) | planned | CONS-1 |
 | CONS-2.2 | CONS-2 | semantic-release → `/py`; tag `py-v{ver}`; seed `py-v3.10.0` | planned | 2.1 |
 | CONS-2.3 | CONS-2 | moon workspace + tasks; reserve `/node` scaffold | planned | 2.1 |
@@ -54,6 +59,22 @@ Merge identity-model into the surviving repo; kill duplicated conformance/fixtur
 | CONS-3.3 | CONS-3 | Re-config PyPI Trusted Publishing | planned | 3.2 |
 | CONS-3.4 | CONS-3 | Fix references (urls/badges/go-module/crates) | planned | 3.2 |
 | CONS-3.5 | CONS-3 | Reconcile stale planning artifacts | planned | 3.2 |
+
+---
+
+## Tier: Identity Stack — Ory as a Configurable SSO Provider — IN PROGRESS
+
+Make identity-stack's IdP *configurable* so an Ory Network provider can be configured and run — **not** a Descope swap-out. Descope stays a configured provider; every change is backward-compatible provider-agnostic wiring. JWT access tokens validated via py-identity-model (standard OIDC; FAPI 2.0 not a target). Default tenancy is canonical-side. Feeder doc `docs/ory-sso-provider-context.md`; epics/stories `_bmad-output/planning-artifacts/epics-ory-sso-provider.md`; IaC plan `docs/ory-iac-automation-plan.md`.
+
+| Epic | Description | FRs | Status |
+|------|-------------|-----|--------|
+| Epic 1 | Ory Network provisioning (IaC) — `infra/ory` `ory/ory` Terraform: project JWT strategy, public SPA client (auth_code + PKCE), identity schema, flag-gated Organizations | FR-18/19/20 | **done — applied live** (PR #370; project `identity-stack-dev`, issuer `inspiring-nash-yli2uiwmcw`) |
+| Epic 2 | Config-driven backend token validation — generalize the Descope-hardcoded issuer allow-list/discovery/audience; add Ory as a configured OIDC provider; `ory` provider row | FR-1/2/3/4/5/6 | **done** (PR #371) |
+| Epic 3 | Canonical resolution, JIT provisioning & Ory adapter — `tenants.external_org_id` migration, `seed_ory`, `OrySyncAdapter`, JIT write-path, `GET /api/identity` | FR-7/8/9/10/11/12/13 (+ FR-14 shipped early) | **done** (PR #372) |
+| Epic 4 | Provider-agnostic frontend & canonical claims — `VITE_OIDC_*` provider-driven `oidcConfig`; `useRBAC`/`useTenants` consume canonical `/api/identity` instead of Descope token claims | FR-9/14/15/16 | **pending** — the FR-14 endpoint already shipped in Epic 3; remaining work is the frontend rewire |
+| Epic 5 | Provider-aware logout & end-to-end Ory validation — Ory RP-initiated logout (Descope Management logout retained) + E2E test reusing the py-identity-model / OIDC conformance path | FR-17/21 | **pending** |
+
+**Open follow-ups (identity-stack GitHub issues):** rotate `ORY_WORKSPACE_API_KEY` (generated in-session — see #370), migrate Terraform state local → HCP (`terraform init -migrate-state`), Epic 4 (frontend), Epic 5 (logout + E2E).
 
 ---
 
@@ -195,6 +216,6 @@ Run via `ralph-prompts/design-system.md`. 5 epics, 31 stories. Full breakdown in
 
 1. **T6 blocked** (enterprise license E074106): Cascades to T18 (SSO), T21 (Step-Up), T22 (MFA), T25 (OIDC/SAML)
 2. **T7/T8 wontfix**: JWT Templates (T20) and Custom Flows (T23/T24) need alternative approaches or descoping
-3. **OIDF certification is done** for py-identity-model — certified 2 Jul 2026 (Basic + Config + Form Post Basic RP, v3.1.0; T164). Next round: #216/#214/#442
+3. **py-identity-model is the OpenID Certified® Relying Party the family matches.** Certified 2 Jul 2026 (Basic + Config + Form Post Basic RP, v3.1.0; T164); the Go and Rust cores in the consolidation are built to match its behavior. Conformance is an ongoing program — next round: Dynamic RP (#216), RP-Initiated Logout (#214), Back-Channel Logout (#442)
 4. **Design system is top priority** for identity-stack — runs parallel with py-identity-model certification
 5. **Toolchain expansion**: Four PRDs planned. Should not start until design system + conformance are stable
