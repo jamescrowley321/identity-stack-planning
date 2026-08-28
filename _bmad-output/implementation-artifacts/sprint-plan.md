@@ -42,23 +42,25 @@ Merge identity-model into the surviving repo; kill duplicated conformance/fixtur
 
 > **Reconciled 2026-08-19 against py-identity-model `origin/main`:** CONS-1.1/1.2/1.3 merged (PRs #538/#541/#540). CONS-1.4 + CONS-1.5 **executed in-session as a stacked pair, PRs open awaiting owner bottom-up merge** — CONS-1.4 = py-identity-model **#548** (CI green; one `/infra`, root `test-fixtures/` removed, first Go/Rust CI jobs, headless authz-code+PKCE e2e in all three languages, `TEST_REQUIRE_LIVE` mechanical gate), CONS-1.5 = **#549** (stacked on #548; Python + new Rust `/spec` vector runners + `spec-vector-coverage` cross-language gate, 12/12/12). Both carried 2-reviewer adversarial evidence in the PR. **Correction (2026-08-22):** CONS-1.4 (#548) **merged 2026-08-21**; **CONS-1.5 (#549) was closed unmerged** — the `/spec` Python/Rust executor + `spec-vector-coverage` gate is **not yet landed** and must be re-opened as a fresh PR. Detail in `epics/epic-cons1-im-merge-testinfra.md`.
 
+> **Update 2026-08-28 — consolidation is code-complete; only owner-gated actions remain.** CONS-1 and CONS-2 are **done** (spec-vector coverage gate + Go/Rust runners, moon, both release pipelines, publish-parity gate — all merged and required in CI). CONS-3 is done except archiving the legacy repo. CONS-1.5 **did land** on `origin/main` (the earlier "closed unmerged, needs a fresh PR" note is obsolete). **The only remaining work:** (1) **cut the first Go + Rust releases** — push `go/vX.Y.Z` and `rust-vX.Y.Z` tags; Rust is blocked until `CARGO_REGISTRY_TOKEN` is set on the repo, and both need a version decision (owner, irreversible public publish); (2) **archive `jamescrowley321/identity-model-legacy`** (owner; safe — its cache-bound fixes were re-implemented natively on the survivor). Epics #534–537 remain open as umbrellas but their sub-work is merged.
+
 | Story | Epic | Description | Status | Depends On |
 |-------|------|-------------|--------|------------|
 | CONS-1.1 | CONS-1 | Import identity-model Go → `/go` | **done** (PR #538) | — |
 | CONS-1.2 | CONS-1 | Import identity-model Rust → `/rust` | **done** (PR #541) | — |
 | CONS-1.3 | CONS-1 | Import neutral conformance `/spec` | **done** (PR #540) | 1.1, 1.2 |
 | CONS-1.4 | CONS-1 | Consolidate IdP fixtures → one `/infra` | **done** (PR #548, merged 2026-08-21) | 1.1, 1.2 |
-| CONS-1.5 | CONS-1 | Python executor on `/spec` + coverage gate | **not done** — PR #549 closed unmerged; needs a fresh PR | 1.3, 1.4 |
-| CONS-2.1 | CONS-2 | Relocate Python core → `/py` (drop root uv workspace) | planned | CONS-1 |
-| CONS-2.2 | CONS-2 | semantic-release → `/py`; tag `py-v{ver}`; seed `py-v3.10.0` | planned | 2.1 |
-| CONS-2.3 | CONS-2 | moon workspace + tasks; reserve `/node` scaffold | planned | 2.1 |
-| CONS-2.4 | CONS-2 | Go (`go/vX.Y.Z`) + Rust (`rust-vX.Y.Z`) release + CI | planned | 2.3 |
-| CONS-2.5 | CONS-2 | Publishing-parity dry-run gate | planned | 2.2, 2.4 |
-| CONS-3.1 | CONS-3 | Archive old `identity-model` (free name) | planned | CONS-1 |
-| CONS-3.2 | CONS-3 | Rename py-identity-model → `identity-model` | planned | 3.1, CONS-2 |
-| CONS-3.3 | CONS-3 | Re-config PyPI Trusted Publishing | planned | 3.2 |
-| CONS-3.4 | CONS-3 | Fix references (urls/badges/go-module/crates) | planned | 3.2 |
-| CONS-3.5 | CONS-3 | Reconcile stale planning artifacts | planned | 3.2 |
+| CONS-1.5 | CONS-1 | Python/Rust `/spec` executors + coverage gate | **done** — `spec-vector-coverage` gate + Go/Rust runners landed, required in CI | 1.3, 1.4 |
+| CONS-2.1 | CONS-2 | Relocate Python core → `/py` (drop root uv workspace) | **done** (PR #550) | CONS-1 |
+| CONS-2.2 | CONS-2 | semantic-release → `/py`; tag `py-v{ver}` | **done** (PR #553; latest `py-v3.11.3`) | 2.1 |
+| CONS-2.3 | CONS-2 | moon workspace + tasks; reserve `/node` scaffold | **done** (PR #554) | 2.1 |
+| CONS-2.4 | CONS-2 | Go (`go/vX.Y.Z`) + Rust (`rust-vX.Y.Z`) release + CI | **pipelines done** (PR #556); **no Go/Rust release cut yet** — Rust blocked on `CARGO_REGISTRY_TOKEN` secret | 2.3 |
+| CONS-2.5 | CONS-2 | Publishing-parity dry-run gate | **done** (PR #557; required in CI) | 2.2, 2.4 |
+| CONS-3.1 | CONS-3 | Archive old repo (now `identity-model-legacy`) | **pending** — repo not yet archived (fixes already salvaged natively) | CONS-1 |
+| CONS-3.2 | CONS-3 | Rename survivor repo → `identity-model` | **done** | 3.1, CONS-2 |
+| CONS-3.3 | CONS-3 | PyPI Trusted Publishing | **done** — core publishes via OIDC Trusted Publishing | 3.2 |
+| CONS-3.4 | CONS-3 | Fix references (urls/badges/go-module/crates) | **done** | 3.2 |
+| CONS-3.5 | CONS-3 | Reconcile stale planning artifacts | **in progress** (this PR) | 3.2 |
 
 ---
 
