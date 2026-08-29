@@ -36,13 +36,15 @@ All feature tasks (T32-T47) done. All review fixes (T101-T116) done. Integration
 
 > **Update 2026-08-17 — Polyglot Consolidation ACTIVATED (correct-course):** The deferred monorepo consolidation is now active, with **direction reversed** — `identity-model` (Go/Rust) merges **into** py-identity-model (which survives w/ history + cert + PyPI), orchestrated by **`moon`** (superseding the T170 root `uv` workspace; per-package uv retained under `/py`), layout `/py /go /rust` (+ reserved `/node`), rename **last**. See `sprint-change-proposal-2026-08-17.md`; epics **CONS-1/2/3** (`epics/epic-cons{1,2,3}-*.md`); `epic-0a` superseded. Design of record: py-identity-model PR #533. Execution = stacked in-session PRs, owner-reviewed (not a loop).
 
-### Tier: py-identity-model — Polyglot Consolidation (CONS-1/2/3) — IN PROGRESS
+### Tier: py-identity-model — Polyglot Consolidation (CONS-1/2/3) — ALL DONE EXCEPT LEGACY-REPO ARCHIVE
 
 Merge identity-model into the surviving repo; kill duplicated conformance/fixture infra; moon orchestration; independent per-language release tags. Stacked PRs, merge bottom-up.
 
 > **Reconciled 2026-08-19 against py-identity-model `origin/main`:** CONS-1.1/1.2/1.3 merged (PRs #538/#541/#540). CONS-1.4 + CONS-1.5 **executed in-session as a stacked pair, PRs open awaiting owner bottom-up merge** — CONS-1.4 = py-identity-model **#548** (CI green; one `/infra`, root `test-fixtures/` removed, first Go/Rust CI jobs, headless authz-code+PKCE e2e in all three languages, `TEST_REQUIRE_LIVE` mechanical gate), CONS-1.5 = **#549** (stacked on #548; Python + new Rust `/spec` vector runners + `spec-vector-coverage` cross-language gate, 12/12/12). Both carried 2-reviewer adversarial evidence in the PR. **Correction (2026-08-22):** CONS-1.4 (#548) **merged 2026-08-21**; **CONS-1.5 (#549) was closed unmerged** — the `/spec` Python/Rust executor + `spec-vector-coverage` gate is **not yet landed** and must be re-opened as a fresh PR. Detail in `epics/epic-cons1-im-merge-testinfra.md`.
 
 > **Update 2026-08-28 — consolidation is code-complete; only owner-gated actions remain.** CONS-1 and CONS-2 are **done** (spec-vector coverage gate + Go/Rust runners, moon, both release pipelines, publish-parity gate — all merged and required in CI). CONS-3 is done except archiving the legacy repo. CONS-1.5 **did land** on `origin/main` (the earlier "closed unmerged, needs a fresh PR" note is obsolete). **The only remaining work:** (1) **cut the first Go + Rust releases** — push `go/vX.Y.Z` and `rust-vX.Y.Z` tags; Rust is blocked until `CARGO_REGISTRY_TOKEN` is set on the repo, and both need a version decision (owner, irreversible public publish); (2) **archive `jamescrowley321/identity-model-legacy`** (owner; safe — its cache-bound fixes were re-implemented natively on the survivor). Epics #534–537 remain open as umbrellas but their sub-work is merged.
+
+> **Update 2026-08-29 — Go + Rust releases fully automated AND cut.** py-identity-model **#570** added `release-go-version`/`release-rust-version` PSR jobs (mirroring `release-fastapi-version`): merging a `feat(go)`/`feat(rust)` commit now auto-tags + publishes with zero manual tagging, same UX as the Python auto-release. `CARGO_REGISTRY_TOKEN` is set. First releases cut on merge and **all three languages are live**: `go/v0.1.0` (Go proxy), `rust-v0.0.1` → crates.io `rs-identity-model`, `py-identity-model 3.11.4` (PyPI). **The ONLY remaining consolidation item is archiving `identity-model-legacy` (owner-gated).** Once archived, close CONS-3 (#537) and the meta epic (#534). See py-identity-model memory `project_identity_model_go_rust_release_automation`.
 
 | Story | Epic | Description | Status | Depends On |
 |-------|------|-------------|--------|------------|
@@ -54,13 +56,13 @@ Merge identity-model into the surviving repo; kill duplicated conformance/fixtur
 | CONS-2.1 | CONS-2 | Relocate Python core → `/py` (drop root uv workspace) | **done** (PR #550) | CONS-1 |
 | CONS-2.2 | CONS-2 | semantic-release → `/py`; tag `py-v{ver}` | **done** (PR #553; latest `py-v3.11.3`) | 2.1 |
 | CONS-2.3 | CONS-2 | moon workspace + tasks; reserve `/node` scaffold | **done** (PR #554) | 2.1 |
-| CONS-2.4 | CONS-2 | Go (`go/vX.Y.Z`) + Rust (`rust-vX.Y.Z`) release + CI | **pipelines done** (PR #556); **no Go/Rust release cut yet** — Rust blocked on `CARGO_REGISTRY_TOKEN` secret | 2.3 |
+| CONS-2.4 | CONS-2 | Go (`go/vX.Y.Z`) + Rust (`rust-vX.Y.Z`) release + CI | **done** — pipelines (#556) + full auto-tagging (py-identity-model #570); first releases `go/v0.1.0` + `rust-v0.0.1` published (crates.io `rs-identity-model` / Go proxy, 2026-08-29) | 2.3 |
 | CONS-2.5 | CONS-2 | Publishing-parity dry-run gate | **done** (PR #557; required in CI) | 2.2, 2.4 |
 | CONS-3.1 | CONS-3 | Archive old repo (now `identity-model-legacy`) | **pending** — repo not yet archived (fixes already salvaged natively) | CONS-1 |
 | CONS-3.2 | CONS-3 | Rename survivor repo → `identity-model` | **done** | 3.1, CONS-2 |
 | CONS-3.3 | CONS-3 | PyPI Trusted Publishing | **done** — core publishes via OIDC Trusted Publishing | 3.2 |
 | CONS-3.4 | CONS-3 | Fix references (urls/badges/go-module/crates) | **done** | 3.2 |
-| CONS-3.5 | CONS-3 | Reconcile stale planning artifacts | **in progress** (this PR) | 3.2 |
+| CONS-3.5 | CONS-3 | Reconcile stale planning artifacts | **done** (PR #90 + this update) | 3.2 |
 
 ---
 
