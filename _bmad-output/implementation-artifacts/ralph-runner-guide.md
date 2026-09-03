@@ -27,6 +27,7 @@ Each iteration completes one phase, persists state to `.claude/task-state.md`, a
 | `fix-review-findings.md` | Fix review findings on existing PRs | All repos |
 | `design-system.md` | PRD 5b design-system story execution (worktree-based) | identity-stack |
 | `ory-frontend-logout.md` | Ory SSO provider — Epic 4 (provider-agnostic frontend) + Epic 5 (provider-aware logout + E2E); worktree-based, RED/BLUE gate | identity-stack |
+| `open-identity-epic-a.md` | Epic A — Descope⇄Ory provider-swap demo, zero RBAC migration (12 stories, worktree-run, cloud Ory Network) | identity-stack |
 | `pim-integration-tests.md` | Integration test chain | py-identity-model |
 | `pim-fix-review-chain.md` | Chained PR fix loop | py-identity-model |
 | `pim-adversarial-review.md` | Full codebase security review (one-shot) | py-identity-model |

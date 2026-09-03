@@ -46,6 +46,8 @@ Merge identity-model into the surviving repo; kill duplicated conformance/fixtur
 
 > **Update 2026-08-29 — Go + Rust releases fully automated AND cut.** py-identity-model **#570** added `release-go-version`/`release-rust-version` PSR jobs (mirroring `release-fastapi-version`): merging a `feat(go)`/`feat(rust)` commit now auto-tags + publishes with zero manual tagging, same UX as the Python auto-release. `CARGO_REGISTRY_TOKEN` is set. First releases cut on merge and **all three languages are live**: `go/v0.1.0` (Go proxy), `rust-v0.0.1` → crates.io `rs-identity-model`, `py-identity-model 3.11.4` (PyPI). **The ONLY remaining consolidation item is archiving `identity-model-legacy` (owner-gated).** Once archived, close CONS-3 (#537) and the meta epic (#534). See py-identity-model memory `project_identity_model_go_rust_release_automation`.
 
+> **Update 2026-09-02 — consolidation DONE.** `identity-model-legacy` is confirmed archived on GitHub (read-only), and its local checkout was renamed `~/repos/auth/identity-model` → `~/repos/auth/identity-model-legacy` so it stops masquerading as the live monorepo. CONS-3.1 is now done → CONS-3 (#537) and the meta epic (#534) are closeable. Note: the **live** monorepo (GitHub `identity-model`) is still checked out locally at the dir `~/repos/auth/py-identity-model/`.
+
 | Story | Epic | Description | Status | Depends On |
 |-------|------|-------------|--------|------------|
 | CONS-1.1 | CONS-1 | Import identity-model Go → `/go` | **done** (PR #538) | — |
@@ -58,7 +60,7 @@ Merge identity-model into the surviving repo; kill duplicated conformance/fixtur
 | CONS-2.3 | CONS-2 | moon workspace + tasks; reserve `/node` scaffold | **done** (PR #554) | 2.1 |
 | CONS-2.4 | CONS-2 | Go (`go/vX.Y.Z`) + Rust (`rust-vX.Y.Z`) release + CI | **done** — pipelines (#556) + full auto-tagging (py-identity-model #570); first releases `go/v0.1.0` + `rust-v0.0.1` published (crates.io `rs-identity-model` / Go proxy, 2026-08-29) | 2.3 |
 | CONS-2.5 | CONS-2 | Publishing-parity dry-run gate | **done** (PR #557; required in CI) | 2.2, 2.4 |
-| CONS-3.1 | CONS-3 | Archive old repo (now `identity-model-legacy`) | **pending** — repo not yet archived (fixes already salvaged natively) | CONS-1 |
+| CONS-3.1 | CONS-3 | Archive old repo (now `identity-model-legacy`) | **done** (2026-09-02) — GitHub repo archived (read-only); local checkout renamed `identity-model` → `identity-model-legacy` | CONS-1 |
 | CONS-3.2 | CONS-3 | Rename survivor repo → `identity-model` | **done** | 3.1, CONS-2 |
 | CONS-3.3 | CONS-3 | PyPI Trusted Publishing | **done** — core publishes via OIDC Trusted Publishing | 3.2 |
 | CONS-3.4 | CONS-3 | Fix references (urls/badges/go-module/crates) | **done** | 3.2 |

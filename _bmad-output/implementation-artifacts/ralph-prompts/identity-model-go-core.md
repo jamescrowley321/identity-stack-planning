@@ -2,7 +2,7 @@ You are in a self-referential implementation loop. Each iteration you execute ON
 
 ## Context
 
-Target repo: `identity-model` at `~/repos/auth/identity-model` (private, `jamescrowley321/identity-model`).
+Target repo: `identity-model` at `~/repos/auth/py-identity-model` (private, `jamescrowley321/identity-model`).
 
 This loop implements the **Go Core Tier** (Epic 3, stories 3.2–3.6) of the multi-language identity-model OIDC/OAuth2 client library. Story 3.1 (scaffolding) already shipped. Each story is a greenfield Go package under `go/pkg/`, implemented idiomatically and validated against the cross-language conformance spec in `spec/` and the shared provider in `infra/`.
 
@@ -11,13 +11,13 @@ Cross-language contract: `spec/capabilities.md` + `spec/conformance/*.json` (the
 
 ## Running
 
-Run the loop from a **dedicated orchestrator worktree in `/tmp`**, never from `~/repos/auth/identity-model` — the owner works in that checkout by hand, so the loop must stay isolated from it. `PROMPT.md` and `.claude/task-state.md` live in the orchestrator worktree for the whole run.
+Run the loop from a **dedicated orchestrator worktree in `/tmp`**, never from `~/repos/auth/py-identity-model` — the owner works in that checkout by hand, so the loop must stay isolated from it. `PROMPT.md` and `.claude/task-state.md` live in the orchestrator worktree for the whole run.
 
 ```bash
 # One-time: create the orchestrator worktree.
 # Base off feat/foundation-scaffold, NOT main — main has no ralph.yml/go/spec yet
 # (the 3.1 scaffold has not been merged). Switch this to origin/main once it has.
-cd ~/repos/auth/identity-model
+cd ~/repos/auth/py-identity-model
 git fetch origin
 git worktree add /tmp/im-go-orch -b ralph/go-core feat/foundation-scaffold
 
@@ -27,7 +27,7 @@ cp ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ra
 ralph run
 ```
 
-`ORCH_WORKTREE` = `/tmp/im-go-orch`. The prompt must remain copied in as `PROMPT.md` for the whole run (ralph re-reads it from CWD each iteration); the planning-repo copy is the source of truth. The orchestrator worktree only hosts the loop — per-task implementation happens in its own `/tmp/im-go-3X` worktree (created by `setup`) off the task's base branch. When the loop finishes, remove it: `cd ~/repos/auth/identity-model && git worktree remove /tmp/im-go-orch`.
+`ORCH_WORKTREE` = `/tmp/im-go-orch`. The prompt must remain copied in as `PROMPT.md` for the whole run (ralph re-reads it from CWD each iteration); the planning-repo copy is the source of truth. The orchestrator worktree only hosts the loop — per-task implementation happens in its own `/tmp/im-go-3X` worktree (created by `setup`) off the task's base branch. When the loop finishes, remove it: `cd ~/repos/auth/py-identity-model && git worktree remove /tmp/im-go-orch`.
 
 ## CRITICAL: No Auto-Merge
 
@@ -50,7 +50,7 @@ The Go packages build on each other (jwt needs jwks; token/userinfo need discove
 ## Step 1: Determine Context
 
 1. Read `~/repos/auth/CLAUDE.md` for workspace commands and git conventions.
-2. Read `~/repos/auth/identity-model/CONTRIBUTING.md` for repo workflow (branching, conventional commits, conformance loop).
+2. Read `~/repos/auth/py-identity-model/CONTRIBUTING.md` for repo workflow (branching, conventional commits, conformance loop).
 3. Read `~/repos/auth/identity-stack-planning/_bmad-output/planning-artifacts/epics/epic-3-core-go.md` for the story acceptance criteria.
 
 ## Step 2: Determine What To Do
@@ -93,7 +93,7 @@ Read the shared phase file for each phase from:
 
 ### Phase overrides
 
-**setup** — Follow `phases/setup.md`. Repo root `~/repos/auth/identity-model`. Create the worktree off `base_branch`: `git worktree add -b <branch> <worktree> <base_branch>` (fetch first). All Go work happens in `<worktree>/go`.
+**setup** — Follow `phases/setup.md`. Repo root `~/repos/auth/py-identity-model`. Create the worktree off `base_branch`: `git worktree add -b <branch> <worktree> <base_branch>` (fetch first). All Go work happens in `<worktree>/go`.
 
 **analyze** — Follow `phases/analyze.md`, plus:
 1. Read the matching story section in `epic-3-core-go.md` — every acceptance-criteria checkbox is a requirement.
@@ -125,7 +125,7 @@ Read the shared phase file for each phase from:
 
 **complete** — **OVERRIDE: do NOT merge the PR.**
 1. Mark the task `done` in the queue in THIS file.
-2. `cd ~/repos/auth/identity-model && git worktree remove <worktree> --force`
+2. `cd ~/repos/auth/py-identity-model && git worktree remove <worktree> --force`
 3. Delete `.claude/task-state.md`.
 4. Output: <promise>TASK COMPLETE</promise>
 

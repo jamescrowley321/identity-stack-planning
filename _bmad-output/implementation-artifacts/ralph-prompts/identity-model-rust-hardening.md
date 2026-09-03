@@ -4,11 +4,11 @@ Self-referential loop. ONE phase of ONE task per iteration, then end. Fresh cont
 
 ## Running
 
-Run the loop from a **dedicated identity-model worktree**, never from the main `~/repos/auth/identity-model` checkout — this keeps `PROMPT.md`/`.claude/task-state.md` out of the primary checkout and keeps `main` pristine.
+Run the loop from a **dedicated identity-model worktree**, never from the main `~/repos/auth/py-identity-model` checkout — this keeps `PROMPT.md`/`.claude/task-state.md` out of the primary checkout and keeps `main` pristine.
 
 ```bash
 # One-time: create the orchestrator worktree off main
-cd ~/repos/auth/identity-model
+cd ~/repos/auth/py-identity-model
 git fetch origin
 git worktree add /tmp/im-rust-ralph -b ralph/rust-hardening origin/main
 
@@ -19,7 +19,7 @@ cp ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ra
 ralph run --idle-timeout 0
 ```
 
-`ORCH_WORKTREE` below refers to `/tmp/im-rust-ralph`. **The prompt must live inside the orchestrator worktree as `PROMPT.md` for the whole run** — ralph re-reads `PROMPT.md` from the worktree's CWD each iteration, so it must be copied in (as above) before `ralph run` and remain there until the loop completes. The planning-repo copy at `ralph-prompts/identity-model-rust-hardening.md` is the source of truth; edit it there and re-`cp` if you change the workstream mid-run. Per-task implementation happens in its own short-lived worktree (`/tmp/im-RX`) created by the `setup` phase — the orchestrator worktree only hosts the loop, never task branches. When the loop finishes, remove it: `cd ~/repos/auth/identity-model && git worktree remove /tmp/im-rust-ralph`.
+`ORCH_WORKTREE` below refers to `/tmp/im-rust-ralph`. **The prompt must live inside the orchestrator worktree as `PROMPT.md` for the whole run** — ralph re-reads `PROMPT.md` from the worktree's CWD each iteration, so it must be copied in (as above) before `ralph run` and remain there until the loop completes. The planning-repo copy at `ralph-prompts/identity-model-rust-hardening.md` is the source of truth; edit it there and re-`cp` if you change the workstream mid-run. Per-task implementation happens in its own short-lived worktree (`/tmp/im-RX`) created by the `setup` phase — the orchestrator worktree only hosts the loop, never task branches. When the loop finishes, remove it: `cd ~/repos/auth/py-identity-model && git worktree remove /tmp/im-rust-ralph`.
 
 ## Task Queue
 
@@ -36,7 +36,7 @@ All Rust work lives under `rust/` (crate `identity-model`, imported as `identity
 
 ## Routing
 
-Repo: `~/repos/auth/identity-model` (the loop's CWD is `ORCH_WORKTREE` = `/tmp/im-rust-ralph`).
+Repo: `~/repos/auth/py-identity-model` (the loop's CWD is `ORCH_WORKTREE` = `/tmp/im-rust-ralph`).
 
 Read `ORCH_WORKTREE/.claude/task-state.md` (i.e. `/tmp/im-rust-ralph/.claude/task-state.md`).
 

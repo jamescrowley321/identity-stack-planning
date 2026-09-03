@@ -2,7 +2,7 @@ You are in a self-referential implementation loop. Each iteration you execute ON
 
 ## Context
 
-Target repo: `identity-model` at `~/repos/auth/identity-model` (private, `jamescrowley321/identity-model`).
+Target repo: `identity-model` at `~/repos/auth/py-identity-model` (private, `jamescrowley321/identity-model`).
 
 This loop implements the **Go Extended Tier** — Epic 5 stories 5.1–5.4 in their Go decomposition (5.1-go … 5.4-go): Token Introspection (RFC 7662), Token Revocation (RFC 7009), Token Exchange (RFC 8693), and DPoP (RFC 9449). The Go Core Tier (Epic 3, `go/pkg/{discovery,jwks,jwt,token,userinfo}`) is merged to `main` — read those packages for the established patterns (functional options, error types, singleflight, TEST_* integration convention).
 
@@ -18,11 +18,11 @@ Cross-language contract: `spec/capabilities.md` + `spec/conformance/*.json` (rea
 
 **DO NOT launch this loop while the Rust core loop (`identity-model-rust-core.md`) is still running — one ralph workstream per repo at a time.** Wait for its LOOP_COMPLETE.
 
-Run the loop from a **dedicated orchestrator worktree in `/tmp`**, never from `~/repos/auth/identity-model` — the owner works in that checkout by hand. `PROMPT.md` and `.claude/task-state.md` live in the orchestrator worktree for the whole run. Note `/tmp` is wiped on reboot: if the worktree vanishes mid-run, `git worktree prune` then recreate with the recipe below and re-mark completed tasks `done` in the fresh PROMPT.md before resuming.
+Run the loop from a **dedicated orchestrator worktree in `/tmp`**, never from `~/repos/auth/py-identity-model` — the owner works in that checkout by hand. `PROMPT.md` and `.claude/task-state.md` live in the orchestrator worktree for the whole run. Note `/tmp` is wiped on reboot: if the worktree vanishes mid-run, `git worktree prune` then recreate with the recipe below and re-mark completed tasks `done` in the fresh PROMPT.md before resuming.
 
 ```bash
 # One-time: create the orchestrator worktree off main.
-cd ~/repos/auth/identity-model
+cd ~/repos/auth/py-identity-model
 git fetch origin
 git worktree add /tmp/im-goext-orch -b ralph/go-extended origin/main
 
@@ -32,7 +32,7 @@ cp ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ra
 ralph run
 ```
 
-`ORCH_WORKTREE` = `/tmp/im-goext-orch`. The prompt must remain copied in as `PROMPT.md` for the whole run; the planning-repo copy is the source of truth. Per-task implementation happens in its own `/tmp/im-goext-5X` worktree (created by `setup`) off the task's base branch. When the loop finishes: `cd ~/repos/auth/identity-model && git worktree remove /tmp/im-goext-orch`.
+`ORCH_WORKTREE` = `/tmp/im-goext-orch`. The prompt must remain copied in as `PROMPT.md` for the whole run; the planning-repo copy is the source of truth. Per-task implementation happens in its own `/tmp/im-goext-5X` worktree (created by `setup`) off the task's base branch. When the loop finishes: `cd ~/repos/auth/py-identity-model && git worktree remove /tmp/im-goext-orch`.
 
 ## CRITICAL: No Auto-Merge
 
@@ -54,7 +54,7 @@ The four capabilities are functionally independent, but every task edits shared 
 ## Step 1: Determine Context
 
 1. Read `~/repos/auth/CLAUDE.md` for workspace commands and git conventions.
-2. Read `~/repos/auth/identity-model/CONTRIBUTING.md` for repo workflow (branching, conventional commits, conformance loop).
+2. Read `~/repos/auth/py-identity-model/CONTRIBUTING.md` for repo workflow (branching, conventional commits, conformance loop).
 3. Read the matching story in `epic-5-extended-tier.md` AND the matching spec story in `epic-0f-spec-extended-tier.md` (G5.1→S.7, G5.2→S.8, G5.3→S.12, G5.4→S.13).
 
 ## Step 2: Determine What To Do
@@ -97,7 +97,7 @@ Read the shared phase file for each phase from:
 
 ### Phase overrides
 
-**setup** — Follow `phases/setup.md`. Repo root `~/repos/auth/identity-model`. Create the worktree off `base_branch`: `git worktree add -b <branch> <worktree> <base_branch>` (fetch first). Work happens in `<worktree>/spec`, `<worktree>/go`, and (where needed) `<worktree>/infra`.
+**setup** — Follow `phases/setup.md`. Repo root `~/repos/auth/py-identity-model`. Create the worktree off `base_branch`: `git worktree add -b <branch> <worktree> <base_branch>` (fetch first). Work happens in `<worktree>/spec`, `<worktree>/go`, and (where needed) `<worktree>/infra`.
 
 **analyze** — Follow `phases/analyze.md`, plus:
 1. Read the Epic 0F story for this capability — its deliverables (capabilities.md section, conformance JSON with the exact test-case IDs, fixture files) are requirements, as are the Epic 5 story ACs for the Go implementation. `spec/conformance/schema.json` referenced by 0F does NOT exist — derive the JSON shape from the existing core conformance files (e.g. `spec/conformance/discovery.json`) and keep it identical; do not invent a schema file unless G5.1 chooses to author one for all files.
@@ -131,7 +131,7 @@ Read the shared phase file for each phase from:
 
 **complete** — **OVERRIDE: do NOT merge the PR.**
 1. Mark the task `done` in the queue in THIS file.
-2. `cd ~/repos/auth/identity-model && git worktree remove <worktree> --force`
+2. `cd ~/repos/auth/py-identity-model && git worktree remove <worktree> --force`
 3. Delete `.claude/task-state.md`.
 4. Output: <promise>TASK COMPLETE</promise>
 
