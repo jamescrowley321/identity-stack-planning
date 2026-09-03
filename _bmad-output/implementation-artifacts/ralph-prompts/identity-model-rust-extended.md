@@ -2,7 +2,7 @@ You are in a self-referential implementation loop. Each iteration you execute ON
 
 ## Context
 
-Target repo: `identity-model` at `~/repos/auth/identity-model` (`jamescrowley321/identity-model`).
+Target repo: `identity-model` at `~/repos/auth/py-identity-model` (`jamescrowley321/identity-model`).
 
 This loop builds the **Rust Extended Tier** — Epic 5 stories 5.1–5.4 in their Rust decomposition (5.1-rust … 5.4-rust): Token Introspection (RFC 7662), Token Revocation (RFC 7009), Token Exchange (RFC 8693), and DPoP (RFC 9449). It brings Rust to **parity with the already-shipped Go Extended tier** — the biggest open capability gap in the repo. The Go Extended tier is the reference implementation: mirror each Go counterpart's conformance IDs, provider quirks, and public-API intent, in idiomatic async Rust.
 
@@ -27,11 +27,11 @@ As each capability's conformance passes, flip its **Rust** column from `planned`
 
 ## Running
 
-Run the loop from a **dedicated orchestrator worktree in `/tmp`**, never from `~/repos/auth/identity-model` — the owner works in that checkout by hand, so the loop must stay isolated from it. `PROMPT.md` and `.claude/task-state.md` live in the orchestrator worktree for the whole run. Note `/tmp` is wiped on reboot: if the worktree vanishes mid-run, `git worktree prune` then recreate with the recipe below and re-mark completed tasks `done` in the fresh `PROMPT.md` before resuming.
+Run the loop from a **dedicated orchestrator worktree in `/tmp`**, never from `~/repos/auth/py-identity-model` — the owner works in that checkout by hand, so the loop must stay isolated from it. `PROMPT.md` and `.claude/task-state.md` live in the orchestrator worktree for the whole run. Note `/tmp` is wiped on reboot: if the worktree vanishes mid-run, `git worktree prune` then recreate with the recipe below and re-mark completed tasks `done` in the fresh `PROMPT.md` before resuming.
 
 ```bash
 # One-time: create the orchestrator worktree off main.
-cd ~/repos/auth/identity-model
+cd ~/repos/auth/py-identity-model
 git fetch origin
 git worktree add /tmp/im-rustext-orch -b ralph/rust-extended origin/main
 
@@ -41,7 +41,7 @@ cp ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ra
 ralph run
 ```
 
-`ORCH_WORKTREE` = `/tmp/im-rustext-orch`. The prompt must remain copied in as `PROMPT.md` for the whole run (ralph re-reads it from CWD each iteration); the planning-repo copy is the source of truth — edit it there and re-`cp` if you change the workstream mid-run. Per-task implementation happens in its own `/tmp/im-rustext-5X` worktree (created by `setup`) off the task's base branch. When the loop finishes: `cd ~/repos/auth/identity-model && git worktree remove /tmp/im-rustext-orch`.
+`ORCH_WORKTREE` = `/tmp/im-rustext-orch`. The prompt must remain copied in as `PROMPT.md` for the whole run (ralph re-reads it from CWD each iteration); the planning-repo copy is the source of truth — edit it there and re-`cp` if you change the workstream mid-run. Per-task implementation happens in its own `/tmp/im-rustext-5X` worktree (created by `setup`) off the task's base branch. When the loop finishes: `cd ~/repos/auth/py-identity-model && git worktree remove /tmp/im-rustext-orch`.
 
 ## CRITICAL: No Auto-Merge
 
@@ -106,7 +106,7 @@ Read the shared phase file for each phase from:
 
 ### Phase overrides
 
-**setup** — Follow `phases/setup.md`. Repo root `~/repos/auth/identity-model`. Create the worktree off `base_branch`: `git worktree add -b <branch> <worktree> <base_branch>` (fetch first). All Rust work happens in `<worktree>/rust`.
+**setup** — Follow `phases/setup.md`. Repo root `~/repos/auth/py-identity-model`. Create the worktree off `base_branch`: `git worktree add -b <branch> <worktree> <base_branch>` (fetch first). All Rust work happens in `<worktree>/rust`.
 
 **analyze** — Follow `phases/analyze.md`, plus:
 1. Read the matching story's Rust decomposition (5.X-rust) in `epic-5-extended-tier.md` — every acceptance-criteria checkbox is a requirement.
@@ -147,7 +147,7 @@ Read the shared phase file for each phase from:
 
 **complete** — **OVERRIDE: do NOT merge the PR.**
 1. Mark the task `done` in the queue in THIS file.
-2. `cd ~/repos/auth/identity-model && git worktree remove <worktree> --force`
+2. `cd ~/repos/auth/py-identity-model && git worktree remove <worktree> --force`
 3. Delete `.claude/task-state.md`.
 4. Output: <promise>TASK COMPLETE</promise>
 

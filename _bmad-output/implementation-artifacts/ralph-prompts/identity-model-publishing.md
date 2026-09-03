@@ -2,7 +2,7 @@ You are in a self-referential implementation loop. Each iteration you execute ON
 
 ## Context
 
-Target repo: `identity-model` at `~/repos/auth/identity-model` (`jamescrowley321/identity-model`).
+Target repo: `identity-model` at `~/repos/auth/py-identity-model` (`jamescrowley321/identity-model`).
 
 This loop builds the **release/publishing infrastructure** for the polyglot library so the Rust crate and Go module can be published from a tag, reproducibly and with provenance. It does **not** perform the first publish — see "No Auto-Publish" — it builds the machinery and gates; the owner pushes the first tag.
 
@@ -30,11 +30,11 @@ Epic/story source of truth: if a publishing epic/story exists under `~/repos/aut
 
 ## Running
 
-Run the loop from a **dedicated orchestrator worktree in `/tmp`**, never from `~/repos/auth/identity-model` — the owner works in that checkout by hand. `PROMPT.md` and `.claude/task-state.md` live in the orchestrator worktree for the whole run. `/tmp` is wiped on reboot: if the worktree vanishes mid-run, `git worktree prune` then recreate and re-mark completed tasks `done` in the fresh `PROMPT.md` before resuming.
+Run the loop from a **dedicated orchestrator worktree in `/tmp`**, never from `~/repos/auth/py-identity-model` — the owner works in that checkout by hand. `PROMPT.md` and `.claude/task-state.md` live in the orchestrator worktree for the whole run. `/tmp` is wiped on reboot: if the worktree vanishes mid-run, `git worktree prune` then recreate and re-mark completed tasks `done` in the fresh `PROMPT.md` before resuming.
 
 ```bash
 # One-time: create the orchestrator worktree off main.
-cd ~/repos/auth/identity-model
+cd ~/repos/auth/py-identity-model
 git fetch origin
 git worktree add /tmp/im-publish-orch -b ralph/publishing origin/main
 
@@ -44,7 +44,7 @@ cp ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ra
 ralph run
 ```
 
-`ORCH_WORKTREE` = `/tmp/im-publish-orch`. Keep the prompt copied in as `PROMPT.md` for the whole run (ralph re-reads it from CWD each iteration); the planning-repo copy is the source of truth — edit it there and re-`cp` if you change the workstream mid-run. Per-task work happens in its own `/tmp/im-publish-PUBX` worktree (created by `setup`) off the task's base branch. When the loop finishes: `cd ~/repos/auth/identity-model && git worktree remove /tmp/im-publish-orch`.
+`ORCH_WORKTREE` = `/tmp/im-publish-orch`. Keep the prompt copied in as `PROMPT.md` for the whole run (ralph re-reads it from CWD each iteration); the planning-repo copy is the source of truth — edit it there and re-`cp` if you change the workstream mid-run. Per-task work happens in its own `/tmp/im-publish-PUBX` worktree (created by `setup`) off the task's base branch. When the loop finishes: `cd ~/repos/auth/py-identity-model && git worktree remove /tmp/im-publish-orch`.
 
 ## CRITICAL: No Auto-Publish and No Auto-Merge
 
@@ -114,7 +114,7 @@ Read the shared phase file for each phase from `~/repos/auth/identity-stack-plan
 
 ### Phase overrides
 
-**setup** — Follow `phases/setup.md`. Repo root `~/repos/auth/identity-model`. Create the worktree off `base_branch`: `git worktree add -b <branch> <worktree> <base_branch>` (fetch first).
+**setup** — Follow `phases/setup.md`. Repo root `~/repos/auth/py-identity-model`. Create the worktree off `base_branch`: `git worktree add -b <branch> <worktree> <base_branch>` (fetch first).
 
 **analyze** — Follow `phases/analyze.md`, plus: read the existing `.github/workflows/ci.yml` (how the `changes` path-filter gates jobs, how the toolchain is pinned/cached), `rust/Cargo.toml`, `go/go.mod`, and both READMEs. For PUB2/PUB3 study a known-good Trusted-Publishing / subdir-module release pattern; do NOT invent registry auth. The plan must list exact files created/modified and the trigger + permissions of each new workflow.
 
@@ -136,7 +136,7 @@ Read the shared phase file for each phase from `~/repos/auth/identity-stack-plan
 
 **complete** — **OVERRIDE: do NOT merge the PR, do NOT push any tag.**
 1. Mark the task `done` in the queue in THIS file.
-2. `cd ~/repos/auth/identity-model && git worktree remove <worktree> --force`
+2. `cd ~/repos/auth/py-identity-model && git worktree remove <worktree> --force`
 3. Delete `.claude/task-state.md`.
 4. Output: <promise>TASK COMPLETE</promise>
 

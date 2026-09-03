@@ -4,7 +4,7 @@ You are in a self-referential implementation loop. Each iteration you execute ON
 
 ## Context
 
-Target repo: `identity-model` at `~/repos/auth/identity-model` (public, `jamescrowley321/identity-model`).
+Target repo: `identity-model` at `~/repos/auth/py-identity-model` (public, `jamescrowley321/identity-model`).
 
 This loop stands up an **OpenID Foundation (OIDF) conformance / certification tier for the Go and Rust client libraries**, mirroring the OIDF-certified `py-identity-model` reference, and then brings the **integration provider matrix** to parity across both languages. It proves the already-merged Go/Rust implementations behave correctly by driving them through the **official OpenID Foundation conformance suite as Relying Parties (RPs)** — the same way py-identity-model earned its OIDF RP certification. It is a *validation and test-infrastructure* workstream, not a new-capability workstream.
 
@@ -35,11 +35,11 @@ Reference test infra: `~/repos/auth/py-identity-model/conformance/` (RP harness 
 
 **DO NOT launch this loop while any other identity-model loop is running — one ralph workstream per repo at a time.** (The Rust hardening loop `identity-model-rust-hardening.md` and this loop both touch `rust/`; run them sequentially, never concurrently.)
 
-Run the loop from a **dedicated orchestrator worktree in `/tmp`**, never from `~/repos/auth/identity-model` — the owner works in that checkout by hand, so the loop must stay isolated from it. `PROMPT.md` and `.claude/task-state.md` live in the orchestrator worktree for the whole run. Note `/tmp` is wiped on reboot: if the worktree vanishes mid-run, `git worktree prune` then recreate with the recipe below and re-mark completed tasks `done` in the fresh `PROMPT.md` before resuming.
+Run the loop from a **dedicated orchestrator worktree in `/tmp`**, never from `~/repos/auth/py-identity-model` — the owner works in that checkout by hand, so the loop must stay isolated from it. `PROMPT.md` and `.claude/task-state.md` live in the orchestrator worktree for the whole run. Note `/tmp` is wiped on reboot: if the worktree vanishes mid-run, `git worktree prune` then recreate with the recipe below and re-mark completed tasks `done` in the fresh `PROMPT.md` before resuming.
 
 ```bash
 # One-time: create the orchestrator worktree off main.
-cd ~/repos/auth/identity-model
+cd ~/repos/auth/py-identity-model
 git fetch origin
 git worktree add /tmp/im-conf-orch -b ralph/conformance-harness origin/main
 
@@ -50,7 +50,7 @@ cp ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ra
 ralph run --idle-timeout 0
 ```
 
-`ORCH_WORKTREE` = `/tmp/im-conf-orch`. The prompt must remain copied in as `PROMPT.md` for the whole run (ralph re-reads it from CWD each iteration); the planning-repo copy is the source of truth — edit it there and re-`cp` if you change the workstream mid-run. Per-task implementation happens in its own `/tmp/im-conf-KX` worktree (created by `setup`) off the task's base branch. When the loop finishes: `cd ~/repos/auth/identity-model && git worktree remove /tmp/im-conf-orch`.
+`ORCH_WORKTREE` = `/tmp/im-conf-orch`. The prompt must remain copied in as `PROMPT.md` for the whole run (ralph re-reads it from CWD each iteration); the planning-repo copy is the source of truth — edit it there and re-`cp` if you change the workstream mid-run. Per-task implementation happens in its own `/tmp/im-conf-KX` worktree (created by `setup`) off the task's base branch. When the loop finishes: `cd ~/repos/auth/py-identity-model && git worktree remove /tmp/im-conf-orch`.
 
 ## CRITICAL: No Auto-Merge
 
@@ -116,7 +116,7 @@ Read the shared phase file for each phase from:
 
 ### Phase overrides
 
-**setup** — Follow `phases/setup.md`. Repo root `~/repos/auth/identity-model`. Create the worktree off `base_branch`: `git worktree add -b <branch> <worktree> <base_branch>` (fetch first). Work happens in `<worktree>/conformance` (K1–K5), `<worktree>/go` + `<worktree>/rust` (K2/K3/K6), `<worktree>/.github` (K5), and `<worktree>/infra` + repo-root `.env.*`/`Makefile` (K6).
+**setup** — Follow `phases/setup.md`. Repo root `~/repos/auth/py-identity-model`. Create the worktree off `base_branch`: `git worktree add -b <branch> <worktree> <base_branch>` (fetch first). Work happens in `<worktree>/conformance` (K1–K5), `<worktree>/go` + `<worktree>/rust` (K2/K3/K6), `<worktree>/.github` (K5), and `<worktree>/infra` + repo-root `.env.*`/`Makefile` (K6).
 
 **analyze** — Follow `phases/analyze.md`, plus:
 1. **Read the py-identity-model reference for this task FIRST and plan to mirror it.** K1: `py-identity-model/conformance/{run_tests.py,configs/*.json,docker-compose.yml,nginx/,README.md}` — understand the `ConformanceSuiteClient` REST calls (create-plan with the `variant` as a single JSON-encoded query param; poll-until-`FINISHED`/`INTERRUPTED`; export download), the per-test driving table (`DISCOVERY_ONLY_TESTS`, `DOUBLE_FLOW_TESTS` for key rotation, else full auth flow), the `PASSING_STATUSES = {PASSED, WARNING, SKIPPED}` gate, and the hosted-only signed-export gating. K2/K3: `conformance/app.py` — the endpoint contract, the in-memory `sessions` map, the `ACCEPTED`/`REJECTED` decision lines, the per-test `ContextVar` + custom log handler + path sanitization, and the **load-bearing rule that the harness must NOT bypass the library's JWKS cache-miss retry** (the key-rotation tests exist to exercise it). K6: `src/tests/integration/{conftest.py,test_utils.py,provider_matrix.py}` — the `--env-file` mechanism, `_REQUIRED_ENV_VARS`, `_detect_grant_capabilities`/`_detect_feature_capabilities`, the file-locked cross-worker caches, and the app-level fixture healthchecks.
@@ -148,7 +148,7 @@ Read the shared phase file for each phase from:
 
 **complete** — **OVERRIDE: do NOT merge the PR.**
 1. Mark the task `done` in the queue in THIS file.
-2. `cd ~/repos/auth/identity-model && git worktree remove <worktree> --force`
+2. `cd ~/repos/auth/py-identity-model && git worktree remove <worktree> --force`
 3. Delete `.claude/task-state.md`.
 4. Output: <promise>TASK COMPLETE</promise>
 

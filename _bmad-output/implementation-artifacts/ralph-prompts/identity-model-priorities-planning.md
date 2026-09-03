@@ -19,7 +19,7 @@ Produce: an updated roadmap, reconciled/created epics + GitHub issues, and a pri
 
 ## Repos & sources of truth
 
-- `identity-model`: `~/repos/auth/identity-model` (GitHub `jamescrowley321/identity-model`).
+- `identity-model`: `~/repos/auth/py-identity-model` (GitHub `jamescrowley321/identity-model`).
 - `py-identity-model` (PIM, the reference): `~/repos/auth/py-identity-model` (GitHub `jamescrowley321/py-identity-model`).
 - Planning (BMAD): `~/repos/auth/identity-stack-planning` — PRD 6 epics in `_bmad-output/planning-artifacts/epics/epic-*.md`, `docs/roadmap.md`, ralph prompts in `_bmad-output/implementation-artifacts/ralph-prompts/`.
 
@@ -33,7 +33,7 @@ Produce: an updated roadmap, reconciled/created epics + GitHub issues, and a pri
 - **Open GH issues** (verify with `gh issue list --repo jamescrowley321/identity-model --state open`): only 8, and mostly noise. **#23 (`azp`) and #24 (secret redaction) are STALE-OPEN — both shipped in PR #37; close them with a commit reference.** `#8–#13` are intentionally-retained **`learning`-labelled** starter tasks (they overlap already-shipped capabilities like `go/pkg/introspection`, `rust/src/token/pkce.rs`) — the label says "do not assign to ralph loops", so do NOT churn/close them without checking the label. There are **no** issues tracking priorities 3/4/5/6 or the Rust-extended parity work — that's the point of this session.
 - **Open dependabot**: **#42** (cargo group, the deferred breaking `jsonwebtoken 10→11` + `base64 0.22→0.23`; #40 was its superseded predecessor).
 - **Prepared-but-superseded**: planning **PR #56** carries the `identity-model-conformance-harness.md` K1–K6 ralph prompt; K1/K2 were done **in-session** (PRs #43/#44) instead of via that loop, so #56 needs reconciling (merge the doc as the K3–K6 tracking, or fold into this plan). The owner prefers in-session PRs over ralph loops for well-scoped work; reserve loops for large epics.
-- **STALE LOCAL CHECKOUT — fix first.** `~/repos/auth/identity-model` `main` runs several commits behind `origin/main`; the merged `conformance/` scaffold (#43) is absent from the local tree. `git -C ~/repos/auth/identity-model fetch origin && git pull --ff-only` before reading anything, and treat `origin/main` (or a fresh worktree off it) as truth.
+- **STALE LOCAL CHECKOUT — fix first.** `~/repos/auth/py-identity-model` `main` runs several commits behind `origin/main`; the merged `conformance/` scaffold (#43) is absent from the local tree. `git -C ~/repos/auth/py-identity-model fetch origin && git pull --ff-only` before reading anything, and treat `origin/main` (or a fresh worktree off it) as truth.
 
 **PIM (the reference) — the parity target:**
 - **Three-layer architecture**: `core/` (protocol-agnostic pure logic + all data models, no I/O) → thin `sync/` and `aio/` wrappers over one shared `core`. `identity-model`'s Go/Rust are flatter (`pkg/*` / `src/*`); assess whether a `core`-vs-transport split is worth adopting.

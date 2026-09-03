@@ -2,7 +2,7 @@ Self-referential loop. ONE phase of ONE task per iteration, then end. Fresh cont
 
 **Epic:** py-identity-model — **Polyglot Consolidation**, epic **CONS-1** (*Merge identity-model in & Collapse Duplicated Test Infrastructure*). This loop delivers CONS-1 only. CONS-2 (reorg + moon + publishing) is a **follow-on loop**; CONS-3 (rename + PyPI + archive) is **owner-manual admin** — neither is in scope here.
 **Design (source of truth):** `identity-stack-planning` → `_bmad-output/planning-artifacts/epics/epic-cons1-im-merge-testinfra.md` (the 5 stories + Given/When/Then ACs) and `_bmad-output/planning-artifacts/sprint-change-proposal-2026-08-17.md` (the pivot). Full technical design: **py-identity-model PR #533** (`docs/polyglot-consolidation-plan.md`).
-**Import source:** the `~/repos/auth/identity-model` checkout (its `go/`, `rust/`, `spec/`, `infra/`). Its git history is **expendable** (0 tags, never released) — bring trees in as ordinary new-file commits; do NOT `git filter-repo`/subtree.
+**Import source:** the `~/repos/auth/identity-model-legacy` checkout (its `go/`, `rust/`, `spec/`, `infra/`). Its git history is **expendable** (0 tags, never released) — bring trees in as ordinary new-file commits; do NOT `git filter-repo`/subtree.
 
 ## BASE MODEL — off-main (updated 2026-08-18) — SUPERSEDES all "stacked / base off previous branch" wording below
 
@@ -94,9 +94,9 @@ Read the current phase file: `~/repos/auth/identity-stack-planning/_bmad-output/
 
 ## Task-Specific Guidance
 
-- **CONS-1.1 (Go):** source = `~/repos/auth/identity-model/go/`. Copy the tree to `py-identity-model/go/`; rewrite the module path to `.../py-identity-model/go` in `go.mod` + all imports; `go mod tidy`; ensure `go build/test/vet ./...` green. Verify the root Python suites are unaffected (no CI trigger/path collision).
-- **CONS-1.2 (Rust):** source = `~/repos/auth/identity-model/rust/`. Copy to `py-identity-model/rust/`; crate name stays `rs-identity-model`; `cargo test`, `cargo build --release`, `cargo clippy`, `cargo deny check` all clean (no new advisories).
-- **CONS-1.3 (spec):** source = `~/repos/auth/identity-model/spec/` (+ any `spec/conformance` contract). Copy to `py-identity-model/spec/`; keep the vector schema (canonical error codes, not per-language types); point the Go/Rust executors from 1.1/1.2 at `/spec`; confirm the full imported vector set passes.
+- **CONS-1.1 (Go):** source = `~/repos/auth/identity-model-legacy/go/`. Copy the tree to `py-identity-model/go/`; rewrite the module path to `.../py-identity-model/go` in `go.mod` + all imports; `go mod tidy`; ensure `go build/test/vet ./...` green. Verify the root Python suites are unaffected (no CI trigger/path collision).
+- **CONS-1.2 (Rust):** source = `~/repos/auth/identity-model-legacy/rust/`. Copy to `py-identity-model/rust/`; crate name stays `rs-identity-model`; `cargo test`, `cargo build --release`, `cargo clippy`, `cargo deny check` all clean (no new advisories).
+- **CONS-1.3 (spec):** source = `~/repos/auth/identity-model-legacy/spec/` (+ any `spec/conformance` contract). Copy to `py-identity-model/spec/`; keep the vector schema (canonical error codes, not per-language types); point the Go/Rust executors from 1.1/1.2 at `/spec`; confirm the full imported vector set passes.
 - **CONS-1.4 (infra):** merge PIM `test-fixtures/` (node-oidc-provider, keycloak, Descope/Ory profiles) + `identity-model/infra/` (node-oidc-provider, identityserver) into ONE `/infra` with a single `docker-compose.yml`. Pre-register client-credentials, authz-code+PKCE, and public+PKCE clients; configurable claims; health check gating CI. Wire headless authz-code+PKCE (carry epic-0a AC-0A.5). Repoint Python(root)+Go+Rust integration suites to `/infra`; delete the now-redundant duplicate fixture copies; `docker compose config` validates.
 - **CONS-1.5 (executor + gate):** add a thin Python executor under `src/tests/` mapping each `/spec` vector to PIM's API + canonical outcome; add a CI coverage gate that fails naming any `(language, vector-id)` a language did not execute. Do NOT touch PIM's external OIDF `conformance/` harness.
 
