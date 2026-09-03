@@ -81,9 +81,16 @@ References to "Open Decision #N" elsewhere in this doc map to the numbered resol
 
 **Locked facts honored (forks closed upstream — recorded so they are not re-opened):**
 
-- **Ory CI target (was epics-doc Open Decision #4):** self-hosted **Kratos/Hydra/Keto** in docker-compose for
-  the **secret-free PR-gating** path (A.1, A.12, C.3), **plus** managed **Ory Network** for the
-  **nightly-live** matrix (C.4, and the managed-Ory side of A.12 if run nightly).
+- **Ory CI target (was epics-doc Open Decision #4; re-resolved 2026-09-02, supersedes the earlier
+  "self-hosted Ory" resolution):** the **existing cloud Ory Network (managed) — for now**. The Descope⇄Ory
+  swap + integration run against that Ory Network project, configured via **Terraform** (Ory project config)
+  with Ory Network credentials wired as a **CI secret / local env**. **CI split:** the FULL Descope⇄Ory swap
+  E2E is **not** secret-free — it runs on **nightly / protected-branch CI** (where the Ory Network secret is
+  available) and **locally**, not on fork PRs (A.1, A.12, C.4). **Secret-free PR-gating uses
+  `node-oidc-provider`** as the second-provider stand-in to exercise the adapter-selection registry,
+  claim-normalization, and the zero-RBAC-migration invariant without live Ory (A.12 PR-gate, C.3).
+  **Self-hosted Ory (docker-compose Kratos/Hydra/Keto) is deferred/optional** — revisit only if secret-free
+  full-swap-on-PRs later becomes a requirement.
 - **Demo RBAC dataset (was epics-doc Open Decision #6):** the swap-demo user (A.10/A.11) uses **only the flat
   portable floor** (`roles`/`permissions`/`role_permissions`/`user_tenant_roles`); `roles.hierarchy` etc.
   stay `n/a` so the 0-row-diff invariant is clean.
@@ -104,7 +111,9 @@ grouped into **3 phases** (identity-stack → library/brain → gate close).
 
 **Epic A (`[IS]`) is the front-loaded primary build and the real weight** — the entire net-new provider-swap
 seam (adapter-selection registry, Ory adapter + inbound validation, claim-normalization abstraction,
-zero-migration CI). **A.1 (Ory infra) is the long pole.** Epic A owns Waves 1–6 as the sole focus.
+zero-migration CI). **A.1 (Ory infra) is the long pole — but it shrinks** now that A.1 connects/configures
+the **existing cloud Ory Network** project (Terraform + wire credentials) instead of standing up a container
+stack. Epic A owns Waves 1–6 as the sole focus.
 
 **Epic C (`[OIM]`/`[BRAIN]`) is the other real build, deferred to Phase 2** — `spec/management/` is **empty
 today**; the namespace, conformance defs, runner, live matrix, and coverage report are net-new. Its **live**
@@ -168,9 +177,13 @@ which is exactly why it is front-loaded and de-risked before anything else begin
 path · **[LP]** long pole · **[PR-gate/secret-free]** · **[nightly-live]**.
 
 ### Wave 1 — Epic A kickoff: Ory infrastructure (+ opportunistic brand)
-- **[IS] A.1 — Ory provider infrastructure** `[CP][LP]` — Terraform + compose + SPA PKCE client + identity
-  schema; issues **JWT** access tokens. **Self-hosted Kratos/Hydra/Keto for PR-gate [PR-gate/secret-free]**;
-  **managed Ory Network for [nightly-live]**. Secrets in Infisical via `config_ref` (NFR13). *(deps: none)*
+- **[IS] A.1 — Ory provider infrastructure** `[CP][LP]` — **connect & configure the existing cloud Ory
+  Network project** (Terraform for Ory project config + SPA PKCE client + identity schema); issues **JWT**
+  access tokens. Ory Network credentials wired as a **CI secret / local env**; the full swap runs
+  **[nightly-live]/local** against the cloud Ory Network, while **`node-oidc-provider` is the secret-free
+  PR-gate stand-in** (no live Ory on fork PRs). **Self-hosted Kratos/Hydra/Keto (docker-compose) is
+  deferred/optional.** This **shrinks the Wave-1 long pole — no container stack to build.** Secrets in
+  Infisical via `config_ref` (NFR13). *(deps: none)*
 - **[BRAIN] D.1 — Reserve package/org names** *(opportunistic; not focus)* — GitHub org, PyPI, crates.io
   placeholders; no renamed release. *(deps: none)*
 - **[BRAIN] D.3 — Rewrite positioning/READMEs** *(opportunistic)* — portability / "identity fabric for
@@ -211,8 +224,11 @@ path · **[LP]** long pole · **[PR-gate/secret-free]** · **[nightly-live]**.
 - **[IS] A.10 — Visible, reproducible swap flow** — before/after roles+tenants intact across a config-only
   switch; **flat-floor** dataset (locked); documented for a reviewer. *(deps: A.3, A.5, A.7, A.8)*
 - **[IS] A.12 — Automated E2E provider-swap CI** `[CP]` — authenticates via each provider, swaps, asserts
-  A.11; deterministic; red blocks merge. **Green = G-D1 + Rename-Gate G-R1.** Runs on **self-hosted Ory
-  [PR-gate/secret-free]**; managed-Ory variant may run [nightly-live]. *(deps: A.11, A.1)*
+  A.11; deterministic; red blocks merge. **Green = G-D1 + Rename-Gate G-R1.** The **full Descope⇄Ory swap
+  E2E runs against the cloud Ory Network (secret) on nightly / protected-branch CI and locally
+  [nightly-live]**, not on fork PRs; the **secret-free PR-gate uses `node-oidc-provider`** as the
+  second-provider stand-in to exercise the swap seam + invariant without live Ory [PR-gate/secret-free].
+  *(deps: A.11, A.1)*
 
 > **End of Phase 1: Epic A is complete and G-D1 is met.** The Python management-plane impl (A.5, A.11) and
 > CI-reachable Ory (A.1/A.6) now exist — every hard dependency the deferred brain track needs is in place.
@@ -378,11 +394,14 @@ sequencing delivers the marquee deliverable earliest.
 
 | Posture | Stories | Notes |
 |---|---|---|
-| **PR-gating, secret-free** | A.1 (self-hosted Kratos/Hydra/Keto path), A.12 (self-hosted swap E2E), B.1, B.2, B.3, B.4, B.6, C.1, C.2, C.3, C.6, and all `[BRAIN]`/`[IS]` non-provider stories | Every PR; no secrets. Default gate. |
-| **Nightly-live (needs provider secrets)** | C.4 (managed Ory Network + Descope test project + node-oidc-provider), managed-Ory side of A.1, optional managed-Ory variant of A.12 | Secrets from Infisical/secret-manager (NFR13); live-run failures = fixtures drift, non-blocking to PRs. |
+| **PR-gating, secret-free** | A.12 (`node-oidc-provider` second-provider stand-in for the swap seam), B.1, B.2, B.3, B.4, B.6, C.1, C.2, C.3, C.6, and all `[BRAIN]`/`[IS]` non-provider stories | Every PR; no secrets. Default gate. `node-oidc-provider` stands in for the second provider to exercise the adapter-selection registry, claim-normalization, and the zero-RBAC-migration invariant without live Ory. |
+| **Nightly-live / local (needs provider secrets)** | A.1 + A.12 full Descope⇄Ory swap E2E (cloud **Ory Network** via secret), C.4 (cloud **Ory Network** + Descope test project + node-oidc-provider) | Ory Network credentials wired as a CI secret / local env (NFR13); runs on nightly / protected-branch CI and locally, not on fork PRs; live-run failures = fixtures drift, non-blocking to PRs. |
 
-Self-hosted Ory keeps the swap E2E (A.12, Phase 1) and the conformance runner (C.3, Phase 2) green on every PR
-without secrets; the managed Ory nightly (C.4) proves fixtures still match reality.
+`node-oidc-provider` keeps the swap seam (A.12 PR-gate) and the conformance runner (C.3) green on every PR
+without secrets; the full Descope⇄Ory swap against the **cloud Ory Network** runs nightly / on protected
+branches and locally (A.12, C.4) to prove the swap and the fixtures still match reality. Self-hosted Ory
+(docker-compose Kratos/Hydra/Keto) is deferred/optional — revisit only if secret-free full-swap-on-PRs later
+becomes a requirement.
 
 ---
 
@@ -397,7 +416,9 @@ without secrets; the managed Ory nightly (C.4) proves fixtures still match reali
   Phase 2 it is across the parallel `[OIM]` library and brain sub-tracks.
 - **Do not start a story until its listed deps are `done`.** The two finalize checkpoints (C.2 fixtures import
   @ W8, C.6 link @ W12) rely on upstream producers (A.5/A.11 from Phase 1; C.5 from W11).
-- **Respect the locked facts** (self-hosted-CI-Ory + managed-nightly; flat-floor demo dataset; 0 renames).
+- **Respect the locked facts** (cloud Ory Network is the Ory target for now, with the full swap E2E on
+  nightly/protected-branch + local and `node-oidc-provider` as the secret-free PR-gate stand-in; self-hosted
+  Ory deferred/optional; flat-floor demo dataset; 0 renames).
 - **Surface the four Open Decisions** at the stories where they bite (A.4 @ W3, A.5/C.2 @ W4/W8, A.2 @ W2,
   B.5 @ W9) before coding those stories — a wrong default on #1 (gateway mode) or #2 (ClaimMapper repo) causes
   rework.

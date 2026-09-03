@@ -400,11 +400,17 @@ spec/                              # co-located with the protocol spec (OD-8 loc
 its own error type. Management-plane vectors additionally carry **canonical state assertions** (e.g. "after
 `sync_role`, the provider projection contains a role whose normalized name == canonical name").
 
-**Two conformance modes** (OD-6, locked):
+**Two conformance modes** (OD-6, locked; Ory-infra target re-resolved 2026-09-02):
 1. **Contract/fixture mode** (gates every PR, secret-free): adapters run against recorded provider
-   contracts / fakes; asserts request shapes + normalized outcomes.
-2. **Live-matrix mode** (nightly, gated): the runnable subset — Ory (self-hostable in CI), Descope
-   (managed test project via secret), and node-oidc-provider — proves the fixtures still match reality.
+   contracts / fakes; asserts request shapes + normalized outcomes. For the second-provider path,
+   **`node-oidc-provider` is the secret-free PR-gate stand-in** — it exercises the adapter-selection
+   registry, claim-normalization, and the zero-RBAC-migration invariant without live Ory.
+2. **Live-matrix / local mode** (nightly / protected-branch + local, gated): the runnable subset — the
+   **existing cloud Ory Network (managed, via secret)**, Descope (managed test project via secret), and
+   node-oidc-provider. The **real Descope⇄Ory swap runs here** (where the Ory Network secret is available),
+   not on fork PRs, and proves the fixtures still match reality. **Self-hosted Ory (docker-compose
+   Kratos/Hydra/Keto) is deferred/optional** — revisit only if secret-free full-swap-on-PRs later becomes a
+   requirement.
 
 **CI gate.** A capability shows `implemented` in the matrix **only if** its conformance file passes for
 that provider×language. The matrix is generated, not asserted.

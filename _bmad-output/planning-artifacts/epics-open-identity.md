@@ -250,21 +250,21 @@ claim-normalization abstraction (`to_principal(claims,"Descope")` hardcoded in `
 `middleware/claims.py`), and the entire Ory adapter (client, adapter impl, Terraform/compose, inbound
 validation, CI). `ProviderType.ory` exists as an enum value only.
 
-### Story A.1: Ory provider infrastructure (Terraform + compose + SPA client + identity schema)
+### Story A.1: Ory provider infrastructure (connect + configure the existing cloud Ory Network: Terraform + SPA client + identity schema)
 
 As an Operator,
-I want a provisioned, reproducible Ory environment (dev and CI) that issues JWT access tokens and supports auth-code+PKCE,
+I want the **existing cloud Ory Network project** connected and configured as code (dev and CI) so it issues JWT access tokens and supports auth-code+PKCE,
 So that the reference app has a real second provider to authenticate against and swap to.
 
 **Acceptance Criteria:**
 
-**Given** the `identity-stack` infra tracks and no Ory environment
+**Given** the `identity-stack` infra tracks and the existing **cloud Ory Network** project (managed) not yet wired to the app
 **When** the Ory infrastructure story is implemented (composes feeder Stories 1.1–1.3)
-**Then** an Ory project/stack is provisioned as code (Terraform track and/or docker-compose) configured to issue **JWT** access tokens (not opaque)
+**Then** the existing cloud Ory Network project is configured as code (**Terraform** for Ory project config — no container stack stood up) so it issues **JWT** access tokens (not opaque)
 **And** a public SPA OAuth2 client exists with authorization-code + PKCE and the app's redirect URIs registered
 **And** an Ory identity schema is defined (with Organizations flag-gated per feeder Story 1.3) and its issuer URL + JWKS endpoint are discoverable
-**And** all Ory credentials/secrets are stored in Infisical and referenced by `config_ref` (never committed; NFR13)
-**And** the environment is bootstrappable in both local dev and CI (see Open Decision #4 re: managed Ory Network vs self-hosted Kratos/Hydra/Keto for the CI live-matrix)
+**And** all Ory Network credentials/secrets are stored in Infisical and referenced by `config_ref` (never committed; NFR13)
+**And** the environment is usable in both local dev and CI via Ory Network credentials wired as a **CI secret / local env** — the full swap runs nightly / on protected branches + locally, while `node-oidc-provider` is the secret-free PR-gate stand-in (see Open Decision #4, RESOLVED 2026-09-02: cloud Ory Network for now; self-hosted Kratos/Hydra/Keto deferred/optional)
 
 *Dependencies:* none (foundational). *Repo:* `identity-stack` (infra) + Ory IaC. *FR:* enables FR-A1/A2.
 
@@ -882,7 +882,7 @@ runner so the cells have a real implementation to run against.
 
 ## Resolved Decisions (locked 2026-09-02)
 
-**ALL RESOLVED (locked 2026-09-02)** — see `sprint-plan-open-identity.md` → Resolved Decisions and the locked facts. Summary: **#1** scope A.4 to standalone mode for MVP (defer gateway-mode / PRD-4 to a later `/bmad-correct-course` pass); **#2** claim-normalization stays **app-side** in `identity-stack` (detail below); **#3** A.2 uses aligned capability strings, C.1 tightens later; **#4** Ory CI = self-hosted Kratos/Hydra/Keto (secret-free PR-gate) + managed Ory nightly; **#5** DPoP is a parity-target, not an MVP gate; **#6** swap-demo uses the flat portable-role floor only. The per-item text below is retained for context.
+**ALL RESOLVED (locked 2026-09-02)** — see `sprint-plan-open-identity.md` → Resolved Decisions and the locked facts. Summary: **#1** scope A.4 to standalone mode for MVP (defer gateway-mode / PRD-4 to a later `/bmad-correct-course` pass); **#2** claim-normalization stays **app-side** in `identity-stack` (detail below); **#3** A.2 uses aligned capability strings, C.1 tightens later; **#4** Ory CI = the **existing cloud Ory Network (managed)** for now — the full Descope⇄Ory swap E2E runs on nightly/protected-branch CI + locally (Ory Network secret), while **`node-oidc-provider` is the secret-free PR-gate stand-in**; self-hosted Kratos/Hydra/Keto (docker-compose) deferred/optional; **#5** DPoP is a parity-target, not an MVP gate; **#6** swap-demo uses the flat portable-role floor only. The per-item text below is retained for context.
 
 1. **PRD 4 (inbound Tyk gateway) vs Epic A (outbound management plane) collision surface.** Resolved
    Decision #1 explicitly **defers** the PRD 4 ↔ Epic A reconciliation to a later `/bmad-correct-course`
@@ -907,11 +907,15 @@ runner so the cells have a real implementation to run against.
    A.2 uses capability strings aligned to the intended namespace and C tightens them to a validated set
    later (avoids a forward cross-epic dependency). Confirm, or decide to block A.2 on C.1.
 
-4. **Ory deployment target for CI.** For the swap E2E (A.12) and the nightly live matrix (C.4): managed
-   **Ory Network** (via Terraform, needs a secret — feeder Epic 1's approach) vs **self-hosted** Ory
-   (Kratos/Hydra/Keto in docker-compose, secret-free — architecture ADR-OI-6 calls Ory "self-hostable in
-   CI"). This affects whether the swap E2E can run secret-free on PRs or only nightly. Pick one for
-   A.1/A.12/C.4.
+4. **Ory deployment target for CI. RESOLVED 2026-09-02 — the existing cloud Ory Network (managed), for
+   now** (supersedes the earlier "self-hosted Ory" resolution). A.1 connects/configures that Ory Network
+   project via Terraform with Ory Network credentials wired as a **CI secret / local env**. **CI split:** the
+   full Descope⇄Ory swap E2E (A.12) and the nightly live matrix (C.4) run against the cloud Ory Network on
+   **nightly / protected-branch CI** (where the secret is available) and **locally**, **not** on fork PRs;
+   the **secret-free PR-gate uses `node-oidc-provider`** as the second-provider stand-in to exercise the
+   adapter-selection registry, claim-normalization, and the zero-RBAC-migration invariant without live Ory.
+   **Self-hosted Ory (Kratos/Hydra/Keto in docker-compose) is deferred/optional** — revisit only if
+   secret-free full-swap-on-PRs later becomes a requirement. Applies to A.1/A.12/C.4.
 
 5. **DPoP depth in the MCP example.** FR-B2 marks DPoP a **parity-target, not a gate**, yet MCP's Nov-2025
    tightening added proof-of-possession. Decide whether the runnable MCP example (**B.5**) must
