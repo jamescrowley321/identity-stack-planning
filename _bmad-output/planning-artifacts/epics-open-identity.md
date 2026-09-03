@@ -337,7 +337,7 @@ So that all downstream authorization code is provider-agnostic and reads canonic
 **And** the gateway-mode vs standalone-mode split is preserved (normalization runs on the pre-validated payload in gateway mode with defense-in-depth `exp`/`iss`/`aud`)
 **And** the seam is unit-tested with language-neutral claim fixtures per profile (feeds Epic C's `claims-normalize.json`)
 
-*Dependencies:* A.4. *Repo:* `identity-stack` (see Open Decision #2 re: whether profiles extend `py_identity_model.to_principal` in `[OIM]`). *FR:* FR-A3.
+*Dependencies:* A.4. *Repo:* `identity-stack` (Resolved 2026-09-02: claim-normalization abstraction + Ory/GenericOIDC profiles + fixtures stay app-side in identity-stack `[IS]`; not promoted to `py_identity_model` for MVP). *FR:* FR-A3.
 
 ### Story A.6: OrySyncAdapter (outbound sync, G1) + Ory management client
 
@@ -880,11 +880,9 @@ runner so the cells have a real implementation to run against.
 
 ---
 
-## Open Decisions for Main Session
+## Resolved Decisions (locked 2026-09-02)
 
-These are genuine forks encountered during headless decomposition that are **not** resolved by the locked
-PRD/architecture inputs. They do not block writing the epics, but should be settled before/early in
-implementation.
+**ALL RESOLVED (locked 2026-09-02)** — see `sprint-plan-open-identity.md` → Resolved Decisions and the locked facts. Summary: **#1** scope A.4 to standalone mode for MVP (defer gateway-mode / PRD-4 to a later `/bmad-correct-course` pass); **#2** claim-normalization stays **app-side** in `identity-stack` (detail below); **#3** A.2 uses aligned capability strings, C.1 tightens later; **#4** Ory CI = self-hosted Kratos/Hydra/Keto (secret-free PR-gate) + managed Ory nightly; **#5** DPoP is a parity-target, not an MVP gate; **#6** swap-demo uses the flat portable-role floor only. The per-item text below is retained for context.
 
 1. **PRD 4 (inbound Tyk gateway) vs Epic A (outbound management plane) collision surface.** Resolved
    Decision #1 explicitly **defers** the PRD 4 ↔ Epic A reconciliation to a later `/bmad-correct-course`
@@ -892,7 +890,12 @@ implementation.
    config-driven validation does not conflict with PRD 4's planned Go claim-mapper plugin at the gateway,
    or explicitly scope A.4 to standalone mode for MVP and leave gateway-mode Ory to the correct-course pass.
 
-2. **Where the provider-neutral ClaimMapper lives.** ADR-OI-5 defines per-provider profiles
+2. **RESOLVED 2026-09-02 — app-side:** the claim-normalization abstraction, the `Ory`/`GenericOIDC` profiles,
+   and the `claims-normalize` conformance fixtures stay in `identity-stack` (`[IS]`). Do **not** extend
+   `py_identity_model.to_principal` with Ory/GenericOIDC for MVP — the library keeps only its existing Descope
+   `to_principal` primitive. Story **A.5** stays entirely `[IS]` (it does **not** split into an Epic B `[OIM]`
+   story). Future option (post-MVP): promote the profiles into the library once stable. **Where the
+   provider-neutral ClaimMapper lives.** ADR-OI-5 defines per-provider profiles
    (`Descope`/`Ory`/`GenericOIDC`), but today `to_principal(claims, provider)` lives in `py_identity_model`
    (`[OIM]`), while Story **A.5** places the abstraction in `identity-stack` (`[IS]`). Decide whether the
    `Ory`/`GenericOIDC` profiles are added to `py_identity_model.to_principal` (making part of A.5 an Epic B

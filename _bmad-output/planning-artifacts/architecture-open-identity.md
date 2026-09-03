@@ -355,6 +355,10 @@ gateway-mode vs standalone-mode split (`GatewayClaimsMiddleware`) is preserved: 
 signature is validated upstream (Tyk), normalization runs on the pre-validated payload with
 defense-in-depth `exp`/`iss`/`aud` checks.
 
+**Placement (locked 2026-09-02):** the multi-provider claim-normalization abstraction + Ory/GenericOIDC
+profiles live app-side in `identity-stack` for MVP; the library keeps its existing Descope `to_principal`
+primitive. Promote to the library post-MVP if it stabilizes.
+
 ---
 
 ### ADR-OI-6 — Management-plane conformance spec extends the identity-model machinery ("the brain" up-stack)
