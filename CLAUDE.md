@@ -8,15 +8,15 @@ This repo is the BMAD-METHOD planning hub for the auth workspace. It contains pr
 
 ## Workspace Layout
 
-This repo lives at `~/repos/auth/identity-stack-planning/` alongside four sibling repositories that form a pseudo-monorepo:
+This repo lives at `~/repos/auth/identity-stack-planning/` alongside these sibling repositories that form a pseudo-monorepo (⚠️ local dir names do not all match their GitHub remotes — check `git remote`):
 
 | Repo | Path | Description |
 |------|------|-------------|
 | `identity-stack-planning` (this repo) | `~/repos/auth/identity-stack-planning/` | BMAD planning artifacts and project knowledge |
-| `py-identity-model` | `~/repos/auth/py-identity-model/` | Production OIDC/OAuth2.0 Python library (JWT, token validation, discovery) |
+| `py-identity-model` *(dir)* = `identity-model` *(GitHub)* | `~/repos/auth/py-identity-model/` | **Live polyglot OIDC/OAuth2 client monorepo** (survivor). GitHub repo is `identity-model`; the local dir is still named `py-identity-model`. Holds `py/` = OpenID-certified PyPI package `py-identity-model` (v3.11.x — JWT/validation/discovery **plus** PKCE/auth-code/token-exchange/DPoP/PAR/FAPI…), `go/` = Go module, `rust/` = crate `rs-identity-model`, `spec/` = cross-language conformance (PRD 6). **Ground all library work here.** |
 | `terraform-provider-descope` | `~/repos/auth/terraform-provider-descope/` | Terraform provider for Descope (Go). Fork of `descope/terraform-provider-descope` |
 | `identity-stack` | `~/repos/auth/identity-stack/` | SaaS starter kit — FastAPI backend + Vite/React frontend + Terraform infra |
-| `identity-model` | `~/repos/auth/identity-model/` | Polyglot OIDC/OAuth2 client library monorepo (Go core+extended, Rust core) with a shared cross-language conformance spec (PRD 6) |
+| `identity-model-legacy` | `~/repos/auth/identity-model-legacy/` | **ARCHIVED** old polyglot repo (GitHub `identity-model-legacy`, read-only). Superseded by the survivor monorepo above; its fixes were re-implemented natively there. **Do NOT use for grounding** — its capability matrix is stale (it marks Python `planned` for flows that already ship). |
 
 ### Cross-Repo Relationships
 
@@ -51,7 +51,7 @@ This repo uses [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) v6 fo
 
 When BMAD workflows reference implementation details, architecture, or existing code:
 
-1. **Read sibling repos directly** — You have full access to `~/repos/auth/py-identity-model/`, `~/repos/auth/terraform-provider-descope/`, `~/repos/auth/identity-stack/`, and `~/repos/auth/identity-model/`. Read their code, tests, configs, and CLAUDE.md files to inform planning.
+1. **Read sibling repos directly** — You have full access to `~/repos/auth/py-identity-model/` (the live polyglot monorepo — GitHub `identity-model`), `~/repos/auth/terraform-provider-descope/`, and `~/repos/auth/identity-stack/`. Read their code, tests, configs, and CLAUDE.md files to inform planning. (`~/repos/auth/identity-model-legacy/` is the archived old repo — do not ground on it.)
 2. **Never modify sibling repos from this context** — Planning artifacts live here; code changes happen in the target repos.
 3. **Reference by repo name** — In planning docs, refer to repos by name (e.g., "py-identity-model") rather than absolute paths.
 

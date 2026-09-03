@@ -54,7 +54,7 @@ The four capabilities are functionally independent, but every task edits shared 
 ## Step 1: Determine Context
 
 1. Read `~/repos/auth/CLAUDE.md` for workspace commands and git conventions.
-2. Read `~/repos/auth/identity-model/CONTRIBUTING.md` for repo workflow (branching, conventional commits, conformance loop).
+2. Read `~/repos/auth/py-identity-model/CONTRIBUTING.md` for repo workflow (branching, conventional commits, conformance loop).
 3. Read the matching story in `epic-5-extended-tier.md` AND the matching spec story in `epic-0f-spec-extended-tier.md` (G5.1→S.7, G5.2→S.8, G5.3→S.12, G5.4→S.13).
 
 ## Step 2: Determine What To Do

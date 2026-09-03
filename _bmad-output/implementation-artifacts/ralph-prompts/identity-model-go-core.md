@@ -50,7 +50,7 @@ The Go packages build on each other (jwt needs jwks; token/userinfo need discove
 ## Step 1: Determine Context
 
 1. Read `~/repos/auth/CLAUDE.md` for workspace commands and git conventions.
-2. Read `~/repos/auth/identity-model/CONTRIBUTING.md` for repo workflow (branching, conventional commits, conformance loop).
+2. Read `~/repos/auth/py-identity-model/CONTRIBUTING.md` for repo workflow (branching, conventional commits, conformance loop).
 3. Read `~/repos/auth/identity-stack-planning/_bmad-output/planning-artifacts/epics/epic-3-core-go.md` for the story acceptance criteria.
 
 ## Step 2: Determine What To Do

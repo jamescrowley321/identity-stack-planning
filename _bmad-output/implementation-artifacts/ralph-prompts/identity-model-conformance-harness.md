@@ -74,7 +74,7 @@ Each task builds on the previous one's files (the shared `conformance/` scaffold
 ## Step 1: Determine Context
 
 1. Read `~/repos/auth/CLAUDE.md` for workspace commands and git conventions.
-2. Read `~/repos/auth/identity-model/CONTRIBUTING.md` for repo workflow (branching, conventional commits, the monorepo CI path-filter table) and `~/repos/auth/identity-model/README.md` + `Makefile` for the current test targets and layout.
+2. Read `~/repos/auth/py-identity-model/CONTRIBUTING.md` for repo workflow (branching, conventional commits, the monorepo CI path-filter table) and `~/repos/auth/py-identity-model/README.md` + `Makefile` for the current test targets and layout.
 3. **Read the py-identity-model reference for the current task** (`~/repos/auth/py-identity-model/conformance/` for K1–K5; `src/tests/integration/` + its `Makefile`/`ci.yml` for K6) and mirror it. This is the source of truth — see the Context mandate. Restated per-phase in `analyze` below.
 
 ## Step 2: Determine What To Do

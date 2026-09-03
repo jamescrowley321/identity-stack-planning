@@ -73,7 +73,7 @@ Tasks touch shared files (`.github/workflows/`, `CONTRIBUTING.md`, both READMEs)
 ## Step 1: Determine Context
 
 1. Read `~/repos/auth/CLAUDE.md` for workspace commands and git conventions.
-2. Read `~/repos/auth/identity-model/CONTRIBUTING.md` for repo workflow (branching, conventional commits, the monorepo CI path-filter table).
+2. Read `~/repos/auth/py-identity-model/CONTRIBUTING.md` for repo workflow (branching, conventional commits, the monorepo CI path-filter table).
 3. Read the current `rust/Cargo.toml`, `go/go.mod`, and `.github/workflows/ci.yml` in the per-task worktree to ground every change in the real files.
 
 ## Step 2: Determine What To Do

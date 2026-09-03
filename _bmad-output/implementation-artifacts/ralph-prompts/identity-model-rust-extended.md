@@ -63,7 +63,7 @@ The four capabilities are functionally independent, but every task edits shared 
 ## Step 1: Determine Context
 
 1. Read `~/repos/auth/CLAUDE.md` for workspace commands and git conventions.
-2. Read `~/repos/auth/identity-model/CONTRIBUTING.md` for repo workflow (branching, conventional commits, the monorepo CI path-filter table, conformance loop).
+2. Read `~/repos/auth/py-identity-model/CONTRIBUTING.md` for repo workflow (branching, conventional commits, the monorepo CI path-filter table, conformance loop).
 3. Read the matching story's Rust decomposition in `epic-5-extended-tier.md` (RE5.1→5.1-rust, RE5.2→5.2-rust, RE5.3→5.3-rust, RE5.4→5.4-rust) — every acceptance-criteria checkbox is a requirement.
 
 ## Step 2: Determine What To Do
