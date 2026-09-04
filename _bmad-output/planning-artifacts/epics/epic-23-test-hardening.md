@@ -275,6 +275,10 @@ P1:        └─► 23.4  └─►(#598-601)   23.6   23.7 (P2)
 6. **23.6** — mutation-at-scale + Go/Rust gates.
 7. **23.7** — real-provider breadth (P2).
 
+## Execution
+
+Ralph loop prompt: `_bmad-output/implementation-artifacts/ralph-prompts/pim-test-hardening.md`. It runs the stories as a **PR stack** (each story branches off the previous; owner merges bottom-up) and **never merges** — the loop opens PRs and posts review evidence only. Externally-blocked stories (23.4 needs #585 merged; 23.3 needs #598–601 fixed) sit at the top of the stack so they don't gate the independent ones. Launch recipe and merge policy are in the prompt's header. One identity-model loop at a time.
+
 ## References
 
 - Audit (2026-09-03): test-tier map + open-issue reconciliation (this epic's `inputDocuments`).
