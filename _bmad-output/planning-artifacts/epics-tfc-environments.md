@@ -97,6 +97,19 @@ tags added in the TFC UI/API — name, state, and VCS connection stay intact.
 - NFR-6 (Compliance): Ory prod on a paid Production workspace before any real PII (Develop tier
   forbids PII and Organizations).
 
+## Filed GitHub issues (`jamescrowley321/identity-stack`)
+
+| Item | Issue |
+|---|---|
+| Epic — dev + prod TFC environments | #411 |
+| TFCENV-1 — Descope root: tag-based TFC workspaces | #412 |
+| TFCENV-2 — GitHub Environments + `environment` variable | #413 |
+| TFCENV-3 — `descope_project_id` + guardrails | #414 |
+| TFCENV-4 — Ory root: TFC backend + migrate local state | #415 |
+| TFCENV-5 — Descope prod project + workspace | #416 |
+| TFCENV-6 — Ory prod: paid workspace | #417 |
+| TFCENV-7 — Variable sets + key rotation | #418 |
+
 ## Epic & story breakdown
 
 All stories target `[IS]` = `jamescrowley321/identity-stack`. Each story is one PR.
