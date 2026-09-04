@@ -95,6 +95,7 @@ Make identity-stack's IdP *configurable* so an Ory Network provider can be confi
 | **py-identity-model IdentityServer fixture** | T130 (#412), T131 (#413), T132 (#414) | Introspection/revocation + PKCE + multi-provider matrix expansion |
 | **py-identity-model conformance breadth** | T147 (#415) — wontfix | Implicit + Hybrid RP dropped (OAuth 2.1-deprecated). Next-round profiles instead: Dynamic RP (#216), RP-Initiated Logout (#214), Back-Channel Logout (#442) |
 | **fastapi-identity-model package + regression** | T172 (#334, PR #434), T173 (#437) | Package (middleware + RP router) in review; OIDF conformance regression drives the real router through all 3 local plans (regression stage, not a second cert). Ralph prompt: `pim-fastapi-conformance-regression.md` |
+| **py-identity-model test hardening (Epic 23)** | 23.1–23.7 (#607–#613, epic #614) | **Harder tiers only, no new unit tests.** Run the configured-but-unrun OIDF profiles (FAPI2/dynamic-reg/logout); make the 9 descriptive-only cross-lang spec capabilities executable; integration/harness for the auth-bypass fixes (23.3 gated on PR #604) + injectable `discovery_policy` rotation (23.4 gated on #585); boot Go/Rust as RS in the token-blaster harness; cross-lang mutation gates. **Stacked PRs, owner-merged bottom-up; the loop never merges.** Epic doc `epics/epic-23-test-hardening.md`; loop `pim-test-hardening.md`. Grounds in the 2026-09-03 test-tier audit; extends epics 17/19/20 + the token-harness plan. |
 
 ### Deferred (still valid, revisit after current focus)
 
