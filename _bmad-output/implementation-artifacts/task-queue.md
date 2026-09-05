@@ -286,6 +286,15 @@ Multi-language OIDC/OAuth2 client library (Go + Rust). Epic source: `planning-ar
 
 **Reconciled 2026-08-12** (priorities session complete): see [`docs/identity-model-reconciliation-2026-08-12.md`](../../docs/identity-model-reconciliation-2026-08-12.md) for the source-verified state, PIM parity matrix, normative-behavior audit, and the sequenced execution plan. New epics: `epic-20-pim-parity`, `epic-21-cross-platform-serializer`, `epic-22-framework-middlewares`. Recommended next = the Parity-Hardening Sweep (in-session, security-normative), then the Rust Extended-tier loop (`ralph-prompts/identity-model-rust-extended.md`). Of #8–#13, #10/#11/#12/#13 are shipped and are owner close-candidates (left open per the `learning` label).
 
+### Cross-Language Parity & Gates — NEW 2026-09-05 (queued behind the open-PR board)
+
+Prompted by the claims-validator stack review ([identity-model #623/#624/#625](https://github.com/jamescrowley321/identity-model/pulls)): the `ci / security-gate` mutation job is **Python-only** — Go/Rust-only diffs pass vacuously (~10s, zero mutants). Compensating controls today are the shared `spec/test-fixtures/*` conformance vectors + behavior-proving integration tests. **Sequencing: do NOT start until the open-PR board clears** (#623–#625 claims validators, #629–#632 id-token, #605 config, #635/#636 CI parity).
+
+| ID | Issue | Status | Description | Size |
+|----|-------|--------|-------------|------|
+| IM.P1 | [638](https://github.com/jamescrowley321/identity-model/issues/638) | pending | Diff-scoped mutation gates for Go (go-gremlins) + Rust (cargo-mutants `--in-diff`), mirroring the Python `mutation-security` contract (mutants on changed security-surface lines must be killed or waived-equivalent; mechanical, fail-closed) | medium |
+| IM.P2 | [639](https://github.com/jamescrowley321/identity-model/issues/639) | pending | Cross-language parity audit refresh + reconciliation: refresh `identity-model-feature-parity-report-2026-08-29.md` vs current main (claims validators, id-token, config landed since), extend to **CI-gate parity** (lint/vuln/coverage CONS-1.5/mutation IM.P1/release automation) and **test-harness parity** (py mock-OP + docker infra, go httptest, rust fixture + live node-oidc); owner decision record for the recon plan's four §3 inversions; per-gap issues, tiered Core → Extended → Advanced | large |
+
 ### Go Core Tier (Epic 3) — DONE (merged 2026-07-02)
 
 Ralph prompt: `ralph-prompts/identity-model-go-core.md`. Foundation scaffold (PR #1) + all five core stories merged bottom-up to `main` 2026-07-02 (PRs #2–#7, incl. the multi-provider integration matrix). Main CI green.
