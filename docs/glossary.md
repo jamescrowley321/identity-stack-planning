@@ -1,10 +1,16 @@
 # Glossary
 
-Definitions for terms used across identity-stack-planning documents. Organized alphabetically.
+Definitions for terms used across identity-stack-planning documents. Grouped for quick lookup; acronym expansions link to source documents.
 
 ---
 
+**ADR (Architecture Decision Record)** — A short record of an architectural decision, its context, and its consequences. See the workspace’s [system architecture and ADR index](system-architecture.md).
+
 **Acceptance Auditor** — Review agent persona that verifies spec compliance. For each acceptance criterion, checks whether it's implemented, tested, and matches intent. Reports PASS / FAIL / PARTIAL / SCOPE CREEP. See [review process](review-process.md).
+
+**Authorization Server (AS)** — The OAuth server that authenticates a client or resource owner and issues authorization grants or access tokens. Defined by [RFC 6749 §1.1](https://www.rfc-editor.org/rfc/rfc6749.html#section-1.1).
+
+**AI (Artificial Intelligence)** — A broad term for machine-based systems that perform tasks associated with human intelligence; in this workspace it includes delegated agents that call protected resources. See the [NIST AI glossary](https://www.nist.gov/artificial-intelligence/glossary).
 
 **Blind Hunter** — Review agent persona that reviews code diffs with zero project context. Sees only the diff, assumes the worst about every line. Catches logic errors, security holes, dead code, and resource leaks. See [review process](review-process.md).
 
@@ -18,7 +24,23 @@ Definitions for terms used across identity-stack-planning documents. Organized a
 
 **DEPLOYMENT_MODE** — Environment variable (`standalone` | `gateway`) evaluated once at FastAPI startup. Controls which middleware is active: standalone mode runs JWT validation in FastAPI; gateway mode offloads it to Tyk. See ADR-GW-4 and ADR-GW-5.
 
+**DPoP (Demonstrating Proof of Possession)** — An OAuth mechanism that binds a token to a client-held key and proves possession on each request. Defined by [RFC 9449](https://www.rfc-editor.org/rfc/rfc9449.html).
+
 **Edge Case Hunter** — Review agent persona that traces every branching path and boundary condition. Reports only genuinely unhandled paths where code will fail, crash, or produce wrong results. See [review process](review-process.md).
+
+**FAPI (Financial-grade API)** — OpenID Foundation security profiles for high-risk OAuth deployments, adding requirements beyond the base OAuth/OIDC specifications. See the [FAPI 2.0 Security Profile](https://openid.net/specs/fapi-security-profile-2_0.html).
+
+**FGA (Fine-Grained Authorization)** — Authorization based on relationships among principals and resources, usually evaluated by a relationship engine. In this workspace FGA is an adapter boundary, not an identity-stack-owned engine. See [OpenFGA authorization concepts](https://openfga.dev/docs/authorization-concepts).
+
+**Identity Provider (IdP)** — A service that authenticates a subject and issues identity or authorization tokens to relying parties and clients. See [OpenID Connect Core §1.2](https://openid.net/specs/openid-connect-core-1_0.html#Terminology).
+
+**IETF (Internet Engineering Task Force)** — The standards organization that publishes the RFC series used by the protocol contracts in this workspace. See the [IETF standards process](https://www.ietf.org/standards/process/).
+
+**HTTP (Hypertext Transfer Protocol)** — The application protocol used for the resource-server and authorization-server interfaces in these plans. Defined by [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html).
+
+**JSON Web Key Set (JWKS)** — A JSON document containing a set of JSON Web Keys used to publish signing or encryption keys. Defined by [RFC 7517 §5](https://www.rfc-editor.org/rfc/rfc7517.html#section-5).
+
+**JSON Web Token (JWT)** — A compact, URL-safe representation of claims that can be signed and/or encrypted. Defined by [RFC 7519](https://www.rfc-editor.org/rfc/rfc7519.html).
 
 **IdentityProviderAdapter** — Abstract base class (ABC) defining the interface for syncing canonical identity operations to an external identity provider. Implementations: `DescopeSyncAdapter` (production), `NoOpSyncAdapter` (testing). Defined in PRD 5 architecture.
 
@@ -28,9 +50,35 @@ Definitions for terms used across identity-stack-planning documents. Organized a
 
 **Infisical** — Secrets management platform chosen over HashiCorp Vault for right-sized complexity. Used for centralized secret storage, audit logging, and runtime injection via `infisical run`. See PRD 1.
 
+**MCP (Model Context Protocol)** — A protocol for connecting AI applications to tools and context providers. See the [MCP authorization specification](https://modelcontextprotocol.io/specification/latest/basic/authorization).
+
+**Mutual TLS (mTLS)** — Mutual Transport Layer Security, in which both sides of a TLS connection authenticate with certificates. OAuth certificate-bound tokens and client authentication are defined by [RFC 8705](https://www.rfc-editor.org/rfc/rfc8705.html).
+
+**MVP (Minimum Viable Product)** — The smallest product scope intended to validate a defined set of user outcomes. The open-identity MVP scope is recorded in [`prd-open-identity.md`](../_bmad-output/planning-artifacts/prd-open-identity.md).
+
+**OAuth 2.0** — The authorization framework for obtaining limited access to protected resources. Defined by [RFC 6749](https://www.rfc-editor.org/rfc/rfc6749.html).
+
+**OAuth 2.1** — The current IETF consolidation profile for OAuth 2.0 security best practices, including authorization code with PKCE and removal of legacy flows. Track the [OAuth 2.1 IETF draft](https://datatracker.ietf.org/doc/draft-ietf-oauth-v2-1/) for the normative status of this evolving specification.
+
+**OIDC (OpenID Connect)** — An identity layer on top of OAuth 2.0 that allows a client to verify the end-user’s identity and obtain claims. Defined by [OpenID Connect Core §1](https://openid.net/specs/openid-connect-core-1_0.html#Introduction).
+
+**OIDF (OpenID Foundation)** — The standards and certification organization responsible for OpenID Connect and related profiles. See the [OpenID Foundation specifications](https://openid.net/developers/specs/).
+
+**OpenFGA** — An open-source relationship-based authorization service. In this workspace it is a possible binding for the relationship authorization port; it is not the authority for tokens, credentials, or policy. See [OpenFGA authorization concepts](https://openfga.dev/docs/authorization-concepts).
+
+**PAR (Pushed Authorization Requests)** — An OAuth endpoint through which a client sends an authorization request directly to the authorization server before redirecting the user. Defined by [RFC 9126](https://www.rfc-editor.org/rfc/rfc9126.html).
+
+**PHI (Protected Health Information)** — Individually identifiable health information protected by the HIPAA Privacy Rule when held or transmitted by a covered entity or business associate. See the [U.S. HHS HIPAA Privacy Rule](https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html).
+
+**PII (Personally Identifiable Information)** — Information that can be used to distinguish or trace an individual’s identity, alone or combined with other linked information. See the [NIST glossary](https://csrc.nist.gov/glossary/term/personally_identifiable_information).
+
+**PKCE (Proof Key for Code Exchange)** — An OAuth extension that protects the authorization-code flow by binding the exchange to a verifier held by the client. Defined by [RFC 7636](https://www.rfc-editor.org/rfc/rfc7636.html).
+
 **Phase** — A single unit of work within a ralph loop iteration. Each iteration completes one phase, then exits. Common phases: `analyze`, `plan`, `implement`, `test`, `review-blind`, `review-edge`, `review-acceptance`, `review-security`, `review-fix`, `docs`, `ci`, `complete`. See [ralph loop process](ralph-loop-process.md).
 
 **Problem Detail** — RFC 9457 standard error response format. Used by the canonical identity service. Includes `type` (URI), `title`, `status`, `detail`, `instance` (request path), and `traceId` (OpenTelemetry). Content-Type: `application/problem+json`.
+
+**PRD (Product Requirements Document)** — A planning artifact that records product problem, scope, requirements, and success criteria. See [`prd-open-identity.md`](../_bmad-output/planning-artifacts/prd-open-identity.md).
 
 **Provider abstraction tiers** — Classification system for identity capabilities by cross-provider mapping feasibility:
 - **Tier 1 (Abstract)** — Similar shape across providers; abstract with a common interface. Examples: User CRUD, ReBAC/authz, SSO/Federation, session management.
@@ -38,15 +86,29 @@ Definitions for terms used across identity-stack-planning documents. Organized a
 - **Tier 3 (Provider-specific)** — Too divergent to abstract. Examples: multi-tenancy model, flows/orchestration, connectors, JWT claim structure.
 See ADR-3 in [system architecture](system-architecture.md).
 
+**RBAC (Role-Based Access Control)** — Access control in which permissions are assigned to roles and users or other principals receive permissions through role assignments. See the [NIST RBAC project](https://csrc.nist.gov/projects/role-based-access-control).
+
+**ReBAC (Relationship-Based Access Control)** — Access control that evaluates relationships between a principal and a resource, such as “viewer of document A.” See [OpenFGA authorization concepts](https://openfga.dev/docs/authorization-concepts).
+
+**RAR (Rich Authorization Requests)** — An OAuth extension for expressing structured authorization details beyond a flat scope string. Defined by [RFC 9396](https://www.rfc-editor.org/rfc/rfc9396.html).
+
 **Ralph loop** — An autonomous execution cycle driven by Ralph Orchestrator. Reads the task queue, picks the next pending task, executes one phase per iteration, persists state to `.claude/task-state.md`, and signals completion. See [ralph loop process](ralph-loop-process.md).
 
 **Ralph Orchestrator** — External autonomous AI agent orchestration tool. Rust-based, hat-based pub/sub architecture. Configured via `ralph.yml` in each application repo. See [mikeyobrien/ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator).
 
 **Result[T, E]** — Functional error handling pattern used by canonical identity services. Methods return `Ok(value)` on success or `Error(IdentityError)` on failure. Routers map Results to HTTP responses via `result_to_response()`. Replaces `raise HTTPException` pattern.
 
+**RFC (Request for Comments)** — The publication series used by the IETF to record Internet protocol specifications and related standards. See [RFC 7322](https://www.rfc-editor.org/rfc/rfc7322.html).
+
+**Resource Server (RS)** — The OAuth component that hosts protected resources and accepts access tokens from clients. Defined by [RFC 6749 §1.1](https://www.rfc-editor.org/rfc/rfc6749.html#section-1.1).
+
+**RLS (Row-Level Security)** — A database feature that restricts which rows a database user can access or modify. See the [PostgreSQL row security documentation](https://www.postgresql.org/docs/current/ddl-rowsecurity.html).
+
 **Review gate** — Quality checkpoint in the ralph loop. After all reviewers produce findings, the loop enters a fix phase. Blocking findings (MUST FIX, BLOCK, FAIL) must be resolved before the PR can be created. Maximum 3 fix iterations; unresolved findings block the PR. See [review process](review-process.md).
 
 **Sentinel** — Review agent persona: pragmatic security auditor focused on the identity/auth domain. Reviews for tenant isolation, authorization bypass, injection, JWT validation gaps, and credential exposure. Reports only genuinely exploitable vulnerabilities with concrete attack scenarios. See [review process](review-process.md).
+
+**SSRF (Server-Side Request Forgery)** — A vulnerability in which an attacker causes a server to make unintended requests, often to internal or metadata endpoints. Discovery and federation onboarding must defend against it. See the [OWASP SSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html).
 
 **Task queue** — Central work tracker at `_bmad-output/implementation-artifacts/task-queue.md`. Tracks tasks across all three application repos with status (`pending`, `in_progress`, `done`, `blocked`, `wontfix`), dependencies, and iteration counts. Ralph loops read this file to pick their next task.
 
@@ -57,3 +119,11 @@ See ADR-3 in [system architecture](system-architecture.md).
 **Worktree** — Git worktree used for filesystem isolation in story-based ralph loops. Each story gets its own worktree (e.g., `/tmp/sss-canonical-story-1.3`) so multiple loops can run in parallel without interference. Cleaned up when the story completes.
 
 **Write-through sync** — Data consistency pattern used by the canonical identity model. API-originated writes go to Postgres first (source of truth), then sync to the identity provider. Sync failures are logged and warned but never rolled back — a reconciliation job catches up asynchronously. See D-7 in [system architecture](system-architecture.md).
+
+**VC (Verifiable Credential)** — A tamper-evident credential that represents claims about a subject and can be presented for verification. Credential evidence is distinct from an authorization decision. See the [W3C Verifiable Credentials Data Model](https://www.w3.org/TR/vc-data-model/).
+
+**VP (Verifiable Presentation)** — A presentation of one or more verifiable credentials, optionally bound to a holder, for a verifier to evaluate. Verification produces evidence; it does not by itself grant access. See the [W3C Verifiable Credentials Data Model](https://www.w3.org/TR/vc-data-model/).
+
+**W3C (World Wide Web Consortium)** — The standards organization that develops open Web standards, including the Verifiable Credentials Data Model. See [W3C standards](https://www.w3.org/standards/).
+
+**Zanzibar** — Google’s globally distributed authorization system and the design commonly associated with relationship tuples and consistent authorization checks. See the [Google Research paper](https://research.google/pubs/zanzibar-googles-consistent-global-authorization-system/).
