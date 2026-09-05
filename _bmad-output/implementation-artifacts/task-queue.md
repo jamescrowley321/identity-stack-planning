@@ -374,3 +374,23 @@ Reconciled 2026-08-12. K1 (#43) + K2 (#44) MERGED — Go RP passes `oidcc-client
 | K4 | pending | config-rp + form-post-basic-rp plans, both langs |
 | K5 | pending | CI `conformance.yml` + hosted evidence workflow |
 | K6 | pending | Integration-matrix parity — Rust → Go provider parity |
+
+## Identity Capability Gaps — PROPOSED
+
+Full gap analysis: [`docs/identity-capability-gap-analysis-2026-09-05.md`](../../docs/identity-capability-gap-analysis-2026-09-05.md).
+Story breakdown: [`epic-24-identity-capability-gaps.md`](../planning-artifacts/epics/epic-24-identity-capability-gaps.md).
+These numeric handles are stable dependency references; story titles are the human-readable source of
+meaning. This section contains reusable open-source identity work across `identity-model`,
+`py-identity-model`, and `identity-stack`.
+
+| ID | Status | Description | Depends On |
+|----|--------|-------------|------------|
+| 24.0 | pending | Reconcile the identity capability baseline across identity-model, py-identity-model, and identity-stack against current source and tests | — |
+| 24.1 | pending | Stabilize canonical identity resolution and normalized principal shape | 24.0 |
+| 24.2 | pending | Establish protocol parity and security-profile coverage, including FAPI mapping | 24.0 |
+| 24.3 | pending | Establish standalone resource-server verification integration | 24.1, 24.2 |
+| 24.4 | pending | Add generic protected-resource, issuer, gateway, and trust registration | 24.1, 24.2 |
+| 24.5 | pending | Integrate delegation and sender-proof evidence | 24.2, 24.3 |
+| 24.6 | pending | Integrate bounded verifiable credential and presentation evidence | 24.2, 24.3 |
+| 24.7 | pending | Add provider-neutral relationship authorization port and OpenFGA-compatible adapter | 24.1, 24.4 |
+| 24.8 | pending | Prove isolation, redaction, deployment parity, and publish the capability report | 24.1–24.7 |

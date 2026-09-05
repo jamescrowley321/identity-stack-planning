@@ -14,6 +14,7 @@ This document is the master index for all planned work across the auth workspace
 | PRD 5 | Canonical Identity Domain Model | identity-stack | Done | 18 stories / 4 epics |
 | PRD 5b | Design System & Admin Frontend | identity-stack | Active | 31 stories / 5 epics |
 | PRD 6 | identity-model Multi-Language Monorepo | identity-model | Active | ~100 stories / 15 epics |
+| Cross-cutting identity | Identity Capability Gap Closure | identity-model, py-identity-model, identity-stack | Proposed | 9 stories / Epic 24 |
 
 ## Dependency Graph
 
@@ -37,6 +38,8 @@ graph TD
         PRD4["PRD 4: Multi-IdP Demo"]
     end
 
+    IC["Identity Capability Gap Closure<br/>(proposed)"]
+
     MAIN --> PRD1
     MAIN --> PRD2
     MAIN --> PRD5
@@ -47,6 +50,8 @@ graph TD
     PRD5 --> PRD4
     PRD5b --> PRD4
     PRD3 --> PRD6
+    PRD5 --> IC
+    PRD6 --> IC
 
     style MAIN fill:#2d6a4f,color:#fff
     style PRD5 fill:#2d6a4f,color:#fff
@@ -59,6 +64,7 @@ graph TD
     style phase1 fill:none,stroke:#40916c
     style phase2 fill:none,stroke:#52b788
     style capstone fill:none,stroke:#95d5b2
+    style IC fill:#f59e0b,color:#000
 ```
 
 **Parallel tracks:**
@@ -223,6 +229,27 @@ graph TD
 - Product Brief: [`product-brief-identity-model-monorepo.md`](../_bmad-output/planning-artifacts/product-brief-identity-model-monorepo.md)
 - Competitive Analysis: [`competitive-analysis-identity-model.md`](../_archive/competitive-analysis-identity-model.md)
 - Epics: [`epics/epic-0a-monorepo-setup.md`](../_bmad-output/planning-artifacts/epics/epic-0a-monorepo-setup.md) through [`epic-15-modern-auth-extensions.md`](../_bmad-output/planning-artifacts/epics/epic-15-modern-auth-extensions.md) (25 files)
+
+### Cross-cutting initiative — Identity Capability Gap Closure
+
+**Problem:** The three open-source identity projects have useful protocol, canonical-identity, and
+gateway foundations, but their current capability boundaries, parity status, resource-server contract,
+trust registration, credential evidence, relationship authorization, and conformance gaps are not
+captured in one source-verified backlog.
+
+**Solution:** Reconcile current source and tests, then define the reusable identity-layer contracts for
+protocol verification, FAPI profile integration, normalized principals, protected-resource trust,
+delegation and sender proof, VC/VP evidence, relationship authorization, tenant isolation, and
+identity-side audit.
+
+**Planning assumption:** consumers may plan against these named interfaces only after their status and
+evidence are explicit. This is not a present-tense implementation or certification claim.
+
+**Depends on:** PRD 5 canonical identity and PRD 6 identity-model protocol/conformance foundations.
+
+**Artifacts:**
+- [Gap analysis](identity-capability-gap-analysis-2026-09-05.md)
+- [Epic 24](../_bmad-output/planning-artifacts/epics/epic-24-identity-capability-gaps.md)
 
 ---
 
