@@ -7,6 +7,9 @@ inputDocuments:
 
 # Ory as a Configurable SSO Provider — Epic Breakdown
 
+**GitHub tracking:** identity-stack #376 (Terraform state migration), [#377](https://github.com/jamescrowley321/identity-stack/issues/377) (Epic 4 — provider-agnostic frontend & canonical claims), [#378](https://github.com/jamescrowley321/identity-stack/issues/378) (Epic 5 — provider-aware logout & E2E).
+
+
 ## Overview
 
 This document decomposes the Ory-as-SSO-provider initiative into implementable epics and

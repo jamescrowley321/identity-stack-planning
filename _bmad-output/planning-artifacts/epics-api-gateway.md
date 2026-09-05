@@ -7,6 +7,9 @@ inputDocuments:
 
 # API Gateway & Deployment Topology — Epic Breakdown
 
+**GitHub tracking:** identity-stack #161–#177 (Tyk gateway epics 1–4).
+
+
 ## Overview
 
 This document provides the complete epic and story breakdown for PRD 2: API Gateway & Deployment Topology. All work is confined to the identity-stack (identity-stack) repository. Each story is scoped to a single PR.

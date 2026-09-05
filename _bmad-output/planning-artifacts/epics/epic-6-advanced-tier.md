@@ -295,4 +295,4 @@ Certification involves running the Foundation's [conformance test suite](https:/
 - [OpenID Foundation Certification](https://openid.net/certification/)
 - [OpenID Conformance Testing Suite](https://openid.net/certification/testing/)
 - [Certified OpenID Connect Implementations](https://openid.net/developers/certified-openid-connect-implementations/)
-- [OIDC Certification Analysis (py-identity-model)](../../docs/oidc-certification-analysis.md)
+- [OIDC Certification Analysis (py-identity-model)](../../../docs/oidc-certification-analysis.md)

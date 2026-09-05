@@ -4,7 +4,7 @@ project_name: 'py-identity-model'
 epic_id: 'CONS-2'
 epic_title: 'Reorg to /py|/go|/rust, moon Orchestration & Keep Publishing Green'
 date: '2026-08-17'
-status: 'draft'
+status: 'done'
 inputDocuments:
   - _bmad-output/planning-artifacts/sprint-change-proposal-2026-08-17.md
   - _bmad-output/planning-artifacts/epics/epic-cons1-im-merge-testinfra.md
@@ -12,6 +12,9 @@ inputDocuments:
 ---
 
 # Epic CONS-2: Reorg to `/py|/go|/rust`, moon Orchestration & Keep Publishing Green
+
+**GitHub tracking:** identity-model [#536](https://github.com/jamescrowley321/identity-model/issues/536).
+
 
 > **Implementation reconcile 2026-08-19 (verified against py-identity-model `origin/main` after the CONS-1 stack).** Read before starting — these correct stale assumptions in the stories below and in the design-of-record:
 >

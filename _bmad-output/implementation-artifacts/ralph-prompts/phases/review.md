@@ -50,7 +50,7 @@ Read only the templates you selected from `~/repos/auth/identity-stack-planning/
 - <Acceptance only:> Read spec: gh issue view <issue_number> --repo jamescrowley321/<repo>
 - <Acceptance only:> Read architecture doc at <abs path>
 - Write findings to <abs path>/.claude/review-<persona>.md
-- Do NOT read PROMPT.md, task-state.md, sprint-plan.md, task-queue.md, or any phases/ file
+- Do NOT read PROMPT.md, task-state.md, or any phases/ file
 - Follow the persona template's output format literally
 - Return one-line summary: total findings by severity
 ```

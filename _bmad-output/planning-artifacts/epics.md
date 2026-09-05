@@ -6,6 +6,9 @@ inputDocuments:
 
 # identity-stack-planning - Epic Breakdown
 
+**GitHub tracking:** this document predates per-epic issue tracking and spans all three repos. For the artifact → issue map see [`implementation-artifacts/status.md`](../implementation-artifacts/status.md); the canonical-identity epics here were delivered as identity-stack #138–#156.
+
+
 Epic and story breakdown across py-identity-model, identity-stack, and terraform-provider-descope. Requirements details are in the PRDs — this document covers epic structure and implementable stories only.
 
 ## Epic List

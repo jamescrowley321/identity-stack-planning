@@ -2,8 +2,7 @@
 stepsCompleted: [1, 2, 3, 4, 5, 6]
 inputDocuments:
   - 'config-api-kickoff (session input, 2026-09-03 — carries the overnight-loop audit findings)'
-  - '_bmad-output/planning-artifacts/identity-model-parity-reconciliation-plan.md'
-  - '_bmad-output/planning-artifacts/identity-model-feature-parity-report-2026-08-29.md'
+  - '_bmad-output/planning-artifacts/identity-model-parity-report-2026-09-05.md'
   - '_bmad-output/planning-artifacts/product-brief-identity-model-monorepo.md (format precedent)'
 workflowType: 'product-brief'
 project_name: 'identity-model config-api'

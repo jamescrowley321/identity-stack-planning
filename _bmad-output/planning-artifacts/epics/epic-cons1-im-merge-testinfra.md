@@ -4,7 +4,7 @@ project_name: 'py-identity-model'
 epic_id: 'CONS-1'
 epic_title: 'Merge identity-model in & Collapse Duplicated Test Infrastructure'
 date: '2026-08-17'
-status: 'in-progress'
+status: 'done'
 inputDocuments:
   - _bmad-output/planning-artifacts/sprint-change-proposal-2026-08-17.md
   - _bmad-output/planning-artifacts/product-brief-identity-model-monorepo.md
@@ -13,6 +13,9 @@ inputDocuments:
 ---
 
 # Epic CONS-1: Merge identity-model in & Collapse Duplicated Test Infrastructure
+
+**GitHub tracking:** identity-model [#535](https://github.com/jamescrowley321/identity-model/issues/535). The CONS-1.5 remainder (cross-language line-coverage gate) is tracked separately as #643.
+
 
 > **Status reconcile 2026-08-19 (verified against py-identity-model `origin/main`):**
 >

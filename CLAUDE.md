@@ -34,7 +34,11 @@ This repo uses [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) v6 fo
 - `_bmad-output/planning-artifacts/` — PRDs, architecture docs, product briefs
 - `_bmad-output/implementation-artifacts/` — Epics, stories, sprint plans
 - `docs/` — Project knowledge base (see `docs/index.md` for full index)
-- `_archive/` — Historical research, brainstorming, completed review findings
+- `_archive/README.md` — Index of retired artifacts: what each was, what superseded it, and the `git show`
+  command to read it back. The artifacts themselves live only in git history
+- `_bmad-output/implementation-artifacts/status.md` — **GitHub issues are the source of truth for status.**
+  Planning artifacts hold rationale and decomposition and link to their tracking issue; they never carry
+  status. Never reintroduce a markdown status tracker
 - `.claude/skills/` — BMAD skills invocable via `/bmad-*` commands
 
 ### Getting Started with BMAD

@@ -4,7 +4,7 @@ project_name: 'identity-model'
 epic_id: '23'
 epic_title: 'Test Hardening — Harder Test Tiers & Coverage'
 date: '2026-09-03'
-status: 'draft'
+status: 'in-progress'
 inputDocuments:
   - _bmad-output/planning-artifacts/epics-token-harness.md
   - _bmad-output/planning-artifacts/architecture-token-harness-load-soak.md
@@ -129,7 +129,7 @@ P0 first: **23.1** (configured profiles we already support but never run — hig
 ### User Story
 
 **As a** security-conscious adopter of the FastAPI middleware,
-**I want** the auth-bypass regressions (#598 WebSocket routes unauthenticated, #599 login-router blocked, #600 excluded-path subpath un-auths nested routes, #601 error-text leak) proven **through the booted resource server**,
+**I want** the auth-bypass regressions (#598 WebSocket routes unauthenticated, #599 login-router blocked, #600 excluded-path subpath un-auths nested routes, #601 error-text leak — all four fixed and closed, #598–#600 by PR #604 and #601 by PR #622) proven **through the booted resource server**,
 **So that** the fixes are enforced at the ASGI boundary, not just by a unit reproducer that could drift from real middleware wiring.
 
 ### Acceptance Criteria
@@ -268,7 +268,7 @@ P1:        └─► 23.4  └─►(#598-601)   23.6   23.7 (P2)
 ### Execution priority
 
 1. **23.1** — highest value/effort: run profiles we already support.
-2. **23.3** — security-critical, covers active bugs #598–601.
+2. **23.3** — security-critical: #598–#601 are fixed, but only by unit reproducers, so the ASGI boundary is still unproven.
 3. **23.2** — parity enforcement backbone (verify the executor first).
 4. **23.4** — closes the freshly-found injectable-policy rotation gap.
 5. **23.5** — cross-language E2E (biggest lift; split Go/Rust).

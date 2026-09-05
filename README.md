@@ -277,14 +277,14 @@ Blocking findings must be resolved before the PR can be created. Maximum 3 fix i
 
 ## Project Status
 
-Live status is tracked in the [task queue](_bmad-output/implementation-artifacts/task-queue.md). Use `/ralph-status` in Claude Code for a real-time summary across all repos.
+Status lives in GitHub issues — see [where status lives](_bmad-output/implementation-artifacts/status.md) for the artifact → issue map. Use `/ralph-status` in Claude Code for a real-time summary across all repos.
 
 | Repo | Status | Links |
 |------|--------|-------|
-| py-identity-model | v3.11.3. OpenID Certified® RP (Basic/Config/Form Post) — the reference the family matches. FAPI 2.0 RP hardening complete. | [PRs](https://github.com/jamescrowley321/py-identity-model/pulls) · [PyPI](https://pypi.org/project/py-identity-model/) |
-| terraform-provider-descope | v1.2.2. Feature-complete. 1 blocked (SSO app requires enterprise license). | [PRs](https://github.com/jamescrowley321/terraform-provider-descope/pulls) · [Registry](https://registry.terraform.io/providers/jamescrowley321/descope/latest) |
-| identity-stack | PRD 5 (canonical identity) complete. **Ory SSO provider active** — Epics 1–3 merged (Epic 1 applied live), Epics 4–5 next. Design system components merged, admin pages in progress. | [PRs](https://github.com/jamescrowley321/identity-stack/pulls) |
-| identity-model | Public. Go (core + extended) and Rust (core, hardened) tiers merged. Next: Rust Extended tier. | [Repo](https://github.com/jamescrowley321/identity-model) |
+| identity-model *(local dir `py-identity-model`)* | The polyglot monorepo: `py/` (PyPI `py-identity-model`, OpenID Certified® RP — Basic/Config/Form Post), `go/`, `rust/`, `packages/fastapi-identity-model`, and the neutral `spec/`. Cross-language parity is the live workstream. | [Issues](https://github.com/jamescrowley321/identity-model/issues) · [PyPI](https://pypi.org/project/py-identity-model/) |
+| terraform-provider-descope | v1.2.2. Feature-complete. 1 blocked (SSO app requires enterprise license). | [Issues](https://github.com/jamescrowley321/terraform-provider-descope/issues) · [Registry](https://registry.terraform.io/providers/jamescrowley321/descope/latest) |
+| identity-stack | PRD 5 (canonical identity) complete. Ory SSO provider Epics 1–3 merged; Epics 4–5 open (#377, #378). Secrets → Vault (#398) and TFC dev+prod environments (#411) are the queued epics. | [Issues](https://github.com/jamescrowley321/identity-stack/issues) |
+| identity-stack-planning | This repo — planning artifacts only. | [Issues](https://github.com/jamescrowley321/identity-stack-planning/issues) |
 
 ## Quick Start
 
@@ -336,8 +336,7 @@ identity-stack-planning/
   _bmad-output/
     planning-artifacts/           # PRDs, architecture docs, epics, design system
     implementation-artifacts/
-      task-queue.md               # Cross-repo task tracker
-      sprint-plan.md              # Prioritized sprint plan
+      status.md                   # Where status lives: artifact -> GitHub issue map
       ralph-prompts/              # Loop prompts for autonomous execution
         phases/                   # Per-phase prompt templates
         review-agents/            # Independent reviewer templates

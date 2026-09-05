@@ -4,7 +4,7 @@ project_name: 'identity-model'
 epic_id: '20'
 epic_title: 'PIM Parity — Capability Matrix, Gap Decomposition & Architecture Decision'
 date: '2026-08-12'
-status: 'draft'
+status: 'in-progress'
 inputDocuments:
   - _bmad-output/planning-artifacts/product-brief-identity-model-monorepo.md
   - docs/identity-model-reconciliation-2026-08-12.md

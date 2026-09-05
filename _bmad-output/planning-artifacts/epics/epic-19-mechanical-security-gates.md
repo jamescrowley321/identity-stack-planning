@@ -12,6 +12,9 @@ inputDocuments:
 
 # Epic 19: Mechanical Security Gates
 
+**GitHub tracking:** identity-model #511 (changed-line scoping), #633 (human-readable waivers) and #638 (Go/Rust mutation gates). No single epic issue — the gates were filed individually.
+
+
 ## Overview
 
 The 2026-08-02 audit found security controls that had **passed an adversarial LLM review** — because the

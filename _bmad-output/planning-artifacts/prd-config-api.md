@@ -9,7 +9,6 @@ classification:
 inputDocuments:
   - '_bmad-output/planning-artifacts/product-brief-config-api.md'
   - 'config-api-kickoff (session input, 2026-09-03 — overnight-loop audit findings)'
-  - '_bmad-output/planning-artifacts/identity-model-parity-reconciliation-plan.md'
 documentCounts:
   briefs: 1
   research: 0
