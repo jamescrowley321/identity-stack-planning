@@ -12,11 +12,18 @@ ghIssues:
   stories: 'jamescrowley321/identity-stack#399 … #405'
 ---
 
-# Epic VAULT: Secrets → HCP Vault Secrets migration
+# Epic VAULT: Secrets → Vault migration (target: HCP Vault Dedicated)
+
+> **⚠️ CORRECT-COURSE (2026-09-04): target changed HVS → HCP Vault Dedicated (HVD).**
+> HCP Vault Secrets is end-of-life (end-of-sale 2025-06; the `hashicorp/hcp` Terraform provider has
+> removed all `hcp_vault_secrets_*` resources/data sources). The design of record is now
+> **`architecture-vault-oidc.md`**. Read "HVS" below as **HVD** unless noted; the OIDC / single-
+> source-of-truth intent is unchanged. Verified caveats: no OIDC *into* HCP Terraform (static
+> `TF_API_TOKEN` stays); Descope *management* keys have no rotation API (manual Console rotation).
 
 ## Overview
 
-Move **every** secret the auth workspace uses into **HCP Vault Secrets (HVS)** as
+Move **every** secret the auth workspace uses into **HCP Vault Dedicated (HVD)** as
 the single source-of-truth, **off the local host**, with each consumer (HCP
 Terraform, GitHub Actions, the running backend, and local dev) pulling via
 **OIDC / workload identity** — no long-lived Vault tokens stored anywhere.
@@ -37,31 +44,33 @@ preconditions on empty secrets + a CI coverage gate).
 
 ## Target state
 
-- **HVS = single source-of-truth.** Consumers pull via OIDC / SSO; no long-lived
+- **HVD = single source-of-truth.** Consumers pull via OIDC / SSO; no long-lived
   Vault tokens committed anywhere.
 - The only credential artifact left on the host is a **short-lived HCP SSO
   session** — no secret material at rest.
 - Every synced secret keeps a **fail-loud guard** (empty ⇒ fail, never silently
   blank).
 
-## Decisions to confirm (before VAULT-0)
+## Decisions (resolved 2026-09-04)
 
-- **HVS vs full Vault** — recommend HVS (managed; native HCP-Terraform + GitHub
-  syncs; no ops).
-- **GitHub delivery** — runtime OIDC pull (recommended for CI creds — never at
-  rest in GitHub) vs HVS→GitHub native sync vs TF-reads-HVS (minimal-change
-  transition).
-- **HVS structure** — apps per repo × env: `identity-stack/{dev,prod}`,
-  `terraform-provider-descope`, `py-identity-model`, `adversarial-review`,
-  `shared`.
-- **HVS tier / secret-count limits / cost** across all repos.
+- **Store** — ~~HVS~~ **HCP Vault Dedicated** (HVS is EOL; HVD keeps "managed, no self-managed
+  ops"). Provisioned via `hcp_hvn` + `hcp_vault_cluster` — a **paid cluster** (owner gate).
+- **GitHub delivery** — **runtime OIDC pull** via `hashicorp/vault-action` (`method: jwt`) against
+  HVD's `jwt` auth backend. No secret at rest in GitHub (only non-secret `VAULT_ADDR` /
+  `VAULT_NAMESPACE`). (The old HVS→GitHub native sync is gone with HVS.)
+- **HCP Terraform delivery** — Dynamic Provider Credentials (Terraform Workload Identity) for the
+  `vault` + `hcp` providers; runs read KV via `data "vault_kv_secret_v2"`.
+- **Structure** — Vault KV-v2 paths per repo × env (`kv/identity-stack/{dev,prod}`,
+  `kv/terraform-provider-descope`, `kv/py-identity-model`, `kv/adversarial-review`, `kv/shared`);
+  one `jwt` role per repo × env, least-privilege policy per path.
+- **Cost/tier** — HVD is a paid cluster (unlike free-tier HVS); confirm tier at provisioning.
 
 ## Non-goals
 
 - Local **mock-IdP fixtures** (`.env.node-oidc` / `.env.keycloak` /
   `.env.identityserver`) — local test config, not real secrets.
 - **docker-compose** local test passwords (`POSTGRES_PASSWORD`, Redis `changeme`).
-- Standing up **self-managed Vault** — HVS is the managed target.
+- Standing up **self-managed Vault / OpenBao** — HVD is the managed target.
 
 ## Stories
 
@@ -70,24 +79,26 @@ rollback each; old secrets stay one phase behind as rollback.
 
 ---
 
-### Story VAULT-0 — Stand up HVS + OIDC/SSO auth + consumer wiring (#399)
+### Story VAULT-0 — Stand up HVD + OIDC/SSO auth + consumer wiring (#399)
 
 **User Story**
-> As the platform owner, I want HCP Vault Secrets provisioned with OIDC/SSO-based
+> As the platform owner, I want HCP Vault Dedicated provisioned with OIDC/SSO-based
 > access for every consumer, so that secrets have a single home and nothing needs
 > a long-lived Vault token.
 
 **Description**
-Create the HVS project + apps (per repo × env) with least-privilege policies and
-audit logging. Wire GitHub Actions OIDC → HVS, the HCP Terraform ↔ HVS
-integration, and human SSO; install the `hcp` CLI. Establish the bootstrap so
-each consumer authenticates with no stored token.
+Provision the HVD cluster (`hcp_hvn` + `hcp_vault_cluster`) and configure Vault (kv-v2 mount,
+`jwt-github` auth backend, one role per repo × env with claim-bound least-privilege policies, an
+audit device). Wire GitHub Actions OIDC → Vault (`vault-action` jwt), HCP Terraform → Vault via
+Dynamic Provider Credentials, and human SSO (`vault login -method=oidc`). Establish the bootstrap
+so each consumer authenticates with no stored token. See `architecture-vault-oidc.md`.
 
 **Acceptance Criteria**
-- [ ] HVS apps created per repo × env with least-privilege policies + audit logging.
-- [ ] GitHub Actions reads a test secret from HVS via OIDC (no static token).
-- [ ] An HCP Terraform workspace reads a test secret from HVS.
-- [ ] `hcp vault-secrets run` fetches a test secret locally after SSO login.
+- [ ] HVD cluster provisioned; kv-v2 paths per repo × env; least-privilege policies + audit device.
+- [ ] `jwt-github` backend + per-repo/env roles trust GitHub's OIDC issuer (claim-bound).
+- [ ] GitHub Actions reads a test secret from Vault via OIDC (no static token).
+- [ ] An HCP Terraform workspace reads a test secret from Vault via Dynamic Provider Credentials.
+- [ ] A human reads a test secret locally after SSO login (no stored token).
 - [ ] Bootstrap documented; no long-lived Vault token committed anywhere.
 
 ---
