@@ -7,7 +7,7 @@ Self-referential loop. ONE phase of ONE task per iteration, then end. Fresh cont
 3. Read `.claude/task-state.md` in the repo root
 
 - **Does not exist** → Pick up next task (below)
-- **phase is `complete`** → Mark task done in queue, delete task-state.md, pick next
+- **phase is `complete`** → Close the issue (or let the merged PR close it), delete task-state.md, pick next
 - **Any other phase** → Read the phase file and execute it
 
 Phase order: `analyze → implement → test → review → review-fix → pr → ci → complete`
@@ -16,14 +16,21 @@ Phase order: `analyze → implement → test → review → review-fix → pr �
 
 ## Pick Up Next Task
 
-Read queue: `~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/task-queue.md`
+The queue is **GitHub issues** — there is no markdown tracker (the former `task-queue.md` was
+retired 2026-09-05 for chronic drift; see `implementation-artifacts/status.md`).
 
-Find your repo's section. Take first `pending` row whose dependencies are all `done`.
+```bash
+gh issue list --repo jamescrowley321/<repo> --state open --limit 100
+```
+
+Take the first open issue in the epic you are driving, in the order the epic body lists its
+stories. If the epic body gives no order, take the lowest open issue number.
 
 - If none eligible → output: <promise>ALL TASKS COMPLETE</promise>
 - Otherwise:
-  1. Set status to `in_progress` in queue
-  2. Determine base branch: most recent `done`/`in_progress` task above with a branch, or `main`
+  1. Comment on the issue that the loop has picked it up (`gh issue comment`)
+  2. Determine base branch: the branch of the most recent story in the same epic that is not
+     yet merged, else `main`
   3. Create feature branch: `git checkout -b <branch> origin/<base_branch>`
   4. Create `.claude/task-state.md`:
      ```

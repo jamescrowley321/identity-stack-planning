@@ -71,25 +71,22 @@ done
 
 Cross-reference PR branches with active task-state branches to identify which PRs are associated with active loops.
 
-## Step 4: Parse task queue summary
+## Step 4: Summarise the work queue
 
-Read the task queue file:
+The queue is GitHub issues (the markdown `task-queue.md` was retired 2026-09-05 — see
+`_bmad-output/implementation-artifacts/status.md`). For each repo, count what is open:
 
+```bash
+for r in identity-model identity-stack terraform-provider-descope identity-stack-planning; do
+  echo "$r: $(gh issue list -R jamescrowley321/$r --state open --limit 200 --json number | jq length) open"
+done
 ```
-~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/task-queue.md
+
+Where a loop is driving a specific epic, expand that epic to show which stories remain:
+
+```bash
+gh issue view <epic> -R jamescrowley321/<repo>
 ```
-
-For each repo section (terraform-provider-descope, identity-stack, py-identity-model), count tasks by status:
-- `done` — completed tasks
-- `in_progress` — currently being worked on
-- `pending` — ready for pickup
-- `blocked` — waiting on dependencies or external factors
-- `wontfix` — intentionally skipped
-
-Also count review fix tasks separately (they appear in "Review Fix Tasks" subsections).
-
-Note: `identity-model` (and `identity-stack-planning` itself) are not tracked in
-this `task-queue.md`; their loops surface via Steps 1–3 only.
 
 ## Step 5: Display the dashboard
 

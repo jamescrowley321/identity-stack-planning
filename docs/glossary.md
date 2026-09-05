@@ -110,7 +110,7 @@ See ADR-3 in [system architecture](system-architecture.md).
 
 **SSRF (Server-Side Request Forgery)** — A vulnerability in which an attacker causes a server to make unintended requests, often to internal or metadata endpoints. Discovery and federation onboarding must defend against it. See the [OWASP SSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html).
 
-**Task queue** — Central work tracker at `_bmad-output/implementation-artifacts/task-queue.md`. Tracks tasks across all three application repos with status (`pending`, `in_progress`, `done`, `blocked`, `wontfix`), dependencies, and iteration counts. Ralph loops read this file to pick their next task.
+**Task queue** — GitHub issues. Each repo's open issues are the work queue; ralph loops read them with `gh issue list` and per-workstream prompts carry their own embedded queue. The former markdown tracker (`_bmad-output/implementation-artifacts/task-queue.md`) was retired on 2026-09-05 for chronic drift; `implementation-artifacts/status.md` records the artifact → issue map.
 
 **Task-state file** — Per-loop state persistence at `.claude/task-state.md` (or `task-state-<name>.md` for parallel loops). Contains current task ID, phase, branch, worktree path, implementation plan, and review findings. Enables crash recovery and manual inspection between phases.
 

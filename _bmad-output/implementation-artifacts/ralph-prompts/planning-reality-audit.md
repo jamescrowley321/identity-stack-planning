@@ -55,9 +55,11 @@ proxy `https://proxy.golang.org/github.com/jamescrowley321/identity-model/go/@v/
 
 **Planner → reality (stale/false planning):**
 1. **Stale status** — an epic/story/sprint row marked `planned`/`in progress`/
-   `blocked` for work that is merged, released, or closed. (Cross-check the
-   sprint-plan, `task-queue.md`, and each `epics/epic-*.md` against merged PRs +
-   tags + closed issues.)
+   `blocked` for work that is merged, released, or closed. (Cross-check each
+   `epics/epic-*.md` frontmatter `status:` and the artifact → issue map in
+   `implementation-artifacts/status.md` against merged PRs + tags + closed
+   issues. Note the markdown trackers were retired 2026-09-05 precisely because
+   they were the largest source of this class — do not reintroduce one.)
 2. **Superseded direction asserted as current** — artifacts describing a plan
    that a later `sprint-change-proposal-*.md` reversed (e.g. the pre-2026-08-17
    "PIM → monorepo / uv-workspace / node tier" direction; the consolidation is
@@ -67,11 +69,11 @@ proxy `https://proxy.golang.org/github.com/jamescrowley321/identity-model/go/@v/
    *slug* (vs the PyPI package name, which is legitimately still that), the old
    Go module path, `identity-model` (unprefixed) crate name, `identity-model`
    as the "polyglot monorepo" (that's now `identity-model-legacy`).
-4. **Finished work still presented as launch-ready** — `ralph-prompts/*.md` and
-   `gh-issue-drafts/*.md` whose queue/stories are already merged; repo-root
-   `PROMPT.md`-style "cp + ralph run" recipes pointing at completed epics
-   (per `feedback_verify_queue_before_launch` the task-queue drifts and shows
-   finished work as open — verify each queue item against merged PRs).
+4. **Finished work still presented as launch-ready** — `ralph-prompts/*.md`
+   whose embedded queue/stories are already merged, and repo-root
+   `PROMPT.md`-style "cp + ralph run" recipes pointing at completed epics.
+   Verify each embedded queue item against merged PRs and closed issues before
+   trusting it.
 5. **Broken internal references** — `[[wikilinks]]`, relative file links, or
    `epics/epic-*.md` ↔ sprint-plan ↔ gh-issue-draft cross-refs that point at
    moved/deleted/renamed files or issue numbers that don't exist.
@@ -85,8 +87,9 @@ proxy `https://proxy.golang.org/github.com/jamescrowley321/identity-model/go/@v/
    close. Also issues pointing at `identity-model-legacy` work already ported to
    the survivor.
 8. **GH issues with no planning coverage, or planning epics/stories with no GH
-   issue** — gaps in either direction; `gh-issue-drafts/*.md` never filed, or
-   filed-and-diverged.
+   issue** — gaps in either direction. `implementation-artifacts/status.md`
+   carries the map, including a deliberate "no tracking issue" list; anything
+   outside both sets is a genuine gap.
 9. **Cross-repo claims that no longer hold** — e.g. a CLAUDE.md/PRD version
    floor (`identity-stack` depends on `py-identity-model>=X`), an integration
    assumption, or an issuer/format claim that the code has since changed.
@@ -99,8 +102,8 @@ Per `feedback_parallelize_research`, split the work across independent
 subagents rather than one monolithic pass. A reasonable split:
 
 - **N artifact readers** (one per cluster): `planning-artifacts/` PRDs+epics;
-  `planning-artifacts/epics/epic-*.md`; `implementation-artifacts/`
-  (sprint-plan + task-queue); `ralph-prompts/` + `gh-issue-drafts/`; `docs/`.
+  `planning-artifacts/epics/epic-*.md`; `implementation-artifacts/status.md`;
+  `ralph-prompts/`; `docs/`.
   Each returns a structured list of every status/direction/slug/reference claim
   and whether it matches the ground-truth snapshot.
 - **1 issue auditor per repo** (4 total): reconcile that repo's open+recent-closed
@@ -127,8 +130,8 @@ Write `_bmad-output/planning-artifacts/planning-reality-audit-<YYYY-MM-DD>.md`
    subset that only edits this repo's artifacts to match reality. These land as
    ONE PR (see below).
 4. **Action list B — sibling-repo / GitHub-issue actions (owner decision):**
-   proposed issue closes/relabels/milestone links, `gh-issue-drafts` to file,
-   new issues to open for uncovered work. **Do not execute these** — present as
+   proposed issue closes/relabels/milestone links, and new issues to open for
+   uncovered work. **Do not execute these** — present as
    a checklist with the exact `gh` command and one-line rationale each, for the
    owner to approve. (`feedback_no_auto_merge_loops`: the owner reviews and acts.)
 

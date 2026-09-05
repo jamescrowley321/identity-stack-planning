@@ -4,7 +4,7 @@ project_name: 'py-identity-model'
 epic_id: 'CONS-3'
 epic_title: 'Rename Repo, Fix References, Retire identity-model & Reconcile Planning Docs'
 date: '2026-08-17'
-status: 'draft'
+status: 'done'
 inputDocuments:
   - _bmad-output/planning-artifacts/sprint-change-proposal-2026-08-17.md
   - _bmad-output/planning-artifacts/epics/epic-cons2-reorg-publishing.md
@@ -13,6 +13,9 @@ inputDocuments:
 ---
 
 # Epic CONS-3: Rename Repo, Fix References, Retire identity-model & Reconcile Planning Docs
+
+**GitHub tracking:** identity-model [#537](https://github.com/jamescrowley321/identity-model/issues/537).
+
 
 ## Overview
 

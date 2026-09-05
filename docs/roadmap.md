@@ -227,7 +227,7 @@ graph TD
 
 **Artifacts:**
 - Product Brief: [`product-brief-identity-model-monorepo.md`](../_bmad-output/planning-artifacts/product-brief-identity-model-monorepo.md)
-- Competitive Analysis: [`competitive-analysis-identity-model.md`](../_archive/competitive-analysis-identity-model.md)
+- Competitive Analysis: `competitive-analysis-identity-model.md` (2026-04-05) — compressed into the [archive index](../_archive/README.md); superseded by [`identity-model-parity-report-2026-09-05.md`](../_bmad-output/planning-artifacts/identity-model-parity-report-2026-09-05.md)
 - Epics: [`epics/epic-0a-monorepo-setup.md`](../_bmad-output/planning-artifacts/epics/epic-0a-monorepo-setup.md) through [`epic-15-modern-auth-extensions.md`](../_bmad-output/planning-artifacts/epics/epic-15-modern-auth-extensions.md) (25 files)
 
 ### Cross-cutting initiative — Identity Capability Gap Closure

@@ -25,7 +25,7 @@ correct-course already decided and partly executed; do NOT re-litigate direction
    (the correct-course: direction, layout, tag scheme, execution model)
 3. identity-stack-planning/_bmad-output/planning-artifacts/epics/epic-cons{1,2,3}-*.md
    (CONS-1 merge & test-infra, CONS-2 reorg+publishing, CONS-3 rename+retire)
-Do NOT cp+run any repo-root PROMPT.md (stale). Ignore task-queue.md until reconciled (it drifts).
+Do NOT cp+run any repo-root PROMPT.md (stale). The queue is GitHub issues.
 
 === CURRENT MERGED STATE (verify against origin/main; do not trust from memory) ===
 DONE (merged into PIM main): CONS-1.1 /go (#538), CONS-1.2 /rust (#541), CONS-1.3 /spec (#540).

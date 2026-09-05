@@ -10,6 +10,9 @@ date: '2026-07-31'
 
 # Token Validation Harness & PIM Feature-Proof — Epic Breakdown
 
+**GitHub tracking:** identity-model [#462](https://github.com/jamescrowley321/identity-model/issues/462) (epic) with stories #463–#474 (TH-1.1 … TH-4).
+
+
 ## Overview
 
 **Source:** Extends **PRD 3 — Multi-Provider Test Infrastructure (I4)**. Triggered by the observation that recent py-identity-model runtime features (esp. #461 jwks-cache FIFO→LRU / T236) were merged on green **unit** CI with **no integration proof**, breaking the repo's own rule (*every feature MUST ship integration tests + examples; unit tests are not sufficient*).

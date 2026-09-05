@@ -4,7 +4,7 @@ Mark task done and clean up. **Do NOT merge the PR.**
 
 1. **Update task status:**
    - If the router prompt has an inline task queue: update status to `done` in PROMPT.md
-   - If using external task-queue.md: update status there
+   - Close the tracking GitHub issue, or confirm the merged PR closed it
 
 2. **Clean up worktree** (if one exists):
    ```

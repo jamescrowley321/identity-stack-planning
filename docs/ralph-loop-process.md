@@ -8,7 +8,7 @@ A ralph loop is an autonomous execution cycle that takes a task from the queue, 
 
 ```mermaid
 flowchart LR
-    PRD[PRD] --> EPIC[Epic breakdown<br/>with stories] --> QUEUE[Task Queue<br/>task-queue.md] --> RALPH[Ralph Loop<br/>ralph run] --> PR[Merged PR]
+    PRD[PRD] --> EPIC[Epic breakdown<br/>with stories] --> QUEUE[GitHub issues<br/>the work queue] --> RALPH[Ralph Loop<br/>ralph run] --> PR[Merged PR]
 ```
 
 ## From Planning to Execution
@@ -27,7 +27,7 @@ Each story has a title, acceptance criteria, and dependency information. Created
 
 ### 4. Stories enter the task queue
 
-The task queue (`_bmad-output/implementation-artifacts/task-queue.md`) is the single source of truth for all work across all repos. Each task has:
+GitHub issues are the single source of truth for all work across all repos. A per-workstream ralph prompt may carry its own embedded queue for the stories it is driving, but that queue is scoped to one loop and dies with it. Each tracked unit of work has:
 
 | Field | Description |
 |-------|-------------|
@@ -233,7 +233,7 @@ Ralph loops can be stopped between iterations (each iteration is a clean exit po
 
 ### Adjusting the queue
 
-Edit `_bmad-output/implementation-artifacts/task-queue.md` to:
+Adjust the queue on GitHub (close, reprioritise, relabel, or edit the epic body that orders the stories) to:
 - Reorder tasks (ralph picks the first pending task with met dependencies)
 - Skip tasks (change status to `wontfix`)
 - Add new tasks

@@ -90,7 +90,7 @@ Follow `phases/analyze.md` with these additions:
 1. Read the GH issue: `gh issue view <issue> --repo jamescrowley321/py-identity-model`
 2. Read the affected source files identified in the issue
 3. Read related test files to understand existing test patterns
-4. Read the security fix plan for batch context: `~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/security-fix-plan.md`
+4. Read the live security-control matrix for batch context: `~/repos/auth/py-identity-model/py/docs/security/control-matrix.md` (the April 2026 `security-fix-plan.md` was retired 2026-09-05 — see `_archive/README.md`)
 5. Plan must include:
    - Exact files to modify with current line counts
    - The exploit scenario from the issue — your fix must block it

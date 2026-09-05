@@ -34,7 +34,7 @@ Make one `Agent` tool call with `subagent_type: general-purpose`. The prompt mus
 - Read the story spec with: gh issue view <issue_number> --repo jamescrowley321/<repo>
 - Update any stale documentation directly in the codebase
 - Write your summary to <absolute path>/.claude/docs-writer.md
-- Do NOT read PROMPT.md, task-state.md, sprint-plan.md, task-queue.md, or any file under ralph-prompts/phases/
+- Do NOT read PROMPT.md, task-state.md, or any file under ralph-prompts/phases/
 - Follow the output format specified in the persona template literally
 - Return a one-line summary: files checked and files updated
 ```

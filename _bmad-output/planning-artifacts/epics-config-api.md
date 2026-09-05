@@ -11,6 +11,9 @@ project_name: 'identity-model config-api'
 
 # Configuration API — Epic Breakdown
 
+**GitHub tracking:** identity-model [#616](https://github.com/jamescrowley321/identity-model/issues/616) (epic) with stories #617–#620; identity-stack #406 (backend) and #407 (frontend).
+
+
 ## Overview
 
 Epic and story breakdown for the unified cross-language Configuration API, decomposing `prd-config-api.md` (36 FRs, 15 NFRs) and `architecture-config-api.md` (decisions D1–D9) into implementable stories. Repo tags: `[OIM]` = identity-model monorepo, `[IS]` = identity-stack.

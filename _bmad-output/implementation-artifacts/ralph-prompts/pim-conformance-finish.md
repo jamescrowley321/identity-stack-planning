@@ -105,7 +105,7 @@ After each fix:
 | Basic RP config | `conformance/configs/basic-rp.json` |
 | Latest results | `conformance/results/basic-rp-latest.json` |
 | Full certification gap analysis | `docs/oidc-certification-analysis.md` |
-| Task queue | `~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/task-queue.md` |
+| Work queue | GitHub issues — `gh issue list --repo jamescrowley321/identity-model --state open` |
 
 ## Constraints
 

@@ -11,6 +11,7 @@ node_modules/
 
 # Claude Code runtime state
 .claude/task-state.md
+.claude/worktrees/
 
 # Ralph orchestrator runtime state
 .ralph/

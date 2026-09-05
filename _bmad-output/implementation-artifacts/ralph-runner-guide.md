@@ -56,4 +56,4 @@ git worktree list               # Active worktrees
 
 ## Adjusting the Queue
 
-Edit `task-queue.md` to reorder, skip (`blocked`/`wontfix`), add tasks, or change dependencies.
+Reorder, skip or add work by editing the GitHub issues — close what is out of scope, and edit the epic body that orders its stories. A loop driven by a per-workstream prompt takes its order from that prompt's embedded queue instead. See [`status.md`](status.md).

@@ -40,10 +40,10 @@ Start with the **[Roadmap](roadmap.md)** to understand the 6 PRDs, cross-cutting
 
 ## Implementation Tracking
 
-- **[Task Queue](../_bmad-output/implementation-artifacts/task-queue.md)** — Cross-repo task tracker with active/pending tasks.
-- **[Sprint Plan](../_bmad-output/implementation-artifacts/sprint-plan.md)** — Prioritized tiers with active work and dependency graph.
+- **[Planning ⇄ GitHub Reconciliation (2026-09-05)](../_bmad-output/planning-artifacts/planning-github-reconciliation-2026-09-05.md)** — What the planning artifacts claimed vs what GitHub says, the drift that was fixed, and the residual gaps.
+- **[Where Status Lives](../_bmad-output/implementation-artifacts/status.md)** — GitHub issues are the source of truth for status; this maps each planning artifact to its tracking issue. Replaces the retired `task-queue.md` and `sprint-plan.md`.
 - **[Ralph Runner Guide](../_bmad-output/implementation-artifacts/ralph-runner-guide.md)** — Quick-reference commands for ralph loops.
 
 ## Archived
 
-Historical research, brainstorming sessions, and completed review findings are in `_archive/`.
+Historical research, brainstorming sessions, spent loop prompts and completed review findings are indexed in [`_archive/README.md`](../_archive/README.md), which records what each artifact was, what superseded it, and the exact `git show` command to read it back. The files themselves are removed from the working tree.
