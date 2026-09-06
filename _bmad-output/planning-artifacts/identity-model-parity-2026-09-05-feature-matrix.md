@@ -12,7 +12,7 @@ Legend: ✅ full · 🟡 partial · ❌ absent · Δ = changed vs the 2026-08-29
 |---|---|:--:|:--:|:--:|---|
 | A1 | Discovery fetch | ✅ | ✅ | ✅ | PY/sync,aio/discovery.py · GO/discovery/discovery.go · RS/discovery/client.rs |
 | A2 | Metadata parse | ✅ | ✅ | ✅ | unchanged |
-| A3 | Issuer validation | 🟡 | ✅ | ✅ | Inversion intact — see §2 I-3 |
+| A3 | Issuer validation | 🟡 | ✅ | ✅ | Inversion intact — see the RFC 8414 issuer-match row in §2 |
 | A4 | Discovery cache | ✅ | ✅ | ✅ | |
 | A5 | SSRF / endpoint-authority | ✅ | 🟡 | 🟡 | PY/core/response_processors.py:100-172 (authority pinning + internal-IP rejection); Go/Rust still HTTPS+body-cap only |
 | B1 | JWKS fetch | ✅ | ✅ | ✅ | |
@@ -51,7 +51,7 @@ Legend: ✅ full · 🟡 partial · ❌ absent · Δ = changed vs the 2026-08-29
 
 ### Advanced / FAPI tier — no cell changed since 2026-08-29
 
-Python ✅ for D2c private_key_jwt, D2d mTLS, D4, G2 cert-bound (8705), G4 PAR, G5 JARM, G6 JAR, G7 RFC 9207, G9 authorize-URL+callback, G10 logout, K5 FAPI; Go/Rust ❌ throughout except D2b client_secret_post (Go ✅ Rust ✅ Py ❌ — inversion I-1) and G9 Rust 🟡 (builder only: RS/token/pkce.rs:100; no callback parse; Go still internal test-helper only). Zero private_key_jwt/client_assertion code in GO/ or RS/. RAR/CIBA: nothing anywhere — capabilities.md "planned ×3" accurate.
+Python ✅ for D2c private_key_jwt, D2d mTLS, D4, G2 cert-bound (8705), G4 PAR, G5 JARM, G6 JAR, G7 RFC 9207, G9 authorize-URL+callback, G10 logout, K5 FAPI; Go/Rust ❌ throughout except D2b client_secret_post (Go ✅ Rust ✅ Py ❌ — an inversion: the ports have it, Python does not) and G9 Rust 🟡 (builder only: RS/token/pkce.rs:100; no callback parse; Go still internal test-helper only). Zero private_key_jwt/client_assertion code in GO/ or RS/. RAR/CIBA: nothing anywhere — capabilities.md "planned ×3" accurate.
 
 ### Cross-cutting — no cell changed since 2026-08-29
 
@@ -70,12 +70,12 @@ Matrix now mostly truthful. Remaining discrepancies:
 
 | # | Inversion | Status | Evidence |
 |---|---|---|---|
-| I-1 | client_secret_post | STILL PRESENT | Py none: PY/core/token_client_logic.py:76-90 (private_key_jwt → mTLS → Basic only), same introspection_logic.py:42-57, revocation_logic.py:39-53; only dead constants (oidc_constants.py:409, config.py:132 enum unwired). Go: token/options.go:16-18 + token.go:204, introspection.go:69, revocation.go:82. Rust: token/mod.rs:83,232; introspection/mod.rs:145 |
-| I-2 | id-token nonce | RESOLVED in Python (Δ) | PY/core/id_token_logic.py:199-207 (constant-time, fail-closed) via first-class validate_id_token. Residual: Go/Rust also expose expected-nonce on BASE JWT validation (GO/jwt/options.go:71-74; RS/jwt/options.rs:164-166); Python's base TokenValidationConfig has no nonce field — JWT-004 satisfied via claims-validator adapter (test_spec_conformance.py:169-226) |
-| I-3 | RFC 8414 issuer-identifier match | STILL PRESENT | Python validates issuer format only (PY/core/validators.py:26,204-226) + endpoint-authority binding; no doc.issuer == requested compare anywhere. Go: discovery.go:206 (DISC-003). Rust: client.rs:88-89. Last inversion where both ports beat the reference |
-| I-4 | azp | RESOLVED for Py+Go (Δ); Rust eager behavior unchanged | Py: id_token_logic.py:182-196 (multi-aud ⇒ azp required; present azp must equal client_id). Go: idtoken.go:125-145. Rust: retains always-on azp in base validate_token when expected_audience set (RS/jwt/claims.rs:296-315) plus profile (id_token.rs:280-286). Plan's I-4 rec ("soften Rust to opt-in") NOT implemented — but the Py/Go direction (profile-scoped, keyed to client_id) is opt-in-shaped |
+| `client_secret_post` | STILL PRESENT | Py none: PY/core/token_client_logic.py:76-90 (private_key_jwt → mTLS → Basic only), same introspection_logic.py:42-57, revocation_logic.py:39-53; only dead constants (oidc_constants.py:409, config.py:132 enum unwired). Go: token/options.go:16-18 + token.go:204, introspection.go:69, revocation.go:82. Rust: token/mod.rs:83,232; introspection/mod.rs:145 |
+| id-token `nonce` | RESOLVED in Python (Δ) | PY/core/id_token_logic.py:199-207 (constant-time, fail-closed) via first-class validate_id_token. Residual: Go/Rust also expose expected-nonce on BASE JWT validation (GO/jwt/options.go:71-74; RS/jwt/options.rs:164-166); Python's base TokenValidationConfig has no nonce field — JWT-004 satisfied via claims-validator adapter (test_spec_conformance.py:169-226) |
+| RFC 8414 issuer-identifier match | STILL PRESENT | Python validates issuer format only (PY/core/validators.py:26,204-226) + endpoint-authority binding; no doc.issuer == requested compare anywhere. Go: discovery.go:206 (DISC-003). Rust: client.rs:88-89. Last inversion where both ports beat the reference |
+| `azp` | RESOLVED for Py+Go (Δ); Rust eager behavior unchanged | Py: id_token_logic.py:182-196 (multi-aud ⇒ azp required; present azp must equal client_id). Go: idtoken.go:125-145. Rust: retains always-on azp in base validate_token when expected_audience set (RS/jwt/claims.rs:296-315) plus profile (id_token.rs:280-286). The earlier recommendation to soften Rust to opt-in was NOT implemented — but the Py/Go direction (profile-scoped, keyed to client_id) is opt-in-shaped |
 
-Net: 2 of 4 closed by the id-token stack; I-1 and I-3 remain open — the two P0 items still requiring §3 sign-off.
+Net: 2 of 4 closed by the id-token stack; `client_secret_post` and the RFC 8414 issuer match remain open.
 
 ## 3. Coverage estimate
 
@@ -95,8 +95,8 @@ Caveat: old report's "Go ≈45% · Rust ≈25%" were size-weighted impressions; 
 ## 4. Gap list (candidate work items)
 
 Python (two open inversions + residuals):
-- client_secret_post for token/introspection/revocation/token-exchange — S, Core (P0 I-1; unblocks capabilities.md MUST conformance)
-- RFC 8414 issuer-identifier match — S, Core (P0 I-3)
+- client_secret_post for token/introspection/revocation/token-exchange — S, Core (P0; unblocks capabilities.md MUST conformance)
+- RFC 8414 issuer-identifier match — S, Core (P0)
 - First-class expected_nonce on base TokenValidationConfig — S, Core
 - Sync-path cache-metrics instrumentation (H6) — S, P1 operational
 - Uniform body caps / redirect-downgrade / dup-claim-key back-ports — M, P3
@@ -115,7 +115,7 @@ Rust:
 - ES512 + EdDSA (C2, jsonwebtoken-crate constraint) — M, Core
 - Discovery single-flight — S, P1 · H3/I2/I3/H6 — M, P1 · A5 pinning — M, P1
 - Sync API (J1) — L, deliberate-scope decision · logging (K3) — M
-- azp softening per plan I-4, if that decision stands — S, Core
+- Softening Rust's always-on `azp` to opt-in — recommended AGAINST; Rust stays strict — S, Core
 - B5 / C7 / G8 — S each · callback-parse half of G9 — S
 - Advanced-FAPI set — L, owner-scheduled
 
