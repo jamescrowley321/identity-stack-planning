@@ -354,14 +354,14 @@ flowchart TD
 | ADR-GW-4 | architecture-api-gateway.md | Env var over OpenFeature | Plain `DEPLOYMENT_MODE` sufficient for binary toggle |
 | ADR-GW-5 | architecture-api-gateway.md | Startup-time evaluation | Middleware assembled once; restart to change mode |
 | ADR-GW-6 | architecture-api-gateway.md | Default profile = standalone | `docker compose up` works with zero infrastructure |
-| D-1 | architecture-canonical-identity.md | PostgreSQL 16 | Replaces SQLite; production-grade for canonical store |
-| D-2 | architecture-canonical-identity.md | SQLModel + Alembic | Async-only, no sync Session anywhere |
-| D-3 | architecture-canonical-identity.md | AsyncSession + asyncpg | Async-only database access |
-| D-4 | architecture-canonical-identity.md | ABCs with constructor injection | No generics; testable via NoOpSyncAdapter |
-| D-5 | architecture-canonical-identity.md | Result[T, E] + RFC 9457 | Service methods return Results; routers map to Problem Details |
-| D-6 | architecture-canonical-identity.md | OpenTelemetry auto-instrumentation | Aspire Dashboard for trace viewing; traceId in error responses |
-| D-7 | architecture-canonical-identity.md | Write-through sync | Postgres first, IdP second; never rollback on sync failure |
-| D-8 | architecture-canonical-identity.md | Repository-level tenant isolation | Explicit tenant_id params, no implicit context |
+| ADR-CANON-1 | architecture-canonical-identity.md | PostgreSQL 16 | Replaces SQLite; production-grade for canonical store |
+| ADR-CANON-2 | architecture-canonical-identity.md | SQLModel + Alembic | Async-only, no sync Session anywhere |
+| ADR-CANON-3 | architecture-canonical-identity.md | AsyncSession + asyncpg | Async-only database access |
+| ADR-CANON-4 | architecture-canonical-identity.md | ABCs with constructor injection | No generics; testable via NoOpSyncAdapter |
+| ADR-CANON-5 | architecture-canonical-identity.md | Result[T, E] + RFC 9457 | Service methods return Results; routers map to Problem Details |
+| ADR-CANON-6 | architecture-canonical-identity.md | OpenTelemetry auto-instrumentation | Aspire Dashboard for trace viewing; traceId in error responses |
+| ADR-CANON-7 | architecture-canonical-identity.md | Write-through sync | Postgres first, IdP second; never rollback on sync failure |
+| ADR-CANON-8 | architecture-canonical-identity.md | Repository-level tenant isolation | Explicit tenant_id params, no implicit context |
 | ADR-IS-1 | architecture-infrastructure-secrets.md | HCP Terraform for state | Encrypted, versioned, locked; free tier sufficient |
 | ADR-IS-2 | architecture-infrastructure-secrets.md | Infisical over Vault | Right-sized complexity; better UX for small teams |
 | ADR-IS-3 | architecture-infrastructure-secrets.md | CLI injection pattern | `infisical run` injects env vars; zero application code changes |

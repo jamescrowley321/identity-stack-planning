@@ -67,6 +67,21 @@ When BMAD workflows reference implementation details, architecture, or existing 
 
 The parent directory `~/repos/auth/CLAUDE.md` contains consolidated commands, git conventions, and cross-repo relationships for all four repos. Always reference it for build/test/lint commands and git workflows — it is the single source of truth for workspace-wide instructions.
 
+## Writing Conventions
+
+**Expand a short code the first time a document uses it.** Write `CONS-1 (the first polyglot-consolidation
+epic)`, never a bare `CONS-1`. A reader should be able to parse any sentence without leaving the page. This
+applies to requirement codes, decision codes, story codes and task IDs alike.
+
+**One prefix, one meaning, repo-wide.** Before inventing a code family, check
+[`docs/glossary.md` → Code index](docs/glossary.md) and add the new family there. `D-1` once meant both an
+architecture decision in `system-architecture.md` and an unrelated sign-off item in a parity report — the
+collision made both unreadable, and cleaning it up cost more than naming things properly would have.
+
+**Prefer plain words to a code.** A code earns its place only when the thing is referenced from several
+documents or tracked on GitHub. A decision that lives in one document does not need an identifier; describe
+it. When work is tracked as a GitHub issue, the issue number is the identifier — do not mint a parallel one.
+
 ## Git Conventions
 
 - **Conventional commits** (Angular convention) — commit messages must use prefixes like `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `ci:`, `build:`, `test:`, `style:`, `perf:`

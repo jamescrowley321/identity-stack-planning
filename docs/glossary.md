@@ -4,6 +4,68 @@ Definitions for terms used across identity-stack-planning documents. Grouped for
 
 ---
 
+## Code index
+
+Planning documents use short codes for requirements, decisions and tasks. Every family in current use is
+listed here. **If a code is not in this table, it is legacy — find the document that introduced it, or
+replace it with plain words.**
+
+Two rules keep this table honest, and they are in `CLAUDE.md`:
+
+1. **Expand a code the first time a document uses it** — `CONS-1 (the first polyglot-consolidation epic)`,
+   not a bare `CONS-1`. A reader should never have to leave the page to parse a sentence.
+2. **One prefix, one meaning, repo-wide.** `D-1` used to mean an architecture decision in
+   `system-architecture.md` *and* an unrelated sign-off item in the parity report. That collision is why this
+   table exists; the architecture series was renamed `ADR-CANON-n` and the parity codes were deleted in favour
+   of plain names.
+
+### Requirements
+
+| Code | Means | Owned by |
+|---|---|---|
+| `FR-<SUB>-n` | Functional requirement, numbered per sub-system | `planning-artifacts/prd*.md` |
+| `NFR-<SUB>-n` | Non-functional requirement (performance, security, operability) | `planning-artifacts/prd*.md` |
+| `AC-<story>-n` | Acceptance criterion for a story | the story's epic document |
+
+`<SUB>` is the repo tag: **PIM** = `py-identity-model` (the Python package), **SSS** = `identity-stack` (the
+SaaS starter), **TFP** = `terraform-provider-descope`, **CROSS** = spans repos.
+
+### Decisions
+
+| Code | Means | Owned by |
+|---|---|---|
+| `ADR-n` | Architecture decision, platform-wide | `architecture.md` |
+| `ADR-GW-n` | …for the API gateway | `architecture-api-gateway.md` |
+| `ADR-IS-n` | …for infrastructure + secrets | `architecture-infrastructure-secrets.md` |
+| `ADR-CANON-n` | …for the canonical identity model | `architecture-canonical-identity.md` |
+| `ADR-OI-n` | …for the open-identity work | `architecture-open-identity.md` |
+| `OD-n` | Open decision, later resolved and locked | `architecture-open-identity.md` |
+
+### Epics and their stories
+
+| Code | Means | Tracking |
+|---|---|---|
+| `CONS-1..3` | Polyglot consolidation: merge, reorganise, rename | identity-model #535 / #536 / #537 |
+| `TH-n.n` | Token-blaster harness stories | identity-model #462 (#463–#474) |
+| `RE5.n` | Rust extended tier: introspection, revocation, token-exchange, DPoP | identity-model |
+| `LP-n` | Load-suite correct-course tasks | identity-model #543–#546 |
+| `K1..K6` | OIDF conformance harness tasks | identity-model #242 |
+| `DS-n.n` | Design-system stories | identity-stack |
+| `VAULT-n` | Secrets-to-Vault migration stories | identity-stack #398 (#399–#405) |
+| `TFCENV-n` | Terraform Cloud dev/prod environment stories | identity-stack #411 (#412–#418) |
+
+### Findings and controls
+
+| Code | Means | Owned by |
+|---|---|---|
+| `RT<n>-F<n>` | Red-team audit round *n*, finding *n* | the round's audit report |
+| `F-nn` | Finding from the 2026-08 red/blue security audit | same |
+| `SC<n>` | Security control | `identity-model` → `py/docs/security/control-matrix.md` |
+| `T<nnn>` | Legacy task ID used by ralph loop prompts | the prompt that defines it |
+
+`T<nnn>` is the weakest of these: the numbers were assigned by whichever prompt needed them and carry no
+global meaning. Prefer the GitHub issue number.
+
 **ADR (Architecture Decision Record)** — A short record of an architectural decision, its context, and its consequences. See the workspace’s [system architecture and ADR index](system-architecture.md).
 
 **Acceptance Auditor** — Review agent persona that verifies spec compliance. For each acceptance criterion, checks whether it's implemented, tested, and matches intent. Reports PASS / FAIL / PARTIAL / SCOPE CREEP. See [review process](review-process.md).
@@ -118,7 +180,7 @@ See ADR-3 in [system architecture](system-architecture.md).
 
 **Worktree** — Git worktree used for filesystem isolation in story-based ralph loops. Each story gets its own worktree (e.g., `/tmp/sss-canonical-story-1.3`) so multiple loops can run in parallel without interference. Cleaned up when the story completes.
 
-**Write-through sync** — Data consistency pattern used by the canonical identity model. API-originated writes go to Postgres first (source of truth), then sync to the identity provider. Sync failures are logged and warned but never rolled back — a reconciliation job catches up asynchronously. See D-7 in [system architecture](system-architecture.md).
+**Write-through sync** — Data consistency pattern used by the canonical identity model. API-originated writes go to Postgres first (source of truth), then sync to the identity provider. Sync failures are logged and warned but never rolled back — a reconciliation job catches up asynchronously. See ADR-CANON-7 in [system architecture](system-architecture.md).
 
 **VC (Verifiable Credential)** — A tamper-evident credential that represents claims about a subject and can be presented for verification. Credential evidence is distinct from an authorization decision. See the [W3C Verifiable Credentials Data Model](https://www.w3.org/TR/vc-data-model/).
 
