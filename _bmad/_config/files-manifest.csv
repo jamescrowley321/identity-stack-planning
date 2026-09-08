@@ -134,7 +134,7 @@ type,name,module,path,hash
 "md","step-04-review","bmm","bmm/workflows/bmad-quick-flow/bmad-quick-spec/steps/step-04-review.md","8d1e3b41c3b2b018bf2177baa22d46b27efac4ca5da6ab7bee9fbf2c7b9079d8"
 "md","step-04-self-check","bmm","bmm/workflows/bmad-quick-flow/bmad-quick-dev/steps/step-04-self-check.md","9a8e3d3cd35c8d8b86ec65b422566e0e0842782bddd36e942bd0327f6b893f0c"
 "md","step-04-ux-alignment","bmm","bmm/workflows/3-solutioning/bmad-check-implementation-readiness/steps/step-04-ux-alignment.md","f71e5f0d77615e885ae40fdee6b04c1dd6e472c871f87b515fe869cb5f6966fb"
-"md","step-05-adversarial-review","bmm","bmm/workflows/bmad-quick-flow/bmad-quick-dev/steps/step-05-adversarial-review.md","d8fe2a3c64b03298aa92d5c104f10f2aa6c470ef16c864b0f5297adf8f82a10a"
+"md","step-05-blind-peer-review","bmm","bmm/workflows/bmad-quick-flow/bmad-quick-dev/steps/step-05-blind-peer-review.md","d8fe2a3c64b03298aa92d5c104f10f2aa6c470ef16c864b0f5297adf8f82a10a"
 "md","step-05-competitive-analysis","bmm","bmm/workflows/1-analysis/research/bmad-market-research/steps/step-05-competitive-analysis.md","17532051ad232cfc859f09ac3b44f9f4d542eb24cff8d07317126ccdff0d225a"
 "md","step-05-competitive-analysis","bmm","bmm/workflows/1-analysis/research/market-steps/step-05-competitive-analysis.md","ff6f606a80ffaf09aa325e38a4ceb321b97019e6542241b2ed4e8eb38b35efa8"
 "md","step-05-epic-quality-review","bmm","bmm/workflows/3-solutioning/bmad-check-implementation-readiness/steps/step-05-epic-quality-review.md","d8a84e57f4e3a321734b5b5d093458ceb1e338744f18954c5a204f5ce3576185"

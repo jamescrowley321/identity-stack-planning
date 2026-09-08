@@ -1,4 +1,4 @@
-# Adversarial Review (General)
+# Blind Peer Review (General)
 
 **Goal:** Cynically review content and produce findings.
 

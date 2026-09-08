@@ -14,7 +14,7 @@ The auth workspace uses AI-driven development loops (Ralph Orchestrator) to impl
 
 Five specialized reviewers, each designed to catch a different class of defects:
 
-### Blind Hunter
+### Cold Read
 
 **Mindset:** Cynical, jaded, expects problems. Zero project context — sees only the diff.
 
@@ -31,7 +31,7 @@ Five specialized reviewers, each designed to catch a different class of defects:
 
 **Template:** [`review-agents/blind-hunter.md`](../_bmad-output/implementation-artifacts/ralph-prompts/review-agents/blind-hunter.md)
 
-### Edge Case Hunter
+### Edge Cases
 
 **Mindset:** Pure path tracer. Methodical, exhaustive, emotionless. Walks every branch.
 
@@ -46,7 +46,7 @@ Five specialized reviewers, each designed to catch a different class of defects:
 
 **Template:** [`review-agents/edge-case-hunter.md`](../_bmad-output/implementation-artifacts/ralph-prompts/review-agents/edge-case-hunter.md)
 
-### Acceptance Auditor
+### Acceptance Criteria
 
 **Mindset:** Literal, unforgiving contract lawyer. Checks every acceptance criterion.
 
@@ -61,7 +61,7 @@ Five specialized reviewers, each designed to catch a different class of defects:
 
 **Template:** [`review-agents/acceptance-auditor.md`](../_bmad-output/implementation-artifacts/ralph-prompts/review-agents/acceptance-auditor.md)
 
-### Sentinel (Security Auditor)
+### Security Review (Security Auditor)
 
 **Mindset:** Pragmatic, experienced, calibrated. Reports only genuinely exploitable vulnerabilities. Never cries wolf.
 
@@ -78,7 +78,7 @@ Five specialized reviewers, each designed to catch a different class of defects:
 
 **Template:** [`review-agents/sentinel.md`](../_bmad-output/implementation-artifacts/ralph-prompts/review-agents/sentinel.md)
 
-### Viper (Red Team)
+### Red Team (Red Team)
 
 **Mindset:** Offensive security specialist. Activated only for high-risk changes.
 
@@ -100,10 +100,10 @@ flowchart TD
     IMPL[Implementation complete] --> DIFF[Generate diff]
 
     subgraph reviewers["Parallel Review"]
-        BH[Blind Hunter<br/>diff only]
-        ECH[Edge Case Hunter<br/>diff + repo]
-        AA[Acceptance Auditor<br/>spec + repo]
-        SEN[Sentinel<br/>security lens]
+        BH[Cold Read<br/>diff only]
+        ECH[Edge Cases<br/>diff + repo]
+        AA[Acceptance Criteria<br/>spec + repo]
+        SEN[Security Review<br/>security lens]
     end
 
     DIFF --> reviewers
@@ -117,7 +117,7 @@ flowchart TD
     RECHECK -->|No, retries left| FIX
     RECHECK -->|Exhausted| BLOCK[Block for manual review]
 
-    TRIAGE -.->|Auth changes?| VIP[Viper Red Team] -.-> TRIAGE
+    TRIAGE -.->|Auth changes?| VIP[Red Team Red Team] -.-> TRIAGE
 
     style BH fill:#e76f51,color:#fff
     style ECH fill:#e76f51,color:#fff
@@ -129,7 +129,7 @@ flowchart TD
 
 **Key properties:**
 - All 4 standard reviewers run in parallel (no shared context between them)
-- Viper is conditional — only triggered for auth/middleware/token/infrastructure changes
+- Red Team is conditional — only triggered for auth/middleware/token/infrastructure changes
 - Each reviewer is a separate Claude Code subagent spawned with a fresh context
 - The fix loop re-reviews ALL findings after fixes (not just the ones that were "fixed")
 - Blocking findings that survive 3 fix iterations require manual intervention
@@ -138,22 +138,22 @@ flowchart TD
 
 When multiple reviewers report overlapping findings, the review-fix phase triages by priority:
 
-1. **BLOCK / CONFIRMED** (Sentinel) — Exploitable security vulnerabilities
-2. **FAIL** (Acceptance Auditor) — Missing or incorrect requirements implementation
-3. **MUST FIX** (Blind Hunter) — Bugs, crashes, data loss
-4. **CRITICAL / HIGH** (Viper) — Red team exploitation paths
-5. **Edge cases with [CRASH] or [DATA]** (Edge Case Hunter) — Unhandled paths causing crashes or data loss
-6. **WARN / LIKELY** (Sentinel) — Security issues requiring unusual conditions
-7. **SHOULD FIX** (Blind Hunter) — Code quality risks
-8. **PARTIAL** (Acceptance Auditor) — Incomplete implementations
-9. **Edge cases with [WRONG] or [DEGRADED]** (Edge Case Hunter) — Incorrect results or degraded behavior
+1. **BLOCK / CONFIRMED** (Security Review) — Exploitable security vulnerabilities
+2. **FAIL** (Acceptance Criteria) — Missing or incorrect requirements implementation
+3. **MUST FIX** (Cold Read) — Bugs, crashes, data loss
+4. **CRITICAL / HIGH** (Red Team) — Red team exploitation paths
+5. **Edge cases with [CRASH] or [DATA]** (Edge Cases) — Unhandled paths causing crashes or data loss
+6. **WARN / LIKELY** (Security Review) — Security issues requiring unusual conditions
+7. **SHOULD FIX** (Cold Read) — Code quality risks
+8. **PARTIAL** (Acceptance Criteria) — Incomplete implementations
+9. **Edge cases with [WRONG] or [DEGRADED]** (Edge Cases) — Incorrect results or degraded behavior
 10. **NITPICK / INFO** — Deferred unless trivial to fix
 
-## Manual Adversarial Review
+## Manual Blind Peer Review
 
 For full codebase re-reviews outside of ralph loops (e.g., when prior in-context reviews were shallow), use the standalone adversarial review prompt:
 
-**py-identity-model:** [`pim-adversarial-review.md`](../_bmad-output/implementation-artifacts/ralph-prompts/pim-adversarial-review.md)
+**py-identity-model:** [`pim-blind-peer-review.md`](../_bmad-output/implementation-artifacts/ralph-prompts/pim-blind-peer-review.md)
 
 This prompt is designed to run in a **completely fresh Claude Code session** with no prior conversation context. It covers:
 1. Architectural reconnaissance (read key files to understand the codebase)

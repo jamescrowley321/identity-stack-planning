@@ -112,14 +112,14 @@ Saved to: {finalFile}
 **Next Steps:**
 
 [A] Advanced Elicitation - refine further
-[R] Adversarial Review - critique of the spec (highly recommended)
+[R] Blind Peer Review - critique of the spec (highly recommended)
 [B] Begin Development - start implementing now (not recommended)
 [D] Done - exit workflow
 [P] Party Mode - get expert feedback before dev
 
 ---
 
-Once you are fully satisfied with the spec (ideally after **Adversarial Review** and maybe a few rounds of **Advanced Elicitation**), it is recommended to run implementation in a FRESH CONTEXT for best results.
+Once you are fully satisfied with the spec (ideally after **Blind Peer Review** and maybe a few rounds of **Advanced Elicitation**), it is recommended to run implementation in a FRESH CONTEXT for best results.
 
 Copy this prompt to start dev:
 
@@ -138,7 +138,7 @@ b) **HALT and wait for user selection.**
 - IF B: Invoke the `bmad-quick-dev` skill with `{finalFile}` in a fresh context if possible (warn: fresh context is better)
 - IF D: Exit workflow - display final confirmation and path to spec
 - IF P: Invoke the `bmad-party-mode` skill with current spec content, process collaborative insights, ask user "Accept changes? (y/n)", if yes update spec then redisplay menu, if no keep original then redisplay menu
-- IF R: Execute Adversarial Review (see below)
+- IF R: Execute Blind Peer Review (see below)
 - IF Any other comments or queries: respond helpfully then redisplay menu
 
 #### EXECUTION RULES:
@@ -146,9 +146,9 @@ b) **HALT and wait for user selection.**
 - ALWAYS halt and wait for user input after presenting menu
 - After A, P, or R execution, return to this menu
 
-#### Adversarial Review [R] Process:
+#### Blind Peer Review [R] Process:
 
-1. **Invoke Adversarial Review Skill**:
+1. **Invoke Blind Peer Review Skill**:
        > With `{finalFile}` constructed, invoke the `bmad-review-adversarial-general` skill. If possible, use information asymmetry: invoke the skill in a separate subagent or process with read access to the project, but no context except the `{finalFile}`.
        > Pass `{finalFile}` as the content to review. The skill should return a list of findings.
 

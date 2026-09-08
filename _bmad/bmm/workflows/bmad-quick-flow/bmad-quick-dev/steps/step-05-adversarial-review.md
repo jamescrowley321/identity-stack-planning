@@ -51,7 +51,7 @@ Merge all changes into `{diff_output}`.
 
 ---
 
-### 2. Invoke Adversarial Review
+### 2. Invoke Blind Peer Review
 
 With `{diff_output}` constructed, invoke the `bmad-review-adversarial-general` skill. If possible, use information asymmetry: invoke the skill in a separate subagent or process with read access to the project, but no context except the `{diff_output}`.
 

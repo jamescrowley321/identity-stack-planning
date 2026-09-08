@@ -85,7 +85,7 @@ Proceeding to adversarial code review...
 
 ## NEXT STEP
 
-Proceed immediately to `./step-05-adversarial-review.md`.
+Proceed immediately to `./step-05-blind-peer-review.md`.
 
 ---
 

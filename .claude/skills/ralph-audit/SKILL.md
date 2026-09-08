@@ -18,7 +18,7 @@ for f in ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifa
 done | sort -rn
 ```
 
-**Flag:** Any prompt >800 words (except completed epics and one-shot prompts like `pim-adversarial-review.md`). Self-contained prompts (>1,000 words with inline phase instructions) should be converted to the router + phase file pattern.
+**Flag:** Any prompt >800 words (except completed epics and one-shot prompts like `pim-blind-peer-review.md`). Self-contained prompts (>1,000 words with inline phase instructions) should be converted to the router + phase file pattern.
 
 **Check for inline phases:** For each prompt >800 words, grep for `### review-blind` or `### review-edge` or `### execute` — presence indicates inline phases that should be externalized.
 
@@ -80,7 +80,7 @@ Read `~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts
 **Flag:**
 - No conditional reviewer selection (all reviewers always run)
 - Missing diff-stat based scope detection
-- Viper not conditional on auth changes
+- Red Team not conditional on auth changes
 
 ## Step 7: Check review-fix for delta re-review
 

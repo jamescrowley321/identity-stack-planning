@@ -11,7 +11,7 @@ Start with the **[Roadmap](roadmap.md)** to understand the 6 PRDs, cross-cutting
 ## How Work Gets Done
 
 - **[Ralph Loop Process](ralph-loop-process.md)** — How stories go from PRD to merged PR: phase pipeline, task-state persistence, worktree isolation, monitoring.
-- **[Review Process](review-process.md)** — Reviewer personas (Blind Hunter, Edge Case Hunter, Acceptance Auditor, Sentinel, Viper), review gate flow, triage priority.
+- **[Review Process](review-process.md)** — Reviewer personas (Cold Read, Edge Cases, Acceptance Criteria, Security Review, Red Team), review gate flow, triage priority.
 - **[Ralph Loop Efficiency](ralph-loop-efficiency.md)** — Token waste audit guide, prompt sizing, phase file overhead.
 
 ## Identity & Auth Domain Knowledge
