@@ -50,8 +50,8 @@ Fix tasks: `setup → fix → test → review → review-fix → ci → complete
 **Risk:** 4 reviewers run on every change regardless of scope.
 **Mitigation:** Conditional reviewer selection based on `git diff --stat`:
 - Auth/middleware/infra changes: all 5 reviewers
-- Business logic: 4 reviewers (no Viper)
-- Test-only changes: Blind Hunter + Acceptance
+- Business logic: 4 reviewers (no Red Team)
+- Test-only changes: Cold Read + Acceptance
 - Docs-only changes: Acceptance only
 
 ### 4. CLAUDE.md bloat

@@ -80,10 +80,10 @@ flowchart TD
 | **analyze** | Read story spec, acceptance criteria, and related code. Identify scope, plan implementation approach, and verify codebase state. | Winston (Architect) |
 | **implement** | Write the code according to the plan. Follow existing patterns, conventions, and CLAUDE.md instructions. | Amelia (Developer) |
 | **test** | Write and run tests. Unit tests for all new code, integration tests where applicable. All tests must pass with 80%+ coverage. | Quinn (QA) |
-| **review-blind** | Independent Blind Hunter review (diff only, fresh context). | Blind Hunter subagent |
-| **review-edge** | Independent Edge Case Hunter review (diff + repo access, fresh context). | Edge Case Hunter subagent |
-| **review-acceptance** | Independent Acceptance Auditor review (spec + repo access, fresh context). | Acceptance Auditor subagent |
-| **review-security** | Independent Sentinel review (security lens, fresh context). Conditional Viper red team for auth changes. | Sentinel subagent |
+| **review-blind** | Independent Cold Read review (diff only, fresh context). | Cold Read subagent |
+| **review-edge** | Independent Edge Cases review (diff + repo access, fresh context). | Edge Cases subagent |
+| **review-acceptance** | Independent Acceptance Criteria review (spec + repo access, fresh context). | Acceptance Criteria subagent |
+| **review-security** | Independent Security Review review (security lens, fresh context). Conditional Red Team red team for auth changes. | Security Review subagent |
 | **review-fix** | Triage all findings by priority. Fix blocking issues. Re-review. Max 3 iterations. | Amelia (Developer) |
 | **pr** | Push branch, create PR. | Automated |
 | **docs** | Update documentation if the story requires it. | Paige (Tech Writer) |
@@ -134,11 +134,11 @@ Below the metadata header, the file accumulates section content as phases comple
 2. backend/app/errors/problem_detail.py — RFC 9457 response model
 ...
 
-## Review: Blind Hunter
+## Review: Cold Read
 ### MUST FIX
 - [backend/app/errors/problem_detail.py:45] ...
 
-## Review: Security (Sentinel)
+## Review: Security (Security Review)
 ### BLOCK
 (none)
 ### WARN
@@ -224,7 +224,7 @@ The prompt set is the source of truth — see [`_bmad-output/implementation-arti
 
 - **General:** `run-next-task.md`, `fix-review-findings.md`, `repository-base-refactor.md`
 - **identity-stack:** `canonical-identity.md`, `api-gateway.md`, `design-system.md`, `epic3-fga-authz.md`
-- **py-identity-model:** `pim-integration-tests.md`, `pim-fix-review-chain.md`, `pim-adversarial-review.md`, `pim-conformance-finish.md`, `pim-fapi2-hardening.md`, `token-harness.md`, `RED-BLUE-GATE.md`
+- **py-identity-model:** `pim-integration-tests.md`, `pim-fix-review-chain.md`, `pim-blind-peer-review.md`, `pim-conformance-finish.md`, `pim-fapi2-hardening.md`, `token-harness.md`, `RED-BLUE-GATE.md`
 - **identity-model:** `identity-model-go-core.md`, `identity-model-go-extended.md`, `identity-model-rust-extended.md`, `identity-model-rust-hardening.md`, `identity-model-conformance-harness.md`
 
 ### Stopping a loop

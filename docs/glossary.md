@@ -6,13 +6,13 @@ Definitions for terms used across identity-stack-planning documents. Grouped for
 
 **ADR (Architecture Decision Record)** — A short record of an architectural decision, its context, and its consequences. See the workspace’s [system architecture and ADR index](system-architecture.md).
 
-**Acceptance Auditor** — Review agent persona that verifies spec compliance. For each acceptance criterion, checks whether it's implemented, tested, and matches intent. Reports PASS / FAIL / PARTIAL / SCOPE CREEP. See [review process](review-process.md).
+**Acceptance Criteria** — Review agent persona that verifies spec compliance. For each acceptance criterion, checks whether it's implemented, tested, and matches intent. Reports PASS / FAIL / PARTIAL / SCOPE CREEP. See [review process](review-process.md).
 
 **Authorization Server (AS)** — The OAuth server that authenticates a client or resource owner and issues authorization grants or access tokens. Defined by [RFC 6749 §1.1](https://www.rfc-editor.org/rfc/rfc6749.html#section-1.1).
 
 **AI (Artificial Intelligence)** — A broad term for machine-based systems that perform tasks associated with human intelligence; in this workspace it includes delegated agents that call protected resources. See the [NIST AI glossary](https://www.nist.gov/artificial-intelligence/glossary).
 
-**Blind Hunter** — Review agent persona that reviews code diffs with zero project context. Sees only the diff, assumes the worst about every line. Catches logic errors, security holes, dead code, and resource leaks. See [review process](review-process.md).
+**Cold Read** — Review agent persona that reviews code diffs with zero project context. Sees only the diff, assumes the worst about every line. Catches logic errors, security holes, dead code, and resource leaks. See [review process](review-process.md).
 
 **BMAD-METHOD** — AI-driven agile planning framework (v6) providing structured agent personas, workflows, and skill integration. Installed at `_bmad/` in identity-stack-planning. See [bmad-code-org/BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD).
 
@@ -26,7 +26,7 @@ Definitions for terms used across identity-stack-planning documents. Grouped for
 
 **DPoP (Demonstrating Proof of Possession)** — An OAuth mechanism that binds a token to a client-held key and proves possession on each request. Defined by [RFC 9449](https://www.rfc-editor.org/rfc/rfc9449.html).
 
-**Edge Case Hunter** — Review agent persona that traces every branching path and boundary condition. Reports only genuinely unhandled paths where code will fail, crash, or produce wrong results. See [review process](review-process.md).
+**Edge Cases** — Review agent persona that traces every branching path and boundary condition. Reports only genuinely unhandled paths where code will fail, crash, or produce wrong results. See [review process](review-process.md).
 
 **FAPI (Financial-grade API)** — OpenID Foundation security profiles for high-risk OAuth deployments, adding requirements beyond the base OAuth/OIDC specifications. See the [FAPI 2.0 Security Profile](https://openid.net/specs/fapi-security-profile-2_0.html).
 
@@ -106,7 +106,7 @@ See ADR-3 in [system architecture](system-architecture.md).
 
 **Review gate** — Quality checkpoint in the ralph loop. After all reviewers produce findings, the loop enters a fix phase. Blocking findings (MUST FIX, BLOCK, FAIL) must be resolved before the PR can be created. Maximum 3 fix iterations; unresolved findings block the PR. See [review process](review-process.md).
 
-**Sentinel** — Review agent persona: pragmatic security auditor focused on the identity/auth domain. Reviews for tenant isolation, authorization bypass, injection, JWT validation gaps, and credential exposure. Reports only genuinely exploitable vulnerabilities with concrete attack scenarios. See [review process](review-process.md).
+**Security Review** — Review agent persona: pragmatic security auditor focused on the identity/auth domain. Reviews for tenant isolation, authorization bypass, injection, JWT validation gaps, and credential exposure. Reports only genuinely exploitable vulnerabilities with concrete attack scenarios. See [review process](review-process.md).
 
 **SSRF (Server-Side Request Forgery)** — A vulnerability in which an attacker causes a server to make unintended requests, often to internal or metadata endpoints. Discovery and federation onboarding must defend against it. See the [OWASP SSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html).
 
@@ -114,7 +114,7 @@ See ADR-3 in [system architecture](system-architecture.md).
 
 **Task-state file** — Per-loop state persistence at `.claude/task-state.md` (or `task-state-<name>.md` for parallel loops). Contains current task ID, phase, branch, worktree path, implementation plan, and review findings. Enables crash recovery and manual inspection between phases.
 
-**Viper** — Review agent persona: offensive red team specialist. Activated only for changes touching auth, middleware, token, or infrastructure code. Runs a 3-stage pipeline: Recon → Vulnerability Analysis → Exploit Validation. Scores findings with CVSS v3.1. See [review process](review-process.md).
+**Red Team** — Review agent persona: offensive red team specialist. Activated only for changes touching auth, middleware, token, or infrastructure code. Runs a 3-stage pipeline: Recon → Vulnerability Analysis → Exploit Validation. Scores findings with CVSS v3.1. See [review process](review-process.md).
 
 **Worktree** — Git worktree used for filesystem isolation in story-based ralph loops. Each story gets its own worktree (e.g., `/tmp/sss-canonical-story-1.3`) so multiple loops can run in parallel without interference. Cleaned up when the story completes.
 

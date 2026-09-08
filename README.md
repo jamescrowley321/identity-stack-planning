@@ -267,11 +267,11 @@ Each reviewer runs in a completely fresh context with zero access to the impleme
 
 | Agent | What It Catches | Trigger |
 |-------|----------------|---------|
-| **Blind Hunter** | Logic errors, security holes, dead code, resource leaks | Every PR (diff only) |
-| **Edge Case Hunter** | Unhandled branches, boundary conditions, async gaps | Every PR (diff + repo) |
-| **Acceptance Auditor** | Missing implementations, spec drift, scope creep | Every PR (spec + repo) |
-| **Sentinel** | Tenant isolation, auth bypass, injection, JWT attacks | Every PR (security lens) |
-| **Viper** | Exploitation paths, privilege escalation, CVSS scoring | Auth/middleware changes only |
+| **Cold Read** | Logic errors, security holes, dead code, resource leaks | Every PR (diff only) |
+| **Edge Cases** | Unhandled branches, boundary conditions, async gaps | Every PR (diff + repo) |
+| **Acceptance Criteria** | Missing implementations, spec drift, scope creep | Every PR (spec + repo) |
+| **Security Review** | Tenant isolation, auth bypass, injection, JWT attacks | Every PR (security lens) |
+| **Red Team** | Exploitation paths, privilege escalation, CVSS scoring | Auth/middleware changes only |
 
 Blocking findings must be resolved before the PR can be created. Maximum 3 fix iterations; unresolved findings block the PR for manual intervention. See [docs/review-process.md](docs/review-process.md).
 
