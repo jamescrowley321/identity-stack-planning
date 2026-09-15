@@ -23,6 +23,12 @@ Start with the **[Roadmap](roadmap.md)** to understand the 6 PRDs, cross-cutting
 - **[Ory as SSO Provider — Context](ory-sso-provider-context.md)** — Feeder doc: making identity-stack's IdP configurable so Ory Network can be configured and run (provider-agnostic wiring, not a Descope swap-out); locked scope, current-state facts, resolved decisions.
 - **[Ory IaC & Automation Plan](ory-iac-automation-plan.md)** — Concrete `ory/ory` Terraform track (project JWT strategy, public SPA client, identity schema), credential model, secrets/state, and CI automation. Backs Epic 1 of `epics-ory-sso-provider.md`.
 
+## Governed Brain
+
+- **[Concepts and Requirements](governed-brain-concepts.md)** — What a governed brain must mean and do: brain, scope, authority, promotion, federation, grant, receipt, plus the BR-REQ-01..16 conformance requirements. Implementation-independent.
+- **[Authorization and Federation Model](governed-brain-authorization.md)** — How a disclosure decision composes: the security invariant, layer responsibilities, the relationship-authorization port, protocol profile, `brain_access` RAR detail, federation flow, and the threat table.
+- **[Long-Term Implementation Plan](governed-brain-implementation-plan.md)** — Phase 0–7 sequencing across `identity-model` and `identity-stack`, what gates federation, and the three entry-point tasks.
+
 ## Planning Artifacts
 
 - **[Main PRD](../_bmad-output/planning-artifacts/prd.md)** — Unified platform vision across all three repos.
