@@ -25,11 +25,57 @@ Start with the **[Roadmap](roadmap.md)** to understand the 6 PRDs, cross-cutting
 
 ## Governed Brain
 
+An initiative in this repository, at the planning stage. **Proposed · five documents · no code ·
+four decisions open.**
+
+**The problem.** An agent that holds knowledge on someone's behalf has to answer a question an
+ordinary search system does not: *may **this actor**, acting for **this person**, obtain **this
+kind of record**, for **this stated reason**, right now?* Retrieval answers what is similar; this
+is an authorization question, and answering it needs the layers this workspace already builds —
+issuer and token verification, canonical identity and tenancy, and a provider-neutral
+relationship-authorization boundary. The initiative is an extension of what is here, not a
+new direction.
+
+**What is genuinely new.** Retrieval filtered by permissions — *this user, this document* — is
+already a mature product category, and this work does not claim it. Two terms are unoccupied
+everywhere we looked. The first is **acting for someone else**: the actor making a request, the
+person it is made on behalf of, and the person the data describes are three different things,
+and no shipped system or current specification keeps them apart. The second is **a stated
+purpose**, which is absent from every token format in general use; where it does appear in
+production it is an attestation a client makes about itself, backed by contract rather than
+proof. So the claim is deliberately narrow and checkable: *permission-aware retrieval is solved
+for identity × document; this is the portable contract for the rest of the decision.*
+
+**Why it belongs in this repository rather than a product.** The contract is independent of any
+database, cloud, authorization engine, model provider, or identity provider. Written that way,
+a tool can be replaced by writing one adapter and re-running the same conformance vectors —
+and the vendor evaluation gets a yardstick that existed before anyone was defending a choice.
+
+**Where it stands.** Sixteen acceptance properties an implementation can be checked against; an
+abstract architecture that names no product; the decision model for a single disclosure; a phased
+plan whose tool choices are explicit gates rather than assumptions; and four independent research
+passes that tested all of it against the current state of standards, the deployed
+relationship-authorization field, the agent-memory market, and consent-receipt prior art. Those
+passes produced 65 change requests — the corrections are applied, and the ones that are design
+decisions are listed as open rather than quietly resolved.
+
+**What has to be decided before anything is built.** Four calls, each blocking a phase: how the
+candidate set gets narrowed before retrieval runs; what the relationship port promises about
+freshness; what makes a receipt worth anything to someone other than its issuer; and when a
+request needs fresh consent. Separately, no engine, store, or identity provider has been chosen —
+those are six recorded gates, each settled by a spike that ran the negative test rather than by a
+vendor's claim. The provider wired into an existing service today was familiarity, not a
+commitment.
+
+**What it is not.** Nothing here is implemented, deployed, certified, or compliant with anything.
+Where a specific regulated domain would impose its own consent regime, that is an additional
+boundary on top of this model and is explicitly out of scope.
+
 - **[Where It Stands](governed-brain-where-it-stands.md)** — Plain-language entry point: the idea in a paragraph, what is genuinely new versus what already exists, and the four open decisions with a recommendation for each. Start here.
 - **[Concepts and Requirements](governed-brain-concepts.md)** — What a governed brain must mean and do: brain, scope, authority, promotion, federation, grant, receipt, plus the BR-REQ-01..16 conformance requirements. Implementation-independent.
 - **[Abstract Architecture](governed-brain-architecture.md)** — The technology-free layer: components as roles, ports with contracts and negative tests, the invariants any implementation must exhibit, and a substitution table giving selection criteria per port. Names no product, engine, provider, or repository.
 - **[Authorization and Federation Model](governed-brain-authorization.md)** — How a disclosure decision composes: the security invariant, layer responsibilities, the relationship-authorization port, protocol profile, `brain_access` RAR detail, federation flow, and the threat table.
-- **[Long-Term Implementation Plan](governed-brain-implementation-plan.md)** — Phase 0–7 sequencing across `identity-model` and `identity-stack`, what gates federation, and the three entry-point tasks.
+- **[Long-Term Implementation Plan](governed-brain-implementation-plan.md)** — Phases 0–7 derived from the architecture: what each phase realizes and must prove, the six tool-selection gates and what settles each, the known blockers, and the entry-point tasks. Where the code lives is marked an implementation decision, not an architectural one.
 - **[Research Findings, 2026-09-15](../_bmad-output/planning-artifacts/research/governed-brain-research-2026-09-15.md)** — Four research passes against the three documents above: standards prior art, the relationship-authorization field, the agent-memory landscape, and receipt/audit prior art. Carries the verdicts, what to reuse instead of invent, what to stop claiming, and 65 change requests across the lane reports beside it.
 
 ## Planning Artifacts
