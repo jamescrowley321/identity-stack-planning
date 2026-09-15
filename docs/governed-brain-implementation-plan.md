@@ -48,16 +48,37 @@ Lands in `identity-model`. These are the prerequisites named in the
 authorization model's reuse order, and they are already the subject of
 [Epic 24](../_bmad-output/planning-artifacts/epics/epic-24-identity-capability-gaps.md).
 
-- Callback `iss` (RFC 9207) and `state` validation, with a callback
-  builder/parser surface in Go and Rust.
-- Discovery endpoint-authority binding, with explicit alias and loopback
-  exceptions.
+They divide by whether the requirement is conditional on how many issuers are in
+play, and that division decides what gates what.
+
+**Phase 1a — unconditional client conformance.** Required with a single issuer,
+so nothing here should wait on a federation decision.
+
+- `state` — or PKCE, or the OpenID Connect `nonce` — binding the callback to the
+  user-agent session. This is CSRF protection (RFC 9700 §4.7), a single-issuer
+  control. Needs a callback builder/parser surface in Go and Rust.
+- Discovery metadata validation: the `issuer` returned MUST be identical to the
+  issuer identifier the well-known URI was built from, and the response MUST NOT
+  be used otherwise (RFC 8414 §3.3). Unconditional, with explicit alias and
+  loopback exceptions.
 - Bounded discovery and JWKS caches; single-flight fetch, including Rust's
-  missing concurrent-fetch deduplication.
+  missing concurrent-fetch deduplication. Availability and resource hygiene,
+  with no multi-issuer precondition.
 - Published cache staleness and failure semantics.
 
+**Phase 1b — multi-issuer defences.** Exploitable only once a second
+authorization server is in the picture.
+
+- Callback `iss` validation (RFC 9207) against authorization-response mix-up.
+  The attack's stated preconditions require multiple authorization servers, one
+  of them attacker-operated (RFC 9700 §4.4.1).
+- Distinct redirect URIs per issuer are the alternative mix-up defence
+  (RFC 9700 §4.4.2.2), which that section says to use only where `iss` is not
+  available.
+
 **Done when:** executable vectors for each behavior pass in every supported
-language, including the negative cases. **Gates:** Phase 6.
+language, including the negative cases. **Gates:** Phase 1b gates Phase 6.
+Phase 1a gates nothing, and should not wait for it.
 
 ### Phase 2 — Relationship-authorization port
 
@@ -116,7 +137,7 @@ merely filtered from the API response.
 
 ### Phase 6 — Federation pilot
 
-**Gated on Phase 1.**
+**Gated on Phase 1b.**
 
 - Federate two synthetic brain authorities with distinct issuers and keys.
 - Exercise PAR/RAR, audience restriction, token exchange, DPoP or mTLS, local
@@ -140,7 +161,8 @@ receipt, and every failure mode above denies rather than degrades.
 ```mermaid
 flowchart TD
   P0[Phase 0<br/>Contract and terminology]
-  P1[Phase 1<br/>Client security gaps]
+  P1A[Phase 1a<br/>Unconditional client conformance]
+  P1B[Phase 1b<br/>Multi-issuer defences]
   P2[Phase 2<br/>Relationship port]
   P3[Phase 3<br/>Brain contract]
   P4[Phase 4<br/>Synthetic relationship slice]
@@ -154,42 +176,62 @@ flowchart TD
   P3 --> P4
   P4 --> P5
   P5 --> P6
-  P1 ==>|gates| P6
+  P1B ==>|gates| P6
   P6 --> P7
 ```
 
 Phase 1 and Phase 2 are independent of each other and of Phase 0, so they can
-run in parallel from the start. Phase 1 does not block Phases 3–5; it blocks
-only federation.
+run in parallel from the start. Only Phase 1b blocks anything downstream, and
+only Phase 6. Phase 1a is baseline client conformance that is live today at a
+single issuer, so it is drawn outside the gate.
 
-### Why Phase 1 is parallel, not first
+### Why Phase 1 splits, and only half of it gates federation
 
-The three client-security gaps share one property: each is a **multi-issuer**
-bug — latent at one issuer, live at several.
+An earlier version of this section claimed all three client-security gaps share
+one property — that each is a multi-issuer bug, latent at one issuer and live at
+several. That is true of one of them. The normative text says otherwise for the
+other two, and the sequencing has been corrected to match.
 
-- Callback `iss`/`state` defends against authorization-response mix-up. With one
-  issuer there is no second response to substitute.
-- Discovery authority binding matters when metadata is fetched from a party
-  trusted only conditionally. A pinned single issuer never does that.
-- Bounded JWKS caches and single-flight fetch address growth and duplicate
-  fetches keyed by issuer count; one issuer means one cache entry.
+- **Callback `iss` — genuinely multi-issuer.** Mix-up's preconditions require
+  the grant to run against multiple authorization servers, one honest and one
+  attacker-operated (RFC 9700 §4.4.1). With a single pinned issuer there is no
+  second response to substitute. RFC 9207 is the defence, and it is fair to gate
+  it on the phase that introduces a second authority.
+- **`state` — single-issuer.** It is CSRF protection binding the callback to the
+  user-agent session (RFC 9700 §4.7), and PKCE or `nonce` provides the same
+  protection. It is live against one issuer, so it cannot sit behind a
+  federation gate.
+- **Discovery authority binding — unconditional.** RFC 8414 §3.3 requires the
+  returned `issuer` to be identical to the issuer identifier the well-known URI
+  was built from, and states that if they differ the response MUST NOT be used.
+  No issuer-count precondition appears in it. The malicious-discovery-document
+  class it defends against is available at one issuer.
+- **Bounded JWKS caches and single-flight fetch — neither.** These are
+  availability and resource-exhaustion controls. No normative text conditions
+  them on issuer count, and the earlier rationale here had none.
 
-Phases 3–5 cannot exercise any of them. Phase 3 is schemas, Phase 4 is
-relationship tuples with no OAuth in the path, and Phase 5 runs against at most
-one synthetic issuer. Phase 6 introduces two authorities with distinct issuers
-and keys, which triggers all three at once — so the gate belongs on Phase 6
-alone.
+So Phase 1a is not a federation prerequisite; it is conformance debt that is
+exploitable now. Phase 1b is the part the federation pilot genuinely gates.
 
-This also reconciles a conflict in the source material, which carried two
-orderings that disagreed: a reuse order putting the client gaps first and the
-relationship adapter fourth, and an implementation sequence putting the
-relationship slice first and omitting the client gaps entirely. Treating them as
-a parallel track with a federation gate honors the reuse order's intent — that
-these are prerequisites, not optional hardening — without blocking three phases
-that structurally cannot trip the bugs.
+This still reconciles the conflict in the source material, which carried two
+orderings that disagreed: a reuse order putting the client gaps first, and an
+implementation sequence putting the relationship slice first and omitting the
+client gaps entirely. Splitting the phase honors the reuse order's intent for
+the unconditional half — these are prerequisites, not optional hardening, and
+they need no federation justification — while keeping the mix-up work off the
+critical path of three phases that structurally cannot trip it.
+
+**Open — does `iss` protect Phase 6 at all?** Mix-up is an attack on
+redirect-delivered authorization *responses*. The federation flow sketched in
+the authorization model is broker to token-exchange to target brain, which is
+back-channel. If Phase 6 never carries a front-channel authorization response
+across authorities, RFC 9207 does not apply to it, and the real Phase 6
+prerequisite is issuer-authority binding in the trust layer — entity statements
+and signed metadata — rather than a callback parameter. Settle this before
+scheduling Phase 1b: the answer either keeps the gate or moves it.
 
 **Open — revisit when federation timing firms up.** If a second real issuer
-appears before Phase 6, for a demo or a partner pilot, Phase 1 becomes the
+appears before Phase 6, for a demo or a partner pilot, Phase 1b becomes the
 critical path and should run strictly first. Phase 0 is the hedge: it fixes
 issuer, subject-mapping, and actor-chain rules in the contract, so Phases 3–5
 stay multi-issuer-aware even while implemented against one. The failure mode to
@@ -202,8 +244,10 @@ The three smallest pieces of real work, in the order they unblock the most:
 
 1. **Phase 0 vocabulary + `brain_access` schema** — pure writing, unblocks
    Phases 3 and 4.
-2. **Phase 1 callback `iss`/`state` vectors** — already scoped under Epic 24,
-   and the single highest-severity gap on the federation path.
+2. **Phase 1a callback and discovery vectors** — already scoped under Epic 24.
+   Start here rather than with `iss`: these are unconditional requirements that
+   a single-issuer deployment already fails, so they pay off before any
+   federation decision is made.
 3. **Phase 2 port skeleton with a fail-closed adapter** — small, and it proves
    the boundary before any brain object exists.
 
