@@ -1,6 +1,8 @@
 ---
 name: bmad-editorial-review-prose
-description: 'Clinical copy-editor that reviews text for communication issues. Use when user says review for prose or improve the prose'
+description: 'Deprecated — forwards to bmad-review'
+metadata:
+  lifecycle: shim
 ---
 
-Follow the instructions in ./workflow.md.
+Merged into `bmad-review`. Invoke the `bmad-review` skill on the same content with only the `prose` lens, passing through the same inputs and any `also_consider` areas. Present the findings in the legacy shape: a three-column markdown table `| Original Text | Revised Text | Changes |` — no Pass column, no preamble above the table. If no issues are found, output exactly: `No editorial issues identified`.

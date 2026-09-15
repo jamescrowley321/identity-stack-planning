@@ -44,11 +44,11 @@ This repo uses [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) v6 fo
 ### Getting Started with BMAD
 
 - Use `/bmad-help` to get contextual guidance on what to do next
-- Use `/bmad-pm` to engage the Product Manager agent
-- Use `/bmad-architect` to engage the Architect agent
-- Use `/bmad-create-product-brief` to kick off a new initiative
-- Use `/bmad-create-prd` to create a Product Requirements Document
-- Use `/bmad-create-architecture` to design system architecture
+- Use `/bmad-agent-pm` to engage the Product Manager agent
+- Use `/bmad-agent-architect` to engage the Architect agent
+- Use `/bmad-product-brief` to kick off a new initiative
+- Use `/bmad-prd` to create a Product Requirements Document
+- Use `/bmad-architecture` to design system architecture
 - Use `/bmad-create-epics-and-stories` to break down work into implementable units
 
 ### Working Across Repos
