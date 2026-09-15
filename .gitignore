@@ -19,3 +19,8 @@ node_modules/
 # BMAD personal (installer-managed, per-user)
 _bmad/config.user.toml
 _bmad/custom/config.user.toml
+
+# BMAD installer-managed skills — regenerate with `npx bmad-method install` (v6.12.0).
+# Generated from _bmad/; every file says "DO NOT EDIT -- overwritten on every update".
+# Scoped to bmad-* so this repo's own skills (ralph-audit, ralph-status) stay tracked.
+.claude/skills/bmad-*/
