@@ -162,6 +162,40 @@ Phase 1 and Phase 2 are independent of each other and of Phase 0, so they can
 run in parallel from the start. Phase 1 does not block Phases 3–5; it blocks
 only federation.
 
+### Why Phase 1 is parallel, not first
+
+The three client-security gaps share one property: each is a **multi-issuer**
+bug — latent at one issuer, live at several.
+
+- Callback `iss`/`state` defends against authorization-response mix-up. With one
+  issuer there is no second response to substitute.
+- Discovery authority binding matters when metadata is fetched from a party
+  trusted only conditionally. A pinned single issuer never does that.
+- Bounded JWKS caches and single-flight fetch address growth and duplicate
+  fetches keyed by issuer count; one issuer means one cache entry.
+
+Phases 3–5 cannot exercise any of them. Phase 3 is schemas, Phase 4 is
+relationship tuples with no OAuth in the path, and Phase 5 runs against at most
+one synthetic issuer. Phase 6 introduces two authorities with distinct issuers
+and keys, which triggers all three at once — so the gate belongs on Phase 6
+alone.
+
+This also reconciles a conflict in the source material, which carried two
+orderings that disagreed: a reuse order putting the client gaps first and the
+relationship adapter fourth, and an implementation sequence putting the
+relationship slice first and omitting the client gaps entirely. Treating them as
+a parallel track with a federation gate honors the reuse order's intent — that
+these are prerequisites, not optional hardening — without blocking three phases
+that structurally cannot trip the bugs.
+
+**Open — revisit when federation timing firms up.** If a second real issuer
+appears before Phase 6, for a demo or a partner pilot, Phase 1 becomes the
+critical path and should run strictly first. Phase 0 is the hedge: it fixes
+issuer, subject-mapping, and actor-chain rules in the contract, so Phases 3–5
+stay multi-issuer-aware even while implemented against one. The failure mode to
+avoid is a verifier boundary with no seam for issuer-authority binding, which
+would make retrofitting in Phase 6 touch everything.
+
 ## Entry points
 
 The three smallest pieces of real work, in the order they unblock the most:
