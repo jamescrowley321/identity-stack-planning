@@ -28,6 +28,7 @@ Start with the **[Roadmap](roadmap.md)** to understand the 6 PRDs, cross-cutting
 - **[Concepts and Requirements](governed-brain-concepts.md)** — What a governed brain must mean and do: brain, scope, authority, promotion, federation, grant, receipt, plus the BR-REQ-01..16 conformance requirements. Implementation-independent.
 - **[Authorization and Federation Model](governed-brain-authorization.md)** — How a disclosure decision composes: the security invariant, layer responsibilities, the relationship-authorization port, protocol profile, `brain_access` RAR detail, federation flow, and the threat table.
 - **[Long-Term Implementation Plan](governed-brain-implementation-plan.md)** — Phase 0–7 sequencing across `identity-model` and `identity-stack`, what gates federation, and the three entry-point tasks.
+- **[Research Findings, 2026-09-15](../_bmad-output/planning-artifacts/research/governed-brain-research-2026-09-15.md)** — Four research passes against the three documents above: standards prior art, the relationship-authorization field, the agent-memory landscape, and receipt/audit prior art. Carries the verdicts, what to reuse instead of invent, what to stop claiming, and 65 change requests across the lane reports beside it.
 
 ## Planning Artifacts
 
