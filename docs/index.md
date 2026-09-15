@@ -25,6 +25,7 @@ Start with the **[Roadmap](roadmap.md)** to understand the 6 PRDs, cross-cutting
 
 ## Governed Brain
 
+- **[Where It Stands](governed-brain-where-it-stands.md)** — Plain-language entry point: the idea in a paragraph, what is genuinely new versus what already exists, and the four open decisions with a recommendation for each. Start here.
 - **[Concepts and Requirements](governed-brain-concepts.md)** — What a governed brain must mean and do: brain, scope, authority, promotion, federation, grant, receipt, plus the BR-REQ-01..16 conformance requirements. Implementation-independent.
 - **[Authorization and Federation Model](governed-brain-authorization.md)** — How a disclosure decision composes: the security invariant, layer responsibilities, the relationship-authorization port, protocol profile, `brain_access` RAR detail, federation flow, and the threat table.
 - **[Long-Term Implementation Plan](governed-brain-implementation-plan.md)** — Phase 0–7 sequencing across `identity-model` and `identity-stack`, what gates federation, and the three entry-point tasks.
