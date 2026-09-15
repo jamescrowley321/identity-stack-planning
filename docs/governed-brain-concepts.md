@@ -214,7 +214,7 @@ The following are intentionally not decided here:
 | Issuer, key, token, and client verification | `identity-model` / `py-identity-model` | Shipping; cross-language parity varies |
 | Canonical subject, tenant, and provider-link mapping | `identity-stack` canonical identity model | Planned (PRD 5) |
 | Provider-neutral relationship authorization port | `identity-stack` integration boundary | Defined in the gap analysis; port not yet built |
-| Relationship engine behind that port | OpenFGA or an equivalent Zanzibar-style engine | External, proxied — not implemented here |
+| Relationship engine behind that port | A relationship-authorization engine meeting the architecture's selection criteria; not chosen | External, proxied — not implemented here |
 | Brain scope, grants, provenance, receipts, federation | This document family | Proposed; no implementation |
 
 The identity libraries stay product-neutral. Brain semantics — scope, authority,
