@@ -26,7 +26,7 @@ This repo lives at `~/repos/auth/identity-stack-planning/` alongside these sibli
 
 ## BMAD Method
 
-This repo uses [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) v6 for AI-driven agile planning. BMAD is installed at `_bmad/` with Claude Code skills at `.claude/skills/`.
+This repo uses [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) v6.12.0 for AI-driven agile planning. BMAD is installed at `_bmad/`, which is tracked. The `/bmad-*` skills under `.claude/skills/` are **generated from it and not tracked** — run `npx bmad-method install` to materialize them in a fresh clone.
 
 ### Key Paths
 
@@ -39,7 +39,7 @@ This repo uses [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) v6 fo
 - `_bmad-output/implementation-artifacts/status.md` — **GitHub issues are the source of truth for status.**
   Planning artifacts hold rationale and decomposition and link to their tracking issue; they never carry
   status. Never reintroduce a markdown status tracker
-- `.claude/skills/` — BMAD skills invocable via `/bmad-*` commands
+- `.claude/skills/` — this repo's own skills (`ralph-audit`, `ralph-status`) are tracked; the `bmad-*` skills are installer-generated and git-ignored
 
 ### Getting Started with BMAD
 
