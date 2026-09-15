@@ -292,10 +292,10 @@ BMAD skills are available as `/bmad-*` commands in Claude Code:
 
 ```
 /bmad-help                      # Contextual guidance on what to do next
-/bmad-pm                        # Product Manager agent
-/bmad-architect                 # Architect agent
-/bmad-create-prd                # Create a Product Requirements Document
-/bmad-create-architecture       # Design system architecture
+/bmad-agent-pm                  # Product Manager agent
+/bmad-agent-architect           # Architect agent
+/bmad-prd                       # Create a Product Requirements Document
+/bmad-architecture              # Design system architecture
 /bmad-create-epics-and-stories  # Break down work into stories
 /bmad-sprint-planning           # Generate sprint plan
 /bmad-code-review               # Multi-layer adversarial code review

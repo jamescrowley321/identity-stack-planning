@@ -1,6 +1,8 @@
 ---
 name: bmad-review-edge-case-hunter
-description: 'Walk every branching path and boundary condition in content, report only unhandled edge cases. Orthogonal to adversarial review - method-driven not attitude-driven. Use when you need exhaustive edge-case analysis of code, specs, or diffs.'
+description: 'Deprecated — forwards to bmad-review'
+metadata:
+  lifecycle: shim
 ---
 
-Follow the instructions in ./workflow.md.
+Merged into `bmad-review`. Invoke the `bmad-review` skill on the same content with only the `edge-case-hunter` lens, passing through any `also_consider` areas. Output ONLY the raw findings JSON array in the legacy shape: the four standard fields (plus `kind`/`confidence` on deletion findings), no `lens` field, no markdown wrapping, no extra text. `[]` is valid when nothing is found.

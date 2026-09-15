@@ -15,3 +15,7 @@ node_modules/
 
 # Ralph orchestrator runtime state
 .ralph/
+
+# BMAD personal (installer-managed, per-user)
+_bmad/config.user.toml
+_bmad/custom/config.user.toml
