@@ -66,6 +66,23 @@ request; it is not a permanent ACL and does not override a current deny, a
 withdrawn consent, a legal hold, a source-system restriction, or a tenant
 boundary.
 
+Two properties of the conjunction are as load-bearing as its terms.
+
+**Ordering.** The conjunction MUST constrain the candidate set *before* any
+learned component runs — retrieval, ranking, reranking, or generation. Evaluating
+the same terms after retrieval is a different and weaker system: published
+measurement of retrieve-then-filter pipelines found unauthorized context reaching
+the model in the large majority of queries, because the filtered-out material has
+already influenced scoring, counts, and what the remaining results mean. "The
+check runs" is not the requirement; "nothing unauthorized is ever a candidate" is.
+
+**Which authorization details.** Where a request carries authorization details
+and the authorization server may enrich, reduce, or otherwise modify them, the
+conjunction MUST be evaluated over the **granted** details bound to the token,
+never the ones the client asked for. Scope and authorization details are granted
+as a merged set, so a scope value MUST NOT be able to confer brain access on its
+own.
+
 ## Roles and authority boundaries
 
 These are domain roles, not legal conclusions. One person or organization may

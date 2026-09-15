@@ -251,6 +251,28 @@ The three smallest pieces of real work, in the order they unblock the most:
 3. **Phase 2 port skeleton with a fail-closed adapter** — small, and it proves
    the boundary before any brain object exists.
 
+## Known blockers
+
+Distinct from the open decisions below: these are places where the plan as
+written cannot be executed, found by the 2026-09-15 research passes
+([synthesis](../_bmad-output/planning-artifacts/research/governed-brain-research-2026-09-15.md)).
+None is resolved here. The plan should not be labelled ready to start on the
+affected phases until each has an answer.
+
+| Blocker | Phase | Why it blocks |
+|---|---|---|
+| No engine offers a safe bulk authorization filter | 5 | The data boundary assumes authorization can narrow the candidate set at scale. Relationship-authorization engines either have no list operation, truncate results silently, or advise in their own documentation against using the list operation for access-control decisions. The field's answer is a change-stream-fed projection that may only ever narrow — a layer this plan does not have |
+| Nothing makes a receipt verifiable | 6 | Phase 6's done-when requires a *verifiable* receipt, and no requirement in the concepts document obliges verifiability by anyone other than the operator holding the record |
+| The relationship port cannot express its own consistency guarantee | 2, 4 | A scalar consistency value cannot abstract over engines whose contracts differ, and at least one engine declares consistency fields it does not implement. The freshness token is a two-sided protocol — a write-time check returning a token stored atomically with the content — so a port offering only `check()` cannot carry it, and the "stale permission survives revocation" negative test cannot pass |
+| `brain_access` defines no comparison algorithm | 0 | The RAR specification delegates comparison to the type definition. Without one, an authorization server cannot decide when an existing grant covers a new request and when re-consent is required |
+
+A fifth finding is not a blocker but changes what can be claimed: **purpose can
+be declared, bounded, and recorded, but never proven.** Authorization engines
+have no cryptographic primitives for it, and the general access-control
+literature places attribute truthfulness outside the engine. Treat a purpose as
+an attested input recorded in the receipt, gate who may declare which purpose,
+and treat absence as deny.
+
 ## Deliberately not decided
 
 - the wire format and cryptographic envelope for federation;
