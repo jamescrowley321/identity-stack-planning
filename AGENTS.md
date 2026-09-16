@@ -63,6 +63,18 @@ separate sweep, and do not rewrite a loop prompt's task queue mid-run.
 If something genuinely has no issue and needs referring to, describe it in words. A decision
 that lives in one document does not need an identifier.
 
+## Machine-readable
+
+Two files publish at the site root and are meant to be fetched rather than read:
+
+- `https://jamescrowley321.github.io/identity-stack-planning/llms.txt` — curated index in
+  llmstxt.org format: what to read, in what order.
+- `https://jamescrowley321.github.io/identity-stack-planning/workspace.yml` — repository
+  mapping, package identities, tracks, and the do-not-touch list, as structured data.
+
+Both are mirrors of the prose, carrying their own verification date. Where one disagrees
+with a document, the document wins — and the mirror is stale and should be fixed.
+
 ## Where to ground
 
 Sibling repositories are checked out next to this one. Read them directly — their code, tests,

@@ -117,6 +117,16 @@ Start at **[AGENTS.md](AGENTS.md)** — what is authoritative, how work is named
 repository to ground against, and what not to touch. Claude Code reads
 [`CLAUDE.md`](CLAUDE.md), which imports it.
 
+Two machine-readable files publish at the site root:
+
+| File | Holds |
+|---|---|
+| [`llms.txt`](https://jamescrowley321.github.io/identity-stack-planning/llms.txt) | Curated index in [llmstxt.org](https://llmstxt.org/) format — what to read, in what order, with the three governing rules stated up front |
+| [`workspace.yml`](https://jamescrowley321.github.io/identity-stack-planning/workspace.yml) | The facts that drift: local directory to GitHub repository mapping, package identities, tracks, and the do-not-touch list |
+
+`workspace.yml` is a mirror, not a source. The prose is authoritative; the manifest carries
+its own verification date.
+
 ## Contributing
 
 This is a planning repository, so a contribution is a change to a *plan*. See

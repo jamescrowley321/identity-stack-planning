@@ -183,7 +183,12 @@ export default function Home(): ReactNode {
               <p className={styles.sectionLede}>
                 Start at <code>AGENTS.md</code>. It carries what is authoritative, how work is
                 named, which sibling checkout to ground against and which one is an archived
-                trap, and what must not be touched.
+                trap, and what must not be touched. Two files publish at the site root to be
+                fetched rather than read:{' '}
+                <a href="/identity-stack-planning/llms.txt">llms.txt</a> for a curated reading
+                order, and{' '}
+                <a href="/identity-stack-planning/workspace.yml">workspace.yml</a> for the
+                repository mapping and track facts as structured data.
               </p>
               <Link
                 className={styles.actionSecondary}

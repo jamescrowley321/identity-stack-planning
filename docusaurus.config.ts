@@ -119,6 +119,14 @@ const config: Config = {
               href: 'https://github.com/jamescrowley321/identity-stack-planning/blob/main/AGENTS.md',
             },
             {
+              label: 'llms.txt',
+              href: 'https://jamescrowley321.github.io/identity-stack-planning/llms.txt',
+            },
+            {
+              label: 'workspace.yml',
+              href: 'https://jamescrowley321.github.io/identity-stack-planning/workspace.yml',
+            },
+            {
               label: 'Contributing',
               href: 'https://github.com/jamescrowley321/identity-stack-planning/blob/main/CONTRIBUTING.md',
             },
