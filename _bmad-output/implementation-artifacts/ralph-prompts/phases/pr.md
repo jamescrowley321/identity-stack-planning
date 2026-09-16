@@ -4,23 +4,54 @@ Push branch and create PR.
 
 `cd <worktree or repo root>`
 
-1. **Integration test gate.** Verify feature work has integration/e2e coverage before pushing:
+1. **Integration test gate.** Verify feature work has integration/e2e coverage before pushing.
+
+   The source and test paths below are **per language and post-consolidation**. An earlier version of
+   this gate matched `^(backend/app/|src/py_identity_model/|internal/)` — paths from before the
+   monorepo consolidation, with `rust/` and `go/` absent entirely. The result was that every Rust and
+   Go pull request produced an empty `CODE` and the gate **passed silently**; identity-model#671
+   merged with no integration test and nothing objected. A gate that cannot fire is worse than no
+   gate, because it reads as a passed check.
+
    ```bash
    BASE=$(grep '^base_branch:' .claude/task-state.md 2>/dev/null | awk '{print $2}')
    BASE=${BASE:-main}
    DIFF=$(git diff --name-only "origin/$BASE...HEAD")
-   CODE=$(echo "$DIFF" | grep -E '^(backend/app/|src/py_identity_model/|internal/)' | grep -vE '(_test\.go$|/tests/)' | head -1)
-   TESTS=$(echo "$DIFF" | grep -E '(tests/integration/|tests/e2e/|_test\.go$)' | head -1)
+
+   # Source that requires proof it works against a real provider or server.
+   SRC='^(py/src/py_identity_model/|py/packages/[^/]+/[^/]+/|go/pkg/|go/internal/|rust/src/|backend/app/|frontend/src/)'
+   # Integration/e2e coverage, per language.
+   ITEST='(py/src/tests/integration/|py/.*/tests/integration/|backend/tests/(integration|e2e)/|frontend/(e2e|tests/e2e)/|_test\.go$|^rust/tests/|\.spec\.ts$)'
+
+   CODE=$(echo "$DIFF" | grep -E "$SRC" | grep -vE "($ITEST|/tests?/)" | head -1)
+   TESTS=$(echo "$DIFF" | grep -E "$ITEST" | head -1)
+
    if [ -n "$CODE" ] && [ -z "$TESTS" ]; then
      if ! git log "origin/$BASE..HEAD" --format=%B | grep -q '\[skip-integration-tests:'; then
-       echo "GATE FAIL: feature code changed but no integration/e2e tests touched."
-       echo "Add tests under tests/integration/, tests/e2e/, or *_test.go."
+       echo "GATE FAIL: source changed ($CODE) but no integration/e2e test did."
+       echo "Add coverage under the path for this language:"
+       echo "  python  py/src/tests/integration/"
+       echo "  go      *_test.go behind the integration build tag"
+       echo "  rust    rust/tests/"
+       echo "  backend backend/tests/integration/ or tests/e2e/"
+       echo "  frontend frontend/e2e/ or *.spec.ts"
        echo "Override (rare): include [skip-integration-tests: <reason>] in a commit body."
        exit 1
      fi
    fi
+
+   # Fail closed on a diff this gate does not understand. If source-looking files
+   # changed but SRC matched none of them, the patterns have drifted from the repo
+   # layout again -- report it rather than passing by default.
+   UNKNOWN=$(echo "$DIFF" | grep -E '\.(py|go|rs|ts|tsx)$' | grep -vE "$SRC" | grep -vE "($ITEST|/tests?/|examples/|conformance/|tools/)" | head -1)
+   if [ -n "$UNKNOWN" ]; then
+     echo "GATE UNCERTAIN: $UNKNOWN is source but matches no known SRC path."
+     echo "Either add it to SRC in phases/pr.md, or justify it in the PR body. Do not ignore this."
+   fi
    ```
-   If the gate fails, **return to the test phase** — do not push, do not skip. Re-running this phase without adding tests is a hard error.
+   If the gate fails, **return to the test phase** — do not push, do not skip. Re-running this phase
+   without adding tests is a hard error. Unit tests alone never satisfy it: a unit test proves the
+   function, an integration test proves the wire.
 
 1b. **Mechanical security gate.** A filename check is NOT a gate (an empty test file passes it). If the diff touches security-control code, run the deterministic gate — mutation testing on the changed security modules (a surviving mutant = a control whose removal no test catches, the exact FAPI2 failure), the custom Semgrep ruleset, the stranded-control reachability check, and the conformance evidence-integrity check:
    ```bash

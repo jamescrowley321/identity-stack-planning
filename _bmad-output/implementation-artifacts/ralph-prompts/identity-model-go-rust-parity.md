@@ -91,6 +91,29 @@ to identity-stack-planning#114 during this workstream and the PR had to be recre
 
 **Out of scope:** FAPI 2.0 for Go/Rust, mTLS, JAR, JARM, RAR, CIBA. Do not start them. If tasks 1–10 finish, write LOOP_COMPLETE and stop.
 
+## Integration tests are not optional
+
+A unit test proves the function; an integration test proves the wire. Every capability task lands
+both. `phases/pr.md` gates this mechanically — and note that the gate was **structurally dead for
+Rust and Go** until it was repaired, so anything merged before that date may lack coverage the gate
+appeared to have checked.
+
+Per language, against the shared fixture in `infra/` (node-oidc-provider + IdentityServer):
+
+| Language | Integration tests live in | Run with |
+|---|---|---|
+| Rust | `rust/tests/<capability>.rs` | `cd infra && docker compose up -d`, then `cargo test --test <capability>` |
+| Go | `go/**/*_test.go` behind `//go:build integration` | `cd infra && docker compose up -d`, then `go test -tags=integration ./...` |
+| Python | `py/src/tests/integration/` | `make test-integration-node-oidc` |
+
+A task that would land only unit coverage is **mis-scoped — return to analyze.** The one legitimate
+exception is a change with no runtime surface (a lockfile bump, a doc edit); say so in the PR body
+rather than relying on the gate's silence.
+
+Rust's own unit tests inside `src/**/mod.rs` with `wiremock` are useful and expected, but they mock
+the server. They do not count as integration coverage for this gate, because a mock cannot catch the
+provider quirks the parity work exists to close.
+
 ## Conformance contract
 
 `spec/vectors/` holds the machine-readable cross-language behavior contracts, including `revocation.json`, `token-exchange.json`, and `dpop.json`. **Do NOT author new conformance vectors for tasks 1–3** — they already exist and Go already satisfies them. Your job is to make Rust satisfy the same IDs.
