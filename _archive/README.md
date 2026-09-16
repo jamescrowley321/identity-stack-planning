@@ -152,3 +152,13 @@ git checkout 9919887 -- <path>   # restore it
 | `_bmad-output/planning-artifacts/research/brand-trademark-diligence-open-identity-2026-09-02.md` | Name availability and US trademark diligence |
 | `_bmad-output/brainstorming/brainstorming-open-identity-naming-2026-09-02.md` | Naming and tagline session |
 | `_bmad-output/implementation-artifacts/ralph-prompts/open-identity-epic-a.md` | Epic A loop prompt — shelved 2026-09-03 because the merged Ory feeder epics had already delivered most of its stories |
+
+## Retired 2026-09-15 — superseded loop prompt
+
+| File | Why |
+|---|---|
+| `_bmad-output/implementation-artifacts/ralph-prompts/identity-model-rust-extended.md` | Its "current implementation state" block asserted there was no `rust/src/introspection` — that capability has since shipped, so the prompt would have sent a loop to rebuild working code. Superseded by `identity-model-go-rust-parity.md`, which re-measures Go and Rust against source and covers the Go advanced tier as well. `git show 9919887:<path>` to read it back |
+
+Two rows in `ralph-runner-guide.md` were also removed: `fix-review-findings.md` and
+`pim-fix-review-chain.md`, both retired on 2026-09-05 (see above) but still listed as
+available. The guide was not updated in that pass.
