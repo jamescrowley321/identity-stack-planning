@@ -151,12 +151,9 @@ The following interfaces are the intended planning outputs. They are not yet imp
 The following planning documents are dependencies/evidence inputs for this backlog, not implementation
 targets:
 
-- [`architecture-open-identity.md`](../_bmad-output/planning-artifacts/architecture-open-identity.md) —
-  canonical identity, protocol/management planes, provider adapters, and relationship boundary.
-- [`prd-open-identity.md`](../_bmad-output/planning-artifacts/prd-open-identity.md) — provider-swap,
-  identity, and protocol requirements already planned in the workspace.
-- [`epics-open-identity.md`](../_bmad-output/planning-artifacts/epics-open-identity.md) — existing
-  identity-stack and identity-model story decomposition.
+- [`idea-open-identity.md`](idea-open-identity.md) — the parked open-identity idea: canonical
+  identity, the protocol/management plane split, provider adapters, and the relationship boundary,
+  condensed from the retired PRD, architecture, and epic documents.
 - [`idp-rbac-comparison.md`](idp-rbac-comparison.md) — canonical RBAC and proxied relationship
   authorization boundary.
 - [`system-architecture.md`](system-architecture.md) — canonical identity tables, tenant isolation,

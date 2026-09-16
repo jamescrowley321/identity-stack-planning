@@ -44,6 +44,10 @@ Start with the **[Roadmap](roadmap.md)** to understand the 6 PRDs, cross-cutting
 - **[Where Status Lives](../_bmad-output/implementation-artifacts/status.md)** — GitHub issues are the source of truth for status; this maps each planning artifact to its tracking issue. Replaces the retired `task-queue.md` and `sprint-plan.md`.
 - **[Ralph Runner Guide](../_bmad-output/implementation-artifacts/ralph-runner-guide.md)** — Quick-reference commands for ralph loops.
 
+## Parked Ideas
+
+- **[open-identity](idea-open-identity.md)** — a rebrand around provider-portable identity, planned in September 2026 and never started. Thesis, ten locked decisions, market and trademark findings, and the readiness-audit lesson, condensed from seven retired documents.
+
 ## Archived
 
 Historical research, brainstorming sessions, spent loop prompts and completed review findings are indexed in [`_archive/README.md`](../_archive/README.md), which records what each artifact was, what superseded it, and the exact `git show` command to read it back. The files themselves are removed from the working tree.

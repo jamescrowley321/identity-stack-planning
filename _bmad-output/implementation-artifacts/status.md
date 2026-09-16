@@ -60,7 +60,7 @@ picked up, and add the row above.
 | `planning-artifacts/epics/epic-17-fapi-attacker-model-tests.md` | Written 2026-08-02, never filed. Distinct from #476, which tracks FAPI2 *hardening*, not the attacker-model suite |
 | `planning-artifacts/epics/epic-16-audit-remediation.md` | Remediation shipped under the closed #300 umbrella; the epic doc is the record of what was decided |
 | `planning-artifacts/epics/epic-0*` … `epic-15` (2026-04-04 vintage) | Written against the pre-consolidation repo layout. Retained as decision records; superseded in substance by the monorepo epics above |
-| `planning-artifacts/epics-design-system.md`, `epics-multi-idp-demo.md`, `epics-multi-provider-test.md`, `epics-infrastructure-secrets.md`, `epics-open-identity.md` | PRD-level decompositions; work was filed ad hoc rather than as a numbered epic |
+| `planning-artifacts/epics-design-system.md`, `epics-multi-idp-demo.md`, `epics-multi-provider-test.md`, `epics-infrastructure-secrets.md` | PRD-level decompositions; work was filed ad hoc rather than as a numbered epic |
 
 ## Reading current state
 

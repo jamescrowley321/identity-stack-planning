@@ -54,7 +54,7 @@ Definitions for terms used across identity-stack-planning documents. Grouped for
 
 **Mutual TLS (mTLS)** — Mutual Transport Layer Security, in which both sides of a TLS connection authenticate with certificates. OAuth certificate-bound tokens and client authentication are defined by [RFC 8705](https://www.rfc-editor.org/rfc/rfc8705.html).
 
-**MVP (Minimum Viable Product)** — The smallest product scope intended to validate a defined set of user outcomes. The open-identity MVP scope is recorded in [`prd-open-identity.md`](../_bmad-output/planning-artifacts/prd-open-identity.md).
+**MVP (Minimum Viable Product)** — The smallest product scope intended to validate a defined set of user outcomes. The open-identity MVP scope is summarised in [`idea-open-identity.md`](idea-open-identity.md).
 
 **OAuth 2.0** — The authorization framework for obtaining limited access to protected resources. Defined by [RFC 6749](https://www.rfc-editor.org/rfc/rfc6749.html).
 
@@ -78,7 +78,7 @@ Definitions for terms used across identity-stack-planning documents. Grouped for
 
 **Problem Detail** — RFC 9457 standard error response format. Used by the canonical identity service. Includes `type` (URI), `title`, `status`, `detail`, `instance` (request path), and `traceId` (OpenTelemetry). Content-Type: `application/problem+json`.
 
-**PRD (Product Requirements Document)** — A planning artifact that records product problem, scope, requirements, and success criteria. See [`prd-open-identity.md`](../_bmad-output/planning-artifacts/prd-open-identity.md).
+**PRD (Product Requirements Document)** — A planning artifact that records product problem, scope, requirements, and success criteria. See [`idea-open-identity.md`](idea-open-identity.md).
 
 **Provider abstraction tiers** — Classification system for identity capabilities by cross-provider mapping feasibility:
 - **Tier 1 (Abstract)** — Similar shape across providers; abstract with a common interface. Examples: User CRUD, ReBAC/authz, SSO/Federation, session management.
