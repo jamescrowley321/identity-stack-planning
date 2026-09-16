@@ -1,6 +1,6 @@
 # OIDC/OAuth 2.0 Certification Analysis for py-identity-model
 
-**Date:** 2026-03-26 · **Updated:** 2026-07-07
+**Date:** 2026-03-26 · **Updated:** 2026-09-15
 **Status:** ✅ **Certified (Basic + Config + Form Post Basic RP)** — expanding to next profiles
 
 > ## ✅ Certification achieved — 2 July 2026
@@ -17,6 +17,33 @@
 > (py-identity-model #331) was resolved via the OIDF Open-Source Project
 > Certification Policy. Current focus is **§6 Phase 4 — expand profiles**
 > (see §8, added 2026-07-07). Tracking: py-identity-model #242.
+
+> ## Standing decision — the hosted suite is the conformance standard (2026-09-15)
+>
+> CI runs conformance against the **hosted** OIDF suite at
+> `https://www.certification.openid.net`. The local Docker suite
+> (`make conformance-up`) remains available for offline and fast local iteration, but
+> it is no longer the gate of record. The Foundation recommends this: it publishes a
+> Python runner library so implementers can wire the suite into a pipeline, and
+> `conformance/run_tests.py` already drives the REST API rather than Selenium.
+>
+> Three things stay distinct, and a PR description should never blur them:
+>
+> | | What it is | Who does it |
+> |---|---|---|
+> | **Hosted run** | CI against the hosted suite, `publish: none` | Automated, routine |
+> | **Evidence package** | A hosted run exported as a zip + RP logs, retained | Automated, deliberate |
+> | **Submission** | Filing with OIDF; appearing on the public list | **The owner, by hand** |
+>
+> Consequences to design for: `CONFORMANCE_TOKEN` is required, so a job that cannot
+> see it must fail loudly rather than skip green; and the gate now depends on an
+> external service, so an outage must be reported as an outage and not as a
+> conformance failure.
+>
+> **Known drift:** the certification names `3.1.0`; the library ships `3.18.1`.
+> Establishing what OIDF requires to refresh a listing is open work under #242.
+>
+> Execution: `ralph-prompts/pim-conformance-evidence.md`.
 
 ## 1. Certification Program Overview
 
