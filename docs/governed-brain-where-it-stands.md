@@ -59,6 +59,29 @@ The defensible claim is therefore narrow and checkable: *permission-aware
 retrieval is solved for identity × document; this is the portable contract for
 the rest of the decision.*
 
+```mermaid
+flowchart TB
+    Q["<b>May this actor</b>, acting for <b>this person</b>, obtain<br/><b>this kind of record</b>, for <b>this stated reason</b>, right now?"]
+
+    Q --> T1["this actor<br/><i>identity, verified</i>"]
+    Q --> T2["this kind of record<br/><i>permission-filtered</i>"]
+    Q --> T3["acting for this person<br/><i>three distinct parties</i>"]
+    Q --> T4["for this stated reason<br/><i>purpose, checkable</i>"]
+
+    T1 --> SOLVED["<b>Mature category</b><br/>shipped, decided per query"]
+    T2 --> SOLVED
+    T3 --> OPEN["<b>Unoccupied</b><br/>no shipped system models it"]
+    T4 --> OPEN
+
+    SOLVED --> SCOPE["This contract covers<br/>the unoccupied terms"]
+    OPEN --> SCOPE
+
+    style SOLVED fill:#ede9fd,stroke:#6d4bd8,color:#221a33
+    style OPEN fill:#fef3e2,stroke:#b07d2b,color:#3a2c14
+    style SCOPE fill:#221a33,stroke:#6d4bd8,color:#ffffff
+    style Q fill:#f7f5ff,stroke:#8b6fe0,color:#221a33
+```
+
 ## Four decisions to make
 
 Each one blocks a phase. None can be settled by more research — they are choices
