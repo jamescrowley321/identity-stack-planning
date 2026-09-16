@@ -26,12 +26,16 @@
 }
 
 .heroLede {
-  max-width: 34ch;
-  margin: 0 0 1.5rem;
-  font-size: clamp(1.125rem, 2.2vw, 1.5rem);
-  font-weight: 500;
-  line-height: 1.3;
-  letter-spacing: -0.015em;
+  max-width: 62ch;
+  margin: 0 0 2.25rem;
+  font-size: clamp(1.0625rem, 1.7vw, 1.25rem);
+  font-weight: 400;
+  line-height: 1.5;
+  color: oklch(0.985 0 0 / 82%);
+}
+
+.heroLede strong {
+  font-weight: 600;
   color: oklch(0.79 0.14 280);
 }
 
@@ -101,17 +105,17 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.375rem;
-  margin-top: 3rem;
+  gap: 0.5rem 0.375rem;
+  margin: 0 0 1rem;
 }
 
 .phase {
   padding: 0.3rem 0.7rem;
-  border: 1px solid oklch(0.985 0 0 / 20%);
+  border: 1px solid var(--plan-rule);
   border-radius: 0.375rem;
   font-family: var(--ifm-font-family-monospace);
   font-size: 0.75rem;
-  color: oklch(0.985 0 0 / 70%);
+  color: var(--plan-muted);
   white-space: nowrap;
 }
 
@@ -127,7 +131,7 @@
   top: 50%;
   width: 0.75rem;
   height: 1px;
-  background: oklch(0.985 0 0 / 22%);
+  background: var(--plan-rule);
 }
 
 .phase[data-emphasis] {
@@ -142,6 +146,206 @@
   font-size: 0.8125rem;
   line-height: 1.55;
   color: oklch(0.985 0 0 / 55%);
+}
+
+/* Prose block — for the sections that argue rather than list. */
+
+.prose {
+  max-width: 68ch;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--ifm-font-color-base);
+}
+
+.prose p {
+  margin: 0 0 1.25rem;
+}
+
+.proseAside {
+  padding-top: 1rem;
+  border-top: 1px solid var(--plan-rule);
+  font-size: 0.9375rem;
+  color: var(--plan-muted);
+}
+
+.subTitle {
+  margin: 3.5rem 0 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--plan-rule);
+  font-size: clamp(1.25rem, 2.2vw, 1.5rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--plan-ink);
+}
+
+/* The guarantee, stated as figures. Laid out as a specification table rather than
+   a row of stat cards: the numbers are the argument, so they sit beside the claim
+   they support instead of floating above it. */
+
+.stats {
+  display: grid;
+  gap: 0;
+}
+
+.stat {
+  display: grid;
+  grid-template-columns: minmax(9rem, 12rem) 1fr;
+  gap: 1rem 2.5rem;
+  align-items: start;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--plan-rule);
+}
+
+.stat:last-child {
+  border-bottom: 1px solid var(--plan-rule);
+}
+
+.statFigure {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--brand-hover);
+}
+
+[data-theme='dark'] .statFigure {
+  color: var(--purple-300);
+}
+
+.statUnit {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.4;
+  color: var(--plan-muted);
+}
+
+.statBody {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--ifm-font-color-base);
+}
+
+@media (max-width: 640px) {
+  .stat {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  .statFigure {
+    font-size: 2rem;
+  }
+  .statUnit {
+    display: inline;
+    margin-left: 0.5rem;
+  }
+}
+
+/* Evidence strip — the hero's claim, immediately backed by figures that each
+   resolve to a link further down. Sits on the ink hero, so it states its colours. */
+
+.evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.75rem 2.5rem;
+  list-style: none;
+  margin: 0 0 2.25rem;
+  padding: 1.5rem 0 0;
+  border-top: 1px solid oklch(0.985 0 0 / 15%);
+}
+
+.evidence li {
+  max-width: 22ch;
+}
+
+.evidenceFigure {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: oklch(0.79 0.14 280);
+}
+
+.evidenceLabel {
+  display: block;
+  margin-top: 0.375rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: oklch(0.985 0 0 / 60%);
+}
+
+.evidenceCert {
+  max-width: 30ch;
+}
+
+.evidenceCert .evidenceFigure {
+  font-size: 1.125rem;
+  letter-spacing: -0.01em;
+}
+
+/* Install block — four languages, one of which is honestly empty. */
+
+.installs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+
+.install {
+  padding-top: 1rem;
+  border-top: 2px solid var(--brand);
+}
+
+.install:last-child {
+  border-top-color: var(--plan-rule);
+  border-top-style: dashed;
+}
+
+.installLang {
+  margin: 0 0 0.625rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--plan-ink);
+}
+
+.installCmd,
+.installCmdMuted {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.375rem;
+  background: var(--plan-surface);
+  border: 1px solid var(--plan-rule);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.75rem;
+  line-height: 1.55;
+  /* `go get github.com/...` is longer than the column; wrap it rather than
+     clipping it into a scroll gutter nobody will find. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+[data-theme='dark'] .installCmd,
+[data-theme='dark'] .installCmdMuted {
+  background: oklch(1 0 0 / 4%);
+}
+
+.installCmdMuted {
+  color: var(--plan-muted);
+}
+
+.installNote {
+  margin: 0.625rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--plan-muted);
 }
 
 /* Sections ---------------------------------------------------------------- */
