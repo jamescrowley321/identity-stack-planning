@@ -39,9 +39,40 @@ Three distinct things. Keep them separate in every PR description:
 2. **An evidence package** — a hosted run exported as a zip plus RP logs, retained as an artifact. Produced deliberately, for a profile being certified.
 3. **A submission** — filing with the OpenID Foundation and appearing on the public list. **Never done by this loop.** See the boundary section.
 
+## Prerequisite — the CI token is stale, and it will not look stale
+
+**On 2026-09-15 the API token was deleted at the OpenID Foundation end**, on the suspicion it had been compromised. The GitHub Actions secret was **not** touched — `gh secret list` still shows `CONFORMANCE_TOKEN`, last updated `2026-07-02`, the date of the certification run.
+
+So the repository holds a value that the suite no longer honours. **Every hosted call will return 401 while the secret still appears healthy.** Do not let that read as a conformance failure, and do not let `gh secret list` reassure you: existence is not validity, and GitHub secrets cannot be read back to check.
+
+**Replacing it is the owner's job, not this loop's.** The repo ships `conformance/scripts/rotate_conformance_token.py`, which mints a fresh token and writes it straight into the Actions secret. It cannot be automated here — the first step is an **interactive OIDC sign-in (Google or GitLab) in a headful browser**. A loop cannot complete it and should not try.
+
+```bash
+cd ~/repos/auth/py-identity-model
+uv run conformance/scripts/rotate_conformance_token.py              # first run: browser opens, sign in
+uv run conformance/scripts/rotate_conformance_token.py --headless   # later runs reuse the profile
+uv run conformance/scripts/rotate_conformance_token.py --dry-run    # check the session, mint nothing
+```
+
+It targets `jamescrowley321/identity-model` / `CONFORMANCE_TOKEN` by default, and needs `gh` authenticated as a repo admin plus the Playwright Chromium binary. The token is never printed and never written to disk.
+
+**Before starting task 1, probe the token — do not just check it exists.** An authenticated call against the suite is the only real test:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' \
+  -H "Authorization: Bearer $CONFORMANCE_TOKEN" \
+  https://www.certification.openid.net/api/plan
+```
+
+`200` means live. `401`/`403` means the secret holds a dead token — **stop and tell the owner to run the rotation script.**
+
+Do not work around it: do not fall back to the local Docker suite and call the gate done, do not mark hosted plans skipped to get a green check, and do not write a token into a file. Tasks 2, 3, 4 and 7 involve no hosted run and can proceed meanwhile.
+
 ## Task Queue
 
 Work top to bottom. Each task is one PR. Mark `done` here as you complete it.
+
+**Everything green first; evidence and submission last.** Tasks 1–7 are engineering. Task 8 gathers evidence, and only then does the owner submit. This ordering is not a preference — a certification package must reflect the final state of the thing being certified. Evidence exported at task 5 and then invalidated by a code change at task 6 is worse than no evidence, because it looks valid.
 
 | # | Task | Issue | Status |
 |---|---|---|---|
@@ -49,35 +80,46 @@ Work top to bottom. Each task is one PR. Mark `done` here as you complete it.
 | 2 | Re-scope `conformance.yml` (local Docker) to an offline/local path — keep `make conformance-up` working and keep it dispatchable, but it is no longer the gate of record | [#607](https://github.com/jamescrowley321/identity-model/issues/607) | pending |
 | 3 | Feature → OIDF profile coverage matrix; link it from `docs/oidc-certification-analysis.md` | [#471](https://github.com/jamescrowley321/identity-model/issues/471) | pending |
 | 4 | Make the fastapi RP conformance run a required gate on validation/middleware PRs, reproducible via one make target | [#472](https://github.com/jamescrowley321/identity-model/issues/472) | pending |
-| 5 | Evidence packages for the next round — `dynamic-rp`, `rpinitiated-logout-rp`, `backchannel-logout-rp`: export zips + RP logs into `conformance/results/hosted/` | [#242](https://github.com/jamescrowley321/identity-model/issues/242), [#473](https://github.com/jamescrowley321/identity-model/issues/473) | pending |
-| 6 | FAPI 2.0 — reconcile the pinned variant in `configs/fapi2-rp.json` against the live suite's plan metadata, then produce an evidence package | [#475](https://github.com/jamescrowley321/identity-model/issues/475), epic [#476](https://github.com/jamescrowley321/identity-model/issues/476) | pending |
+| 5 | Bring the logout plans under the standard gate — `rpinitiated-logout-rp` + `backchannel-logout-rp` green and gating, including against the Keycloak fixture | [#473](https://github.com/jamescrowley321/identity-model/issues/473) | pending |
+| 6 | FAPI 2.0 — reconcile the pinned variant in `configs/fapi2-rp.json` against the live suite's plan metadata and get it green under the standard gate | [#475](https://github.com/jamescrowley321/identity-model/issues/475), epic [#476](https://github.com/jamescrowley321/identity-model/issues/476) | pending |
 | 7 | Write up the 3.1.0-vs-3.18.1 certification drift: what OIDF requires to refresh a listing for a new version, and a recommendation | [#242](https://github.com/jamescrowley321/identity-model/issues/242) | pending |
+| 8 | **Last.** Evidence pass — once 1–7 are merged and the nightly gate has been green across a full run, export packages for every profile being certified: `dynamic-rp`, `rpinitiated-logout-rp`, `backchannel-logout-rp`, `fapi2-rp`. Then hand off | [#242](https://github.com/jamescrowley321/identity-model/issues/242) | pending |
 
-Task 1 first — it is what makes hosted the standard and stops the six plans rotting. Tasks 5 and 6 depend on 1 proving those plans still pass against the hosted suite.
+Task 1 first — it is what makes hosted the standard and stops the six plans rotting.
+
+**Do not export an evidence package before task 8.** Routine hosted runs in tasks 1–7 use `publish: none` and no `--export-zip`. If a task tempts you to capture evidence early, it is the wrong task.
 
 **Out of scope:** mTLS certification (`fapi2-mtls-rp`) as a *submission* target. Wire it into the standard run under task 1, but `conformance/README.md` records that FAPI2 certifies on DPoP and mTLS is a separate future path. Do not pursue it.
 
 ### Task 1 design constraints
 
-- **`CONFORMANCE_TOKEN` is required.** Every hosted job needs it. A job that cannot see the secret must **fail loudly with a distinct message**, never skip quietly into a green check.
+- **`CONFORMANCE_TOKEN` is required, and it has three distinct failure modes.** CI must report each differently, because they need different fixes: **secret absent** (repo misconfigured), **401/403** (the token was revoked at the OIDF end — rotate it; this is the state as of 2026-09-15), and **conformance failure** (the library actually regressed). Collapsing these into one red check makes the gate untrustworthy. None may skip quietly into green.
 - **The suite is an external dependency.** When `certification.openid.net` is unreachable or returns 5xx, the run must fail with a message that names the outage as the cause and distinguishes it from a conformance failure. An implementer reading a red check must be able to tell "the library regressed" from "the Foundation's service was down" without opening logs.
 - **`publish` defaults to `none`.** Scheduled and PR-triggered runs never publish. Publishing stays a deliberate `workflow_dispatch` choice.
-- **Retain artifacts.** Export zips and RP logs from scheduled runs are what make a later submission cheap.
+- **Do not export evidence from scheduled runs.** Retain the plain run logs so a failure is diagnosable, but export zips and RP-log bundles belong to task 8 only — evidence must name one settled version, and `main` moves.
 - Consider `staging.certification.openid.net` (tracks the suite's master branch) if a plan needs a fix that has landed upstream but is not yet in production. Do not make staging the default — it moves under you.
 - Keep the PR trigger scoped to paths that can actually change RP behaviour (`py/`, `conformance/`), not every docs commit.
 
-## The submission boundary — read before tasks 5 and 6
+## The submission boundary — read before task 8
 
-**This loop prepares evidence. It never submits a certification.**
+**This loop prepares evidence. It never submits a certification.** And it prepares that evidence exactly once, at the end.
 
-Submitting to the OpenID Foundation is an outward-facing, name-attached act with a fee policy and a legal declaration. When a hosted run produces a complete evidence package:
+Preconditions before task 8 starts. If any is false, task 8 is not ready:
 
-1. Write the export zip and RP logs to `conformance/results/hosted/`.
-2. Open a PR with the evidence and a summary of what passed.
-3. Comment on #242 with the plan, the version, and the artifact paths.
-4. **Stop. Tell the owner it is ready to submit.**
+- Tasks 1–7 are merged to `main`.
+- The nightly hosted gate has run green on `main` at least once *after* the last of them merged.
+- The version the evidence will name is settled — see task 7. Certification is version-specific, and `main` moves.
 
-Never run a workflow with `publish: summary` or `publish: everything`. Never fill in OIDF forms, email the Foundation, or edit a public certification listing. Those are the owner's.
+Then, in one pass:
+
+1. Run each profile being certified against the hosted suite with `--export-zip` and `--rp-logs-zip`, writing to `conformance/results/hosted/`.
+2. Open a single PR with all the evidence and a summary table: profile, result, library version, run date.
+3. Comment on #242 with that table and the artifact paths.
+4. **Stop. Tell the owner the package is complete and ready to submit.**
+
+Never run a workflow with `publish: summary` or `publish: everything`. Never fill in OIDF forms, email the Foundation, or edit a public certification listing. Submitting is name-attached, carries a fee policy and a legal declaration, and is the owner's alone.
+
+If a conformance failure appears during task 8, do not patch around it to preserve the package. Stop, report it, and let it become ordinary work — a green package built on a worked-around failure is the one outcome worse than a late one.
 
 ## Running
 
