@@ -275,5 +275,5 @@ This two-layer approach adds complexity. Situations where a simpler model might 
 
 ### Internal Architecture
 - [System Architecture](system-architecture.md) — ADR-2 (Two-Layer Authorization), ADR-3 (Provider Abstraction Tiers)
-- [Canonical Identity PRD](../_bmad-output/planning-artifacts/prd-canonical-identity.md) — Why the platform owns identity data
+- [Canonical Identity PRD](system-architecture.md) — Why the platform owns identity data
 - [Descope Data Model](descope-data-model.md) — Descope JWT claim structure and tenant model

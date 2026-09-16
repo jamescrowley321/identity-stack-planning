@@ -22,45 +22,69 @@ stale only when a new epic is written, never merely because work progressed.
 
 ## Epic → GitHub tracking
 
-### identity-model (`jamescrowley321/identity-model`)
+### identity-model (`jamescrowley321/identity-model`) — Track 1
 
 | Planning artifact | Tracking issue(s) |
 |---|---|
-| `planning-artifacts/epics/epic-20-pim-parity.md` | [#573](https://github.com/jamescrowley321/identity-model/issues/573) epic |
+| `planning-artifacts/epics/epic-20-pim-parity.md` | [#573](https://github.com/jamescrowley321/identity-model/issues/573) epic; stories #574–#579 |
 | `planning-artifacts/epics/epic-23-test-hardening.md` | [#614](https://github.com/jamescrowley321/identity-model/issues/614) epic; stories #607–#613 |
 | `planning-artifacts/epics-token-harness.md` | [#462](https://github.com/jamescrowley321/identity-model/issues/462) epic; stories #463–#474 |
 | `planning-artifacts/epics-config-api.md` | [#616](https://github.com/jamescrowley321/identity-model/issues/616) epic; stories #617–#620 |
-| `planning-artifacts/epics/epic-19-mechanical-security-gates.md` | #511, #633, #638 |
-| `planning-artifacts/epics/epic-cons1-im-merge-testinfra.md` | [#535](https://github.com/jamescrowley321/identity-model/issues/535) |
-| `planning-artifacts/epics/epic-cons2-reorg-publishing.md` | [#536](https://github.com/jamescrowley321/identity-model/issues/536) |
-| `planning-artifacts/epics/epic-cons3-rename-retire.md` | [#537](https://github.com/jamescrowley321/identity-model/issues/537) |
-| `planning-artifacts/identity-model-parity-report-2026-09-05.md` | [#639](https://github.com/jamescrowley321/identity-model/issues/639) audit; follow-ups #642–#646 |
-| `implementation-artifacts/ralph-prompts/pim-fapi2-hardening.md` | [#476](https://github.com/jamescrowley321/identity-model/issues/476) epic; #215, #218, #431, #475 |
-| `docs/oidc-certification-analysis.md` | [#242](https://github.com/jamescrowley321/identity-model/issues/242) certification tracking |
+| `planning-artifacts/epics/epic-19-mechanical-security-gates.md` | #511, #633, #642, #643 |
+| `planning-artifacts/identity-model-parity-report-2026-09-05.md` | [#639](https://github.com/jamescrowley321/identity-model/issues/639) audit |
+| `docs/oidc-certification-analysis.md` | [#242](https://github.com/jamescrowley321/identity-model/issues/242) certification; [#476](https://github.com/jamescrowley321/identity-model/issues/476) FAPI 2.0 |
+| `ralph-prompts/identity-model-go-rust-parity.md` | #573, #574, #575, #576, #578, #579 |
+| `ralph-prompts/pim-conformance-evidence.md` | #607, #471, #472, #473, #242, #475, #476 |
 
-### identity-stack (`jamescrowley321/identity-stack`)
+### identity-stack (`jamescrowley321/identity-stack`) — Track 2
 
 | Planning artifact | Tracking issue(s) |
 |---|---|
-| `planning-artifacts/epics-tfc-environments.md` | [#411](https://github.com/jamescrowley321/identity-stack/issues/411) epic; stories #412–#418 |
-| `planning-artifacts/epics/epic-secrets-vault-migration.md` | [#398](https://github.com/jamescrowley321/identity-stack/issues/398) epic; stories #399–#405 |
-| `planning-artifacts/epics-ory-sso-provider.md` | #376, #377 (Epic 4), #378 (Epic 5) |
-| `planning-artifacts/epics-config-api.md` (frontend + backend legs) | #406, #407 |
-| `planning-artifacts/epics-api-gateway.md` | #161–#177 |
-| `planning-artifacts/epics.md` (canonical identity) | #138–#156 |
+| `planning-artifacts/epics-ory-sso-provider.md` | #376, #377, #378 |
+| `planning-artifacts/epics-tfc-environments.md` | [#411](https://github.com/jamescrowley321/identity-stack/issues/411) epic; stories #413–#418 |
+| `planning-artifacts/epics-config-api.md` (backend/frontend legs) | #406, #407 |
+| `docs/ory-sso-provider-context.md`, `docs/ory-iac-automation-plan.md` | #376–#378 |
+| `ralph-prompts/ory-frontend-logout.md` | #377, #378 |
 
-### Planning artifacts with no tracking issue
+### terraform-provider-descope / oss-admin — Track 3
 
-Not an oversight to fix silently — each is a deliberate state. File an issue when the work is
-picked up, and add the row above.
+| Planning artifact | Tracking issue(s) |
+|---|---|
+| — (no planning artifact; work is filed directly) | [terraform-provider-descope#109](https://github.com/jamescrowley321/terraform-provider-descope/issues/109) |
+
+`oss-admin` is administered entirely through its Terraform roots and carries no planning
+artifacts or issues here.
+
+### Governed brain — Track 4
+
+Gated. No issues filed, deliberately: four decisions and four blockers are unresolved.
+
+The documents landed on `main` in #108 — six under `docs/governed-brain-*.md` plus the
+research passes under `planning-artifacts/research/`. Landing them is not scheduling them;
+nothing here gets an issue until the four decisions in
+`docs/governed-brain-where-it-stands.md` are settled.
+
+## Planning artifacts with no tracking issue
+
+Naming the gap is the point — a silent absence reads identically to an oversight.
 
 | Planning artifact | Why there is no issue |
 |---|---|
 | `planning-artifacts/epics/epic-24-identity-capability-gaps.md` | `status: proposed` — not yet accepted into a repo's backlog |
 | `planning-artifacts/epics/epic-17-fapi-attacker-model-tests.md` | Written 2026-08-02, never filed. Distinct from #476, which tracks FAPI2 *hardening*, not the attacker-model suite |
 | `planning-artifacts/epics/epic-16-audit-remediation.md` | Remediation shipped under the closed #300 umbrella; the epic doc is the record of what was decided |
-| `planning-artifacts/epics/epic-0*` … `epic-15` (2026-04-04 vintage) | Written against the pre-consolidation repo layout. Retained as decision records; superseded in substance by the monorepo epics above |
-| `planning-artifacts/epics-design-system.md`, `epics-multi-idp-demo.md`, `epics-multi-provider-test.md`, `epics-infrastructure-secrets.md` | PRD-level decompositions; work was filed ad hoc rather than as a numbered epic |
+| `planning-artifacts/epics/epic-18-load-soak-testing.md`, `epic-21-cross-platform-serializer.md`, `epic-22-framework-middlewares.md` | Decomposition written ahead of the work; not yet filed |
+| `docs/idea-open-identity.md` | A parked idea, not work |
+| `docs/ideas.md` | Recorded thinking, explicitly not scheduled |
+
+## Issues with no planning artifact
+
+This is the normal state, not a gap. Standalone backlog items are filed straight to GitHub
+and need no decomposition here — middleware fixes, dependency bumps, flaky-test triage.
+
+Three are epic-shaped and have carried no planning artifact since 2026-09-05:
+`identity-stack-planning#61` (tier-2 FOSS security hardening), `#66` (cross-repo Security-tab
+triage), and `#94` (Keycloak provider integration).
 
 ## Reading current state
 
