@@ -69,18 +69,29 @@ The parent directory `~/repos/auth/CLAUDE.md` contains consolidated commands, gi
 
 ## Writing Conventions
 
-**Expand a short code the first time a document uses it.** Write `CONS-1 (the first polyglot-consolidation
-epic)`, never a bare `CONS-1`. A reader should be able to parse any sentence without leaving the page. This
-applies to requirement codes, decision codes, story codes and task IDs alike.
+**GitHub issue numbers are the only identifier for work.** An epic gets a name; a story gets an issue
+number. Write cross-repo references as `repo#N` (`identity-model#573`), never a bare `#N` — bare `#N`
+collides with ordinary prose numbering, and a matcher once read "Resolved Decision #9" in a PRD as
+`identity-model#9`, scoring a live decision-locked document as fully spent.
 
-**One prefix, one meaning, repo-wide.** Before inventing a code family, check
-[`docs/glossary.md` → Code index](docs/glossary.md) and add the new family there. `D-1` once meant both an
-architecture decision in `system-architecture.md` and an unrelated sign-off item in a parity report — the
-collision made both unreadable, and cleaning it up cost more than naming things properly would have.
+**Do not invent a code family.** No `TH-1.5`, no `T300`, no `FR-PIM-2`, no `RT5-F18`. The repo accumulated
+~1,900 occurrences across 25 such families; they are a private namespace competing with GitHub issue
+numbers, and they drift exactly the way the retired markdown status trackers did. `D-1` once meant both an
+architecture decision and an unrelated sign-off item — cleaning that up cost more than naming things
+properly would have.
 
-**Prefer plain words to a code.** A code earns its place only when the thing is referenced from several
-documents or tracked on GitHub. A decision that lives in one document does not need an identifier; describe
-it. When work is tracked as a GitHub issue, the issue number is the identifier — do not mint a parallel one.
+Identifiers that are *externally* meaningful are fine and expected: RFC numbers, CVE and PYSEC ids, OIDF
+profile names (`oidcc-client-basic-certification-test-plan`), conformance vector ids defined in `spec/`
+(`REV-001`), and provider claim names (`dct`, `tenants`). The test is whether the identifier means the same
+thing outside this repo.
+
+**Legacy codes: replace them in any file you are already editing.** Some documents still carry the old
+families — `docs/glossary.md` has the decoder. When you touch such a file for other reasons, swap its codes
+for issue numbers or plain words as you go, and only for the parts you are already changing. Do not open a
+separate sweep to do it, and do not rewrite a loop prompt's task queue mid-run.
+
+If a thing genuinely has no GitHub issue and needs referring to, describe it in words. A decision that lives
+in one document does not need an identifier.
 
 ## Git Conventions
 

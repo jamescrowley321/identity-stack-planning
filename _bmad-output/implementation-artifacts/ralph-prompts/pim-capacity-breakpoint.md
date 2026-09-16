@@ -98,3 +98,20 @@ Read design `architecture-token-harness-load-soak.md` §4/§5/§10 for every tas
 - Numbers are **directional** (co-located, bigger-runner-only) — state cache-state + algorithm + worker-count + runner on every capacity figure; do not claim absolute isolated ceilings.
 - If stuck 3+ iterations on one task: set it `blocked`, clean up the worktree, move on.
 - If all done: `<promise>LOOP_COMPLETE</promise>`
+
+## Identifier discipline
+
+- **GitHub issue numbers are the only identifier for work.** Write cross-repo references as
+  `repo#N` (`identity-model#462`), never a bare `#N`.
+- **Do not mint new code families.**
+- **Retire legacy codes in files you are already editing.** Some documents still carry the old private
+  identifier families (`TH-1.5`, `T300`, `FR-PIM-2`, `RT5-F18`, `TFCENV-7`); `docs/glossary.md` in the
+  planning repo decodes them. When a task has you editing such a file, replace the codes **in the parts you
+  are already changing** with the GitHub issue number or plain words. Do not open a separate de-coding
+  sweep, do not touch sections your task does not concern, and never rewrite this prompt's own task queue
+  mid-run. Externally meaningful identifiers stay: RFC numbers, CVE/PYSEC ids, OIDF profile names, and
+  `spec/` conformance vector ids such as `REV-001`.
+
+> This prompt's own queue still uses the legacy scheme. That is deliberate — rewriting a task
+> queue while the loop is consuming it is how queues and reality come apart. Leave it; replace
+> codes in the *planning artifacts and source files* the tasks touch.
