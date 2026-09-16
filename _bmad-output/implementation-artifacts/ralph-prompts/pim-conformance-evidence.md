@@ -175,6 +175,11 @@ Phase instructions are in `phases/*.md` alongside this prompt. Read only the pha
 
 ## Rules
 
+- **Never merge your own pull request.** Open it, link its issue, and stop. Do not run `gh pr merge`,
+  do not pass `--auto` or `--admin`, do not use a merge queue, and do not change branch-protection or
+  repository settings to make a merge possible. The owner reviews and merges every PR. This holds even
+  when CI is fully green and the change looks trivial — an unreviewed merge is the failure, not a
+  failing check.
 - Feature branches only, never commit to `main`. Conventional commits (Angular) — semantic-release is active.
 - **A skipped profile must be skipped loudly** — log the reason. Never let a skip read as a pass. #607 calls this out explicitly, and it matters more now that the gate depends on an external service.
 - Do not change variant parameters in `conformance/configs/*.json` to make a plan go green. Those values are cert-grade and deliberately chosen; `conformance/README.md` records why. If a variant looks wrong, the live suite's plan metadata is the source of truth — reconcile against it and say so in the PR.
