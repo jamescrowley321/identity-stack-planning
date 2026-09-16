@@ -48,7 +48,7 @@ vendor's current docs instead; these are kept only for "why did we pick this".
 | File | Subject | Current status of the decision |
 |---|---|---|
 | `_archive/brainstorming/research/hcp-terraform-research.md` | HCP Terraform backends, workspaces, variable sets | Adopted. Live work: identity-stack#411 (TFC dev+prod environments) |
-| `_archive/brainstorming/research/infisical-research.md` | Infisical self-hosted vs cloud | **Rejected.** Secrets target is HCP Vault Dedicated — identity-stack#398 |
+| `_archive/brainstorming/research/infisical-research.md` | Infisical self-hosted vs cloud | **Rejected.** The HCP Vault successor was abandoned too (Vault Secrets EOL 2026-07-01; Vault Dedicated ~$1,152/mo). Secrets are HCP Terraform variable sets |
 | `_archive/brainstorming/research/node-oidc-provider-research.md` | `panva/node-oidc-provider` as a test OP | Adopted. Now a live integration fixture in identity-model |
 | `_archive/brainstorming/research/tyk-gateway-research.md` | Tyk OSS gateway tiers and JWT handling | Adopted and shipped. identity-stack#161–#177 all closed |
 

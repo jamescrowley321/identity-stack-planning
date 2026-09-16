@@ -17,7 +17,7 @@ inputDocuments:
 
 `py-identity-model` (PIM) is the OIDF-certified reference implementation and **the source of truth — for both the feature set and the implementation**. This epic brings the Go and Rust ports of `identity-model` to **behavioral** parity with PIM — the same capability set, the same normative security checks, the same provider quirks — measured by an explicit capability matrix and a normative-behavior audit, decomposed into per-language implementation gaps.
 
-> **Consolidation (deferred):** PIM will eventually merge into this monorepo as `python/` to avoid duplicating conformance/integration test infra, collapsing to one harness across `{python, go, rust}`. That is deliberately deferred until identity-model is more mature; until then PIM stays its own repo and remains the reference.
+> **Consolidation: done.** PIM merged into this monorepo. The repo now carries `py/ go/ rust/ node/ spec/ infra/ conformance/` behind one harness, shipping as `py-v3.18.1`. The tracking epics — `identity-model#535`, `#536`, `#537` — are all closed. `py/` remains the reference implementation; it is no longer a separate repository.
 
 It does **not** mandate mirroring PIM's Python file layout (see the Architecture Decision below). Full verified state, the matrix, and the audit live in [`docs/identity-model-reconciliation-2026-08-12.md`](../../../docs/identity-model-reconciliation-2026-08-12.md); this epic is the actionable decomposition.
 

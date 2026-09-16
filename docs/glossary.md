@@ -48,7 +48,7 @@ Definitions for terms used across identity-stack-planning documents. Grouped for
 
 **idp_links** — Database table linking a canonical user to their identity at a specific provider. Contains `external_sub` (the provider's subject identifier), `provider_id`, and JSONB metadata. Enables one user to authenticate through multiple providers.
 
-**Infisical** — Secrets management platform chosen over HashiCorp Vault for right-sized complexity. Used for centralized secret storage, audit logging, and runtime injection via `infisical run`. See PRD 1.
+**HCP Terraform variable sets** — How secrets reach Terraform. `oss-admin` reads `descope_management_key` from the org-wide `descope-company` variable set. This replaced Infisical (rejected) and the planned HCP Vault migration (abandoned: Vault Secrets reached EOL 2026-07-01 and Vault Dedicated fails the free-only constraint).
 
 **MCP (Model Context Protocol)** — A protocol for connecting AI applications to tools and context providers. See the [MCP authorization specification](https://modelcontextprotocol.io/specification/latest/basic/authorization).
 

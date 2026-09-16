@@ -57,12 +57,12 @@ Three distinct credential types — do not conflate them:
 
 | Credential | What it's for | Where it lives | Status |
 |---|---|---|---|
-| **Ory Network Project/Workspace API key** | Authenticates the `ory/ory` **Terraform provider** and the `ory` **CLI** for management-plane writes (create client, patch project config, define schema) | Infisical → injected as a TF Cloud workspace env var (sensitive) | **Likely net-new** — PIM doesn't need it. Mint in the Ory console. **[CONFIRM]** exact provider var name for v26.3.x (`ORY_PROJECT_API_KEY` / `api_key`) |
-| **OAuth2 M2M client** (`client_id` + `client_secret`) | Client-credentials tokens (what PIM validates; audience `https://py-identity-model`). Reusable if the backend ever needs an Ory M2M token | Already a PIM secret; mirror into Infisical if identity-stack needs it | **Exists** (PIM) |
+| **Ory Network Project/Workspace API key** | Authenticates the `ory/ory` **Terraform provider** and the `ory` **CLI** for management-plane writes (create client, patch project config, define schema) | HCP Terraform variable set → injected as a workspace env var (sensitive) | **Likely net-new** — PIM doesn't need it. Mint in the Ory console. **[CONFIRM]** exact provider var name for v26.3.x (`ORY_PROJECT_API_KEY` / `api_key`) |
+| **OAuth2 M2M client** (`client_id` + `client_secret`) | Client-credentials tokens (what PIM validates; audience `https://py-identity-model`). Reusable if the backend ever needs an Ory M2M token | Already a PIM secret; mirror into the variable set if identity-stack needs it | **Exists** (PIM) |
 | **OAuth2 public SPA client** (`client_id`, **no secret**) | The frontend's interactive auth_code + PKCE login | **Created by Terraform** (Story 1.2); `client_id` published as app/CI config | **Net-new**, IaC-owned |
 
-**Secrets discipline (NFR-3):** the project API key and any client secrets flow through
-**Infisical** and are surfaced to Terraform as sensitive TF Cloud workspace variables. No secret is
+**Secrets discipline (NFR-3):** the project API key and any client secrets are supplied by an
+**HCP Terraform variable set** as sensitive workspace variables. No secret is
 written to `.tf`, committed, or stored in Postgres. The SPA client is public (no secret to leak).
 
 ## Repository Layout
@@ -143,12 +143,12 @@ Mirror the terraform-provider-descope / identity-stack Terraform Cloud pattern:
 4. **Drift detection** — a scheduled `terraform plan` (nightly) flags drift; because schemas/secrets
    are create-only, drift on those is surfaced as a warning to reconcile manually rather than
    auto-applied.
-5. **Secrets injection** — the Ory project API key is a sensitive TF Cloud workspace env var sourced
-   from Infisical; CI never sees the raw key.
+5. **Secrets injection** — the Ory project API key is a sensitive workspace env var supplied by an
+   HCP Terraform variable set; CI never sees the raw key.
 
 ## Bootstrap Sequence (MVP, `enable_organizations = false`)
 
-1. **Mint an Ory Network Project/Workspace API key** in the Ory console; store it in Infisical.
+1. **Mint an Ory Network Project/Workspace API key** in the Ory console; store it in an HCP Terraform variable set.
    **[CONFIRM]** whether the same-as-PIM project or a new one.
 2. Create TF Cloud workspace `identity-stack-ory-dev`; set the API key as a sensitive env var; set
    `ory_project_id` + redirect/origin vars.

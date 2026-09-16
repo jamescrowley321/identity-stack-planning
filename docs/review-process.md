@@ -151,11 +151,9 @@ When multiple reviewers report overlapping findings, the review-fix phase triage
 
 ## Manual Blind Peer Review
 
-For full codebase re-reviews outside of ralph loops (e.g., when prior in-context reviews were shallow), use the standalone adversarial review prompt:
+For full codebase re-reviews outside of ralph loops (e.g., when prior in-context reviews were shallow), run the **`blind-peer-review:check`** skill. It dispatches eight fresh-context lenses — Cold Read, Edge Cases, Acceptance Criteria, Security Review, Red Team, Policy & Provenance, OWASP Web, OWASP LLM — each with no access to the implementation conversation. All eight are on by default.
 
-**py-identity-model:** [`pim-blind-peer-review.md`](../_bmad-output/implementation-artifacts/ralph-prompts/pim-blind-peer-review.md)
-
-This prompt is designed to run in a **completely fresh Claude Code session** with no prior conversation context. It covers:
+This replaces the standalone `pim-adversarial-review.md` prompt, which required manually opening a fresh session. The review covers:
 1. Architectural reconnaissance (read key files to understand the codebase)
 2. Red team security review (JWT attacks, OIDC exploitation, protocol flow attacks)
 3. Blind code review (sync/async parity, error paths, resource lifecycle, thread safety)

@@ -73,7 +73,7 @@ FR-21: An **end-to-end integration test** proves Ory login → JWT validation �
 
 NFR-1: PKCE is enforced on the Ory authorization-code flow (public client, no secret).
 NFR-2: Validation enforces correct `iss` (Ory issuer) and `aud` (audience-scoped) per baseline OIDC; **FAPI 2.0 is not a target**.
-NFR-3: Ory secrets (project API token, OAuth2 client secrets, admin keys) live in the **Infisical** pipeline (`config_ref`) — never in Postgres or the repo.
+NFR-3: Ory secrets (project API token, OAuth2 client secrets, admin keys) are supplied by **HCP Terraform variable sets** (`config_ref`) — never in Postgres or the repo.
 NFR-4: Token validation **reuses py-identity-model** (>= 3.8.5, already a dependency) — no new validation code paths.
 NFR-5: Adding/removing a provider requires only **config + a provider row** — no change to backend business logic or the login wiring.
 NFR-6: Ory identity schemas and secrets are **create-only** in Terraform (no import) — the IaC documents this drift caveat.
@@ -111,7 +111,7 @@ NFR-8: Existing Descope integration and its tests remain **green** (backward com
 ### Epic 1: Ory Network Provisioning (IaC)
 Stand up the Ory Network OAuth2/OIDC surface via a new `ory/ory` Terraform track — JWT
 access-token strategy, a public SPA client (auth_code + PKCE), and the identity schema — with all
-secrets in Infisical, so identity-stack has a real Ory issuer, `client_id`, and JWKS to target.
+secrets in an HCP Terraform variable set, so identity-stack has a real Ory issuer, `client_id`, and JWKS to target.
 Descope IaC is untouched. Detailed plan: `docs/ory-iac-automation-plan.md`.
 **FRs covered:** FR-18, FR-19, FR-20
 
@@ -146,7 +146,7 @@ py-identity-model path.
 
 Stand up the Ory Network OAuth2/OIDC surface declaratively via a new `ory/ory` Terraform track,
 so identity-stack has a real Ory issuer, public SPA `client_id`, and JWKS to point at. Secrets flow
-through Infisical; the Descope Terraform track is untouched. See `docs/ory-iac-automation-plan.md`
+through HCP Terraform variable sets; the Descope Terraform track is untouched. See `docs/ory-iac-automation-plan.md`
 for the full resource inventory, credential model, and CI automation.
 
 ### Story 1.1: Ory Terraform track scaffold + project config with JWT access tokens
@@ -162,7 +162,7 @@ So that identity-stack can validate Ory access tokens locally as JWTs (the strat
 - [ ] A new Terraform track exists under identity-stack infra (e.g. `infra/ory/`), pinned to the `ory/ory` provider (v26.3.x) and targeting Ory Network (SaaS).
 - [ ] `ory_project_config` (or an `ory patch` equivalent captured in code) sets the OAuth2 access-token strategy to `jwt` project-wide — matching the project py-identity-model already validates.
 - [ ] `oauth2/allowed_top_level_claims` is set to the allowlist required by the chosen tenancy model (empty beyond standard OIDC for the default canonical-side plan).
-- [ ] Ory Network API token / admin credentials are read from Infisical (via env/`config_ref`), never written to `.tf` or committed (NFR-3).
+- [ ] Ory Network API token / admin credentials are read from an HCP Terraform variable set (via env/`config_ref`), never written to `.tf` or committed (NFR-3).
 - [ ] `terraform plan` runs clean against the project; the module README documents that identity schemas and secrets are create-only / no-import (NFR-6).
 - [ ] The terraform-provider-descope track is not modified (NFR-8).
 
@@ -211,14 +211,14 @@ existing Descope test remain unchanged.
 ### Story 2.1: Register the `ory` provider in the canonical registry
 
 As a platform admin,
-I want an `ory` provider row registered in the canonical `providers` registry with its issuer/base URL and Infisical `config_ref`,
+I want an `ory` provider row registered in the canonical `providers` registry with its issuer/base URL and HCP Terraform variable-set `config_ref`,
 So that backend token validation can source Ory's issuer and discovery from config rather than code.
 
 **FRs:** FR-6
 
 **Acceptance Criteria:**
 
-- [ ] A seed/config path registers a `Provider` row with `type=ProviderType.ory`, `issuer_url` (the Ory project issuer), `base_url`, and `config_ref` (Infisical), via `ProviderService.register_provider`.
+- [ ] A seed/config path registers a `Provider` row with `type=ProviderType.ory`, `issuer_url` (the Ory project issuer), `base_url`, and `config_ref` (HCP Terraform variable set), via `ProviderService.register_provider`.
 - [ ] `ProviderService.list_providers()` returns both the Descope and Ory rows, and `get_provider_capabilities` reflects JWT validation for Ory.
 - [ ] Ory secrets are referenced only by `config_ref`; no secret value is stored in Postgres (NFR-3).
 - [ ] Unit test: registering then listing the `ory` provider round-trips `issuer_url`/`base_url`/`config_ref`; the Descope row is unaffected.
