@@ -37,6 +37,40 @@ const PROOF = [
   },
 ];
 
+/** What the library lets you do, by the problem rather than by the capability name. */
+const CAPABILITIES = [
+  {
+    title: 'Sign people in',
+    body: 'Authorization code with PKCE, the state and nonce checks done properly, and issuer validation so a mixed-up-provider attack fails closed. Device flow for anything without a browser.',
+    specs: 'RFC 7636 · RFC 9207 · RFC 8628',
+  },
+  {
+    title: 'Validate tokens in your API',
+    body: 'Discovery, JWKS with caching, signature and claim validation — including the parts usually got wrong: algorithm confusion, audience, clock skew, issuer mismatch.',
+    specs: 'RFC 7517 · RFC 7519 · RFC 7662',
+  },
+  {
+    title: 'Make a stolen token useless',
+    body: 'Sender-constrained tokens bind a token to a key the client proves it holds, so one lifted from a log or a proxy is worthless without it.',
+    specs: 'RFC 9449 DPoP · RFC 8705 mTLS',
+  },
+  {
+    title: 'Call a service as the user',
+    body: 'Preserve who the original subject was across internal hops, instead of every service running as one omnipotent account.',
+    specs: 'RFC 8693',
+  },
+  {
+    title: 'Harden the request itself',
+    body: 'Push the authorization request over a back channel, sign it, and take the response signed too, so the front channel carries nothing worth tampering with.',
+    specs: 'RFC 9126 · RFC 9101 · JARM · RFC 7523',
+  },
+  {
+    title: 'Meet a regulated profile',
+    body: 'Request and configuration validators for FAPI 2.0 ship with the library, rather than leaving you to read the profile and hope.',
+    specs: 'FAPI 2.0 Security Profile',
+  },
+];
+
 const PHASES = ['setup', 'analyze', 'implement', 'test', 'review', 'review-fix', 'pr', 'docs', 'ci', 'complete'];
 
 const TRACKS = [
@@ -161,8 +195,40 @@ export default function Home(): ReactNode {
         </div>
       </section>
 
-      {/* The claim that needs proving, and the proof */}
+      {/* What you can actually do with it */}
       <section className={styles.sectionAlt}>
+        <div className={styles.inner}>
+          <h2 className={styles.sectionTitle}>What you can build with it</h2>
+          <p className={styles.sectionLede}>
+            Every capability maps to a specification and ships with a runnable example. Python
+            carries the full surface and is the certified reference; Go and Rust carry core and
+            most of the extended tier, and the gaps are published rather than implied.
+          </p>
+
+          <div className={styles.capabilities}>
+            {CAPABILITIES.map((c) => (
+              <article key={c.title} className={styles.capability}>
+                <h3 className={styles.capabilityTitle}>{c.title}</h3>
+                <p className={styles.capabilityBody}>{c.body}</p>
+                <p className={styles.capabilitySpecs}>{c.specs}</p>
+              </article>
+            ))}
+          </div>
+
+          <p className={styles.sectionNote}>
+            Also: dynamic client registration, RP-initiated and back-channel logout, token
+            revocation, and injectable claims validators.{' '}
+            <Link to="/docs/what-you-can-build">
+              The full list, with per-language availability
+            </Link>
+            . Next up are a Node implementation, Go and Rust parity on the advanced tier, and
+            three further certification profiles.
+          </p>
+        </div>
+      </section>
+
+      {/* The claim that needs proving, and the proof */}
+      <section className={styles.section}>
         <div className={styles.inner}>
           <h2 className={styles.sectionTitle}>
             &ldquo;Behaves the same everywhere&rdquo; is only worth something if it is enforced.
@@ -200,7 +266,7 @@ export default function Home(): ReactNode {
       </section>
 
       {/* How it gets built — supporting, not the lead */}
-      <section className={styles.section}>
+      <section className={styles.sectionAlt}>
         <div className={styles.inner}>
           <h2 className={styles.sectionTitle}>Built by agents, reviewed by agents that never saw the code</h2>
           <p className={styles.sectionLede}>
@@ -246,7 +312,7 @@ export default function Home(): ReactNode {
         </div>
       </section>
 
-      <section className={styles.sectionAlt}>
+      <section className={styles.section}>
         <div className={styles.inner}>
           <h2 className={styles.sectionTitle}>Four tracks, running independently</h2>
           <p className={styles.sectionLede}>

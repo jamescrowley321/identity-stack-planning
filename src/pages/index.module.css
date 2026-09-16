@@ -348,6 +348,47 @@
   color: var(--plan-muted);
 }
 
+/* Capabilities — grouped by the problem they solve, each tagged with the
+   specification it implements so the claim is checkable rather than atmospheric. */
+
+.capabilities {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem 2.5rem;
+}
+
+.capability {
+  padding-top: 1rem;
+  border-top: 2px solid var(--brand);
+}
+
+.capabilityTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--plan-ink);
+}
+
+.capabilityBody {
+  margin: 0 0 0.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--plan-muted);
+}
+
+.capabilitySpecs {
+  margin: 0;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: var(--brand-hover);
+}
+
+[data-theme='dark'] .capabilitySpecs {
+  color: var(--purple-300);
+}
+
 /* Sections ---------------------------------------------------------------- */
 
 .section,
