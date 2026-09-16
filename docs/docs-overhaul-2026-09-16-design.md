@@ -1,3 +1,11 @@
+---
+title: "Overhauling the documentation — design"
+sidebar_label: "Docs overhaul (2026-09-16)"
+description: "The design for the documentation overhaul: the front door, a published site, and a machine-readable layer for agents."
+status: adopted
+last_verified: 2026-09-15
+---
+
 # Overhauling the documentation — design
 
 **Date:** 2026-09-16 · **Status:** proposed, awaiting review

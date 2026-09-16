@@ -1,3 +1,10 @@
+---
+title: "Code Review Process"
+description: "The independent review lenses, what each one catches, and the order findings are triaged in."
+status: current
+last_verified: 2026-09-15
+---
+
 # Code Review Process
 
 This document describes how code quality is enforced across the auth workspace using independent review agents.
@@ -29,7 +36,7 @@ Five specialized reviewers, each designed to catch a different class of defects:
 
 **Output format:** MUST FIX (blocks merge) / SHOULD FIX (quality risk) / NITPICK (style only)
 
-**Template:** [`review-agents/blind-hunter.md`](../_bmad-output/implementation-artifacts/ralph-prompts/review-agents/blind-hunter.md)
+**Template:** [`review-agents/blind-hunter.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/review-agents/blind-hunter.md)
 
 ### Edge Cases
 
@@ -44,7 +51,7 @@ Five specialized reviewers, each designed to catch a different class of defects:
 
 **Output format:** Table with location, trigger condition, guard snippet, and consequence severity ([CRASH] / [DATA] / [WRONG] / [DEGRADED])
 
-**Template:** [`review-agents/edge-case-hunter.md`](../_bmad-output/implementation-artifacts/ralph-prompts/review-agents/edge-case-hunter.md)
+**Template:** [`review-agents/edge-case-hunter.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/review-agents/edge-case-hunter.md)
 
 ### Acceptance Criteria
 
@@ -59,7 +66,7 @@ Five specialized reviewers, each designed to catch a different class of defects:
 
 **Output format:** PASS / FAIL / PARTIAL / SCOPE CREEP per acceptance criterion. FAIL and unresolved PARTIAL block merge.
 
-**Template:** [`review-agents/acceptance-auditor.md`](../_bmad-output/implementation-artifacts/ralph-prompts/review-agents/acceptance-auditor.md)
+**Template:** [`review-agents/acceptance-auditor.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/review-agents/acceptance-auditor.md)
 
 ### Security Review (Security Auditor)
 
@@ -76,7 +83,7 @@ Five specialized reviewers, each designed to catch a different class of defects:
 
 **Output format:** BLOCK (CONFIRMED/LIKELY — must include concrete attack scenario) / WARN (LIKELY/UNLIKELY) / INFO (acceptable risk). Overall: PASS or FAIL.
 
-**Template:** [`review-agents/sentinel.md`](../_bmad-output/implementation-artifacts/ralph-prompts/review-agents/sentinel.md)
+**Template:** [`review-agents/sentinel.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/review-agents/sentinel.md)
 
 ### Red Team (Red Team)
 
@@ -91,7 +98,7 @@ Five specialized reviewers, each designed to catch a different class of defects:
 
 **Output format:** CRITICAL / HIGH / MEDIUM / LOW with attack scenarios, prerequisites, CVSS scores, and remediation steps.
 
-**Template:** [`review-agents/viper.md`](../_bmad-output/implementation-artifacts/ralph-prompts/review-agents/viper.md)
+**Template:** [`review-agents/viper.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/review-agents/viper.md)
 
 ## Review Flow in Ralph Loops
 
@@ -165,5 +172,5 @@ This replaces the standalone `pim-adversarial-review.md` prompt, which required 
 ## Review Findings History
 
 Past review findings are tracked in:
-- `review-findings-identity-stack.md` — 44 MUST FIX, 85 SHOULD FIX, 51 DEFER across 12 PRs (all resolved). Compressed into the [archive index](../_archive/README.md), which names the `git show` command to read it back.
+- `review-findings-identity-stack.md` — 44 MUST FIX, 85 SHOULD FIX, 51 DEFER across 12 PRs (all resolved). Compressed into the [archive index](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_archive/README.md), which names the `git show` command to read it back.
 - Individual task-state files record per-PR findings during ralph loop execution

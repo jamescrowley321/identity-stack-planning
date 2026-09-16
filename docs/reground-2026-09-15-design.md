@@ -1,3 +1,11 @@
+---
+title: "Re-grounding the planning repo — design"
+sidebar_label: "Re-grounding (2026-09-15)"
+description: "What was measured against source, what changed as a result, and why the six-PRD program was retired in favour of four independent tracks."
+status: adopted
+last_verified: 2026-09-15
+---
+
 # Re-grounding the planning repo — design
 
 **Date:** 2026-09-15 · **Status:** proposed, awaiting review

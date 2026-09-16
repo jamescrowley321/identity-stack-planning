@@ -1,3 +1,11 @@
+---
+title: "Identity Capability Gap Analysis"
+sidebar_label: "Identity capability gaps"
+description: "Reusable capability gaps across the protocol, trust, resource-server, credential, relationship, and conformance layers."
+status: current
+last_verified: 2026-09-15
+---
+
 # Identity Capability Gap Analysis
 
 Status: proposed planning baseline, 2026-09-05.

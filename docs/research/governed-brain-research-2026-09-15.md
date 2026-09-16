@@ -1,4 +1,8 @@
 ---
+title: "Governed Brain — Research Findings"
+sidebar_label: "Research findings"
+description: "Four independent research passes against the governed-brain documents, with six lane reports beside them."
+last_verified: 2026-09-16
 workflowType: 'research'
 research_type: 'technical'
 research_topic: 'Governed brain — standards prior art, relationship authorization, agent-memory landscape, receipts and audit'
@@ -7,6 +11,7 @@ user_name: 'James'
 date: '2026-09-15'
 web_research_enabled: true
 source_verification: true
+status: proposed
 ---
 
 # Governed Brain — Research Findings

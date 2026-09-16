@@ -1,3 +1,11 @@
+---
+title: "Idea — open-identity"
+sidebar_label: "open-identity"
+description: "A rebrand around provider-portable identity: ten locked decisions, market and trademark findings, and the readiness-audit lesson. Planned in September 2026 and never started."
+status: parked
+last_verified: 2026-09-15
+---
+
 # Idea — open-identity
 
 **Status:** parked idea, not planned work · **Decisions locked:** 2026-09-02 · **Parked:** 2026-09-15

@@ -1,3 +1,11 @@
+---
+title: "IdP Authorization Comparison: RBAC, ReBAC, and the Space Between"
+sidebar_label: "IdP authorization comparison"
+description: "RBAC and ReBAC across nine identity providers, and why the reference architecture owns RBAC and proxies ReBAC."
+status: current
+last_verified: 2026-09-15
+---
+
 # IdP Authorization Comparison: RBAC, ReBAC, and the Space Between
 
 How identity providers handle authorization, why none of them are portable, and where the identity-stack reference architecture lands.

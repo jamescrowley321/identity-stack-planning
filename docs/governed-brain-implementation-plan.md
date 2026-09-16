@@ -1,3 +1,11 @@
+---
+title: "Governed Brain — Long-Term Implementation Plan"
+sidebar_label: "Implementation plan"
+description: "Phases 0 to 7, six tool-selection gates, and the blockers that keep the track gated."
+status: proposed
+last_verified: 2026-09-15
+---
+
 # Governed Brain — Long-Term Implementation Plan
 
 **Status:** Proposed · **Date:** 2026-09-15 · **Depends on:** [Concepts](governed-brain-concepts.md) · [Authorization model](governed-brain-authorization.md)
@@ -117,7 +125,7 @@ and describe a denial without reading either design document.
 
 Lands in `identity-model`. These are the prerequisites named in the
 authorization model's reuse order, and they are already the subject of
-[Epic 24](../_bmad-output/planning-artifacts/epics/epic-24-identity-capability-gaps.md).
+[Epic 24](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/planning-artifacts/epics/epic-24-identity-capability-gaps.md).
 
 They divide by whether the requirement is conditional on how many issuers are in
 play, and that division decides what gates what.
@@ -370,7 +378,7 @@ The three smallest pieces of real work, in the order they unblock the most:
 
 Distinct from the open decisions below: these are places where the plan as
 written cannot be executed, found by the 2026-09-15 research passes
-([synthesis](../_bmad-output/planning-artifacts/research/governed-brain-research-2026-09-15.md)).
+([synthesis](research/governed-brain-research-2026-09-15.md)).
 None is resolved here. The plan should not be labelled ready to start on the
 affected phases until each has an answer.
 

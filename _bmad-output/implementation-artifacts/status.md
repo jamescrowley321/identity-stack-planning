@@ -60,7 +60,7 @@ artifacts or issues here.
 Gated. No issues filed, deliberately: four decisions and four blockers are unresolved.
 
 The documents landed on `main` in #108 — six under `docs/governed-brain-*.md` plus the
-research passes under `planning-artifacts/research/`. Landing them is not scheduling them;
+research passes under `docs/research/`. Landing them is not scheduling them;
 nothing here gets an issue until the four decisions in
 `docs/governed-brain-where-it-stands.md` are settled.
 

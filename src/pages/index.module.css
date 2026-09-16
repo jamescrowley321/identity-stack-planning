@@ -1,0 +1,306 @@
+.inner {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* Hero — ink ground in both themes, so the purple-on-black identity is the first
+   thing the site says regardless of the reader's colour preference. */
+
+.hero {
+  background: oklch(0.145 0 0);
+  color: oklch(0.985 0 0);
+  padding: clamp(3.5rem, 9vw, 6rem) 0 clamp(2.5rem, 6vw, 4rem);
+  border-bottom: 1px solid oklch(0.67 0.2 278 / 45%);
+}
+
+.heroTitle {
+  /* Infima paints every h1 with --ifm-heading-color, which is near-black in the
+     light theme. The hero sits on ink in both themes, so it has to say so. */
+  color: oklch(0.985 0 0);
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 0 0 0.75rem;
+}
+
+.heroLede {
+  max-width: 34ch;
+  margin: 0 0 1.5rem;
+  font-size: clamp(1.125rem, 2.2vw, 1.5rem);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: oklch(0.79 0.14 280);
+}
+
+.heroBody {
+  max-width: 68ch;
+  margin: 0 0 2rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: oklch(0.985 0 0 / 72%);
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.actionPrimary,
+.actionSecondary {
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 1.5rem;
+  border-radius: 0.625rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.actionPrimary {
+  background: oklch(0.565 0.235 276);
+  color: oklch(0.99 0 0);
+}
+
+.actionPrimary:hover {
+  background: oklch(0.67 0.2 278);
+  color: oklch(0.99 0 0);
+  text-decoration: none;
+}
+
+.actionSecondary {
+  border: 1px solid var(--plan-rule);
+  color: var(--ifm-color-primary);
+}
+
+.actionSecondary:hover {
+  border-color: var(--brand);
+  text-decoration: none;
+}
+
+.hero .actionSecondary {
+  border-color: oklch(0.985 0 0 / 28%);
+  color: oklch(0.985 0 0);
+}
+
+.hero .actionSecondary:hover {
+  border-color: oklch(0.67 0.2 278);
+  color: oklch(0.79 0.14 280);
+}
+
+/* Pipeline — the actual phase sequence, which is the mechanism this project is
+   about. `review` is the phase that had to change, so it is the one that reads
+   loudest; the rest are deliberately quiet. */
+
+.pipeline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 3rem;
+}
+
+.phase {
+  padding: 0.3rem 0.7rem;
+  border: 1px solid oklch(0.985 0 0 / 20%);
+  border-radius: 0.375rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.75rem;
+  color: oklch(0.985 0 0 / 70%);
+  white-space: nowrap;
+}
+
+.phase + .phase {
+  position: relative;
+  margin-left: 0.75rem;
+}
+
+.phase + .phase::before {
+  content: '';
+  position: absolute;
+  left: -0.75rem;
+  top: 50%;
+  width: 0.75rem;
+  height: 1px;
+  background: oklch(0.985 0 0 / 22%);
+}
+
+.phase[data-emphasis] {
+  background: oklch(0.565 0.235 276);
+  border-color: oklch(0.565 0.235 276);
+  color: oklch(0.99 0 0);
+}
+
+.pipelineNote {
+  margin: 1rem 0 0;
+  max-width: 60ch;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: oklch(0.985 0 0 / 55%);
+}
+
+/* Sections ---------------------------------------------------------------- */
+
+.section,
+.sectionAlt {
+  padding: clamp(3rem, 7vw, 5rem) 0;
+}
+
+.sectionAlt {
+  background: var(--plan-surface);
+  border-block: 1px solid var(--plan-rule);
+}
+
+.sectionTitle {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin: 0 0 1rem;
+  color: var(--plan-ink);
+}
+
+.sectionLede {
+  max-width: 68ch;
+  margin: 0 0 2.5rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--plan-muted);
+}
+
+.sectionNote {
+  margin: 2rem 0 0;
+  font-size: 0.9375rem;
+  color: var(--plan-muted);
+}
+
+/* Review lenses ----------------------------------------------------------- */
+
+.lenses {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.75rem 2.5rem;
+  margin: 0;
+}
+
+.lens {
+  border-top: 1px solid var(--plan-rule);
+  padding-top: 0.875rem;
+}
+
+.lensName {
+  margin: 0 0 0.375rem;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--plan-ink);
+}
+
+.lensBody {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--plan-muted);
+}
+
+/* Tracks ------------------------------------------------------------------ */
+
+.lanes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.lane {
+  display: flex;
+  flex-direction: column;
+  padding-top: 1.125rem;
+  border-top: 3px solid var(--lane-tone, var(--brand));
+}
+
+.lane[data-tone='brain'] {
+  --lane-tone: var(--plan-muted);
+  border-top-style: dashed;
+}
+
+.laneName {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin: 0 0 0.75rem;
+  color: var(--plan-ink);
+}
+
+.laneLabel {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--brand-hover);
+}
+
+[data-theme='dark'] .laneLabel {
+  color: var(--purple-300);
+}
+
+.laneGoal {
+  margin: 0 0 0.875rem;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--ifm-font-color-base);
+}
+
+.laneDone {
+  margin: 0 0 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--plan-muted);
+}
+
+.laneWhere {
+  margin: auto 0 0;
+  font-size: 0.875rem;
+}
+
+/* Split ------------------------------------------------------------------- */
+
+.split {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3rem;
+}
+
+.split .sectionLede {
+  margin-bottom: 1.75rem;
+}
+
+/* Responsive -------------------------------------------------------------- */
+
+@media (max-width: 996px) {
+  .lanes {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .split {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .inner {
+    padding: 0 20px;
+  }
+  .lanes {
+    grid-template-columns: 1fr;
+  }
+  .phase + .phase {
+    margin-left: 0;
+  }
+  .phase + .phase::before {
+    display: none;
+  }
+}

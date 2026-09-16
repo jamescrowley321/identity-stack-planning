@@ -1,3 +1,11 @@
+---
+title: "Governed Brain — Concepts and Requirements"
+sidebar_label: "Concepts and requirements"
+description: "Brain, scope, authority, grant and receipt defined, plus sixteen acceptance properties any implementation can be checked against."
+status: proposed
+last_verified: 2026-09-15
+---
+
 # Governed Brain — Concepts and Requirements
 
 **Status:** Proposed · **Date:** 2026-09-15

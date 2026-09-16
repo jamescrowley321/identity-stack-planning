@@ -1,8 +1,14 @@
-# identity-stack-planning
+# Identity Stack Brain
+
+*The repository is `identity-stack-planning`; the name is pending the
+[open-identity rebrand](docs/idea-open-identity.md), planned in September 2026 and never
+started.*
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Planning docs](https://img.shields.io/badge/docs-planning%20hub-2d6a4f.svg)](docs/index.md)
 [![Status](https://img.shields.io/badge/status-GitHub%20issues-181717?logo=github)](https://github.com/jamescrowley321/identity-stack-planning/issues)
+
+**[Read it as a site → jamescrowley321.github.io/identity-stack-planning](https://jamescrowley321.github.io/identity-stack-planning/)**
 
 Planning and orchestration hub for a multi-repo identity platform. **Zero application code** —
 only the architecture decisions, domain research, and autonomous-execution prompts that drive
@@ -19,8 +25,8 @@ Four independent tracks, not one program. **They do not gate each other.**
 | Track | Goal | Repos |
 |---|---|---|
 | **Library** | A credible, certified, multi-language open-source identity library | `identity-model` |
-| **Proving ground** | Exercise the library against real providers; keep Descope and Tyk skills sharp | `identity-stack` |
-| **Expertise** | Stay fluent in Descope, Terraform, and repo governance | `terraform-provider-descope`, `oss-admin` |
+| **Proving ground** | Run the library against real providers end to end, in a working application | `identity-stack` |
+| **Expertise** | Keep provider tooling and repository governance in working order | `terraform-provider-descope`, `oss-admin` |
 | **Governed brain** | Research: agent memory as an authorization problem. Gated, nothing built | — |
 
 ```mermaid
@@ -30,7 +36,7 @@ graph LR
     end
     subgraph t2["Track 2 — proving ground"]
         IS["identity-stack<br/>FastAPI · React · canonical identity"]
-        PROV["Descope · Ory · node-oidc-provider"]
+        PROV["Keycloak · IdentityServer<br/>node-oidc-provider · Descope · Ory"]
     end
     subgraph t3["Track 3 — expertise"]
         TFP["terraform-provider-descope"]
@@ -55,8 +61,9 @@ The library is the flagship, and Python is **OpenID Certified® by the OpenID Fo
 Relying Party** — Basic, Config and Form Post Basic RP, since 2 July 2026. It is the certified
 reference the family's Go and Rust native libraries are built to match.
 
-`identity-stack` is **not a product**. Tyk and Descope are deliberate expertise vehicles —
-POC-grade by design, chosen because they are worth being fluent in.
+`identity-stack` is **not a product**. It is where the library gets run end to end against
+real providers rather than test doubles — POC-grade by design. Any given provider in it is
+one implementation of the standards, not the subject.
 
 Full detail: **[docs/roadmap.md](docs/roadmap.md)**.
 
@@ -67,16 +74,16 @@ links; it does not restate.
 
 | Repository | What it is | Release |
 |---|---|---|
-| [identity-model](https://github.com/jamescrowley321/identity-model) | Multi-language OIDC/OAuth2 **client** library — `py/ go/ rust/ spec/ conformance/` behind one harness. OpenID Certified RP | [![PyPI](https://img.shields.io/pypi/v/py-identity-model?label=py-identity-model)](https://pypi.org/project/py-identity-model/) |
+| [identity-model](https://github.com/jamescrowley321/identity-model) | Multi-language OIDC/OAuth2 **client** library — `py/ go/ rust/ spec/ conformance/` behind one harness. Provider-agnostic: one conformance suite runs against Keycloak, IdentityServer, node-oidc-provider and Descope. OpenID Certified RP | [![PyPI](https://img.shields.io/pypi/v/py-identity-model?label=py-identity-model)](https://pypi.org/project/py-identity-model/) |
 | [identity-stack](https://github.com/jamescrowley321/identity-stack) | Proving ground — FastAPI + React + Terraform, canonical Postgres identity, Tyk gateway, Descope and Ory | — |
-| [terraform-provider-descope](https://github.com/jamescrowley321/terraform-provider-descope) | Terraform provider for Descope (Go). Fork of the upstream provider | [![Registry](https://img.shields.io/github/v/release/jamescrowley321/terraform-provider-descope?label=registry)](https://registry.terraform.io/providers/jamescrowley321/descope/latest) |
+| [terraform-provider-descope](https://github.com/jamescrowley321/terraform-provider-descope) | Terraform provider for Descope (Go), fork of the upstream provider — tooling for one of the providers, not a dependency of the library | [![Registry](https://img.shields.io/github/v/release/jamescrowley321/terraform-provider-descope?label=registry)](https://registry.terraform.io/providers/jamescrowley321/descope/latest) |
 | [oss-admin](https://github.com/jamescrowley321/oss-admin) *(private)* | One Terraform root per administered repo — GitHub settings, branch protection, CI secrets | — |
 
 ## Where things live
 
 | Path | Holds |
 |---|---|
-| [`docs/`](docs/index.md) | The knowledge base — program map, architecture, identity-domain analysis, governed-brain research |
+| [`docs/`](docs/index.md) | The knowledge base, published as the site — program map, architecture, identity-domain analysis, governed-brain research |
 | [`_bmad-output/planning-artifacts/`](_bmad-output/planning-artifacts/) | Epics and product briefs, each linked to its tracking issue |
 | [`_bmad-output/implementation-artifacts/`](_bmad-output/implementation-artifacts/) | Ralph loop prompts, the runner guide, and the artifact → issue map |
 | [`_archive/README.md`](_archive/README.md) | What was retired, why, and the `git show` that prints it back. The files live only in git history |
