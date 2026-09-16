@@ -1,10 +1,14 @@
 ---
+title: "Ory as SSO Provider — Planning Context & Technical Research"
+sidebar_label: "Ory as SSO provider"
+description: "Planning context and technical research for using Ory as an SSO provider alongside Descope."
+last_verified: 2026-09-15
 workflowType: 'research'
 doc_type: 'planning-input'
 project_name: 'identity-stack'
 user_name: 'James'
 date: '2026-08-13'
-status: 'draft'
+status: current
 purpose: >-
   Pre-BMAD context + technical research for adopting Ory Network as the SSO
   provider for identity-stack. Intended as an inputDocument for

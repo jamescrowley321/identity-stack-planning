@@ -1,3 +1,11 @@
+---
+title: "Descope Data Model: OAuth 2.0 / OpenID Connect Mapping"
+sidebar_label: "Descope data model"
+description: "How Descope maps onto OAuth 2.0 and OIDC: the dct and tenants claims, supported grant types, and session management."
+status: current
+last_verified: 2026-03-26
+---
+
 # Descope Data Model: OAuth 2.0 / OpenID Connect Mapping
 
 This document maps Descope platform concepts to standard OAuth 2.0 and OpenID Connect specifications. It serves as a reference for developers working across the auth workspace repos.

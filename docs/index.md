@@ -1,3 +1,11 @@
+---
+title: "Documentation Index"
+sidebar_label: "Documentation index"
+description: "Index of the planning knowledge base: the program map, how work gets done, identity-domain analysis, and the governed-brain research."
+status: current
+last_verified: 2026-09-15
+---
+
 # Documentation Index
 
 Start with the **[Program map](roadmap.md)** — four tracks, what each is for, and where its
@@ -6,7 +14,7 @@ work is tracked.
 ## Getting oriented
 
 - **[Program map](roadmap.md)** — the four tracks and their live work. **Read this first.**
-- **[Where status lives](../_bmad-output/implementation-artifacts/status.md)** — GitHub is the
+- **[Where status lives](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/status.md)** — GitHub is the
   source of truth for status; this maps each planning artifact to its tracking issue.
 - **[System architecture](system-architecture.md)** — C4 context, component architecture,
   canonical identity ER diagram, request lifecycle, ADR index.
@@ -18,7 +26,7 @@ work is tracked.
 
 - **[Ralph loop process](ralph-loop-process.md)** — how a story becomes a merged PR: phase
   pipeline, task-state persistence, worktree isolation.
-- **[Ralph runner guide](../_bmad-output/implementation-artifacts/ralph-runner-guide.md)** —
+- **[Ralph runner guide](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-runner-guide.md)** —
   the available loop prompts and how to launch one.
 - **[Review process](review-process.md)** — the review lenses and the triage order.
 - **[Ralph loop efficiency](ralph-loop-efficiency.md)** — prompt sizing and token-waste audit.
@@ -58,7 +66,7 @@ document; this is the portable contract for the rest of the decision.
   relationship-authorization port, and the threat table.
 - **[Long-term implementation plan](governed-brain-implementation-plan.md)** — phases 0–7,
   six tool-selection gates, and the known blockers.
-- **[Research findings](../_bmad-output/planning-artifacts/research/governed-brain-research-2026-09-15.md)**
+- **[Research findings](research/governed-brain-research-2026-09-15.md)**
   — four independent passes against the documents above, with six lane reports beside it.
 
 ## Parked ideas
@@ -70,6 +78,6 @@ document; this is the portable contract for the rest of the decision.
 
 ## Archived
 
-Retired artifacts are indexed in [`_archive/README.md`](../_archive/README.md), which records
+Retired artifacts are indexed in [`_archive/README.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_archive/README.md), which records
 what each was, why it went, and the `git show` command that prints it back. The files
 themselves live only in git history.

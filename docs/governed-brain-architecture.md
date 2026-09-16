@@ -1,3 +1,11 @@
+---
+title: "Governed Brain — Abstract Architecture"
+sidebar_label: "Abstract architecture"
+description: "Components as roles, ports with contracts and negative tests, and a substitution table. Names no product and no vendor."
+status: proposed
+last_verified: 2026-09-15
+---
+
 # Governed Brain — Abstract Architecture
 
 **Status:** Proposed · **Date:** 2026-09-15

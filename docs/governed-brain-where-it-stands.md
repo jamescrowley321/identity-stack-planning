@@ -1,3 +1,11 @@
+---
+title: "Governed Brain — Where It Stands"
+sidebar_label: "Where it stands"
+description: "Plain-language entry point: the idea, what is genuinely new against what already exists, and the four open decisions with a recommendation for each."
+status: proposed
+last_verified: 2026-09-15
+---
+
 # Governed Brain — Where It Stands
 
 **Status:** Proposed · **Date:** 2026-09-15
@@ -23,7 +31,7 @@ authorization engine, or model provider.
 | [Concepts and Requirements](governed-brain-concepts.md) | What a governed brain must mean and do — brain, scope, authority, grant, receipt — plus sixteen acceptance properties written so any implementation can be checked against them |
 | [Authorization and Federation Model](governed-brain-authorization.md) | How one disclosure decision composes: the security invariant, which layer owns which check, the relationship-authorization port, and the threat table |
 | [Long-Term Implementation Plan](governed-brain-implementation-plan.md) | Phases 0–7 across the identity repositories, what gates what, and the known blockers |
-| [Research Findings](../_bmad-output/planning-artifacts/research/governed-brain-research-2026-09-15.md) | Four independent passes testing all of the above against the current state of the field |
+| [Research Findings](research/governed-brain-research-2026-09-15.md) | Four independent passes testing all of the above against the current state of the field |
 
 Nothing is built. No phase has started.
 

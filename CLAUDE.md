@@ -1,102 +1,41 @@
 # Claude Code Instructions — identity-stack-planning
 
-## Purpose
+The rules for working in this repository are tool-neutral and live in `AGENTS.md`. They are
+imported here, so everything in that file applies:
 
-This repo is the BMAD-METHOD planning hub for the auth workspace. It contains project planning artifacts, architecture documents, PRDs, epics, and stories that drive development across the sibling repos.
+@AGENTS.md
 
-**This repo does NOT contain application code.** It is a planning-only repo that uses BMAD skills and agents to produce structured planning artifacts.
+What follows is Claude Code specific.
 
-## Workspace Layout
+## Skills
 
-This repo lives at `~/repos/auth/identity-stack-planning/` alongside these sibling repositories that form a pseudo-monorepo (⚠️ local dir names do not all match their GitHub remotes — check `git remote`):
+BMAD-METHOD v6.12.0 is installed at `_bmad/`, which is tracked. The `/bmad-*` skills under
+`.claude/skills/` are **generated from it and not tracked** — in a fresh clone, run
+`npx bmad-method install` once to materialize them.
 
-| Repo | Path | Description |
-|------|------|-------------|
-| `identity-stack-planning` (this repo) | `~/repos/auth/identity-stack-planning/` | BMAD planning artifacts and project knowledge |
-| `py-identity-model` *(dir)* = `identity-model` *(GitHub)* | `~/repos/auth/py-identity-model/` | **Live polyglot OIDC/OAuth2 client monorepo** (survivor). GitHub repo is `identity-model`; the local dir is still named `py-identity-model`. Holds `py/` = OpenID-certified PyPI package `py-identity-model` (v3.18.x — JWT/validation/discovery **plus** PKCE/auth-code/token-exchange/DPoP/PAR/FAPI…), `go/` = Go module, `rust/` = crate `rs-identity-model`, `spec/` = cross-language conformance (PRD 6). **Ground all library work here.** |
-| `terraform-provider-descope` | `~/repos/auth/terraform-provider-descope/` | Terraform provider for Descope (Go). Fork of `descope/terraform-provider-descope` |
-| `identity-stack` | `~/repos/auth/identity-stack/` | SaaS starter kit — FastAPI backend + Vite/React frontend + Terraform infra |
-| `identity-model-legacy` | `~/repos/auth/identity-model-legacy/` | **ARCHIVED** old polyglot repo (GitHub `identity-model-legacy`, read-only). Superseded by the survivor monorepo above; its fixes were re-implemented natively there. **Do NOT use for grounding** — its capability matrix is stale (it marks Python `planned` for flows that already ship). |
+| Skill | Use |
+|---|---|
+| `/bmad-help` | Contextual guidance on what to do next |
+| `/bmad-product-brief` | Kick off a new initiative |
+| `/bmad-prd` | Create a product requirements document |
+| `/bmad-architecture` | Design system architecture |
+| `/bmad-create-epics-and-stories` | Break work into implementable units |
+| `/bmad-agent-pm`, `/bmad-agent-architect` | Engage a specific BMAD persona |
+| `/ralph-status` | Real-time summary of active ralph loops across the workspace |
 
-### Cross-Repo Relationships
+This repository's own skills — `ralph-audit` and `ralph-status` — are tracked. The `bmad-*`
+ones are not.
 
-- `identity-stack/backend` depends on `py-identity-model` (pinned `>=3.8.5,<4`; the library ships 3.18.x, so the floor is well behind) for token validation
-- `terraform-provider-descope` manages Descope project infrastructure that the SaaS starter connects to
-- `py-identity-model/examples/descope/` contains Descope-specific integration examples
+## Worktrees
 
-## BMAD Method
+Work happens on a feature branch in a dedicated git worktree, never in the primary checkout.
+Concurrent sessions switch branches underneath each other otherwise.
 
-This repo uses [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) v6.12.0 for AI-driven agile planning. BMAD is installed at `_bmad/`, which is tracked. The `/bmad-*` skills under `.claude/skills/` are **generated from it and not tracked** — run `npx bmad-method install` to materialize them in a fresh clone.
+Create worktrees under `/tmp`, not inside the repository: a worktree in a git-ignored path
+makes some lint and typecheck tooling silently skip the tree it is meant to be checking.
 
-### Key Paths
+## Reading sibling repositories
 
-- `_bmad/` — BMAD core + BMM module (agents, workflows, config)
-- `_bmad-output/planning-artifacts/` — PRDs, architecture docs, product briefs
-- `_bmad-output/implementation-artifacts/` — Epics, stories, sprint plans
-- `docs/` — Project knowledge base (see `docs/index.md` for full index)
-- `_archive/README.md` — Index of retired artifacts: what each was, what superseded it, and the `git show`
-  command to read it back. The artifacts themselves live only in git history
-- `_bmad-output/implementation-artifacts/status.md` — **GitHub issues are the source of truth for status.**
-  Planning artifacts hold rationale and decomposition and link to their tracking issue; they never carry
-  status. Never reintroduce a markdown status tracker
-- `.claude/skills/` — this repo's own skills (`ralph-audit`, `ralph-status`) are tracked; the `bmad-*` skills are installer-generated and git-ignored
-
-### Getting Started with BMAD
-
-- Use `/bmad-help` to get contextual guidance on what to do next
-- Use `/bmad-agent-pm` to engage the Product Manager agent
-- Use `/bmad-agent-architect` to engage the Architect agent
-- Use `/bmad-product-brief` to kick off a new initiative
-- Use `/bmad-prd` to create a Product Requirements Document
-- Use `/bmad-architecture` to design system architecture
-- Use `/bmad-create-epics-and-stories` to break down work into implementable units
-
-### Working Across Repos
-
-When BMAD workflows reference implementation details, architecture, or existing code:
-
-1. **Read sibling repos directly** — You have full access to `~/repos/auth/py-identity-model/` (the live polyglot monorepo — GitHub `identity-model`), `~/repos/auth/terraform-provider-descope/`, and `~/repos/auth/identity-stack/`. Read their code, tests, configs, and CLAUDE.md files to inform planning. (`~/repos/auth/identity-model-legacy/` is the archived old repo — do not ground on it.)
-2. **Never modify sibling repos from this context** — Planning artifacts live here; code changes happen in the target repos.
-3. **Reference by repo name** — In planning docs, refer to repos by name (e.g., "py-identity-model") rather than absolute paths.
-
-## Ralph Orchestrator Integration
-
-[Ralph Orchestrator](https://github.com/mikeyobrien/ralph-orchestrator) is used for autonomous task execution across the workspace. Each application repo has its own `ralph.yml` configuration.
-
-## Workspace Root CLAUDE.md
-
-The parent directory `~/repos/auth/CLAUDE.md` contains consolidated commands, git conventions, and cross-repo relationships for all four repos. Always reference it for build/test/lint commands and git workflows — it is the single source of truth for workspace-wide instructions.
-
-## Writing Conventions
-
-**GitHub issue numbers are the only identifier for work.** An epic gets a name; a story gets an issue
-number. Write cross-repo references as `repo#N` (`identity-model#573`), never a bare `#N` — bare `#N`
-collides with ordinary prose numbering, and a matcher once read "Resolved Decision #9" in a PRD as
-`identity-model#9`, scoring a live decision-locked document as fully spent.
-
-**Do not invent a code family.** No `TH-1.5`, no `T300`, no `FR-PIM-2`, no `RT5-F18`. The repo accumulated
-~1,900 occurrences across 25 such families; they are a private namespace competing with GitHub issue
-numbers, and they drift exactly the way the retired markdown status trackers did. `D-1` once meant both an
-architecture decision and an unrelated sign-off item — cleaning that up cost more than naming things
-properly would have.
-
-Identifiers that are *externally* meaningful are fine and expected: RFC numbers, CVE and PYSEC ids, OIDF
-profile names (`oidcc-client-basic-certification-test-plan`), conformance vector ids defined in `spec/`
-(`REV-001`), and provider claim names (`dct`, `tenants`). The test is whether the identifier means the same
-thing outside this repo.
-
-**Legacy codes: replace them in any file you are already editing.** Some documents still carry the old
-families — `docs/glossary.md` has the decoder. When you touch such a file for other reasons, swap its codes
-for issue numbers or plain words as you go, and only for the parts you are already changing. Do not open a
-separate sweep to do it, and do not rewrite a loop prompt's task queue mid-run.
-
-If a thing genuinely has no GitHub issue and needs referring to, describe it in words. A decision that lives
-in one document does not need an identifier.
-
-## Git Conventions
-
-- **Conventional commits** (Angular convention) — commit messages must use prefixes like `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `ci:`, `build:`, `test:`, `style:`, `perf:`
-- Planning artifacts are committed to this repo
-- Always work on feature branches, never commit directly to `main`
-- Branch names follow `<type>/<short-description>` format (e.g., `feat/ralph-status-skill`, `docs/update-architecture`)
-- Each sibling repo has its own git history and remote — see `~/repos/auth/CLAUDE.md` for per-repo conventions
+You have full filesystem access to the sibling checkouts listed in `AGENTS.md`. Read them to
+ground planning work — and read `~/repos/auth/CLAUDE.md` for the build, test and lint commands
+of each. Never modify them from this context.

@@ -24,3 +24,8 @@ _bmad/custom/config.user.toml
 # Generated from _bmad/; every file says "DO NOT EDIT -- overwritten on every update".
 # Scoped to bmad-* so this repo's own skills (ralph-audit, ralph-status) stay tracked.
 .claude/skills/bmad-*/
+
+# Docusaurus
+/build
+/.docusaurus
+/node_modules

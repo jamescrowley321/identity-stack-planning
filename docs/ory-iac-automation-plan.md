@@ -1,10 +1,14 @@
 ---
+title: "Ory IaC & Automation Plan"
+sidebar_label: "Ory IaC and automation"
+description: "The infrastructure-as-code and automation plan for the Ory track."
+last_verified: 2026-09-15
 workflowType: 'planning'
 doc_type: 'iac-automation-plan'
 project_name: 'identity-stack'
 user_name: 'James'
 date: '2026-08-19'
-status: 'draft'
+status: current
 purpose: >-
   Concrete Infrastructure-as-Code and automation plan for standing up Ory Network as a
   configurable SSO provider for identity-stack, using the ory/ory Terraform provider. Backs

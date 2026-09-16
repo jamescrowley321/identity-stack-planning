@@ -1,3 +1,10 @@
+---
+title: "Glossary"
+description: "Definitions for the terms used across these documents, plus the decoder for the retired identifier families."
+status: current
+last_verified: 2026-09-15
+---
+
 # Glossary
 
 Definitions for terms used across identity-stack-planning documents. Grouped for quick lookup; acronym expansions link to source documents.

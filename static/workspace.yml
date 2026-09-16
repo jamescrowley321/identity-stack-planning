@@ -1,0 +1,145 @@
+# Machine-readable facts about this workspace.
+#
+# This file is a MIRROR, not a source. The prose documents are authoritative; this
+# exists so an agent can get the facts that bite it — chiefly the local-directory to
+# GitHub-repository mismatch — without parsing 300 KB of markdown.
+#
+# Rendering the prose from this file was considered and rejected: it needs template
+# syntax inside the markdown, which shows raw on github.com, and half the readership
+# is on github.com.
+
+schema: identity-stack-planning/workspace
+version: 1
+verified: 2026-09-16
+verified_against: source tree and the GitHub API, not other planning documents
+
+project:
+  name: Identity Stack Brain
+  repository: jamescrowley321/identity-stack-planning
+  site: https://jamescrowley321.github.io/identity-stack-planning/
+  contains_application_code: false
+  naming_note: >-
+    "Identity Stack Brain" is the current name. A rebrand to open-identity was planned
+    in September 2026 and never started; see docs/idea-open-identity.md.
+
+authority:
+  status:
+    source: GitHub issues
+    never: a markdown status tracker in this repository
+    note: >-
+      task-queue.md and sprint-plan.md were retired on 2026-09-05. At retirement, 34 rows
+      across them were marked pending against closed issues.
+  what_the_work_is: docs/roadmap.md
+  artifact_to_issue_map: _bmad-output/implementation-artifacts/status.md
+  precedence: >-
+    Source and live APIs outrank every document here. When a document disagrees with the
+    tree, the tree wins and the document gets fixed.
+
+naming:
+  work_identifier: GitHub issue number
+  cross_repo_reference_form: repo#N          # identity-model#573 — never a bare #N
+  invented_code_families: forbidden           # no TH-1.5, T300, FR-PIM-2, RT5-F18
+  externally_meaningful_identifiers_allowed:
+    - RFC numbers
+    - CVE and PYSEC identifiers
+    - OIDF profile names          # oidcc-client-basic-certification-test-plan
+    - conformance vector ids defined in spec/  # REV-001
+    - provider claim names        # dct, tenants
+
+# The local directory names do not all match their GitHub remotes. This is the single
+# most common way an agent gets a repository name wrong in a document.
+repositories:
+  - github: jamescrowley321/identity-model
+    local_path: ~/repos/auth/py-identity-model
+    name_matches_directory: false
+    role: >-
+      The live polyglot OIDC/OAuth2 client monorepo and the survivor of consolidation.
+      Ground all library work here.
+    languages: [python, go, rust]
+    packages:
+      - registry: pypi
+        name: py-identity-model
+      - registry: crates.io
+        name: rs-identity-model
+      - registry: go
+        name: github.com/jamescrowley321/identity-model/go
+    certification:
+      body: OpenID Foundation
+      role: Relying Party
+      profiles: [Basic RP, Config RP, Form Post Basic RP]
+      certified_on: 2026-07-02
+    provider_agnostic: true
+    conformance_providers: [keycloak, identityserver, node-oidc-provider, descope]
+
+  - github: jamescrowley321/identity-stack
+    local_path: ~/repos/auth/identity-stack
+    name_matches_directory: true
+    role: >-
+      Proving ground. FastAPI backend, React frontend, Terraform infrastructure, canonical
+      Postgres identity. Not a product.
+    depends_on:
+      - package: py-identity-model
+        constraint: ">=3.8.5,<4"
+        note: the only dependency between any two tracks
+
+  - github: jamescrowley321/terraform-provider-descope
+    local_path: ~/repos/auth/terraform-provider-descope
+    name_matches_directory: true
+    role: >-
+      Terraform provider for one identity provider. A fork of descope/terraform-provider-descope;
+      pull requests go to the fork. Tooling for a provider, not a dependency of the library.
+
+  - github: jamescrowley321/oss-admin
+    local_path: ~/repos/auth/oss-admin
+    name_matches_directory: true
+    private: true
+    role: One Terraform root per administered repository — GitHub settings, branch protection, CI secrets.
+    administers: [identity-model, identity-stack, terraform-provider-descope]
+    does_not_administer: [identity-stack-planning]
+
+  - github: jamescrowley321/identity-model-legacy
+    local_path: ~/repos/auth/identity-model-legacy
+    name_matches_directory: true
+    archived: true
+    do_not_ground_on: true
+    reason: >-
+      Superseded by the survivor monorepo. Its capability matrix is stale — it marks Python
+      "planned" for flows that already ship.
+
+tracks:
+  - name: Library
+    goal: A credible, certified, multi-language open-source identity library.
+    done_looks_like: Certification breadth grows and cross-language parity holds.
+    repositories: [identity-model]
+  - name: Proving ground
+    goal: Run the library against real providers end to end, not just against test doubles.
+    done_looks_like: The library is proven in a working application, against more than one provider.
+    repositories: [identity-stack]
+  - name: Expertise
+    goal: Keep provider tooling and repository governance in working order.
+    done_looks_like: Provider infrastructure stays reproducible from Terraform, not from a console.
+    repositories: [terraform-provider-descope, oss-admin]
+  - name: Governed brain
+    goal: Test the thesis that agent memory is an authorization problem.
+    done_looks_like: The four open decisions are settled so phase 0 can start.
+    gated: true
+    nothing_built: true
+    repositories: []
+
+tracks_gate_each_other: false
+
+do_not_touch:
+  - path: _bmad/
+    reason: Vendored BMAD-METHOD install. Update with `npx bmad-method install`, never by hand.
+  - path: .claude/skills/bmad-*
+    reason: Generated by that installer and git-ignored.
+  - path: _bmad-output/implementation-artifacts/ralph-prompts/
+    reason: Loop prompts may be mid-run; editing one changes a loop already executing against it.
+  - path: _archive/
+    reason: Only the index is tracked. The artifacts live in git history by design.
+
+conventions:
+  commits: conventional (Angular)
+  branches: <type>/<short-description>
+  direct_commits_to_main: forbidden
+  loops_merge_their_own_pull_requests: false

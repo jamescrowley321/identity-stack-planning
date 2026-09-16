@@ -1,3 +1,11 @@
+---
+title: "Relationship Authorization as a Proxied Port — Field Review"
+sidebar_label: "Relationship authorization"
+description: "Field review of treating relationship authorization as a proxied port rather than an owned store."
+status: proposed
+last_verified: 2026-09-16
+---
+
 # Relationship Authorization as a Proxied Port — Field Review
 
 **Date:** 2026-09-15 · **Scope:** assessment of the `RelationshipAuthorizationPort` boundary in
