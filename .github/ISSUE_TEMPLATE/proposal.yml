@@ -1,0 +1,43 @@
+name: Proposal — new work or a change of direction
+description: Propose an epic, a track change, or a decision worth recording.
+title: "proposal: "
+labels: [proposal]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Work that will be *done* is tracked as an issue in the repository that will do it.
+        Use this when the proposal is about the plan itself — a new epic, a track changing
+        shape, or a decision that needs recording before anything is scheduled.
+  - type: dropdown
+    id: track
+    attributes:
+      label: Track
+      options:
+        - Library (identity-model)
+        - Proving ground (identity-stack)
+        - Expertise (terraform-provider-descope, oss-admin)
+        - Governed brain (research, gated)
+        - The planning repository itself
+        - New track
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What and why
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: What makes this worth doing? Prefer something measured over something assumed.
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: What "done" looks like
+    validations:
+      required: true
