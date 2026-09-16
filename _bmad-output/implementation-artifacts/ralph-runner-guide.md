@@ -24,18 +24,22 @@ Each iteration completes one phase, persists state to `.claude/task-state.md`, a
 | Prompt | Purpose | Target Repos |
 |--------|---------|-------------|
 | `run-next-task.md` | General task execution from queue | All repos |
-| `fix-review-findings.md` | Fix review findings on existing PRs | All repos |
 | `design-system.md` | PRD 5b design-system story execution (worktree-based) | identity-stack |
 | `ory-frontend-logout.md` | Ory SSO provider — Epic 4 (provider-agnostic frontend) + Epic 5 (provider-aware logout + E2E); worktree-based, RED/BLUE gate | identity-stack |
 | `pim-integration-tests.md` | Integration test chain | py-identity-model |
-| `pim-fix-review-chain.md` | Chained PR fix loop | py-identity-model |
 | `pim-adversarial-review.md` | Full codebase security review (one-shot) | py-identity-model |
 | `pim-fapi2-hardening.md` | FAPI2 RP gating items (private_key_jwt, RFC 9207) + jwks-cache LRU (worktree-run) | py-identity-model |
 | `identity-model-go-core.md` | Go Core Tier (Epic 3, stories 3.2–3.6) — stacked PRs, conformance-gated (worktree-run) | identity-model |
 | `token-harness.md` | TH-1..TH-3: RS boot + correctness matrix + Locust load/soak + feature-proof (worktree-run) | py-identity-model |
 | `pim-capacity-breakpoint.md` | TH-4: capacity & breakpoint — ramp-to-SLO-breach, worker scaling, nightly full sweep (worktree-run) | py-identity-model |
+| `identity-model-go-rust-parity.md` | **Go/Rust catch-up** — Rust extended tier (revocation, token exchange, DPoP), Go advanced tier (client auth, PAR), cross-language correctness fixes. Supersedes `identity-model-rust-extended.md` (worktree-run) | identity-model |
+| `pim-conformance-evidence.md` | **Finish OIDF conformance** — wire the six orphaned plans into CI, then hosted evidence for the next certification round + FAPI 2.0 (worktree-run) | identity-model |
 
 > Completed one-shot loops (PRD 5 `canonical-identity`, PRD 2 `api-gateway`, `repository-base-refactor`, dated planning sessions) are archived under `_archive/ralph-planning/completed-epics/`.
+
+> **One workstream per repo.** `identity-model-go-rust-parity.md` and `pim-conformance-evidence.md` both
+> target `identity-model`. Run them sequentially — wait for one to write LOOP_COMPLETE before starting the
+> other. The same applies to any other loop touching that repo.
 
 ## Phase Pipeline
 
