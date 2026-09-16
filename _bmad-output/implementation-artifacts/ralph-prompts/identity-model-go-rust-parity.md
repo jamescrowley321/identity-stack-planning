@@ -41,20 +41,53 @@ Layout: `py/src/py_identity_model/` (reference), `go/pkg/<capability>/`, `rust/s
 
 Work top to bottom. Each task is one PR. Mark `done` here as you complete it.
 
-| # | Task | Lang | Reference impl | Issue | Status |
-|---|---|---|---|---|---|
-| 1 | Token Revocation (RFC 7009) | Rust | `go/pkg/revocation` | #573 | pending |
-| 2 | Token Exchange (RFC 8693) — a real grant, not `exchange_code` | Rust | `go/pkg/token` exchange grant | #573 | pending |
-| 3 | DPoP (RFC 9449) | Rust | `go/pkg/dpop` | #573 | pending |
-| 4 | Duplicate-`kid` try-all on verify failure | all three | — | [#575](https://github.com/jamescrowley321/identity-model/issues/575) | pending |
-| 5 | ID-token vs access-token discrimination in shared validators | all three | Python F-07 work | [#576](https://github.com/jamescrowley321/identity-model/issues/576) | pending |
-| 6 | Widen Rust JWT algs (ES512, EdDSA) + discovery single-flight | Rust | Python/Go | [#579](https://github.com/jamescrowley321/identity-model/issues/579) | pending |
-| 7 | `private_key_jwt` + `client_secret_jwt` client auth (RFC 7523) | Go | `py/.../core` client auth | #573 | pending |
-| 8 | PAR (RFC 9126) | Go | `py/.../core/par_logic.py` | #573 | pending |
-| 9 | Operational parity — Cache-Control TTL, HTTP retry/backoff, SSL-CA env, cache metrics | Go + Rust | Python | [#578](https://github.com/jamescrowley321/identity-model/issues/578) | pending |
-| 10 | Three inversions where Go/Rust beat Python — `client_secret_post`, base `expected_nonce`, RFC 8414 issuer match | Python | Go/Rust | [#574](https://github.com/jamescrowley321/identity-model/issues/574) | pending |
+| # | Task | Lang | Reference impl | Issue | Base branch | Status |
+|---|---|---|---|---|---|---|
+| 1 | Token Revocation (RFC 7009) | Rust | `go/pkg/revocation` | #573 | — | **done** — merged, identity-model#671 |
+| 2 | Token Exchange (RFC 8693) | Rust | `go/pkg/token` | #573 | — | **done** — merged, identity-model#673 |
+| 3 | DPoP (RFC 9449) | Rust | `go/pkg/dpop` | #573 | `main` | **in review** — identity-model#675, open |
+| 4 | Duplicate-`kid` try-all on verify failure | all three | — | [#575](https://github.com/jamescrowley321/identity-model/issues/575) | task 3's branch | pending |
+| 5 | ID-token vs access-token discrimination in shared validators | all three | Python F-07 work | [#576](https://github.com/jamescrowley321/identity-model/issues/576) | task 4's branch | pending |
+| 6 | Widen Rust JWT algs (ES512, EdDSA) + discovery single-flight | Rust | Python/Go | [#579](https://github.com/jamescrowley321/identity-model/issues/579) | task 5's branch | pending |
+| 7 | `private_key_jwt` + `client_secret_jwt` client auth (RFC 7523) | Go | `py/.../core` client auth | #573 | task 6's branch | pending |
+| 8 | PAR (RFC 9126) | Go | `py/.../core/par_logic.py` | #573 | task 7's branch | pending |
+| 9 | Operational parity — Cache-Control TTL, HTTP retry/backoff, SSL-CA env, cache metrics | Go + Rust | Python | [#578](https://github.com/jamescrowley321/identity-model/issues/578) | task 8's branch | pending |
+| 10 | Three inversions where Go/Rust beat Python — `client_secret_post`, base `expected_nonce`, RFC 8414 issuer match | Python | Go/Rust | [#574](https://github.com/jamescrowley321/identity-model/issues/574) | task 9's branch | pending |
 
-Tasks 1–3 are the largest gap and unlock the most. Tasks 4–6 are correctness fixes that touch all languages. Tasks 7–8 are the Go advanced tier. Task 10 fixes the embarrassment of the reference implementation trailing its own ports.
+Tasks 4–6 are correctness fixes that touch all languages. Tasks 7–8 are the Go advanced tier. Task 10 fixes the embarrassment of the reference implementation trailing its own ports.
+
+### One task per run
+
+**Complete exactly ONE task, then write `LOOP_COMPLETE` and stop.** Do not start the next one.
+
+The owner reviews the pull request, merges it, and relaunches the loop for the task after it. That
+is the intended pace: small reviewable units with a human between each. A run that opens two PRs has
+gone wrong even if both are good — task 3 landed at +3,144 lines across ten files, which is past the
+size a person can review carefully, and that is the pattern this pacing exists to stop.
+
+If a task is genuinely two separable pieces (a capability and its conformance wiring, say), open the
+first and stop. Note the remainder in the PR body so the split is visible.
+
+### Stacked pull requests
+
+Each task's branch is based on the **previous task's branch**, not on `main`, so the queue reads as a
+stack on GitHub and each PR's diff shows only its own change.
+
+At `setup`, pick the base:
+
+```bash
+# The most recent task branch that is still open; main if none is.
+gh pr list --repo jamescrowley321/identity-model --state open \
+  --json number,headRefName,baseRefName --jq '.[] | select(.headRefName|startswith("feat/")) | .headRefName'
+```
+
+Take the branch named in this queue's **Base branch** column. If that task's PR has already merged,
+`main` is the base instead — GitHub retargets the rest of the stack automatically on merge. Record
+the choice in `.claude/task-state.md` under `base_branch:` and pass it to `gh pr create --base`.
+
+**When the owner merges a stack, merge bottom-up and do not delete the base branch in the same
+command.** Deleting a branch that another open PR is based on closes that PR outright — it happened
+to identity-stack-planning#114 during this workstream and the PR had to be recreated.
 
 **Out of scope:** FAPI 2.0 for Go/Rust, mTLS, JAR, JARM, RAR, CIBA. Do not start them. If tasks 1–10 finish, write LOOP_COMPLETE and stop.
 
