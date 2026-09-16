@@ -7,6 +7,9 @@ Monitor CI checks and fix failures.
 1. Find PR: `gh pr list --head <branch> --repo jamescrowley321/<repo>`
 2. Wait: `gh pr checks <pr> --repo jamescrowley321/<repo> --watch --fail-fast`
 3. **All pass** → advance to `complete`. End your response.
+   **Green CI is not permission to merge.** Do not run `gh pr merge`, `--auto`, `--admin`, or a merge
+   queue, and do not change branch protection. A green PR waiting on the owner is the correct
+   end state, not an unfinished one.
 4. **Fail** → diagnose:
    - `gh run list --branch <branch> --repo jamescrowley321/<repo> --limit 1`
    - `gh run view <run_id> --repo jamescrowley321/<repo> --log-failed`

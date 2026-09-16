@@ -96,6 +96,11 @@ Phase instructions are in `phases/*.md` alongside this prompt. Read only the pha
 
 ## Rules
 
+- **Never merge your own pull request.** Open it, link its issue, and stop. Do not run `gh pr merge`,
+  do not pass `--auto` or `--admin`, do not use a merge queue, and do not change branch-protection or
+  repository settings to make a merge possible. The owner reviews and merges every PR. This holds even
+  when CI is fully green and the change looks trivial — an unreviewed merge is the failure, not a
+  failing check.
 - Feature branches only, never commit to `main`. Conventional commits (Angular) — semantic-release is active.
 - Integration tests are mandatory for library changes, not just unit tests.
 - Mirror the reference implementation's **behavior**, not its file layout. Idiomatic Go and idiomatic Rust are the goal; Python's module shape is not.

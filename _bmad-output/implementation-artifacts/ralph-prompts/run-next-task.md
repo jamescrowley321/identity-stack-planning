@@ -60,3 +60,10 @@ Read the current phase file:
 - **IdentityService seam (D21):** For identity-stack — all new API routes MUST inject `IdentityService`, not `DescopeManagementClient` directly
 - Use `gh` for GitHub ops, `git` for push/pull/fetch
 - If stuck 3+ iterations: set task to `blocked`, delete state, pick next
+
+## Merging
+
+**Never merge a pull request.** Open it, link its issue, post the review evidence, and stop. No
+`gh pr merge`, no `--auto`, no `--admin`, no merge queue, and no changes to branch protection or
+repository settings to enable a merge. The owner reviews and merges every PR — including PRs whose
+CI is fully green.
