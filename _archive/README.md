@@ -48,7 +48,7 @@ vendor's current docs instead; these are kept only for "why did we pick this".
 | File | Subject | Current status of the decision |
 |---|---|---|
 | `_archive/brainstorming/research/hcp-terraform-research.md` | HCP Terraform backends, workspaces, variable sets | Adopted. Live work: identity-stack#411 (TFC dev+prod environments) |
-| `_archive/brainstorming/research/infisical-research.md` | Infisical self-hosted vs cloud | **Rejected.** Secrets target is HCP Vault Dedicated — identity-stack#398 |
+| `_archive/brainstorming/research/infisical-research.md` | Infisical self-hosted vs cloud | **Rejected.** The HCP Vault successor was abandoned too (Vault Secrets EOL 2026-07-01; Vault Dedicated ~$1,152/mo). Secrets are HCP Terraform variable sets |
 | `_archive/brainstorming/research/node-oidc-provider-research.md` | `panva/node-oidc-provider` as a test OP | Adopted. Now a live integration fixture in identity-model |
 | `_archive/brainstorming/research/tyk-gateway-research.md` | Tyk OSS gateway tiers and JWT handling | Adopted and shipped. identity-stack#161–#177 all closed |
 
@@ -121,3 +121,34 @@ discovered while retiring the tracker.
 | `_bmad-output/implementation-artifacts/audit-overnight-loops-2026-09-03.md` | A one-shot audit plan for two overnight loops, explicitly "point-in-time — RE-VERIFY". Both loops' work has since merged |
 | `_bmad-output/planning-artifacts/identity-model-feature-parity-report-2026-08-29.md` | Superseded by `identity-model-parity-report-2026-09-05.md`, which re-measured every row |
 | `_bmad-output/planning-artifacts/identity-model-parity-reconciliation-plan.md` | Its §3 sign-off gate (the four inversions) was overtaken: two inversions were closed by the id-token stack and the decision record was dropped. Live plan: the 2026-09-05 report's sequencing section |
+
+---
+
+## Retired 2026-09-15 — the open-identity set
+
+Seven planning documents plus one shelved loop prompt, ~38,200 words, condensed into a
+single idea record at [`docs/idea-open-identity.md`](../docs/idea-open-identity.md).
+
+open-identity was planned thoroughly in September 2026 and never started. It is an idea for
+later, not scheduled work, so it does not need a brief, a PRD, an architecture, and an epic
+breakdown standing separately in the working tree. The condensed record keeps what stays
+useful: the thesis, the ten locked decisions, the two research corrections, the naming and
+trademark position, the epic shape, and the readiness-audit lesson.
+
+Recover any of them with:
+
+```bash
+git show 9919887:<path>          # print it
+git checkout 9919887 -- <path>   # restore it
+```
+
+| File | What it was |
+|---|---|
+| `_bmad-output/planning-artifacts/product-brief-open-identity-2026-09-02.md` | BMAD product brief — the three pillars and MVP scope |
+| `_bmad-output/planning-artifacts/prd-open-identity.md` | PRD with the ten decisions locked 2026-09-02, five user journeys, phased scope |
+| `_bmad-output/planning-artifacts/architecture-open-identity.md` | Architecture: ADR-OI-1 through ADR-OI-10, the versioned adapter contract, conformance spec design |
+| `_bmad-output/planning-artifacts/epics-open-identity.md` | Epics A–D, 32 stories, FR coverage map |
+| `_bmad-output/planning-artifacts/research/market-open-identity-research-2026-09-02.md` | Market research returning a conditional go; source-cited with confidence tiers |
+| `_bmad-output/planning-artifacts/research/brand-trademark-diligence-open-identity-2026-09-02.md` | Name availability and US trademark diligence |
+| `_bmad-output/brainstorming/brainstorming-open-identity-naming-2026-09-02.md` | Naming and tagline session |
+| `_bmad-output/implementation-artifacts/ralph-prompts/open-identity-epic-a.md` | Epic A loop prompt — shelved 2026-09-03 because the merged Ory feeder epics had already delivered most of its stories |

@@ -13,14 +13,14 @@ This repo lives at `~/repos/auth/identity-stack-planning/` alongside these sibli
 | Repo | Path | Description |
 |------|------|-------------|
 | `identity-stack-planning` (this repo) | `~/repos/auth/identity-stack-planning/` | BMAD planning artifacts and project knowledge |
-| `py-identity-model` *(dir)* = `identity-model` *(GitHub)* | `~/repos/auth/py-identity-model/` | **Live polyglot OIDC/OAuth2 client monorepo** (survivor). GitHub repo is `identity-model`; the local dir is still named `py-identity-model`. Holds `py/` = OpenID-certified PyPI package `py-identity-model` (v3.11.x — JWT/validation/discovery **plus** PKCE/auth-code/token-exchange/DPoP/PAR/FAPI…), `go/` = Go module, `rust/` = crate `rs-identity-model`, `spec/` = cross-language conformance (PRD 6). **Ground all library work here.** |
+| `py-identity-model` *(dir)* = `identity-model` *(GitHub)* | `~/repos/auth/py-identity-model/` | **Live polyglot OIDC/OAuth2 client monorepo** (survivor). GitHub repo is `identity-model`; the local dir is still named `py-identity-model`. Holds `py/` = OpenID-certified PyPI package `py-identity-model` (v3.18.x — JWT/validation/discovery **plus** PKCE/auth-code/token-exchange/DPoP/PAR/FAPI…), `go/` = Go module, `rust/` = crate `rs-identity-model`, `spec/` = cross-language conformance (PRD 6). **Ground all library work here.** |
 | `terraform-provider-descope` | `~/repos/auth/terraform-provider-descope/` | Terraform provider for Descope (Go). Fork of `descope/terraform-provider-descope` |
 | `identity-stack` | `~/repos/auth/identity-stack/` | SaaS starter kit — FastAPI backend + Vite/React frontend + Terraform infra |
 | `identity-model-legacy` | `~/repos/auth/identity-model-legacy/` | **ARCHIVED** old polyglot repo (GitHub `identity-model-legacy`, read-only). Superseded by the survivor monorepo above; its fixes were re-implemented natively there. **Do NOT use for grounding** — its capability matrix is stale (it marks Python `planned` for flows that already ship). |
 
 ### Cross-Repo Relationships
 
-- `identity-stack/backend` depends on `py-identity-model` (>= 3.8.5) for token validation
+- `identity-stack/backend` depends on `py-identity-model` (pinned `>=3.8.5,<4`; the library ships 3.18.x, so the floor is well behind) for token validation
 - `terraform-provider-descope` manages Descope project infrastructure that the SaaS starter connects to
 - `py-identity-model/examples/descope/` contains Descope-specific integration examples
 

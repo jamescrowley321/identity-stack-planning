@@ -7,9 +7,7 @@ date: '2026-09-05'
 status: 'proposed'
 dependencies:
   - docs/identity-capability-gap-analysis-2026-09-05.md
-  - _bmad-output/planning-artifacts/architecture-open-identity.md
-  - _bmad-output/planning-artifacts/prd-open-identity.md
-  - _bmad-output/planning-artifacts/epics-open-identity.md
+  - docs/idea-open-identity.md
   - docs/idp-rbac-comparison.md
   - docs/system-architecture.md
 ---

@@ -110,13 +110,13 @@ global meaning. Prefer the GitHub issue number.
 
 **idp_links** — Database table linking a canonical user to their identity at a specific provider. Contains `external_sub` (the provider's subject identifier), `provider_id`, and JSONB metadata. Enables one user to authenticate through multiple providers.
 
-**Infisical** — Secrets management platform chosen over HashiCorp Vault for right-sized complexity. Used for centralized secret storage, audit logging, and runtime injection via `infisical run`. See PRD 1.
+**HCP Terraform variable sets** — How secrets reach Terraform. `oss-admin` reads `descope_management_key` from the org-wide `descope-company` variable set. This replaced Infisical (rejected) and the planned HCP Vault migration (abandoned: Vault Secrets reached EOL 2026-07-01 and Vault Dedicated fails the free-only constraint).
 
 **MCP (Model Context Protocol)** — A protocol for connecting AI applications to tools and context providers. See the [MCP authorization specification](https://modelcontextprotocol.io/specification/latest/basic/authorization).
 
 **Mutual TLS (mTLS)** — Mutual Transport Layer Security, in which both sides of a TLS connection authenticate with certificates. OAuth certificate-bound tokens and client authentication are defined by [RFC 8705](https://www.rfc-editor.org/rfc/rfc8705.html).
 
-**MVP (Minimum Viable Product)** — The smallest product scope intended to validate a defined set of user outcomes. The open-identity MVP scope is recorded in [`prd-open-identity.md`](../_bmad-output/planning-artifacts/prd-open-identity.md).
+**MVP (Minimum Viable Product)** — The smallest product scope intended to validate a defined set of user outcomes. The open-identity MVP scope is summarised in [`idea-open-identity.md`](idea-open-identity.md).
 
 **OAuth 2.0** — The authorization framework for obtaining limited access to protected resources. Defined by [RFC 6749](https://www.rfc-editor.org/rfc/rfc6749.html).
 
@@ -140,7 +140,7 @@ global meaning. Prefer the GitHub issue number.
 
 **Problem Detail** — RFC 9457 standard error response format. Used by the canonical identity service. Includes `type` (URI), `title`, `status`, `detail`, `instance` (request path), and `traceId` (OpenTelemetry). Content-Type: `application/problem+json`.
 
-**PRD (Product Requirements Document)** — A planning artifact that records product problem, scope, requirements, and success criteria. See [`prd-open-identity.md`](../_bmad-output/planning-artifacts/prd-open-identity.md).
+**PRD (Product Requirements Document)** — A planning artifact that records product problem, scope, requirements, and success criteria. See [`idea-open-identity.md`](idea-open-identity.md).
 
 **Provider abstraction tiers** — Classification system for identity capabilities by cross-provider mapping feasibility:
 - **Tier 1 (Abstract)** — Similar shape across providers; abstract with a common interface. Examples: User CRUD, ReBAC/authz, SSO/Federation, session management.

@@ -26,7 +26,7 @@ graph TB
 
     subgraph infra["Infrastructure"]
         TF["Terraform Provider<br/>Descope IaC"]
-        INF["Infisical<br/>Secrets"]
+        VS["HCP Terraform<br/>Variable sets"]
         HCP["HCP Terraform<br/>Remote state"]
     end
 
@@ -40,7 +40,7 @@ graph TB
     GW -.-> DESC & OIDC & ORY & CLOUD
     BE --> DESC
     TF --> DESC & HCP
-    INF --> BE
+    VS --> TF
     AP --> RALPH --> REVIEW
 ```
 

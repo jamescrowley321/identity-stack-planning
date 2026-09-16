@@ -148,7 +148,7 @@ the relevant pieces are:
 5. **IaC** — stand up an **`ory/ory` Terraform** track (SaaS-only, v26.3.1) parallel to
    `terraform-provider-descope`: `ory_project_config` (incl. JWT access-token strategy),
    `ory_oauth2_client` (the SPA public client), `ory_identity_schema`, optional
-   `ory_organization`/`ory_action`, and `ory_custom_domain`. Secrets → Infisical (`config_ref`).
+   `ory_organization`/`ory_action`, and `ory_custom_domain`. Secrets → HCP Terraform variable set (`config_ref`).
    Note: identity schemas + secrets are create-only (no import).
 
 ### Confirmed from PIM configuration (2026-08-14)
@@ -198,7 +198,7 @@ defines the sync surface — so this is an adapter + mapping exercise, not new a
 | Ory identity (Kratos) / OIDC `sub` | `idp_links.external_sub` (`provider_id` → the `ory` provider) → `users.id` | Unique `(provider_id, external_sub)` already enforced |
 | Ory identity email / traits | `users.email`, `given_name`, `family_name`; `idp_links.external_email` | `users` is SCIM-aligned |
 | Ory **Organization** (B2B) | `tenants` (`name`, `domains[]`, `status`) | **Gap:** `tenants` has no `external_id`/metadata column for the Ory org id — needs a migration or a tenant-level link |
-| Ory project / OAuth2 issuer | `providers` row: `type='ory'`, `issuer_url`, `base_url`, `config_ref` (Infisical) | `config_ref` keeps secrets out of Postgres |
+| Ory project / OAuth2 issuer | `providers` row: `type='ory'`, `issuer_url`, `base_url`, `config_ref` (HCP Terraform variable set) | `config_ref` keeps secrets out of Postgres |
 | Roles / permissions | `roles`, `permissions`, `user_tenant_roles` — **stay canonical** | Not pushed to Ory; resolved server-side post-auth |
 
 ### Token → canonical resolution (per request)
@@ -240,8 +240,8 @@ provisions Ory state as the canonical model changes:
   harness work in `py-identity-model` is unaffected by this initiative.)
 - Enforce **PKCE** on the auth-code flow; decide DPoP posture (py-identity-model supports
   DPoP) — **[CONFIRM Ory Network DPoP support on plan]**.
-- Secrets (Ory API keys / OAuth2 client secrets) belong in the **Infisical** secrets
-  pipeline (per PRD 1 / architecture-infrastructure-secrets), never in Postgres or repo.
+- Secrets (Ory API keys / OAuth2 client secrets) are supplied by **HCP Terraform variable
+  sets**, never stored in Postgres or the repo.
 - Reuse the OIDC **conformance harness** to validate Ory the same way other providers are
   validated.
 

@@ -22,7 +22,7 @@ graph TB
         pg["PostgreSQL"]
         redis["Redis"]
         tyk["Tyk Gateway"]
-        infisical["Infisical"]
+        varsets["HCP Terraform<br/>variable sets"]
         hcp["HCP Terraform"]
     end
 
@@ -38,7 +38,7 @@ graph TB
     is --> pg
     tfp --> descope
     tfp --> hcp
-    infisical -.-> is
+    varsets -.-> is
     tyk --> is
     tyk --> descope
     tyk --> redis
@@ -318,28 +318,28 @@ graph LR
 | gateway | + Tyk + Redis | Enterprise authentication patterns |
 | full | + PostgreSQL + node-oidc-provider + Aspire | Full platform with canonical identity + multi-provider |
 
-## Secrets Pipeline Architecture (PRD 1)
+## Secrets
+
+Secrets are supplied by **HCP Terraform variable sets**. `oss-admin` reads
+`descope_management_key` from the org-wide `descope-company` variable set, shared across
+the workspaces that need it; the workspace runs in local execution mode.
 
 ```mermaid
 flowchart TD
-    DEV["Developer Workstation<br/>2 bootstrap credentials"]
-    DEV --> INF["Infisical Cloud<br/>Secret storage + audit"]
-    DEV --> HCP["HCP Terraform<br/>State + locking"]
-    DEV --> TF["terraform apply"]
-
-    TF --> DESC["Descope API<br/>Provision roles, perms, tenants"]
-    TF --> INF_WRITE["Write TF outputs<br/>to Infisical"]
-
-    subgraph consume["Application Consumption"]
-        CLI["infisical run --"] --> BACKEND["FastAPI backend<br/>os.environ reads"]
-        CLI2["infisical run --"] --> FRONTEND["npm run build<br/>VITE_* env vars"]
-    end
-
-    INF --> CLI
-    INF --> CLI2
+    VS["HCP Terraform<br/>org-wide variable sets"]
+    VS --> WS["Workspace<br/>(local execution mode)"]
+    WS --> TF["terraform apply"]
+    TF --> DESC["Descope API<br/>roles, permissions, tenants"]
+    TF --> ORY["Ory Network<br/>clients, project config"]
 ```
 
-**Bootstrap reduction:** N scattered `.env` secrets → 2 machine identity credentials (`INFISICAL_MACHINE_IDENTITY_CLIENT_ID` + `CLIENT_SECRET`). Everything else lives in Infisical and is injected at runtime via `infisical run`.
+Terraform is the source of truth for deployment. HCP Terraform's free tier covers 500
+managed resources and one concurrent run, which is the operating constraint.
+
+**Rejected alternatives.** Infisical was evaluated and rejected. HCP Vault was planned and
+abandoned on evidence: HCP Vault Secrets reached end of life on 2026-07-01, and HCP Vault
+Dedicated costs roughly $1,152/month for a production Essentials cluster plus $72.92 per
+client per month — against a constraint that everything must be free.
 
 ## Consolidated ADR Index
 

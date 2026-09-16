@@ -94,15 +94,26 @@ graph TD
 
 ---
 
-### PRD 1 — Infrastructure Secrets Pipeline
+### PRD 1 — Infrastructure Secrets Pipeline — RETIRED
 
-**Problem:** N secrets scattered across `.env` files with no audit trail, rotation policy, or access control.
+**Retired 2026-09-15.** Superseded by what already runs: **HCP Terraform variable sets**.
+`oss-admin` reads `descope_management_key` from the org-wide `descope-company` variable set,
+with the workspace in local execution mode. Terraform is the source of truth for deployment,
+and HCP Terraform's free tier (500 managed resources, 1 concurrent run) is the constraint.
 
-**Solution:** Three-layer pipeline using HCP Terraform (state management) + Infisical (secret storage) + Descope API (provisioning). Reduces bootstrap to 2 credentials.
+Both of this PRD's candidate backends are dead:
 
-**MVP scope:** HCP Terraform workspace migration, Infisical project setup, `infisical run` integration for backend and frontend, Terraform provider for writing outputs to Infisical.
+- **Infisical** — evaluated and rejected. Its free tier (5 identities / 3 projects / 3
+  environments, plus free self-hosting of the MIT core) would in fact have satisfied the
+  cost constraint, which is worth knowing if the question is ever reopened.
+- **HCP Vault** — the planned successor, abandoned on evidence. HCP Vault **Secrets** was
+  discontinued (end of sale 2025-06-30, **end of life 2026-07-01**, already past), and HCP
+  Vault **Dedicated** costs ~$1,152/month for a production Essentials cluster plus $72.92
+  per client per month. Against a free-only constraint, neither is viable.
 
-**Growth scope:** Secret rotation automation, CI/CD pipeline integration, self-hosted Infisical option.
+The VAULT epic tracking this work — `identity-stack#398`–`#405`, seven open issues written
+2026-09-04 — describes a migration to a product that no longer exists. `identity-stack` has
+no Vault provider, no HVS, and no variable sets in its Terraform; nothing was built.
 
 **Artifacts:**
 - PRD: [`prd-infrastructure-secrets.md`](../_bmad-output/planning-artifacts/prd-infrastructure-secrets.md)
@@ -221,7 +232,23 @@ graph TD
 
 **Scope:** 15 epics covering: monorepo setup, cross-language conformance specs, Core Tier (all 4 languages), Extended Tier (Introspection, Revocation, Token Exchange, DPoP), Advanced Tier (PAR, RAR), OpenTelemetry, security pipeline, documentation site, benchmarks, contributor DX, competitive analysis, naming/versioning, improvement spikes, and modern auth extensions.
 
-**Status:** Public repo live. Go core + extended tiers (discovery, jwks, jwt, token, userinfo, dpop, introspection, revocation) and Rust core tier **+ security hardening** (discovery, jwks, jwt, token, userinfo; secret redaction, redirect-downgrade defence, `azp`/clock-skew, jsonwebtoken 11) merged. Toolchains: Go 1.26, Rust MSRV 1.96. The monorepo, shared conformance `spec/`, and shared `infra/` (node-oidc-provider + IdentityServer) are stood up. **Conformance:** the OIDF RP-harness (`conformance/`) is in-flight — the Go RP passes `oidcc-client-basic-certification-test-plan` (K1 PR #43 merged, K2 PR #44). Node/TS planned; Python (`py-identity-model`) merges into `python/` later. **Priorities reconciled 2026-08-12** — see [`docs/identity-model-reconciliation-2026-08-12.md`](identity-model-reconciliation-2026-08-12.md): source-verified state, PIM parity matrix, normative-behavior audit (RFC 9207 `iss`, discovery endpoint-authority binding, and JWKS/discovery cache max-entries bound are gaps in **both** Go and Rust), and a sequenced plan. New epics: `epic-20-pim-parity`, `epic-21-cross-platform-serializer`, `epic-22-framework-middlewares`. **Sequenced next:** (1) Parity-Hardening Sweep [in-session, security-normative]; (2) Rust Extended-tier parity [loop: `ralph-prompts/identity-model-rust-extended.md`] — the biggest capability gap; (3) Conformance K3–K6 [loop]. One workstream per repo at a time. **PIM (`py-identity-model`) is the source of truth for features and implementation; the Go/Rust ports mirror it.** PIM will consolidate into this monorepo (as `python/`) to avoid duplicating conformance/integration test infra — **deferred until identity-model is more mature**; until then PIM stays its own repo.
+**Status (re-verified 2026-09-15 against source):** The monorepo consolidated — `identity-model` now carries `py/ go/ rust/ node/ spec/ infra/ conformance/` behind one harness, shipping as `py-v3.18.1`. The consolidation epics (`identity-model#535`, `#536`, `#537`) are closed. Python remains the reference implementation; it is **not** a separate repository, and any document saying consolidation is "deferred" is stale.
+
+**Cross-language parity, measured in source:**
+
+| Capability | Python | Go | Rust |
+|---|---|---|---|
+| discovery, JWKS, JWT, token, userinfo, id_token, introspection | yes | yes | yes |
+| revocation | yes | yes | **no** |
+| token exchange (RFC 8693) | yes | yes | **no** |
+| DPoP (RFC 9449) | yes | yes | **no** |
+| PAR (RFC 9126) | yes | **no** | **no** |
+| `private_key_jwt` / `client_secret_jwt` client auth | yes | **no** | **no** |
+| FAPI 2.0 | yes | **no** | **no** |
+
+Rust's extended tier is the largest gap; Go's is client authentication, PAR, and FAPI. Tracked by `identity-model#573` (cross-language parity epic) with `#574`–`#579` as the specific gaps.
+
+**Conformance:** the OIDF RP-harness (`conformance/`) is live and the Go RP passes `oidcc-client-basic-certification-test-plan`. Python holds OpenID certification (Basic + Config + Form Post Basic RP, certified 2 July 2026).
 
 **Depends on:** Main PRD (py-identity-model protocol features complete). Ships its own shared `infra/`, so no longer gated on PRD 3.
 
