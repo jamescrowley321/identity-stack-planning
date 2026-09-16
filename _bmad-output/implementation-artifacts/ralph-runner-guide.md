@@ -33,7 +33,7 @@ Each iteration completes one phase, persists state to `.claude/task-state.md`, a
 | `token-harness.md` | TH-1..TH-3: RS boot + correctness matrix + Locust load/soak + feature-proof (worktree-run) | py-identity-model |
 | `pim-capacity-breakpoint.md` | TH-4: capacity & breakpoint — ramp-to-SLO-breach, worker scaling, nightly full sweep (worktree-run) | py-identity-model |
 | `identity-model-go-rust-parity.md` | **Go/Rust catch-up** — Rust extended tier (revocation, token exchange, DPoP), Go advanced tier (client auth, PAR), cross-language correctness fixes. Supersedes `identity-model-rust-extended.md` (worktree-run) | identity-model |
-| `pim-conformance-evidence.md` | **Finish OIDF conformance** — wire the six orphaned plans into CI, then hosted evidence for the next certification round + FAPI 2.0 (worktree-run) | identity-model |
+| `pim-conformance-evidence.md` | **Finish OIDF conformance** — make the hosted suite the CI standard across all twelve plans, then evidence packages for the next certification round + FAPI 2.0 (worktree-run) | identity-model |
 
 > Completed one-shot loops (PRD 5 `canonical-identity`, PRD 2 `api-gateway`, `repository-base-refactor`, dated planning sessions) are archived under `_archive/ralph-planning/completed-epics/`.
 
