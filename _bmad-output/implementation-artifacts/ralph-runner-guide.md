@@ -30,6 +30,7 @@ Each iteration completes one phase, persists state to `.claude/task-state.md`, a
 | `pim-capacity-breakpoint.md` | TH-4: capacity & breakpoint — ramp-to-SLO-breach, worker scaling, nightly full sweep (worktree-run) | py-identity-model |
 | `identity-model-go-rust-parity.md` | **Go/Rust catch-up** — Rust extended tier (revocation, token exchange, DPoP), Go advanced tier (client auth, PAR), cross-language correctness fixes. Supersedes `identity-model-rust-extended.md` (worktree-run) | identity-model |
 | `pim-conformance-evidence.md` | **Finish OIDF conformance** — make the hosted suite the CI standard across all twelve plans, then evidence packages for the next certification round + FAPI 2.0 (worktree-run) | identity-model |
+| `retro-review-sweep.md` | **Retrospective review audit** — run the blind-peer-review lenses against already-merged, unreviewed PRs and file issues for confirmed findings. One-shot, fresh session, files issues but fixes nothing | identity-model (any repo) |
 
 > Completed one-shot loops (PRD 5 `canonical-identity`, PRD 2 `api-gateway`, `repository-base-refactor`, dated planning sessions) are archived under `_archive/ralph-planning/completed-epics/`.
 
