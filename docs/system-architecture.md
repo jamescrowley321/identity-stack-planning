@@ -89,7 +89,7 @@ graph TB
 
 ### identity-model
 
-The polyglot evolution of `py-identity-model` (PRD 6): one cross-language OIDC/OAuth2 client-library monorepo with a shared conformance `spec/`. **Go** ships the Core + Extended tiers; **Rust** ships the Core tier (hardened). `py-identity-model` is the reference implementation the Go/Rust ports mirror, and folds in as `python/` once the monorepo matures. Toolchains: Go 1.26, Rust MSRV 1.96. Current source-verified state and the sequenced plan live in [`identity-model-reconciliation-2026-08-12.md`](identity-model-reconciliation-2026-08-12.md).
+The polyglot evolution of `py-identity-model` (PRD 6): one cross-language OIDC/OAuth2 client-library monorepo with a shared conformance `spec/`. **Go** ships the Core + Extended tiers; **Rust** ships the Core tier (hardened). `py-identity-model` is the reference implementation the Go/Rust ports mirror, and folds in as `python/` once the monorepo matures. Toolchains: Go 1.26, Rust MSRV 1.96. Current source-verified state and the sequenced plan live in [`identity-model-reconciliation-2026-08-12.md`](../_bmad-output/planning-artifacts/identity-model-parity-report-2026-09-05.md).
 
 ### identity-stack
 

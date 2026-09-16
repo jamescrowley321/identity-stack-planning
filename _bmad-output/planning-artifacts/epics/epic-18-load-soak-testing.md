@@ -22,7 +22,7 @@ inputDocuments:
 >   the resolved single-issuer-RS topology.
 > - **Epic/stories:** [`epics-token-harness.md`](../epics-token-harness.md) — **TH-1.5 (#474)** Locust load/soak,
 >   **TH-1.4 (#466)** `make test-harness` + CI gate, **TH-2.1 (#467)** the JWKS-cache LRU prove-or-revert.
-> - **Loop:** [`ralph-prompts/token-harness.md`](../../implementation-artifacts/ralph-prompts/token-harness.md).
+> - **Loop:** [`ralph-prompts/token-harness.md`](../epics-token-harness.md).
 >
 > Every L-story below is absorbed — nothing is dropped. Kept for traceability (esp. the RT4-F6 audit linkage in
 > L.2 and the residual noted in L.3). **Build from the docs above, not this file.**

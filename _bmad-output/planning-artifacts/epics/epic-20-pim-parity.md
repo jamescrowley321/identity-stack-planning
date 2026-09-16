@@ -19,7 +19,7 @@ inputDocuments:
 
 > **Consolidation: done.** PIM merged into this monorepo. The repo now carries `py/ go/ rust/ node/ spec/ infra/ conformance/` behind one harness, shipping as `py-v3.18.1`. The tracking epics — `identity-model#535`, `#536`, `#537` — are all closed. `py/` remains the reference implementation; it is no longer a separate repository.
 
-It does **not** mandate mirroring PIM's Python file layout (see the Architecture Decision below). Full verified state, the matrix, and the audit live in [`docs/identity-model-reconciliation-2026-08-12.md`](../../../docs/identity-model-reconciliation-2026-08-12.md); this epic is the actionable decomposition.
+It does **not** mandate mirroring PIM's Python file layout (see the Architecture Decision below). Full verified state, the matrix, and the audit live in [`docs/identity-model-reconciliation-2026-08-12.md`](../identity-model-parity-report-2026-09-05.md); this epic is the actionable decomposition.
 
 ## Architecture Decision (ADR) — keep the flat idiomatic shape
 

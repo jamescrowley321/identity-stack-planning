@@ -162,3 +162,48 @@ git checkout 9919887 -- <path>   # restore it
 Two rows in `ralph-runner-guide.md` were also removed: `fix-review-findings.md` and
 `pim-fix-review-chain.md`, both retired on 2026-09-05 (see above) but still listed as
 available. The guide was not updated in that pass.
+
+---
+
+## Retired 2026-09-15 — the PRD program
+
+The six numbered PRDs are retired and replaced by four independent tracks
+(see [`docs/roadmap.md`](../docs/roadmap.md)). Some were **delivered**, some were
+**superseded by evidence**, and some described a product this workspace decided not to
+build. In every case the working tree kept carrying them as if they were live.
+
+**80 files, ~167,000 words.** Recover any of them with:
+
+```bash
+git show 9919887:<path>          # print it
+git checkout 9919887 -- <path>   # restore it
+```
+
+| Group | Files | Why retired |
+|---|---:|---|
+| **PRD 1 — infrastructure secrets** | 5 | Dead twice over. Infisical was rejected; its HCP Vault successor is worse — Vault Secrets reached EOL 2026-07-01 and Vault Dedicated costs ~$1,152/month against a free-only constraint. What actually runs is HCP Terraform variable sets in `oss-admin` |
+| **PRD 2 — API gateway (Tyk)** | 3 | Delivered. `identity-stack/tyk/` exists; issues #161–#177 closed |
+| **PRD 3 — multi-provider test** | 3 | Absorbed. node-oidc-provider and IdentityServer live in `identity-model/infra/` |
+| **PRD 4 — multi-IdP capstone** | 3 | The capstone demo is retired. identity-stack is a proving ground and a Descope/Tyk sandbox, not a product |
+| **PRD 5 — canonical identity** | 2 | Delivered. Eight repositories, sync adapters, inbound sync, migrations — verified in source |
+| **PRD 5b — design system** | 5 | 31 stories of product polish for something that is not a product. 3 of 8 components existed, 0 of 5 admin pages, and no GitHub issue ever tracked it |
+| **Main PRD** | 3 | Superseded by the four-track map. Its FR taxonomy (`FR-PIM-*`, `FR-SSS-*`, `FR-CROSS-*`) was also a large part of the private identifier scheme now retired |
+| **PRD 6 epics 0a–15** | 24 | Shipped. The library consolidated and ships as `py-v3.18.1` |
+| **Consolidation epics** | 3 | Done — `identity-model#535`, `#536`, `#537` all closed; `py/ go/ rust/` are all present |
+| **Superseded records** | 10 | Three sprint-change proposals, the security-findings triage, two OSS-tooling docs, the monorepo product brief, the 2026-09-05 GitHub reconciliation, the 2026-08-12 identity-model reconciliation, and `scripts/audit-history.sh` (a one-shot pre-publication audit; the repo is public) |
+| **Ralph prompts for merged loops** | 19 | A finished loop prompt is a log, not a plan. Several had also gone stale in a way that would actively mislead — `pim-conformance-finish.md` still referenced pre-consolidation `src/py_identity_model/` paths and marked every phase COMPLETE |
+
+### What survives, and why
+
+The live prompts are `run-next-task.md`, `planning-reality-audit.md`, `RED-BLUE-GATE.md`,
+`ory-frontend-logout.md`, `token-harness.md`, `pim-capacity-breakpoint.md`,
+`pim-fapi2-hardening.md`, the two new identity-model loops, plus the shared `phases/` and
+`review-agents/` files that every loop reads.
+
+Four of those were nearly retired in this pass and were pulled back after checking their
+issues: `ory-frontend-logout.md` drives the open Ory work (`identity-stack#377`, `#378`),
+`token-harness.md` backs the open `identity-model#462` epic and its twelve stories,
+`pim-capacity-breakpoint.md` backs `#474`, and `pim-fapi2-hardening.md` backs `#476`. A loop
+prompt is only spent when the issues behind it are closed — age alone is not evidence. The live planning artifacts are the config-API set, the token harness, the
+2026-09-05 parity report, epics 16–24, the Ory and TFC work, and the domain knowledge in
+`docs/`.

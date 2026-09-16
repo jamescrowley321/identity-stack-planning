@@ -4,45 +4,54 @@ Planning and orchestration hub for a multi-repo identity platform. This repo con
 
 The workspace is also a case study in **agentic software development**: AI agents plan the work (BMAD-METHOD), execute it autonomously (Ralph Orchestrator), and review it adversarially with independent agents that have zero access to the implementation context.
 
-## The Vision
+## What this is
 
-Build a provider-independent identity platform where swapping or adding an identity provider means implementing one adapter — not rewriting the application. The platform starts with Descope, proves the abstraction with a second provider, and delivers a capstone multi-IdP demo.
+Four independent tracks, not one program. They do not gate each other.
+
+| Track | Goal | Repos |
+|---|---|---|
+| **Library** | A credible, certified, multi-language open-source identity library | `identity-model` |
+| **Proving ground** | Exercise the library against real providers; keep Descope and Tyk skills sharp | `identity-stack` |
+| **Expertise** | Stay fluent in Descope, Terraform, and repo governance | `terraform-provider-descope`, `oss-admin` |
+| **Governed brain** | Research: agent memory as an authorization problem. Gated, nothing built | — |
+
+The library is the flagship: `py/ go/ rust/ node/ spec/ infra/ conformance/` behind one
+harness, shipping `py-v3.18.1`, with Python OpenID-certified for Basic, Config and Form Post
+Basic RP since 2 July 2026.
+
+`identity-stack` is **not a product**. Tyk and Descope are deliberate expertise vehicles —
+POC-grade by design, chosen because they are worth being fluent in.
 
 ```mermaid
-graph TB
-    subgraph app["Identity Platform"]
-        FE["React Frontend<br/>react-oidc-context + shadcn/ui"]
-        GW["Tyk API Gateway<br/>JWT validation · claim normalization"]
-        BE["FastAPI Backend<br/>Canonical identity · authorization"]
-        DB[("PostgreSQL<br/>Canonical identity store")]
+graph LR
+    subgraph t1["Track 1 — library"]
+        IM["identity-model<br/>py · go · rust · spec · conformance"]
     end
-
-    subgraph providers["Identity Providers"]
-        DESC["Descope"]
-        OIDC["node-oidc-provider"]
-        ORY["Ory Hydra"]
-        CLOUD["Entra · Cognito · Okta"]
+    subgraph t2["Track 2 — proving ground"]
+        IS["identity-stack<br/>FastAPI · React · canonical identity"]
+        PROV["Descope · Ory · node-oidc-provider"]
     end
-
-    subgraph infra["Infrastructure"]
-        TF["Terraform Provider<br/>Descope IaC"]
-        VS["HCP Terraform<br/>Variable sets"]
-        HCP["HCP Terraform<br/>Remote state"]
+    subgraph t3["Track 3 — expertise"]
+        TFP["terraform-provider-descope"]
+        OSS["oss-admin<br/>TF roots · variable sets"]
     end
-
-    subgraph planning["Planning & Orchestration"]
-        AP["identity-stack-planning"]
-        RALPH["Ralph Orchestrator"]
-        REVIEW["Review Agents"]
+    subgraph t4["Track 4 — governed brain"]
+        GB["research · gated"]
     end
+    IM -->|"pinned dependency"| IS
+    IS --> PROV
+    OSS --> TFP
 
-    FE --> GW --> BE --> DB
-    GW -.-> DESC & OIDC & ORY & CLOUD
-    BE --> DESC
-    TF --> DESC & HCP
-    VS --> TF
-    AP --> RALPH --> REVIEW
+    style IM fill:#2d6a4f,color:#fff
+    style IS fill:#40916c,color:#fff
+    style GB fill:#f59e0b,color:#000
 ```
+
+The one real coupling is that arrow: `identity-stack/backend` depends on `py-identity-model`
+for token validation. Everything else is independent.
+
+Full detail: **[docs/roadmap.md](docs/roadmap.md)**. Status lives in GitHub issues, never in
+this repo — see [where status lives](_bmad-output/implementation-artifacts/status.md).
 
 ## The Repositories
 
