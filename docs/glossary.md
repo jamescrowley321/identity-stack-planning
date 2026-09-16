@@ -4,20 +4,22 @@ Definitions for terms used across identity-stack-planning documents. Grouped for
 
 ---
 
-## Code index
+## Code index — a decoder for legacy codes, not a registry
 
-Planning documents use short codes for requirements, decisions and tasks. Every family in current use is
-listed here. **If a code is not in this table, it is legacy — find the document that introduced it, or
-replace it with plain words.**
+**These code families are retired. Do not add to this table and do not mint new ones.** GitHub issue
+numbers are the only identifier for work; see `CLAUDE.md` → Writing Conventions. The table exists so a
+reader meeting `TH-1.5` or `T300` in an older document can work out what it meant.
 
-Two rules keep this table honest, and they are in `CLAUDE.md`:
+About 558 occurrences survive across roughly 27 files, concentrated in the token-harness, FAPI 2.0 and
+TFC-environment material. They are replaced opportunistically: **when you edit one of those files for
+another reason, swap the codes you are already touching for issue numbers or plain words.** No separate
+sweep — and never rewrite a loop prompt's task queue while that loop may be running.
 
-1. **Expand a code the first time a document uses it** — `CONS-1 (the first polyglot-consolidation epic)`,
-   not a bare `CONS-1`. A reader should never have to leave the page to parse a sentence.
-2. **One prefix, one meaning, repo-wide.** `D-1` used to mean an architecture decision in
-   `system-architecture.md` *and* an unrelated sign-off item in the parity report. That collision is why this
-   table exists; the architecture series was renamed `ADR-CANON-n` and the parity codes were deleted in favour
-   of plain names.
+Why they went: a private namespace competing with GitHub issue numbers drifts the same way the retired
+markdown status trackers did. `D-1` once meant both an architecture decision in `system-architecture.md`
+and an unrelated sign-off item in a parity report. Worse, bare `#N` codes collide with real issue
+references — a matcher once read "Resolved Decision #9" as `identity-model#9` and scored a live,
+decision-locked PRD as fully spent.
 
 ### Requirements
 

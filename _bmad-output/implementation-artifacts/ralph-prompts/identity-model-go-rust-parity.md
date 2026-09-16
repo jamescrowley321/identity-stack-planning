@@ -101,4 +101,11 @@ Phase instructions are in `phases/*.md` alongside this prompt. Read only the pha
 - Mirror the reference implementation's **behavior**, not its file layout. Idiomatic Go and idiomatic Rust are the goal; Python's module shape is not.
 - Every capability PR must cite the conformance vector IDs it satisfies.
 - **Identifiers are GitHub issue numbers.** Do not invent private code schemes (`P0-3`, `RT5-F18`, `D-1`) — #574 was explicitly rescoped to remove exactly that, because the codes were opaque and collided across repos. An epic gets a name; a story gets an issue number.
+- **Retire legacy codes in files you are already editing.** Some documents still carry the old private
+  identifier families (`TH-1.5`, `T300`, `FR-PIM-2`, `RT5-F18`, `TFCENV-7`); `docs/glossary.md` in the
+  planning repo decodes them. When a task has you editing such a file, replace the codes **in the parts you
+  are already changing** with the GitHub issue number or plain words. Do not open a separate de-coding
+  sweep, do not touch sections your task does not concern, and never rewrite this prompt's own task queue
+  mid-run. Externally meaningful identifiers stay: RFC numbers, CVE/PYSEC ids, OIDF profile names, and
+  `spec/` conformance vector ids such as `REV-001`.
 - Never mark a capability `implemented` in `spec/capabilities.md` on the strength of a grep. Run it.

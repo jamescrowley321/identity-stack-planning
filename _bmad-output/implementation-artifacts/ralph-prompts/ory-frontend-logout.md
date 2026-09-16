@@ -108,3 +108,20 @@ If all stories are `done`: output `<promise>LOOP_COMPLETE</promise>`
   - **E2E story (5.2):** an integration test drives an Ory JWT through the middleware and asserts signature/`iss`/`aud` validation → JIT provisioning → correct `GET /api/identity` payload → access to an RBAC-gated route, **reusing the py-identity-model / OIDC conformance path** (no new validation logic). Gate on Ory creds (`TEST_DISCO_ADDRESS` + M2M client) so missing credentials **skip, not fail**. The Descope end-to-end path must still pass in the same suite.
 - **Conventional commits** — `feat:` for new wiring, `test:` for the E2E story.
 - Run `make lint` + the relevant tests before opening a PR. **Integration/E2E must pass locally**, not just in CI.
+
+## Identifier discipline
+
+- **GitHub issue numbers are the only identifier for work.** Write cross-repo references as
+  `repo#N` (`identity-model#462`), never a bare `#N`.
+- **Do not mint new code families.**
+- **Retire legacy codes in files you are already editing.** Some documents still carry the old private
+  identifier families (`TH-1.5`, `T300`, `FR-PIM-2`, `RT5-F18`, `TFCENV-7`); `docs/glossary.md` in the
+  planning repo decodes them. When a task has you editing such a file, replace the codes **in the parts you
+  are already changing** with the GitHub issue number or plain words. Do not open a separate de-coding
+  sweep, do not touch sections your task does not concern, and never rewrite this prompt's own task queue
+  mid-run. Externally meaningful identifiers stay: RFC numbers, CVE/PYSEC ids, OIDF profile names, and
+  `spec/` conformance vector ids such as `REV-001`.
+
+> This prompt's own queue still uses the legacy scheme. That is deliberate — rewriting a task
+> queue while the loop is consuming it is how queues and reality come apart. Leave it; replace
+> codes in the *planning artifacts and source files* the tasks touch.

@@ -179,4 +179,11 @@ Phase instructions are in `phases/*.md` alongside this prompt. Read only the pha
 - **A skipped profile must be skipped loudly** — log the reason. Never let a skip read as a pass. #607 calls this out explicitly, and it matters more now that the gate depends on an external service.
 - Do not change variant parameters in `conformance/configs/*.json` to make a plan go green. Those values are cert-grade and deliberately chosen; `conformance/README.md` records why. If a variant looks wrong, the live suite's plan metadata is the source of truth — reconcile against it and say so in the PR.
 - **Identifiers are GitHub issue numbers.** Do not invent private code schemes. The old `TH-3.1` / `T308` style still appears in some issue titles; when you touch one, refer to it by its issue number.
+- **Retire legacy codes in files you are already editing.** Some documents still carry the old private
+  identifier families (`TH-1.5`, `T300`, `FR-PIM-2`, `RT5-F18`, `TFCENV-7`); `docs/glossary.md` in the
+  planning repo decodes them. When a task has you editing such a file, replace the codes **in the parts you
+  are already changing** with the GitHub issue number or plain words. Do not open a separate de-coding
+  sweep, do not touch sections your task does not concern, and never rewrite this prompt's own task queue
+  mid-run. Externally meaningful identifiers stay: RFC numbers, CVE/PYSEC ids, OIDF profile names, and
+  `spec/` conformance vector ids such as `REV-001`.
 - Do not re-run all twelve plans every iteration. Run what the task needs.
