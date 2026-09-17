@@ -1,3 +1,10 @@
+---
+title: "Ralph Loop Efficiency — Token Optimization"
+description: "A token-waste audit of the loop prompts, and the prompt sizing that came out of it."
+status: current
+last_verified: 2026-09-07
+---
+
 # Ralph Loop Efficiency — Token Optimization
 
 This document describes the token efficiency architecture for ralph loops, the optimizations applied, and how to audit for regressions.

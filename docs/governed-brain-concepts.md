@@ -1,3 +1,11 @@
+---
+title: "Governed Brain — Concepts and Requirements"
+sidebar_label: "Concepts and requirements"
+description: "Brain, scope, authority, grant and receipt defined, plus sixteen acceptance properties any implementation can be checked against."
+status: proposed
+last_verified: 2026-09-15
+---
+
 # Governed Brain — Concepts and Requirements
 
 **Status:** Proposed · **Date:** 2026-09-15
@@ -104,6 +112,25 @@ create proposals, corrections, unsupported-question records, or feedback.
 Neither path may directly create approved truth. Approval, versioning,
 provenance, snapshot publication, and maker-checker controls remain explicit.
 
+```mermaid
+flowchart LR
+    SRC["Source intake"] --> PROP
+    ACT["Application activity"] --> PROP
+    MODEL["Model output"] --> PROP
+    PROP["Proposal<br/><i>correction · unsupported question · feedback</i>"]
+    PROP --> REV["Review workflow<br/><b>maker-checker</b>"]
+    REV -->|approved| GOV["Governed record<br/><i>revision · citation ·<br/>classification · provenance</i>"]
+    REV -->|rejected| DROP["Not truth"]
+    PROP -.->|"never"| GOV
+
+    style GOV fill:#ede9fd,stroke:#6d4bd8,color:#221a33
+    style REV fill:#221a33,stroke:#6d4bd8,color:#ffffff
+    style DROP fill:#f4f4f5,stroke:#a1a1aa,color:#3f3f46
+```
+
+The dotted edge is the property that matters: **no observation path may write
+approved truth directly**, and activity alone never constitutes approval.
+
 ### Federation
 
 Federation is an authorized exchange between separately scoped brains. It is not
@@ -145,6 +172,23 @@ disclosure. It binds the request, source, revision or snapshot, policy and grant
 references, redactions, timing, and verification result. A receipt records what
 was disclosed and under which authority; it does not make the recipient
 authoritative for the source material.
+
+```mermaid
+flowchart LR
+    A["<b>Brain A</b><br/><i>source, stays authoritative</i>"]
+    B["<b>Brain B</b><br/><i>recipient</i>"]
+    A -->|"grant — bounded by recipient, operation,<br/>subject, purpose, data class, selectors,<br/>validity window, revocation state,<br/>onward-disclosure rule"| B
+    B --> EV["Stored as <b>source-attributed external evidence</b><br/><i>a local claim only through B's own review and policy</i>"]
+    B --> RB["Receipt at B"]
+    A --> RA["Receipt at A"]
+    RA -.- OPEN["<b>Open requirement:</b> a record held only by<br/>the party whose conduct is in question<br/>proves nothing to anyone else"]
+    RB -.- OPEN
+
+    style A fill:#ede9fd,stroke:#6d4bd8,color:#221a33
+    style B fill:#f7f5ff,stroke:#8b6fe0,color:#221a33
+    style OPEN fill:#fef3e2,stroke:#b07d2b,color:#3a2c14
+    style EV fill:#f4f4f5,stroke:#a1a1aa,color:#3f3f46
+```
 
 Two cautions carried over from the consent-receipt prior art. First, the word is
 used here for the **issuer-side** record, which inverts its established usage —

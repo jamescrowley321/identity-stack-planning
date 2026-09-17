@@ -1,3 +1,11 @@
+---
+title: "Ideas"
+sidebar_label: "Deployment ideas"
+description: "Free-tier deployment ideas on Supabase and Cloudflare, and the 10ms CPU ceiling that would have to be measured first."
+status: parked
+last_verified: 2026-09-15
+---
+
 # Ideas
 
 Recorded thinking that is **not planned work**. Nothing here is scheduled, estimated, or
@@ -49,5 +57,5 @@ assumption.
 The OpenID certification names `py-identity-model 3.1.0`; the library ships `3.18.1`. What
 the Foundation requires to refresh a listing for a newer version is not established. Tracked
 as task 7 of
-[`pim-conformance-evidence.md`](../_bmad-output/implementation-artifacts/ralph-prompts/pim-conformance-evidence.md)
+[`pim-conformance-evidence.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/pim-conformance-evidence.md)
 rather than left here, because it has a concrete owner and a concrete question.

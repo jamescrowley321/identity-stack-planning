@@ -1,3 +1,11 @@
+---
+title: "Agent protocols + purpose binding — relayed sub-agent findings, 2026-09-15"
+sidebar_label: "Agent protocols"
+description: "Agent protocols and purpose binding: what the current protocol landscape carries and what it cannot express."
+status: proposed
+last_verified: 2026-09-16
+---
+
 # Agent protocols + purpose binding — relayed sub-agent findings, 2026-09-15
 
 _Relayed from a sub-agent dispatched by one of the research agents._

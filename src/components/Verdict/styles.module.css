@@ -1,0 +1,86 @@
+.verdict {
+  margin: 0;
+  padding: 1.5rem 1.75rem 1.5rem 1.5rem;
+  border: 1px solid var(--plan-rule);
+  border-left: 4px solid var(--brand);
+  background: oklch(0.565 0.235 276 / 3.5%);
+  border-radius: 0 0.625rem 0.625rem 0;
+}
+
+[data-theme='dark'] .verdict {
+  background: oklch(1 0 0 / 3.5%);
+}
+
+.verdict[data-failed] {
+  border-left-color: var(--purple-600);
+}
+
+[data-theme='dark'] .verdict[data-failed] {
+  border-left-color: var(--purple-400);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.5rem 1.5rem;
+  align-items: baseline;
+}
+
+.row + .row {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--plan-rule);
+}
+
+.label {
+  font-style: normal;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--plan-muted);
+}
+
+.claimed {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--ifm-font-color-base);
+}
+
+.source {
+  display: block;
+  margin-top: 0.375rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.75rem;
+  color: var(--plan-muted);
+}
+
+.measured {
+  margin: 0;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8125rem;
+  line-height: 1.75;
+  color: var(--ifm-font-color-base);
+}
+
+.result {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--plan-ink);
+}
+
+@media (max-width: 640px) {
+  .verdict {
+    padding: 1.25rem 1rem 1.25rem 1.125rem;
+  }
+  .row {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+  .result {
+    font-size: 1.125rem;
+  }
+}

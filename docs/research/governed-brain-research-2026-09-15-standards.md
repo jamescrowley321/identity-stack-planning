@@ -1,3 +1,11 @@
+---
+title: "Governed Brain — Standards Prior-Art Assessment"
+sidebar_label: "Standards prior art"
+description: "What existing standards already cover of the governed-brain model, and what they leave open."
+status: proposed
+last_verified: 2026-09-16
+---
+
 # Governed Brain — Standards Prior-Art Assessment
 
 **Reviewed:** `governed-brain-concepts.md`, `governed-brain-authorization.md`,
