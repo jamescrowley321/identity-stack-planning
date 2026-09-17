@@ -77,6 +77,11 @@ const config: Config = {
         {to: '/docs/roadmap', label: 'Program map', position: 'left'},
         {to: '/docs/governed-brain-where-it-stands', label: 'Governed brain', position: 'left'},
         {
+          href: 'https://jamescrowley321.github.io/identity-model/',
+          label: 'The library',
+          position: 'right',
+        },
+        {
           href: 'https://github.com/jamescrowley321/identity-stack-planning/issues',
           label: 'Status',
           position: 'right',
@@ -103,6 +108,7 @@ const config: Config = {
         {
           title: 'Repositories',
           items: [
+            {label: 'identity-model docs', href: 'https://jamescrowley321.github.io/identity-model/'},
             {label: 'identity-model', href: 'https://github.com/jamescrowley321/identity-model'},
             {label: 'identity-stack', href: 'https://github.com/jamescrowley321/identity-stack'},
             {

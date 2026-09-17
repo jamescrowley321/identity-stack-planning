@@ -1,356 +1,259 @@
 import type {ReactNode} from 'react';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
+import Verdict from '@site/src/components/Verdict';
 import styles from './index.module.css';
 
 const IM = 'https://github.com/jamescrowley321/identity-model';
+const IM_DOCS = 'https://jamescrowley321.github.io/identity-model/';
 
-/** Stated in the hero, each one checkable against a link in the section below. */
-const EVIDENCE = [
-  {figure: '3', label: 'native languages'},
-  {figure: '119', label: 'shared conformance cases'},
-  {figure: '12', label: 'capabilities, each RFC-referenced'},
-];
+const PY = `from py_identity_model import TokenValidationConfig, validate_token
 
-const INSTALLS = [
-  {lang: 'Python', cmd: 'pip install py-identity-model', note: 'OpenID Certified. Full Core and Extended surface.'},
-  {lang: 'Go', cmd: 'go get github.com/jamescrowley321/identity-model/go', note: 'Core and Extended: introspection, revocation, token exchange, DPoP.'},
-  {lang: 'Rust', cmd: 'cargo add rs-identity-model', note: 'Core and introspection. Revocation, token exchange and DPoP in progress.'},
-  {lang: 'Node', cmd: null, note: 'Planned.'},
-];
+claims = validate_token(
+    jwt=token,
+    token_validation_config=TokenValidationConfig(
+        perform_disco=True, audience="my-api"
+    ),
+    disco_doc_address="https://issuer.example.com",
+)`;
 
-const PROOF = [
-  {
-    stat: '119',
-    unit: 'cases written once, run by all three',
-    body: 'Across twelve capabilities, as language-neutral JSON: inputs and expected outcomes expressed as canonical cross-language error codes. Exactly one case cannot be a static vector — a live JWKS refresh — and is marked native with a stated reason.',
-  },
-  {
-    stat: '0',
-    unit: 'cases a language may skip',
-    body: 'A language that marks a capability implemented must execute every vector for it. The coverage gate fails CI if a runner silently drops one, so the capability matrix cannot claim more than the code does.',
-  },
-  {
-    stat: '4',
-    unit: 'providers in the conformance harness',
-    body: 'Keycloak, IdentityServer, node-oidc-provider and Descope run locally from one compose file, alongside the OpenID Foundation’s hosted suite. No provider is privileged, and none of them is the definition of correct.',
-  },
-];
+const GO = `import "github.com/jamescrowley321/identity-model/go/pkg/jwt"
 
-/** What the library lets you do, by the problem rather than by the capability name. */
-const CAPABILITIES = [
-  {
-    title: 'Sign people in',
-    body: 'Authorization code with PKCE, the state and nonce checks done properly, and issuer validation so a mixed-up-provider attack fails closed. Device flow for anything without a browser.',
-    specs: 'RFC 7636 · RFC 9207 · RFC 8628',
-  },
-  {
-    title: 'Validate tokens in your API',
-    body: 'Discovery, JWKS with caching, signature and claim validation — including the parts usually got wrong: algorithm confusion, audience, clock skew, issuer mismatch.',
-    specs: 'RFC 7517 · RFC 7519 · RFC 7662',
-  },
-  {
-    title: 'Make a stolen token useless',
-    body: 'Sender-constrained tokens bind a token to a key the client proves it holds, so one lifted from a log or a proxy is worthless without it.',
-    specs: 'RFC 9449 DPoP · RFC 8705 mTLS',
-  },
-  {
-    title: 'Call a service as the user',
-    body: 'Preserve who the original subject was across internal hops, instead of every service running as one omnipotent account.',
-    specs: 'RFC 8693',
-  },
-  {
-    title: 'Harden the request itself',
-    body: 'Push the authorization request over a back channel, sign it, and take the response signed too, so the front channel carries nothing worth tampering with.',
-    specs: 'RFC 9126 · RFC 9101 · JARM · RFC 7523',
-  },
-  {
-    title: 'Meet a regulated profile',
-    body: 'Request and configuration validators for FAPI 2.0 ship with the library, rather than leaving you to read the profile and hope.',
-    specs: 'FAPI 2.0 Security Profile',
-  },
-];
+claims, err := jwt.Validate(ctx, rawToken, keySet,
+    jwt.WithIssuer("https://issuer.example.com"),
+    jwt.WithAudience("my-api"),
+)`;
 
-const PHASES = ['setup', 'analyze', 'implement', 'test', 'review', 'review-fix', 'pr', 'docs', 'ci', 'complete'];
+const RUST = `use rs_identity_model::{ValidationOptions, validate_token_with_jwks};
 
-const TRACKS = [
+let claims = validate_token_with_jwks(
+    &token,
+    &jwks,
+    &ValidationOptions::new()
+        .issuer("https://issuer.example.com")
+        .audience("my-api"),
+)?;`;
+
+const BODIES = [
   {
-    name: 'Library',
-    goal: 'A credible, certified, multi-language open-source identity library.',
-    done: 'Certification breadth grows and cross-language parity holds.',
-    where: {label: 'identity-model', href: IM},
-    tone: 'library',
+    title: 'Authorization across nine identity providers',
+    body: 'RBAC and ReBAC compared provider by provider, ending in a position: the application owns roles in Postgres, and relationship authorization is proxied to a Zanzibar engine rather than owned. The cases where a simpler model wins are named too.',
+    to: '/docs/idp-rbac-comparison',
   },
   {
-    name: 'Proving ground',
-    goal: 'Run the library against real providers end to end, not just against test doubles.',
-    done: 'The library is proven in a working application, against more than one provider.',
-    where: {label: 'identity-stack', href: 'https://github.com/jamescrowley321/identity-stack'},
-    tone: 'proving',
+    title: 'What a certification programme actually costs',
+    body: 'Which profiles are certified, why the hosted OpenID Foundation suite is the standing conformance standard rather than a local harness, and which profiles are built but not yet submitted.',
+    to: '/docs/oidc-certification-analysis',
   },
   {
-    name: 'Expertise',
-    goal: 'Keep provider tooling and repository governance in working order.',
-    done: 'Provider infrastructure stays reproducible from Terraform, not from a console.',
-    where: {label: 'terraform-provider-descope', href: 'https://github.com/jamescrowley321/terraform-provider-descope'},
-    tone: 'expertise',
+    title: 'Reviewing code an agent wrote',
+    body: 'Five lenses, each running in a context with no access to the implementation. Written after reviews that ran in the authoring context passed changes carrying cross-tenant IDOR and privilege escalation.',
+    to: '/docs/review-process',
   },
   {
-    name: 'Governed brain',
-    goal: 'Test the thesis that agent memory is an authorization problem.',
-    done: 'The four open decisions are settled so phase 0 can start.',
-    where: {label: 'Research, gated', href: '/docs/governed-brain-where-it-stands'},
-    tone: 'brain',
+    title: 'Gaps that survive any provider choice',
+    body: 'Capability gaps across the protocol, trust, resource-server, credential, relationship and conformance layers — the ones that are properties of the standards rather than of a vendor.',
+    to: '/docs/identity-capability-gap-analysis-2026-09-05',
+  },
+  {
+    title: 'Agent memory as an authorization problem',
+    body: 'A thesis with four decisions deliberately left open and nothing built. Permission-filtered retrieval is a mature category; acting on behalf of someone, for a stated reason, is not. Published at the stage where it can still be wrong.',
+    to: '/docs/governed-brain-where-it-stands',
   },
 ];
 
 export default function Home(): ReactNode {
   return (
     <Layout
-      title="One identity client library, in every language"
-      description="identity-model implements OpenID Connect and OAuth 2.0 natively in Python, Go and Rust — one design, held to 119 shared conformance cases, with the Python library certified by the OpenID Foundation as a Relying Party.">
+      title="The decisions behind a certified identity library"
+      description="Every claim in this repository is checked against source rather than against another document. The authorization comparisons, certification strategy, review model and research behind identity-model — with the evidence for each.">
       <header className={styles.hero}>
         <div className={styles.inner}>
-          <h1 className={styles.heroTitle}>
-            One identity client.
-            <br />
-            Every language you ship.
-          </h1>
-          <p className={styles.heroLede}>
-            Stop assembling an OAuth stack per language. <strong>identity-model</strong>{' '}
-            implements OpenID Connect and OAuth 2.0 natively in Python, Go and Rust — one
-            design, one capability surface, and a single executable specification all three
-            must pass.
-          </p>
+          <div className={styles.heroGrid}>
+            <div>
+              <h1 className={styles.heroTitle}>
+                The decisions behind a certified identity library.
+              </h1>
+              <p className={styles.heroBody}>
+                No application code lives here. This is the reasoning — the authorization
+                comparisons, the certification strategy, the review model, the research — and
+                the evidence behind each of them. Documents here are checked against the source
+                tree and live APIs, never against each other, and the result is published even
+                when the result is that the document was wrong.
+              </p>
+              <div className={styles.heroActions}>
+                <Link className={styles.actionPrimary} to="/docs">
+                  Read the decisions
+                </Link>
+                <Link className={styles.actionSecondary} href={IM_DOCS}>
+                  identity-model docs
+                </Link>
+              </div>
+            </div>
 
-          <ul className={styles.evidence}>
-            {EVIDENCE.map((e) => (
-              <li key={e.label}>
-                <span className={styles.evidenceFigure}>{e.figure}</span>
-                <span className={styles.evidenceLabel}>{e.label}</span>
-              </li>
-            ))}
-            <li className={styles.evidenceCert}>
-              <span className={styles.evidenceFigure}>OpenID Certified®</span>
-              <span className={styles.evidenceLabel}>
-                Relying Party — Basic, Config, Form Post Basic, 2 July 2026
-              </span>
-            </li>
-          </ul>
-
-          <div className={styles.heroActions}>
-            <Link className={styles.actionPrimary} href={IM}>
-              Get the library
-            </Link>
-            <Link className={styles.actionSecondary} href={`${IM}/blob/main/spec/capabilities.md`}>
-              Capability matrix
-            </Link>
+            <div className={styles.heroVerdict}>
+              <Verdict
+                claimed={
+                  <>
+                    “The Python library stays its own repository; consolidation is deferred
+                    until identity-model is more mature.”
+                  </>
+                }
+                source="docs/roadmap.md, before 2026-09-15"
+                measured={
+                  <>
+                    identity-model contains py/ go/ rust/ spec/ infra/ conformance/
+                    <br />
+                    latest tag py-v3.18.1 · epics #535, #536, #537 all closed
+                  </>
+                }
+                verdict="False. It had already shipped."
+              />
+            </div>
           </div>
         </div>
       </header>
 
-      {/* The problem, then the shape of the answer */}
+      {/* The method, shown rather than described */}
       <section className={styles.section}>
         <div className={styles.inner}>
           <h2 className={styles.sectionTitle}>
-            Writing an OAuth client should not mean rebuilding it per language.
+            A planning document is the thing most likely to be wrong.
           </h2>
-          <div className={styles.prose}>
-            <p>
-              Building an OpenID Connect or OAuth 2.0 <em>client</em> usually means gluing
-              together three or four half-overlapping libraries in every language you use — one
-              for JWTs, another for discovery, a third for the flows. Each has its own quirks
-              and its own gaps, and none of it transfers to the next service written in a
-              different language.
-            </p>
-            <p>
-              identity-model is one library instead. Every capability maps to a specific RFC or
-              OpenID Connect section rather than to a vendor's happy path, and each
-              implementation is real idiomatic code in its own language — on{' '}
-              <code>httpx</code>, <code>net/http</code> and <code>reqwest</code> — not bindings
-              over a shared runtime. Move a service from Python to Go and the mental model
-              comes with you.
-            </p>
-            <p>
-              It is provider-agnostic: Keycloak, IdentityServer, Okta, Auth0, Entra, Descope, or
-              anything else that follows the specifications.
-            </p>
+          <p className={styles.lede}>
+            So it gets measured. On 2026-09-15 the entire corpus — 152 files, 314,672 words —
+            was checked against the source tree and live APIs. Eighty-six files were retired.
+            These are three of the findings.
+          </p>
+
+          <div className={styles.verdicts}>
+            <Verdict
+              claimed="“Secrets migrate to HCP Vault.” Seven open issues, written 2026-09-04."
+              source="identity-stack#398–#405"
+              measured={
+                <>
+                  HCP Vault Secrets: end of life 2026-07-01, already passed
+                  <br />
+                  HCP Vault Dedicated: ~$1,152/month, against a free-only constraint
+                  <br />
+                  identity-stack: no Vault provider, no variable sets in Terraform
+                </>
+              }
+              verdict="Dead twice over. What actually runs is HCP Terraform variable sets."
+            />
+            <Verdict
+              claimed="“Status is tracked in task-queue.md and sprint-plan.md.”"
+              source="retired 2026-09-05"
+              measured={
+                <>
+                  16 task-queue rows marked pending against closed issues
+                  <br />
+                  18 more in the sprint plan · 136 of 152 files carried no
+                  <br />
+                  resolvable GitHub reference at all — 91% by volume
+                </>
+              }
+              verdict="Retired. Status lives in GitHub issues and nowhere else."
+            />
+            <Verdict
+              claimed="“The review passed.” Four pull requests, reviewed in the context that wrote them."
+              source="identity-stack#178–#181"
+              measured={
+                <>
+                  re-reviewed cold, with no access to the implementation:
+                  <br />
+                  cross-tenant IDOR · privilege escalation · resource leaks
+                </>
+              }
+              verdict="A reviewer that wrote the code confirms its own work."
+            />
           </div>
 
-          <div className={styles.installs}>
-            {INSTALLS.map((i) => (
-              <div key={i.lang} className={styles.install}>
-                <p className={styles.installLang}>{i.lang}</p>
-                {i.cmd && <code className={styles.installCmd}>{i.cmd}</code>}
-                <p className={styles.installNote}>{i.note}</p>
-              </div>
-            ))}
-          </div>
-
-          <p className={styles.proseAside}>
-            It is a protocol client: it talks to identity providers. It is not an identity
-            provider or an authorization server, and it is not framework middleware — though{' '}
-            <code>fastapi-identity-model</code> is built on top of it.
+          <p className={styles.note}>
+            The full audit, including what was retired and why, is the{' '}
+            <Link to="/docs/reground-2026-09-15-design">re-grounding design</Link>. Retired
+            files are indexed with the command that prints each one back out of git history.
           </p>
         </div>
       </section>
 
-      {/* What you can actually do with it */}
+      {/* What is actually here */}
       <section className={styles.sectionAlt}>
         <div className={styles.inner}>
-          <h2 className={styles.sectionTitle}>What you can build with it</h2>
-          <p className={styles.sectionLede}>
-            Every capability maps to a specification and ships with a runnable example. Python
-            carries the full surface and is the certified reference; Go and Rust carry core and
-            most of the extended tier, and the gaps are published rather than implied.
-          </p>
-
-          <div className={styles.capabilities}>
-            {CAPABILITIES.map((c) => (
-              <article key={c.title} className={styles.capability}>
-                <h3 className={styles.capabilityTitle}>{c.title}</h3>
-                <p className={styles.capabilityBody}>{c.body}</p>
-                <p className={styles.capabilitySpecs}>{c.specs}</p>
-              </article>
+          <h2 className={styles.sectionTitle}>What is here</h2>
+          <ul className={styles.bodies}>
+            {BODIES.map((b) => (
+              <li key={b.title} className={styles.body}>
+                <h3 className={styles.bodyTitle}>
+                  <Link to={b.to}>{b.title}</Link>
+                </h3>
+                <p className={styles.bodyText}>{b.body}</p>
+              </li>
             ))}
-          </div>
-
-          <p className={styles.sectionNote}>
-            Also: dynamic client registration, RP-initiated and back-channel logout, token
-            revocation, and injectable claims validators.{' '}
-            <Link to="/docs/what-you-can-build">
-              The full list, with per-language availability
-            </Link>
-            . Next up are a Node implementation, Go and Rust parity on the advanced tier, and
-            three further certification profiles.
-          </p>
+          </ul>
         </div>
       </section>
 
-      {/* The claim that needs proving, and the proof */}
+      {/* The library — evidence for its one claim, then a link out */}
       <section className={styles.section}>
         <div className={styles.inner}>
-          <h2 className={styles.sectionTitle}>
-            &ldquo;Behaves the same everywhere&rdquo; is only worth something if it is enforced.
-          </h2>
-          <p className={styles.sectionLede}>
-            Plenty of projects ship libraries in several languages and hope they agree. Here,
-            what <em>correct</em> means lives outside every implementation — in a
-            language-neutral specification that all three execute, with CI failing if one of
-            them quietly does not.
+          <h2 className={styles.sectionTitle}>The library this reasoning is for</h2>
+          <p className={styles.lede}>
+            <Link href={IM}>identity-model</Link> implements OpenID Connect and OAuth 2.0
+            natively in Python, Go and Rust. Its claim is that the three behave identically.
+            That claim gets the same treatment as every other.
           </p>
 
-          <div className={styles.stats}>
-            {PROOF.map((p) => (
-              <div key={p.unit} className={styles.stat}>
-                <p className={styles.statFigure}>
-                  {p.stat}
-                  <span className={styles.statUnit}>{p.unit}</span>
-                </p>
-                <p className={styles.statBody}>{p.body}</p>
-              </div>
-            ))}
+          <div className={styles.codeTabs}>
+            <Tabs groupId="lang">
+              <TabItem value="py" label="Python">
+                <CodeBlock language="python">{PY}</CodeBlock>
+              </TabItem>
+              <TabItem value="go" label="Go">
+                <CodeBlock language="go">{GO}</CodeBlock>
+              </TabItem>
+              <TabItem value="rust" label="Rust">
+                <CodeBlock language="rust">{RUST}</CodeBlock>
+              </TabItem>
+            </Tabs>
           </div>
 
-          <p className={styles.sectionNote}>
-            The Python library is certified by the OpenID Foundation as a Relying Party, and
-            that certification is the reference the Go and Rust implementations are built to
-            match. The authoritative per-language status is the{' '}
-            <Link href={`${IM}/blob/main/spec/capabilities.md`}>capability matrix</Link> in{' '}
-            <Link href={`${IM}/tree/main/spec`}>
-              <code>spec/</code>
-            </Link>
-            , not this page.
+          <Verdict
+            failed={false}
+            claimed="“Every implementation behaves the same everywhere.”"
+            measured={
+              <>
+                119 conformance cases across 12 capabilities, written once as
+                <br />
+                language-neutral JSON and executed by all three implementations
+                <br />
+                coverage gate fails CI if a runner skips one · 4 providers in the harness
+                <br />
+                Python certified by the OpenID Foundation as a Relying Party, 2 July 2026
+              </>
+            }
+            verdict="Enforced, not asserted."
+          />
+
+          <p className={styles.note}>
+            Installation, the API reference and the capability matrix live with the library:{' '}
+            <Link href={IM_DOCS}>identity-model documentation</Link> ·{' '}
+            <Link href={`${IM}/blob/main/spec/capabilities.md`}>capability matrix</Link>
           </p>
         </div>
       </section>
 
-      {/* How it gets built — supporting, not the lead */}
       <section className={styles.sectionAlt}>
-        <div className={styles.inner}>
-          <h2 className={styles.sectionTitle}>Built by agents, reviewed by agents that never saw the code</h2>
-          <p className={styles.sectionLede}>
-            This repository is the reasoning behind the library — the architecture, the
-            identity-domain research, and the prompts that run the work. A loop takes one story
-            through a fixed pipeline, completing exactly one phase per iteration and writing its
-            state to disk before it exits, so a crash resumes instead of restarting and every
-            phase begins with a fresh context.
-          </p>
-
-          <div className={styles.pipeline} aria-label="Loop phases, in order">
-            {PHASES.map((phase) => (
-              <span
-                key={phase}
-                className={styles.phase}
-                data-emphasis={phase === 'review' ? 'true' : undefined}>
-                {phase}
-              </span>
-            ))}
-          </div>
-
-          <div className={styles.prose}>
-            <p>
-              Review is the phase that had to change. Reviews once ran in the context that wrote
-              the code and were shallow — they confirmed their own work. Four pull requests that
-              passed that way were re-reviewed cold and turned out to carry cross-tenant IDOR,
-              privilege escalation and resource leaks. For a library whose job is deciding
-              whether a token is valid, that is not a tolerable failure mode.
-            </p>
-            <p>
-              Five reviewers now run against every change, each in a fresh context with no access
-              to the implementation plan, the task state, or the conversation that produced the
-              diff: cold read, edge cases, acceptance criteria, security review, and a red team
-              on anything touching auth or middleware. Blocking findings are fixed before a pull
-              request opens, and a loop never merges its own — a person does that.
-            </p>
-          </div>
-
-          <p className={styles.sectionNote}>
-            <Link to="/docs/ralph-loop-process">How a story becomes a merged pull request</Link> ·{' '}
-            <Link to="/docs/review-process">the review process in full</Link>
-          </p>
-        </div>
-      </section>
-
-      <section className={styles.section}>
-        <div className={styles.inner}>
-          <h2 className={styles.sectionTitle}>Four tracks, running independently</h2>
-          <p className={styles.sectionLede}>
-            The library is the flagship; the other three exist to keep it honest, keep the
-            tooling working, and test one idea that is deliberately not being built yet.
-          </p>
-
-          <div className={styles.lanes}>
-            {TRACKS.map((track) => (
-              <article key={track.name} className={styles.lane} data-tone={track.tone}>
-                <h3 className={styles.laneName}>{track.name}</h3>
-                <p className={styles.laneGoal}>
-                  <span className={styles.laneLabel}>Goal</span>
-                  {track.goal}
-                </p>
-                <p className={styles.laneDone}>
-                  <span className={styles.laneLabel}>Done looks like</span>
-                  {track.done}
-                </p>
-                <p className={styles.laneWhere}>
-                  <Link to={track.where.href}>{track.where.label}</Link>
-                </p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className={styles.section}>
         <div className={styles.inner}>
           <div className={styles.split}>
             <div>
-              <h2 className={styles.sectionTitle}>Where status lives</h2>
-              <p className={styles.sectionLede}>
-                GitHub issues, and nowhere else. These documents hold the reasoning and the
-                decomposition; they never say whether something is done. Two markdown trackers
-                were retired for drifting from the issues they duplicated — at retirement, 34
-                rows across them were marked pending against closed issues.
+              <h2 className={styles.sectionTitleSmall}>Where status lives</h2>
+              <p className={styles.lede}>
+                GitHub issues, and nowhere else. These documents hold reasoning and
+                decomposition; they never say whether something is done.
               </p>
               <Link
                 className={styles.actionSecondary}
@@ -359,15 +262,12 @@ export default function Home(): ReactNode {
               </Link>
             </div>
             <div>
-              <h2 className={styles.sectionTitle}>If you are an agent</h2>
-              <p className={styles.sectionLede}>
-                Start at <code>AGENTS.md</code>. It carries what is authoritative, how work is
-                named, which sibling checkout to ground against and which one is an archived
-                trap, and what must not be touched. Two files publish at the site root to be
-                fetched rather than read:{' '}
-                <a href="/identity-stack-planning/llms.txt">llms.txt</a> for a curated reading
-                order, and <a href="/identity-stack-planning/workspace.yml">workspace.yml</a> for
-                the repository mapping and track facts as structured data.
+              <h2 className={styles.sectionTitleSmall}>If you are an agent</h2>
+              <p className={styles.lede}>
+                Start at <code>AGENTS.md</code> for what is authoritative and what must not be
+                touched. Two files publish at the site root to be fetched rather than read:{' '}
+                <a href="/identity-stack-planning/llms.txt">llms.txt</a> and{' '}
+                <a href="/identity-stack-planning/workspace.yml">workspace.yml</a>.
               </p>
               <Link
                 className={styles.actionSecondary}

@@ -1,50 +1,61 @@
 .inner {
-  max-width: 1140px;
+  max-width: 1180px;
   margin: 0 auto;
   padding: 0 32px;
 }
 
-/* Hero — ink ground in both themes, so the purple-on-black identity is the first
-   thing the site says regardless of the reader's colour preference. */
+/* Hero — asymmetric, and the evidence sits in it rather than under it. */
 
 .hero {
   background: oklch(0.145 0 0);
   color: oklch(0.985 0 0);
-  padding: clamp(3.5rem, 9vw, 6rem) 0 clamp(2.5rem, 6vw, 4rem);
-  border-bottom: 1px solid oklch(0.67 0.2 278 / 45%);
+  padding: clamp(3.5rem, 8vw, 6rem) 0;
+  border-bottom: 1px solid oklch(0.67 0.2 278 / 40%);
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 4rem;
+  align-items: center;
 }
 
 .heroTitle {
-  /* Infima paints every h1 with --ifm-heading-color, which is near-black in the
-     light theme. The hero sits on ink in both themes, so it has to say so. */
+  /* Infima paints h1 with --ifm-heading-color, which is ink in the light theme. */
   color: oklch(0.985 0 0);
-  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-size: clamp(2.25rem, 4.4vw, 3.75rem);
   font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-  margin: 0 0 0.75rem;
-}
-
-.heroLede {
-  max-width: 62ch;
-  margin: 0 0 2.25rem;
-  font-size: clamp(1.0625rem, 1.7vw, 1.25rem);
-  font-weight: 400;
-  line-height: 1.5;
-  color: oklch(0.985 0 0 / 82%);
-}
-
-.heroLede strong {
-  font-weight: 600;
-  color: oklch(0.79 0.14 280);
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  margin: 0 0 1.5rem;
+  max-width: 16ch;
 }
 
 .heroBody {
-  max-width: 68ch;
-  margin: 0 0 2rem;
-  font-size: 1rem;
+  max-width: 54ch;
+  margin: 0 0 2.25rem;
+  font-size: 1.0625rem;
   line-height: 1.65;
-  color: oklch(0.985 0 0 / 72%);
+  color: oklch(0.985 0 0 / 80%);
+}
+
+/* The hero verdict sits on ink, so it restates its own surface. */
+.heroVerdict :global(figure) {
+  background: oklch(1 0 0 / 5%);
+  border-left-color: oklch(0.67 0.2 278);
+}
+
+.heroVerdict :global(figure) * {
+  color: oklch(0.985 0 0) !important;
+}
+
+.heroVerdict :global(figure) p:first-of-type,
+.heroVerdict :global(figure) dfn {
+  color: oklch(0.985 0 0 / 62%) !important;
+}
+
+.heroVerdict :global(figure) > div + div {
+  border-top-color: oklch(1 0 0 / 12%);
 }
 
 .heroActions {
@@ -88,7 +99,7 @@
 }
 
 .hero .actionSecondary {
-  border-color: oklch(0.985 0 0 / 28%);
+  border-color: oklch(0.985 0 0 / 30%);
   color: oklch(0.985 0 0);
 }
 
@@ -97,303 +108,11 @@
   color: oklch(0.79 0.14 280);
 }
 
-/* Pipeline — the actual phase sequence, which is the mechanism this project is
-   about. `review` is the phase that had to change, so it is the one that reads
-   loudest; the rest are deliberately quiet. */
-
-.pipeline {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 0.375rem;
-  margin: 0 0 1rem;
-}
-
-.phase {
-  padding: 0.3rem 0.7rem;
-  border: 1px solid var(--plan-rule);
-  border-radius: 0.375rem;
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.75rem;
-  color: var(--plan-muted);
-  white-space: nowrap;
-}
-
-.phase + .phase {
-  position: relative;
-  margin-left: 0.75rem;
-}
-
-.phase + .phase::before {
-  content: '';
-  position: absolute;
-  left: -0.75rem;
-  top: 50%;
-  width: 0.75rem;
-  height: 1px;
-  background: var(--plan-rule);
-}
-
-.phase[data-emphasis] {
-  background: oklch(0.565 0.235 276);
-  border-color: oklch(0.565 0.235 276);
-  color: oklch(0.99 0 0);
-}
-
-.pipelineNote {
-  margin: 1rem 0 0;
-  max-width: 60ch;
-  font-size: 0.8125rem;
-  line-height: 1.55;
-  color: oklch(0.985 0 0 / 55%);
-}
-
-/* Prose block — for the sections that argue rather than list. */
-
-.prose {
-  max-width: 68ch;
-  font-size: 1rem;
-  line-height: 1.7;
-  color: var(--ifm-font-color-base);
-}
-
-.prose p {
-  margin: 0 0 1.25rem;
-}
-
-.proseAside {
-  padding-top: 1rem;
-  border-top: 1px solid var(--plan-rule);
-  font-size: 0.9375rem;
-  color: var(--plan-muted);
-}
-
-.subTitle {
-  margin: 3.5rem 0 1rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--plan-rule);
-  font-size: clamp(1.25rem, 2.2vw, 1.5rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--plan-ink);
-}
-
-/* The guarantee, stated as figures. Laid out as a specification table rather than
-   a row of stat cards: the numbers are the argument, so they sit beside the claim
-   they support instead of floating above it. */
-
-.stats {
-  display: grid;
-  gap: 0;
-}
-
-.stat {
-  display: grid;
-  grid-template-columns: minmax(9rem, 12rem) 1fr;
-  gap: 1rem 2.5rem;
-  align-items: start;
-  padding: 1.5rem 0;
-  border-top: 1px solid var(--plan-rule);
-}
-
-.stat:last-child {
-  border-bottom: 1px solid var(--plan-rule);
-}
-
-.statFigure {
-  margin: 0;
-  font-size: 2.5rem;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-  color: var(--brand-hover);
-}
-
-[data-theme='dark'] .statFigure {
-  color: var(--purple-300);
-}
-
-.statUnit {
-  display: block;
-  margin-top: 0.5rem;
-  font-size: 0.8125rem;
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 1.4;
-  color: var(--plan-muted);
-}
-
-.statBody {
-  margin: 0;
-  font-size: 0.9375rem;
-  line-height: 1.65;
-  color: var(--ifm-font-color-base);
-}
-
-@media (max-width: 640px) {
-  .stat {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-  .statFigure {
-    font-size: 2rem;
-  }
-  .statUnit {
-    display: inline;
-    margin-left: 0.5rem;
-  }
-}
-
-/* Evidence strip — the hero's claim, immediately backed by figures that each
-   resolve to a link further down. Sits on the ink hero, so it states its colours. */
-
-.evidence {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.75rem 2.5rem;
-  list-style: none;
-  margin: 0 0 2.25rem;
-  padding: 1.5rem 0 0;
-  border-top: 1px solid oklch(0.985 0 0 / 15%);
-}
-
-.evidence li {
-  max-width: 22ch;
-}
-
-.evidenceFigure {
-  display: block;
-  font-size: 1.75rem;
-  font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-  color: oklch(0.79 0.14 280);
-}
-
-.evidenceLabel {
-  display: block;
-  margin-top: 0.375rem;
-  font-size: 0.8125rem;
-  line-height: 1.45;
-  color: oklch(0.985 0 0 / 60%);
-}
-
-.evidenceCert {
-  max-width: 30ch;
-}
-
-.evidenceCert .evidenceFigure {
-  font-size: 1.125rem;
-  letter-spacing: -0.01em;
-}
-
-/* Install block — four languages, one of which is honestly empty. */
-
-.installs {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2.5rem;
-}
-
-.install {
-  padding-top: 1rem;
-  border-top: 2px solid var(--brand);
-}
-
-.install:last-child {
-  border-top-color: var(--plan-rule);
-  border-top-style: dashed;
-}
-
-.installLang {
-  margin: 0 0 0.625rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--plan-ink);
-}
-
-.installCmd,
-.installCmdMuted {
-  display: block;
-  overflow-x: auto;
-  padding: 0.5rem 0.625rem;
-  border-radius: 0.375rem;
-  background: var(--plan-surface);
-  border: 1px solid var(--plan-rule);
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.75rem;
-  line-height: 1.55;
-  /* `go get github.com/...` is longer than the column; wrap it rather than
-     clipping it into a scroll gutter nobody will find. */
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-[data-theme='dark'] .installCmd,
-[data-theme='dark'] .installCmdMuted {
-  background: oklch(1 0 0 / 4%);
-}
-
-.installCmdMuted {
-  color: var(--plan-muted);
-}
-
-.installNote {
-  margin: 0.625rem 0 0;
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  color: var(--plan-muted);
-}
-
-/* Capabilities — grouped by the problem they solve, each tagged with the
-   specification it implements so the claim is checkable rather than atmospheric. */
-
-.capabilities {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem 2.5rem;
-}
-
-.capability {
-  padding-top: 1rem;
-  border-top: 2px solid var(--brand);
-}
-
-.capabilityTitle {
-  margin: 0 0 0.5rem;
-  font-size: 1.0625rem;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  color: var(--plan-ink);
-}
-
-.capabilityBody {
-  margin: 0 0 0.75rem;
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  color: var(--plan-muted);
-}
-
-.capabilitySpecs {
-  margin: 0;
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.6875rem;
-  line-height: 1.5;
-  color: var(--brand-hover);
-}
-
-[data-theme='dark'] .capabilitySpecs {
-  color: var(--purple-300);
-}
-
 /* Sections ---------------------------------------------------------------- */
 
 .section,
 .sectionAlt {
-  padding: clamp(3rem, 7vw, 5rem) 0;
+  padding: clamp(3.5rem, 7vw, 5.5rem) 0;
 }
 
 .sectionAlt {
@@ -402,132 +121,118 @@
 }
 
 .sectionTitle {
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  max-width: 22ch;
+  font-size: clamp(1.75rem, 3.4vw, 2.75rem);
   font-weight: 600;
-  letter-spacing: -0.025em;
-  line-height: 1.2;
-  margin: 0 0 1rem;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 0 0 1.25rem;
   color: var(--plan-ink);
 }
 
-.sectionLede {
-  max-width: 68ch;
+.sectionTitleSmall {
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin: 0 0 0.875rem;
+  color: var(--plan-ink);
+}
+
+/* Body copy is ink, not grey. Grey is for metadata only. */
+.lede {
+  max-width: 66ch;
   margin: 0 0 2.5rem;
-  font-size: 1rem;
+  font-size: 1.0625rem;
   line-height: 1.65;
-  color: var(--plan-muted);
+  color: var(--ifm-font-color-base);
 }
 
-.sectionNote {
+.note {
+  max-width: 70ch;
   margin: 2rem 0 0;
-  font-size: 0.9375rem;
-  color: var(--plan-muted);
-}
-
-/* Review lenses ----------------------------------------------------------- */
-
-.lenses {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.75rem 2.5rem;
-  margin: 0;
-}
-
-.lens {
-  border-top: 1px solid var(--plan-rule);
-  padding-top: 0.875rem;
-}
-
-.lensName {
-  margin: 0 0 0.375rem;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  color: var(--plan-ink);
-}
-
-.lensBody {
-  margin: 0;
   font-size: 0.9375rem;
   line-height: 1.6;
   color: var(--plan-muted);
 }
 
-/* Tracks ------------------------------------------------------------------ */
-
-.lanes {
+.verdicts {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
-.lane {
-  display: flex;
-  flex-direction: column;
-  padding-top: 1.125rem;
-  border-top: 3px solid var(--lane-tone, var(--brand));
+/* What is here — a list, not a deck of cards. */
+
+.bodies {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 78ch;
 }
 
-.lane[data-tone='brain'] {
-  --lane-tone: var(--plan-muted);
-  border-top-style: dashed;
+.body {
+  padding: 1.75rem 0;
+  border-top: 1px solid var(--plan-rule);
 }
 
-.laneName {
-  font-size: 1.125rem;
+.body:last-child {
+  border-bottom: 1px solid var(--plan-rule);
+}
+
+.bodyTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  letter-spacing: -0.015em;
-  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.bodyTitle a {
   color: var(--plan-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--plan-rule);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.25em;
+  transition: color 120ms ease, text-decoration-color 120ms ease;
 }
 
-.laneLabel {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--brand-hover);
+.bodyTitle a:hover {
+  color: var(--ifm-color-primary);
+  text-decoration-color: var(--brand);
 }
 
-[data-theme='dark'] .laneLabel {
-  color: var(--purple-300);
-}
-
-.laneGoal {
-  margin: 0 0 0.875rem;
-  font-size: 0.9375rem;
-  line-height: 1.55;
+.bodyText {
+  margin: 0;
+  max-width: 70ch;
+  font-size: 1rem;
+  line-height: 1.65;
   color: var(--ifm-font-color-base);
 }
 
-.laneDone {
-  margin: 0 0 1.25rem;
-  font-size: 0.875rem;
-  line-height: 1.55;
-  color: var(--plan-muted);
+.codeTabs {
+  max-width: 760px;
+  margin: 0 0 2.5rem;
 }
-
-.laneWhere {
-  margin: auto 0 0;
-  font-size: 0.875rem;
-}
-
-/* Split ------------------------------------------------------------------- */
 
 .split {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 3rem;
+  gap: 3.5rem;
 }
 
-.split .sectionLede {
+.split .lede {
   margin-bottom: 1.75rem;
 }
 
 /* Responsive -------------------------------------------------------------- */
 
 @media (max-width: 996px) {
-  .lanes {
-    grid-template-columns: repeat(2, 1fr);
+  .heroGrid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .heroTitle {
+    max-width: 20ch;
   }
   .split {
     grid-template-columns: 1fr;
@@ -538,14 +243,5 @@
 @media (max-width: 640px) {
   .inner {
     padding: 0 20px;
-  }
-  .lanes {
-    grid-template-columns: 1fr;
-  }
-  .phase + .phase {
-    margin-left: 0;
-  }
-  .phase + .phase::before {
-    display: none;
   }
 }

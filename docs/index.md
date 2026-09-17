@@ -8,8 +8,13 @@ last_verified: 2026-09-15
 
 # Documentation Index
 
-Start with **[what you can build](what-you-can-build.md)** if you want to know what the
-library does, or the **[program map](roadmap.md)** if you want to know what the work is.
+This is the reasoning layer: the decisions behind a certified identity library, and the
+evidence for each one. Documents here are checked against the source tree and live APIs
+rather than against each other.
+
+**Looking for the library itself?** Installation, the API reference and the capability
+matrix live with it — [identity-model documentation](https://jamescrowley321.github.io/identity-model/)
+and the [capability matrix](https://github.com/jamescrowley321/identity-model/blob/main/spec/capabilities.md).
 
 Status is never in these pages. It lives in GitHub issues, and
 [`status.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/status.md)
