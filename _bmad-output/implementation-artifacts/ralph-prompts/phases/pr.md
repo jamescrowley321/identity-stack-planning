@@ -77,4 +77,7 @@ Push branch and create PR.
 
 4. **Post the review evidence (mandatory).** Post EVERY `.claude/review-*.md` as a PR comment (`gh pr comment <pr> -R jamescrowley321/<repo> --body-file <file>`), and edit the PR body's "## Review Findings Addressed" to name **which reviewer personas ran** (blind / edge-case / acceptance / sentinel / viper) with per-persona finding counts. If a docs/config-only skip was recorded, state that instead. A feature PR with no reviewer comments is invalid — if you reach here without them, return to the review phase.
 5. Record PR number in task-state under `## PR`
-6. **Advance to the next phase. End your response.**
+6. **Do not merge it.** Opening the PR is the deliverable. Never run `gh pr merge`, never pass
+   `--auto` or `--admin`, never use a merge queue, and never alter branch protection or repository
+   settings to make a merge possible. The owner reviews and merges every PR.
+7. **Advance to the next phase. End your response.**
