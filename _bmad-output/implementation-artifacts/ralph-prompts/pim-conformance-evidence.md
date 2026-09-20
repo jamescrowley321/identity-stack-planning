@@ -89,6 +89,21 @@ Task 1 first — it is what makes hosted the standard and stops the six plans ro
 
 **Do not export an evidence package before task 8.** Routine hosted runs in tasks 1–7 use `publish: none` and no `--export-zip`. If a task tempts you to capture evidence early, it is the wrong task.
 
+### One task per run
+
+**Complete exactly ONE task, then write `LOOP_COMPLETE` and stop.** The owner reviews the pull
+request, merges it, and relaunches for the next. Small reviewable units with a human between each.
+
+### Stacked pull requests
+
+Base each task's branch on the **previous task's branch** rather than `main`, so the queue reads as a
+stack on GitHub and every PR's diff shows only its own change. Record the choice in
+`.claude/task-state.md` under `base_branch:` and pass it to `gh pr create --base`. If the previous
+task has already merged, base on `main` — GitHub retargets the rest of the stack automatically.
+
+**Merging a stack is bottom-up, and the base branch must not be deleted in the same command** —
+deleting a branch another open PR is based on closes that PR outright.
+
 **Out of scope:** mTLS certification (`fapi2-mtls-rp`) as a *submission* target. Wire it into the standard run under task 1, but `conformance/README.md` records that FAPI2 certifies on DPoP and mTLS is a separate future path. Do not pursue it.
 
 ### Task 1 design constraints
