@@ -1,0 +1,50 @@
+# Identity Stack Brain
+
+> The planning repository for a multi-repo identity platform. It holds no application
+> code — only the architecture decisions, identity-domain research, and the prompts that
+> drive autonomous execution across four sibling repositories. The project is an
+> implementation of agentic software engineering, and what the agents build is OIDC and
+> OAuth 2.0 software held to the specifications.
+
+Read these first, in this order. Three rules govern everything here: GitHub issues are the
+only source of truth for status and a markdown status tracker must never be reintroduced;
+work is named by issue number written `repo#N` and no private code family may be invented;
+and when a document disagrees with the source tree, the tree wins and the document gets
+fixed.
+
+Machine-readable repository and track facts: https://jamescrowley321.github.io/identity-stack-planning/workspace.yml
+
+## Start here
+
+- [AGENTS.md](https://github.com/jamescrowley321/identity-stack-planning/blob/main/AGENTS.md): Operating rules for agents — what is authoritative, naming, where to ground, and what must not be touched.
+- [Program map](https://jamescrowley321.github.io/identity-stack-planning/docs/roadmap): The four tracks, what each is for, what done looks like, and where the work is tracked. Re-derived from GitHub issues and sibling-repo source on 2026-09-15.
+- [Where status lives](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/status.md): The planning-artifact to GitHub-issue map. Contains no status words, only stable identifiers.
+- [Glossary](https://jamescrowley321.github.io/identity-stack-planning/docs/glossary): Terms used across these documents, and the decoder for the retired identifier families.
+
+## How the work gets done
+
+- [Ralph loop process](https://jamescrowley321.github.io/identity-stack-planning/docs/ralph-loop-process): The phase pipeline, task-state persistence, and worktree isolation that take a story to a merged pull request.
+- [Review process](https://jamescrowley321.github.io/identity-stack-planning/docs/review-process): The five independent review lenses, what each catches, and the triage order. Every reviewer runs in a fresh context with no access to the implementation.
+- [Ralph loop efficiency](https://jamescrowley321.github.io/identity-stack-planning/docs/ralph-loop-efficiency): Token-waste audit and the prompt sizing that came out of it.
+
+## Architecture and identity domain
+
+- [System architecture](https://jamescrowley321.github.io/identity-stack-planning/docs/system-architecture): C4 context and components, the canonical identity ER model, request lifecycle, and the ADR index.
+- [IdP authorization comparison](https://jamescrowley321.github.io/identity-stack-planning/docs/idp-rbac-comparison): RBAC and ReBAC across nine providers, and why the reference architecture owns RBAC and proxies ReBAC.
+- [Identity capability gaps](https://jamescrowley321.github.io/identity-stack-planning/docs/identity-capability-gap-analysis-2026-09-05): Reusable gaps across the protocol, trust, resource-server, credential, relationship and conformance layers.
+- [OIDC certification analysis](https://jamescrowley321.github.io/identity-stack-planning/docs/oidc-certification-analysis): Certification status, the standing decision that the hosted OIDF suite is the conformance standard, and the profile expansion plan.
+- [Descope data model](https://jamescrowley321.github.io/identity-stack-planning/docs/descope-data-model): How one provider maps onto OAuth 2.0 and OIDC — the dct and tenants claims, grant types, session management.
+
+## Governed brain (research, gated, nothing built)
+
+- [Where it stands](https://jamescrowley321.github.io/identity-stack-planning/docs/governed-brain-where-it-stands): Entry point — the idea, what is genuinely new against what exists, and four open decisions with a recommendation for each.
+- [Concepts and requirements](https://jamescrowley321.github.io/identity-stack-planning/docs/governed-brain-concepts): Brain, scope, authority, grant and receipt, plus sixteen checkable acceptance properties.
+- [Authorization and federation model](https://jamescrowley321.github.io/identity-stack-planning/docs/governed-brain-authorization): How one disclosure decision composes — the security invariant, layer responsibilities, and the threat table.
+- [Research findings](https://jamescrowley321.github.io/identity-stack-planning/docs/research/governed-brain-research-2026-09-15): Four independent passes against the documents above, with six lane reports beside them.
+
+## Optional
+
+- [Contributing](https://github.com/jamescrowley321/identity-stack-planning/blob/main/CONTRIBUTING.md): How to propose a change to a plan, and the rules that get a change rejected.
+- [Re-grounding design (2026-09-15)](https://jamescrowley321.github.io/identity-stack-planning/docs/reground-2026-09-15-design): What was measured against source, and why the six-PRD program was retired.
+- [Docs overhaul design (2026-09-16)](https://jamescrowley321.github.io/identity-stack-planning/docs/docs-overhaul-2026-09-16-design): The design for this site and the machine-readable layer.
+- [Archive index](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_archive/README.md): Retired artifacts — what each was, what superseded it, and the git command that prints it back.

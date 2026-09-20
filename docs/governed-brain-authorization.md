@@ -1,3 +1,11 @@
+---
+title: "Governed Brain — Authorization and Federation Model"
+sidebar_label: "Authorization and federation"
+description: "How a single disclosure decision composes: the security invariant, layer responsibilities, the relationship-authorization port, and the threat table."
+status: proposed
+last_verified: 2026-09-15
+---
+
 # Governed Brain — Authorization and Federation Model
 
 **Status:** Proposed · **Date:** 2026-09-15 · **Companion to:** [Concepts and Requirements](governed-brain-concepts.md)

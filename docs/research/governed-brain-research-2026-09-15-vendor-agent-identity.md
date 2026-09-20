@@ -1,3 +1,11 @@
+---
+title: "Vendor AI-agent identity / delegated authorization — shipped status, September 2026"
+sidebar_label: "Vendor agent identity"
+description: "What vendors have actually shipped for AI-agent identity and delegated authorization, as of September 2026."
+status: proposed
+last_verified: 2026-09-16
+---
+
 # Vendor AI-agent identity / delegated authorization — shipped status, September 2026
 
 _Source: sub-agent dispatched by the agent-memory research agent. Findings relayed 2026-09-15._

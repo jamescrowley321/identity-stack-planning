@@ -1,0 +1,37 @@
+name: Correction — a document says something untrue
+description: A planning document contradicts the source tree, a live API, or another document.
+title: "correction: "
+labels: [correction]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is the highest-value issue type in this repository. The planning documents are
+        the thing most likely to be wrong; the tree is not.
+  - type: input
+    id: document
+    attributes:
+      label: Document
+      description: Path in this repository.
+      placeholder: docs/roadmap.md
+    validations:
+      required: true
+  - type: textarea
+    id: claim
+    attributes:
+      label: What it says
+      description: Quote the claim.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What is actually true
+      description: What did you check it against — a file and line in a sibling repo, a GitHub issue, an API response?
+    validations:
+      required: true
+  - type: textarea
+    id: knock-on
+    attributes:
+      label: Knock-on effects
+      description: Other documents that repeat the same claim, if you know of any.

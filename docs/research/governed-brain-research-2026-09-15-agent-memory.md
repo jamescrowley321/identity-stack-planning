@@ -1,3 +1,11 @@
+---
+title: "Is the \"governed brain\" gap open? — landscape research, 2026-09-15"
+sidebar_label: "Agent memory"
+description: "Landscape research on whether the governed-brain gap is genuinely open in the agent-memory category."
+status: proposed
+last_verified: 2026-09-16
+---
+
 # Is the "governed brain" gap open? — landscape research, 2026-09-15
 
 Research target: the positioning claim in

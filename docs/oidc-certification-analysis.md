@@ -1,3 +1,11 @@
+---
+title: "OIDC/OAuth 2.0 Certification Analysis for py-identity-model"
+sidebar_label: "OIDC certification"
+description: "Certification status, the standing decision that the hosted OIDF suite is the conformance standard, and the profile expansion plan."
+status: current
+last_verified: 2026-09-15
+---
+
 # OIDC/OAuth 2.0 Certification Analysis for py-identity-model
 
 **Date:** 2026-03-26 · **Updated:** 2026-09-15

@@ -1,3 +1,11 @@
+---
+title: "Governed Brain — Where It Stands"
+sidebar_label: "Where it stands"
+description: "Plain-language entry point: the idea, what is genuinely new against what already exists, and the four open decisions with a recommendation for each."
+status: proposed
+last_verified: 2026-09-15
+---
+
 # Governed Brain — Where It Stands
 
 **Status:** Proposed · **Date:** 2026-09-15
@@ -23,7 +31,7 @@ authorization engine, or model provider.
 | [Concepts and Requirements](governed-brain-concepts.md) | What a governed brain must mean and do — brain, scope, authority, grant, receipt — plus sixteen acceptance properties written so any implementation can be checked against them |
 | [Authorization and Federation Model](governed-brain-authorization.md) | How one disclosure decision composes: the security invariant, which layer owns which check, the relationship-authorization port, and the threat table |
 | [Long-Term Implementation Plan](governed-brain-implementation-plan.md) | Phases 0–7 across the identity repositories, what gates what, and the known blockers |
-| [Research Findings](../_bmad-output/planning-artifacts/research/governed-brain-research-2026-09-15.md) | Four independent passes testing all of the above against the current state of the field |
+| [Research Findings](research/governed-brain-research-2026-09-15.md) | Four independent passes testing all of the above against the current state of the field |
 
 Nothing is built. No phase has started.
 
@@ -50,6 +58,29 @@ greenfield here would be read as uninformed.
 The defensible claim is therefore narrow and checkable: *permission-aware
 retrieval is solved for identity × document; this is the portable contract for
 the rest of the decision.*
+
+```mermaid
+flowchart TB
+    Q["<b>May this actor</b>, acting for <b>this person</b>, obtain<br/><b>this kind of record</b>, for <b>this stated reason</b>, right now?"]
+
+    Q --> T1["this actor<br/><i>identity, verified</i>"]
+    Q --> T2["this kind of record<br/><i>permission-filtered</i>"]
+    Q --> T3["acting for this person<br/><i>three distinct parties</i>"]
+    Q --> T4["for this stated reason<br/><i>purpose, checkable</i>"]
+
+    T1 --> SOLVED["<b>Mature category</b><br/>shipped, decided per query"]
+    T2 --> SOLVED
+    T3 --> OPEN["<b>Unoccupied</b><br/>no shipped system models it"]
+    T4 --> OPEN
+
+    SOLVED --> SCOPE["This contract covers<br/>the unoccupied terms"]
+    OPEN --> SCOPE
+
+    style SOLVED fill:#ede9fd,stroke:#6d4bd8,color:#221a33
+    style OPEN fill:#fef3e2,stroke:#b07d2b,color:#3a2c14
+    style SCOPE fill:#221a33,stroke:#6d4bd8,color:#ffffff
+    style Q fill:#f7f5ff,stroke:#8b6fe0,color:#221a33
+```
 
 ## Four decisions to make
 

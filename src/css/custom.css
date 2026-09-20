@@ -1,0 +1,206 @@
+/**
+ * identity-stack-planning — theme
+ *
+ * The palette, type scale and radius are taken verbatim from identity-stack's design
+ * system (frontend/src/index.css) so the planning site and the platform it plans read
+ * as one product: the same OKLCH purple ramp, the same near-black ink, Geist and
+ * Geist Mono, radius 0.625rem.
+ *
+ * Track identity is carried by steps along the purple ramp rather than four unrelated
+ * hues — a track is a position in one system, not a separate brand.
+ */
+
+:root {
+  /* identity-stack purple ramp, verbatim */
+  --purple-50: oklch(0.975 0.015 285);
+  --purple-100: oklch(0.945 0.035 285);
+  --purple-200: oklch(0.885 0.08 283);
+  --purple-300: oklch(0.79 0.14 280);
+  --purple-400: oklch(0.67 0.2 278);
+  --purple-500: oklch(0.565 0.235 276);
+  --purple-600: oklch(0.49 0.24 273);
+  --purple-700: oklch(0.41 0.215 270);
+  --purple-800: oklch(0.335 0.175 268);
+  --purple-900: oklch(0.27 0.13 266);
+
+  --brand: var(--purple-500);
+  --brand-hover: var(--purple-600);
+  --brand-soft: oklch(0.96 0.025 285);
+
+  --plan-ink: oklch(0.205 0 0);
+  --plan-ground: oklch(1 0 0);
+  --plan-surface: oklch(0.985 0.005 285);
+  --plan-muted: oklch(0.52 0 0);
+  --plan-rule: oklch(0.92 0.005 285);
+  --plan-on-ink: oklch(0.985 0 0);
+
+  /* Track identity — four distinguishable steps of the same ramp. A track is a
+     position in one system, not a separate brand. */
+  --plan-track-1: oklch(0.79 0.14 280);
+  --plan-track-2: oklch(0.565 0.235 276);
+  --plan-track-3: oklch(0.41 0.215 270);
+  --plan-track-4: oklch(0.27 0.13 266);
+
+  --ifm-color-primary: oklch(0.49 0.24 273);
+  --ifm-color-primary-dark: oklch(0.44 0.23 271);
+  --ifm-color-primary-darker: oklch(0.41 0.215 270);
+  --ifm-color-primary-darkest: oklch(0.335 0.175 268);
+  --ifm-color-primary-light: oklch(0.565 0.235 276);
+  --ifm-color-primary-lighter: oklch(0.62 0.22 277);
+  --ifm-color-primary-lightest: oklch(0.67 0.2 278);
+
+  --ifm-background-color: var(--plan-ground);
+  --ifm-background-surface-color: var(--plan-surface);
+  --ifm-font-color-base: oklch(0.145 0 0);
+  --ifm-heading-color: var(--plan-ink);
+  --ifm-toc-border-color: var(--plan-rule);
+  --ifm-hr-border-color: var(--plan-rule);
+  --ifm-table-border-color: var(--plan-rule);
+  --ifm-table-stripe-background: oklch(0.975 0.015 285 / 55%);
+  --ifm-navbar-background-color: var(--plan-ground);
+  --ifm-footer-background-color: var(--plan-surface);
+  --ifm-navbar-shadow: none;
+  --ifm-navbar-height: 60px;
+
+  --ifm-font-family-base: 'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --ifm-heading-font-family: var(--ifm-font-family-base);
+  --ifm-font-family-monospace: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --ifm-global-radius: 0.625rem;
+  --ifm-code-font-size: 88%;
+  --ifm-heading-font-weight: 600;
+  --ifm-h1-font-size: 2.25rem;
+  --ifm-h2-font-size: 1.75rem;
+  --ifm-h3-font-size: 1.375rem;
+  --ifm-line-height-base: 1.6;
+
+  --docusaurus-highlighted-code-line-bg: oklch(0.565 0.235 276 / 12%);
+}
+
+[data-theme='dark'] {
+  --brand: var(--purple-400);
+  --brand-hover: var(--purple-300);
+  --brand-soft: oklch(0.3 0.08 278);
+
+  --plan-ink: oklch(0.985 0 0);
+  --plan-ground: oklch(0.145 0 0);
+  --plan-surface: oklch(0.18 0.01 270);
+  --plan-muted: oklch(0.72 0 0);
+  --plan-rule: oklch(1 0 0 / 12%);
+  --plan-on-ink: oklch(0.985 0 0);
+
+  --plan-track-1: oklch(0.885 0.08 283);
+  --plan-track-2: oklch(0.79 0.14 280);
+  --plan-track-3: oklch(0.67 0.2 278);
+  --plan-track-4: oklch(0.52 0.16 275);
+
+  --ifm-color-primary: oklch(0.67 0.2 278);
+  --ifm-color-primary-dark: oklch(0.62 0.22 277);
+  --ifm-color-primary-darker: oklch(0.565 0.235 276);
+  --ifm-color-primary-darkest: oklch(0.49 0.24 273);
+  --ifm-color-primary-light: oklch(0.73 0.17 279);
+  --ifm-color-primary-lighter: oklch(0.79 0.14 280);
+  --ifm-color-primary-lightest: oklch(0.885 0.08 283);
+
+  --ifm-font-color-base: oklch(0.985 0 0);
+  --ifm-table-stripe-background: oklch(1 0 0 / 3%);
+  --docusaurus-highlighted-code-line-bg: oklch(0.67 0.2 278 / 16%);
+}
+
+/* Chrome ------------------------------------------------------------------ */
+
+.navbar {
+  border-bottom: 1px solid var(--plan-rule);
+}
+
+.navbar__title {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.footer {
+  border-top: 1px solid var(--plan-rule);
+}
+
+.footer__copyright {
+  color: var(--plan-muted);
+  font-size: 0.8125rem;
+}
+
+.menu {
+  font-size: 0.9375rem;
+}
+
+.menu__link--active:not(.menu__link--sublist) {
+  background: var(--brand-soft);
+  color: var(--ifm-color-primary-darkest);
+}
+
+[data-theme='dark'] .menu__link--active:not(.menu__link--sublist) {
+  color: var(--plan-on-ink);
+}
+
+/* Article ----------------------------------------------------------------- */
+
+.theme-doc-markdown.markdown {
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.theme-doc-markdown.markdown h1,
+.theme-doc-markdown.markdown h2,
+.theme-doc-markdown.markdown h3,
+.theme-doc-markdown.markdown h4 {
+  letter-spacing: -0.02em;
+}
+
+.theme-doc-markdown.markdown h2 {
+  margin-top: 2.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--plan-rule);
+}
+
+.theme-doc-markdown.markdown table {
+  display: table;
+  width: 100%;
+  font-size: 0.9375rem;
+}
+
+.theme-doc-markdown.markdown blockquote {
+  border-left: 3px solid var(--brand);
+  background: none;
+  color: var(--ifm-font-color-base);
+}
+
+/* Wide tables and diagrams scroll inside their own container rather than
+   forcing the page to scroll sideways. */
+.theme-doc-markdown.markdown .docusaurus-mermaid-container {
+  overflow-x: auto;
+}
+
+/* Front-matter stamp ------------------------------------------------------ */
+
+.plan-stamp {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  align-items: baseline;
+  margin-bottom: 1.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--plan-rule);
+  font-size: 0.8125rem;
+  color: var(--plan-muted);
+}
+
+.plan-stamp__status {
+  font-weight: 500;
+  color: var(--brand-hover);
+}
+
+[data-theme='dark'] .plan-stamp__status {
+  color: var(--brand);
+}
+
+.plan-stamp__status[data-status='parked'] {
+  color: var(--plan-muted);
+}

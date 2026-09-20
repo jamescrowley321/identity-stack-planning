@@ -1,3 +1,11 @@
+---
+title: "Governed Brain — Abstract Architecture"
+sidebar_label: "Abstract architecture"
+description: "Components as roles, ports with contracts and negative tests, and a substitution table. Names no product and no vendor."
+status: proposed
+last_verified: 2026-09-15
+---
+
 # Governed Brain — Abstract Architecture
 
 **Status:** Proposed · **Date:** 2026-09-15
@@ -203,11 +211,54 @@ effective subject, data subject, class, purpose, brain) → policy and relations
 terms evaluated → projection yields candidates → retrieval runs *within* those
 candidates → obligations applied → receipt appended → response.
 
+```mermaid
+flowchart TB
+    REQ["Request"] --> EV["<b>Evidence verifier</b><br/>issuer · signature · audience ·<br/>freshness · sender proof · actor chain"]
+    EV --> CTX["<b>Decision context</b><br/>actor · effective subject · data subject ·<br/>class · purpose · brain"]
+    CTX --> POL["<b>Policy evaluator</b><br/>classification · purpose ·<br/>destination · obligations"]
+    CTX --> REL["<b>Relationship authority</b><br/>does the relationship hold,<br/>at the stated freshness?"]
+    POL --> PROJ
+    REL --> PROJ["<b>Candidate projection</b><br/><i>permission-narrowed view</i>"]
+    PROJ --> RET["<b>Retrieval</b><br/>similarity and structured search<br/><i>within the projection only</i>"]
+    RET --> OBL["Obligations applied"]
+    OBL --> RCPT["<b>Receipt log</b><br/>append"]
+    RCPT --> RES["Response"]
+
+    style PROJ fill:#221a33,stroke:#6d4bd8,color:#ffffff
+    style RET fill:#f7f5ff,stroke:#8b6fe0,color:#221a33
+    style EV fill:#ede9fd,stroke:#6d4bd8,color:#221a33
+    style RCPT fill:#ede9fd,stroke:#6d4bd8,color:#221a33
+```
+
+Retrieval never reaches outside the projection it was given. That is what makes
+the narrowing a security boundary rather than a ranking optimisation, and it is
+why the projection is a named component instead of an implementation detail.
+
 **Cross-brain disclosure.** Peer authority resolved through the trust port →
 delegation broker mints a target-scoped credential preserving the chain →
 target brain runs its own single-brain read, treating the chain as evidence and
 never as authority → both sides receipt → result returns as source-attributed
 external evidence, never as the recipient's own truth.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant S as Source brain
+    participant T as Trust authority
+    participant D as Delegation broker
+    participant P as Peer brain
+    S->>T: resolve peer authority
+    T-->>S: issuer keys, metadata, trust chain
+    S->>D: request target-scoped credential
+    D-->>S: credential preserving the delegation chain
+    Note over D: may narrow the chain, never widen it
+    S->>P: disclosure request + chain
+    Note over P: chain is evidence, never authority
+    P->>P: its own single-brain read
+    P-->>S: result
+    Note over S,P: both sides append a receipt
+    Note over S: returns as source-attributed external evidence
+```
 
 **Revocation.** Revocation recorded in the grant registry → its own receipt →
 distributed as an event → recipients converge within a published bound →

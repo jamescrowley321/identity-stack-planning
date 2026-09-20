@@ -1,15 +1,22 @@
+---
+title: "Program map"
+description: "Four independent tracks, what each is for, what done looks like, and where its work is tracked. Re-derived from GitHub issues and sibling-repo source."
+status: current
+last_verified: 2026-09-15
+---
+
 # Program map
 
 **Re-derived 2026-09-15** from GitHub issues and sibling-repo source, replacing the six
 numbered PRDs and their dependency graph. Rationale and evidence:
 [`reground-2026-09-15-design.md`](reground-2026-09-15-design.md). Retired artifacts:
-[`_archive/README.md`](../_archive/README.md).
+[`_archive/README.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_archive/README.md).
 
 Four tracks. **They do not gate each other** — the old dependency graph was the fiction.
 Each has its own goal and its own test of done.
 
 Status lives in GitHub, never here. This file says what the work *is* and why; the issue
-says where it stands. See [`status.md`](../_bmad-output/implementation-artifacts/status.md).
+says where it stands. See [`status.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/status.md).
 
 ---
 
@@ -39,8 +46,8 @@ Rust's extended tier is the largest gap; Go's is client authentication, PAR, and
 (`#463`–`#474`) · FAPI 2.0 `#476` · RP certification `#242` · security gates `#633`, `#642`,
 `#643`.
 
-**Loops.** [`identity-model-go-rust-parity.md`](../_bmad-output/implementation-artifacts/ralph-prompts/identity-model-go-rust-parity.md)
-and [`pim-conformance-evidence.md`](../_bmad-output/implementation-artifacts/ralph-prompts/pim-conformance-evidence.md).
+**Loops.** [`identity-model-go-rust-parity.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/identity-model-go-rust-parity.md)
+and [`pim-conformance-evidence.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/pim-conformance-evidence.md).
 Both target this repo — **run them one at a time.**
 
 **Standing decision.** The hosted OIDF suite is the conformance standard; see
@@ -67,7 +74,7 @@ epics including `OrySyncAdapter` and provider-driven token validation.
 Ory Terraform state migration `#376` · TFC environments `#411` (`#413`–`#418`) ·
 configuration API `#406`, `#407` · the FastAPI rate-limit pin `#324`.
 
-**Loop.** [`ory-frontend-logout.md`](../_bmad-output/implementation-artifacts/ralph-prompts/ory-frontend-logout.md).
+**Loop.** [`ory-frontend-logout.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/ory-frontend-logout.md).
 
 **Dead here.** The VAULT epic `#398`–`#405` targets HCP Vault Secrets, which reached end of
 life 2026-07-01, and HCP Vault Dedicated, which costs ~$1,152/month against a free-only
@@ -108,7 +115,7 @@ mature category for identity × document; what is unoccupied is *acting on behal
 else* and *for a stated purpose*.
 
 **Landed 2026-09-15** (#108): six documents in `docs/governed-brain-*.md` plus four research
-passes under `planning-artifacts/research/`. Start at
+passes under `docs/research/`. Start at
 [`governed-brain-where-it-stands.md`](governed-brain-where-it-stands.md), which carries the
 four open decisions and a recommendation for each. No issues are filed, deliberately —
 nothing should be scheduled until those decisions are settled.

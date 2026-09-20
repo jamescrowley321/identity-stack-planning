@@ -1,3 +1,11 @@
+---
+title: "Consent-receipt and audit prior art vs. the governed-brain grant/receipt model"
+sidebar_label: "Consent receipts"
+description: "Consent-receipt and audit prior art measured against the governed-brain grant and receipt model."
+status: proposed
+last_verified: 2026-09-16
+---
+
 # Consent-receipt and audit prior art vs. the governed-brain grant/receipt model
 
 **Research date:** 2026-09-15 · **Reviewed against:** `docs/governed-brain-concepts.md`,

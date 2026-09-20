@@ -1,3 +1,10 @@
+---
+title: "Ralph Loop Process"
+description: "How a story becomes a merged pull request: the phase pipeline, task-state persistence, and worktree isolation."
+status: current
+last_verified: 2026-09-07
+---
+
 # Ralph Loop Process
 
 This document describes how autonomous task execution works in the auth workspace using Ralph Orchestrator, from story planning through merged PR.
@@ -220,7 +227,7 @@ git worktree list
 
 ### Available Prompts
 
-The prompt set is the source of truth — see [`_bmad-output/implementation-artifacts/ralph-prompts/`](../_bmad-output/implementation-artifacts/ralph-prompts/) (~28 prompts spanning all four code repos, plus `phases/` and `review-agents/`). The directory listing is authoritative; this list is not enumerated here because it drifts. Representative prompts by target:
+The prompt set is the source of truth — see [`_bmad-output/implementation-artifacts/ralph-prompts/`](https://github.com/jamescrowley321/identity-stack-planning/tree/main/_bmad-output/implementation-artifacts/ralph-prompts/) (~28 prompts spanning all four code repos, plus `phases/` and `review-agents/`). The directory listing is authoritative; this list is not enumerated here because it drifts. Representative prompts by target:
 
 - **General:** `run-next-task.md`, `fix-review-findings.md`, `repository-base-refactor.md`
 - **identity-stack:** `canonical-identity.md`, `api-gateway.md`, `design-system.md`, `epic3-fga-authz.md`
