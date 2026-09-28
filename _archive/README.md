@@ -204,6 +204,25 @@ Four of those were nearly retired in this pass and were pulled back after checki
 issues: `ory-frontend-logout.md` drives the open Ory work (`identity-stack#377`, `#378`),
 `token-harness.md` backs the open `identity-model#462` epic and its twelve stories,
 `pim-capacity-breakpoint.md` backs `#474`, and `pim-fapi2-hardening.md` backs `#476`. A loop
-prompt is only spent when the issues behind it are closed — age alone is not evidence. The live planning artifacts are the config-API set, the token harness, the
+prompt is only spent when the issues behind it are closed — age alone is not evidence. The live planning artifacts are the token harness, the
 2026-09-05 parity report, epics 16–24, the Ory and TFC work, and the domain knowledge in
 `docs/`.
+
+---
+
+## Retired 2026-09-27 — the config-API set
+
+| File | Why |
+|---|---|
+| `_bmad-output/planning-artifacts/product-brief-config-api.md` | Brief for the cross-language configuration API (identity-model#616) |
+| `_bmad-output/planning-artifacts/prd-config-api.md` | Its PRD. Listed "no removal of the env-var default path" as a non-goal — the opposite of the new direction |
+| `_bmad-output/planning-artifacts/architecture-config-api.md` | Source registry, precedence and legacy-resolution design |
+| `_bmad-output/planning-artifacts/epics-config-api.md` | Epics A–G; identity-model#616–#620 and #729 closed as not planned. The identity-stack legs (#406, #407) stay open and carry their own design |
+
+Replaced, not finished. The design kept the library reading the environment behind the
+caller's back and grew a registry, a legacy-resolution mode and a case-ID'd spec that no
+production code used. The replacement is a plain settings object passed in, with small
+loader helpers, and the library never reading the environment:
+[identity-model#751](https://github.com/jamescrowley321/identity-model/issues/751).
+`git show e63b83d:<path>` to read any of them back.
+

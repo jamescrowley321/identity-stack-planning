@@ -42,7 +42,7 @@ own warning that it is hand-maintained and has drifted, so this was read off the
 Rust's extended tier is the largest gap; Go's is client authentication, PAR, and FAPI.
 
 **Live work.** Parity `identity-model#573` (stories `#574`–`#579`) · test hardening `#614`
-(`#607`–`#613`) · configuration API `#616` (`#617`–`#620`) · token harness `#462`
+(`#607`–`#613`) · injected config `#751` · token harness `#462`
 (`#463`–`#474`) · FAPI 2.0 `#476` · RP certification `#242` · security gates `#633`, `#642`,
 `#643`.
 
@@ -72,7 +72,7 @@ epics including `OrySyncAdapter` and provider-driven token validation.
 
 **Live work.** Ory provider-agnostic frontend and logout `identity-stack#377`, `#378` ·
 Ory Terraform state migration `#376` · TFC environments `#411` (`#413`–`#418`) ·
-configuration API `#406`, `#407` · the FastAPI rate-limit pin `#324`.
+app config `#406`, `#407` · the FastAPI rate-limit pin `#324`.
 
 **Loop.** [`ory-frontend-logout.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/ory-frontend-logout.md).
 
