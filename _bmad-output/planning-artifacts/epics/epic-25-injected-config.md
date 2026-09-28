@@ -13,9 +13,9 @@ inputDocuments:
 
 ## Overview
 
-Settings are passed in; the library never reads the process environment itself. Callers build settings however they like — small helpers cover environment variables and any dict of strings (a parsed `.env` file, YAML, a secrets manager). Replaces the Configuration API epic (identity-model#616); see `sprint-change-proposal-2026-09-27.md` for why.
+Settings are passed in; the library never reads the process environment or any other source. The dependency is fully inverted: the library defines a typed `Config` and consumes it, and nothing more. Where values come from — environment variables, a `.env` file, YAML, a secrets manager — is entirely the caller's code. The library ships no loaders. Replaces the Configuration API epic (identity-model#616); see `sprint-change-proposal-2026-09-27.md` for why.
 
-**Goal / Definition of Done:** no library code in Python, Go or Rust reads the process environment; every setting is reachable through an injected `Config` (or the language's existing options); a gate fails if an environment read comes back.
+**Goal / Definition of Done:** no library code in Python, Go or Rust reads the process environment or ships a config loader; every setting is reachable through an injected `Config` (or the language's existing options); a gate fails if an environment read comes back.
 
 ### GitHub tracking
 
@@ -43,25 +43,22 @@ The Python stories are stacked in order: 25.1 → 25.2 → 25.3, with 25.4 and 2
 ## Story 25.1: Plain Python `Config`
 
 **As a** library caller,
-**I want** a plain, frozen `Config` with defaults and two small loaders,
-**So that** I decide where settings come from.
+**I want** a plain, frozen, typed `Config` with defaults,
+**So that** I build it from wherever my settings live and hand it to the library.
 
 ### Acceptance Criteria
 
 **Given** `Config()`,
-**Then** every setting has today's default, and no environment access happens.
+**Then** every setting has today's default.
 
-**Given** an invalid value (e.g. a negative retry count, a non-positive timeout),
-**When** a `Config` is created,
-**Then** it raises one error naming every invalid setting.
+**Given** `Config(http_timeout=..., ...)` with typed values,
+**Then** they are validated on creation; an invalid value (e.g. a negative retry count, a non-positive timeout) raises one error naming every invalid setting.
 
-**Given** `Config.from_mapping({...})` with string values,
-**Then** values are parsed and validated the same way; unknown keys are ignored.
-
-**Given** `Config.from_env(prefix=...)`,
-**Then** it is exactly `from_mapping` over `os.environ`. It is the only place in the library allowed to touch `os.environ`.
+**And** `Config` has no loaders: no `from_env`, no `from_mapping`, no string parsing. Turning strings into typed values is the caller's job.
 
 **And** the registry, `ConfigSource`, `EnvSource`, `MappingSource` and legacy-resolution code in `core/config.py` are deleted. `Secret` is kept if the client secret still needs redaction.
+
+**And** the docs show a short example of a caller building a `Config` from environment variables in their own code.
 
 ---
 
@@ -80,14 +77,14 @@ The Python stories are stacked in order: 25.1 → 25.2 → 25.3, with 25.4 and 2
 
 **And** a negative retry count can no longer reach the retry loop (closes identity-model#728).
 
-**And** the release is a major version, and the changelog says that environment variables only take effect via `Config.from_env()`.
+**And** the release is a major version, and the changelog says the library no longer reads any environment variables; callers build and pass a `Config`.
 
 ---
 
-## Story 25.3: FastAPI package uses the same helpers
+## Story 25.3: FastAPI package takes settings, never reads the environment
 
-**Given** `OIDCSettings.from_env(prefix)`,
-**Then** it builds through the library's loaders and is the only environment read in the package. `build_oidc_router(settings, ...)` and `TokenValidationMiddleware` pass the settings through to the library.
+**Given** `fastapi-identity-model`,
+**Then** `OIDCSettings.from_env` is removed; the app constructs `OIDCSettings` (and the library `Config`) itself. `build_oidc_router(settings, ...)` and `TokenValidationMiddleware` pass them through to the library.
 
 ---
 
@@ -106,7 +103,7 @@ The Python stories are stacked in order: 25.1 → 25.2 → 25.3, with 25.4 and 2
 **When** a client operation runs with an injected `Config`,
 **Then** it passes. Reverting any one wiring change from 25.2 makes it fail.
 
-**And** ruff's banned-API rule (`TID251`) forbids `os.getenv` / `os.environ` in library code outside `Config.from_env`.
+**And** ruff's banned-API rule (`TID251`) forbids `os.getenv` / `os.environ` in all library and package code, with no exemptions.
 
 ---
 

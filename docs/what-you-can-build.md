@@ -157,8 +157,8 @@ The [program map](roadmap.md) links each to its tracking issue.
   implemented and not yet certified; the hosted OIDF suite is the standing conformance
   standard. See [OIDC certification analysis](oidc-certification-analysis.md).
 - **Injected configuration.** Callers pass a plain settings object in; the library never
-  reads the environment itself, and small helpers build settings from environment
-  variables, a `.env` file or any mapping. Tracked in
+  reads the environment or ships loaders. Where settings come from is the caller's
+  code. Tracked in
   [identity-model#751](https://github.com/jamescrowley321/identity-model/issues/751).
 - **Test hardening**, because a capability that is only claimed is not a capability. See
   [the review process](review-process.md) and the mechanical gates behind it.
