@@ -13,9 +13,9 @@ inputDocuments:
 
 ## Overview
 
-Settings are passed in; the library never reads the process environment or any other source. The dependency is fully inverted: the library defines a typed `Config` and consumes it, and nothing more. Where values come from — environment variables, a `.env` file, YAML, a secrets manager — is entirely the caller's code. The library ships no loaders. Replaces the Configuration API epic (identity-model#616); see `sprint-change-proposal-2026-09-27.md` for why.
+Settings are passed in; the library never reads the process environment or any other source. The dependency is fully inverted: the library defines a typed `Config` and consumes it. Where values come from is the caller's decision. The library offers optional standalone helpers (`config_from_env`, `config_from_mapping`) in a separate module. A caller can use them or write their own, and either way passes the resulting `Config` in explicitly. The library never calls a helper itself. Replaces the Configuration API epic (identity-model#616); see `sprint-change-proposal-2026-09-27.md` for why.
 
-**Goal / Definition of Done:** no library code in Python, Go or Rust reads the process environment or ships a config loader; every setting is reachable through an injected `Config` (or the language's existing options); a gate fails if an environment read comes back.
+**Goal / Definition of Done:** no library code in Python, Go or Rust reads the process environment, except the optional helpers, which only run when a caller calls them; every setting is reachable through an injected `Config` (or the language's existing options); a gate fails if an environment read comes back.
 
 ### GitHub tracking
 
@@ -36,7 +36,7 @@ Defaults stay as they are today.
 
 ## Priority ordering
 
-The Python stories are stacked in order: 25.1 → 25.2 → 25.3, with 25.4 and 25.5 alongside 25.2. Go (25.6) and Rust (25.7) are independent and can go at any time.
+The Python stories are stacked in order: 25.1 → 25.1b → 25.2 → 25.3, with 25.4 and 25.5 alongside 25.2. Go (25.6) and Rust (25.7) are independent and can go at any time.
 
 ---
 
@@ -54,11 +54,30 @@ The Python stories are stacked in order: 25.1 → 25.2 → 25.3, with 25.4 and 2
 **Given** `Config(http_timeout=..., ...)` with typed values,
 **Then** they are validated on creation; an invalid value (e.g. a negative retry count, a non-positive timeout) raises one error naming every invalid setting.
 
-**And** `Config` has no loaders: no `from_env`, no `from_mapping`, no string parsing. Turning strings into typed values is the caller's job.
+**And** `Config` itself has no loaders: no `Config.from_env` classmethod and no string parsing on the type.
 
 **And** the registry, `ConfigSource`, `EnvSource`, `MappingSource` and legacy-resolution code in `core/config.py` are deleted. `Secret` is kept if the client secret still needs redaction.
 
-**And** the docs show a short example of a caller building a `Config` from environment variables in their own code.
+**And** the docs show a caller building a `Config` in their own code, and the same thing done with a helper.
+
+---
+
+## Story 25.1b: Optional config helpers
+
+**As a** library caller,
+**I want** ready-made helpers for common sources,
+**So that** I don't have to write a loader for the usual cases, and I can still write my own.
+
+### Acceptance Criteria
+
+**Given** a separate module (e.g. `py_identity_model.config_helpers`),
+**Then** it provides `config_from_mapping(values: Mapping[str, str]) -> Config` and `config_from_env(prefix: str = "") -> Config`. The second is `config_from_mapping(os.environ)`, with today's variable names.
+
+**Given** a `.env` file,
+**Then** the docs show loading it with `python-dotenv`'s `dotenv_values()` and passing the result to `config_from_mapping`. There is no bundled `.env` parser.
+
+**And** the helpers return a `Config` and nothing else. The library never imports or calls this module, so a caller who doesn't call a helper gets no environment access.
+
 
 ---
 
@@ -84,7 +103,7 @@ The Python stories are stacked in order: 25.1 → 25.2 → 25.3, with 25.4 and 2
 ## Story 25.3: FastAPI package takes settings, never reads the environment
 
 **Given** `fastapi-identity-model`,
-**Then** `OIDCSettings.from_env` is removed; the app constructs `OIDCSettings` (and the library `Config`) itself. `build_oidc_router(settings, ...)` and `TokenValidationMiddleware` pass them through to the library.
+**Then** `OIDCSettings.from_env` moves to a standalone helper (`oidc_settings_from_env(prefix)`) that the app calls if it wants to; otherwise the app constructs `OIDCSettings` (and the library `Config`) itself. `build_oidc_router(settings, ...)` and `TokenValidationMiddleware` pass them through to the library.
 
 ---
 
@@ -103,7 +122,9 @@ The Python stories are stacked in order: 25.1 → 25.2 → 25.3, with 25.4 and 2
 **When** a client operation runs with an injected `Config`,
 **Then** it passes. Reverting any one wiring change from 25.2 makes it fail.
 
-**And** ruff's banned-API rule (`TID251`) forbids `os.getenv` / `os.environ` in all library and package code, with no exemptions.
+**And** ruff's banned-API rule (`TID251`) forbids `os.getenv` / `os.environ` in all library and package code except the helper modules.
+
+**And** a check fails if any library module other than the helpers' own tests imports a helper module, so the library can never call one on its own.
 
 ---
 
