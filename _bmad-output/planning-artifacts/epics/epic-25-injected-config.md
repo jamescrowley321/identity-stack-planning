@@ -19,7 +19,7 @@ Settings are passed in; the library never reads the process environment or any o
 
 ### GitHub tracking
 
-Epic issue **identity-model#751**. Story issues are sub-issues of #751.
+Epic issue **identity-model#751**. Stories: 25.1 → #752, 25.1b → #759, 25.2 → #753, 25.3 → #754, 25.4 → #755, 25.5 → #756, 25.6 → #757, 25.7 → #758.
 
 ### Settings
 
