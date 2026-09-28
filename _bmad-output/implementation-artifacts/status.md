@@ -29,7 +29,7 @@ stale only when a new epic is written, never merely because work progressed.
 | `planning-artifacts/epics/epic-20-pim-parity.md` | [#573](https://github.com/jamescrowley321/identity-model/issues/573) epic; stories #574–#579 |
 | `planning-artifacts/epics/epic-23-test-hardening.md` | [#614](https://github.com/jamescrowley321/identity-model/issues/614) epic; stories #607–#613 |
 | `planning-artifacts/epics-token-harness.md` | [#462](https://github.com/jamescrowley321/identity-model/issues/462) epic; stories #463–#474 |
-| — (no planning artifact; the design lives in the issue) | [#751](https://github.com/jamescrowley321/identity-model/issues/751) injected config |
+| `planning-artifacts/epics/epic-25-injected-config.md` | [#751](https://github.com/jamescrowley321/identity-model/issues/751) epic; stories #752–#758 |
 | `planning-artifacts/epics/epic-19-mechanical-security-gates.md` | #511, #633, #642, #643 |
 | `planning-artifacts/identity-model-parity-report-2026-09-05.md` | [#639](https://github.com/jamescrowley321/identity-model/issues/639) audit |
 | `docs/oidc-certification-analysis.md` | [#242](https://github.com/jamescrowley321/identity-model/issues/242) certification; [#476](https://github.com/jamescrowley321/identity-model/issues/476) FAPI 2.0 |
@@ -42,7 +42,7 @@ stale only when a new epic is written, never merely because work progressed.
 |---|---|
 | `planning-artifacts/epics-ory-sso-provider.md` | #376, #377, #378 |
 | `planning-artifacts/epics-tfc-environments.md` | [#411](https://github.com/jamescrowley321/identity-stack/issues/411) epic; stories #413–#418 |
-| — (no planning artifact; the design lives in the issues) | #406, #407 |
+| — (app side of `epic-25-injected-config.md`; design lives in the issues) | #406, #407 |
 | `docs/ory-sso-provider-context.md`, `docs/ory-iac-automation-plan.md` | #376–#378 |
 | `ralph-prompts/ory-frontend-logout.md` | #377, #378 |
 
