@@ -50,7 +50,7 @@ The previous fix, the Configuration API epic (#616), made this bigger rather tha
 
 ### Technical impact
 
-This is a breaking change and needs a major version. Setting `HTTP_TIMEOUT` and the other variables no longer does anything unless the caller builds its settings with `Config.from_env()`. The owner judges that nobody depends on the implicit reads.
+This is a breaking change and needs a major version. Setting `HTTP_TIMEOUT` and the other variables no longer does anything; callers build a `Config` and pass it in. The owner judges that nobody depends on the implicit reads.
 
 ## 3. Recommended Approach
 
@@ -59,7 +59,7 @@ This is a breaking change and needs a major version. Setting `HTTP_TIMEOUT` and 
 The design:
 1. **Settings are passed in.** A plain, frozen `Config` with defaults. Clients and entry points take `config=`. No `config` means defaults, not the environment.
 2. **The library never reads `os.environ`.** Validation happens once, when a `Config` is created.
-3. **Loading is the caller's job, with small helpers.** `Config.from_mapping(values)` accepts any dict of strings, so it covers `.env` files, YAML, a secrets manager and so on. `Config.from_env(prefix=...)` is `from_mapping(os.environ)`.
+3. **Loading is entirely the caller's job.** The dependency is fully inverted: the library ships no loaders (no `from_env`, no `from_mapping`). Callers read environment variables, `.env` files, YAML or a secrets manager in their own code and construct a typed `Config`. The docs show a short example.
 4. **The spec is one plain page:** the settings, their types and defaults, and a statement that the library does not read the environment. No case IDs.
 
 **Effort:** small to medium. Python is most of it; Go and Rust each have a single env read.
