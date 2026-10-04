@@ -13,6 +13,8 @@ dependencies:
 
 # Epic COG: AWS Cognito as a live identity-model test provider
 
+**GitHub tracking:** identity-model [#843](https://github.com/jamescrowley321/identity-model/issues/843) (epic) with stories #844–#850 (COG-1 … COG-7).
+
 ## Why
 
 The main user of identity-model runs on AWS Cognito, and no CI job runs against it. Cognito
