@@ -17,7 +17,7 @@ inputDocuments:
 
 # Epic CIT: OIDC Spec-Citation Correctness
 
-Tracking issue: see `implementation-artifacts/status.md`.
+Tracking issue: [identity-model#852](https://github.com/jamescrowley321/identity-model/issues/852) (stories #853–#861; absorbs #771, #773, #774).
 
 ## Evidence
 
@@ -67,15 +67,15 @@ Already filed, and absorbed by this epic: #774 (py `application/jwt` UserInfo sk
 
 | ID | Title | Size | Depends on |
 |---|---|---|---|
-| CIT-1 | `docs: correct OIDC spec citations across py, go, rust, spec, docs and conformance` | M | — |
-| CIT-2 | `fix(logout): require exp in Back-Channel Logout Tokens` | S | — |
-| CIT-3 | `fix(fapi): treat missing REQUIRED discovery metadata as a violation` | S | — |
-| CIT-4 | `fix(rust): drop azp enforcement from base JWT validation` | S | — |
-| CIT-5 | `fix(token-validation): reject untrusted additional audiences (Core §3.1.3.7 step 3)` | M | — |
-| CIT-6 | `fix(id-token): make azp rules opt-in per Core errata 2 §3.1.3.7 steps 4-5` | M | CIT-4, CIT-5, D1 |
-| CIT-7 | `fix(id-token): require at_hash/c_hash only for values issued with the ID Token` | M | CIT-1, D3 |
-| CIT-8 | `fix(go,rust): select the key for a kid-less JWT the same way as Python` | M | — |
-| CIT-9 | `ci(tools): gate OIDC section/step citations against a vendored spec index` | S | CIT-1 |
+| CIT-1 (#853) | `docs: correct OIDC spec citations across py, go, rust, spec, docs and conformance` | M | — |
+| CIT-2 (#854) | `fix(logout): require exp in Back-Channel Logout Tokens` | S | — |
+| CIT-3 (#855) | `fix(fapi): treat missing REQUIRED discovery metadata as a violation` | S | — |
+| CIT-4 (#856) | `fix(rust): drop azp enforcement from base JWT validation` | S | — |
+| CIT-5 (#857) | `fix(token-validation): reject untrusted additional audiences (Core §3.1.3.7 step 3)` | M | — |
+| CIT-6 (#858) | `fix(id-token): make azp rules opt-in per Core errata 2 §3.1.3.7 steps 4-5` | M | CIT-4, CIT-5, D1 |
+| CIT-7 (#859) | `fix(id-token): require at_hash/c_hash only for values issued with the ID Token` | M | CIT-1, D3 |
+| CIT-8 (#860) | `fix(go,rust): select the key for a kid-less JWT the same way as Python` | M | — |
+| CIT-9 (#861) | `ci(tools): gate OIDC section/step citations against a vendored spec index` | S | CIT-1 |
 | #774, #773 | existing UserInfo fixes | S | — |
 | #771 | existing Discovery §3 required fields, extended for `require_key_set` + empty arrays | M | #821, D2 |
 
