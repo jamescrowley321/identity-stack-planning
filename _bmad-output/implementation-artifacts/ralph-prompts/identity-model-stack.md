@@ -130,7 +130,10 @@ Integration red is a hard block; never rationalize a failure. Known flakes, one 
 `node-oidc_*.json` there, then rerun). Local mutation gate: `rm -rf py/mutants/` after adding
 tests, or survivors look unchanged.
 
-Every PR, whatever its base, runs the full CI suite: build/ci, conformance, CodeQL, OSV.
+Every PR, whatever its base, runs the full CI suite: Build, Conformance, CodeQL and OSV-Scanner.
+This needs identity-model `ci/pr-workflows-any-base` merged to `main`. Before that, those
+three workflows run only on PRs into `main`. Stacker refuses to start until it has merged, and
+Shipper checks that all four workflows ran on each PR.
 
 ## PR body template
 

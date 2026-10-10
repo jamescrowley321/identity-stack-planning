@@ -28,7 +28,10 @@ hats:
       and `.ralph/stack-ledger.md` (create it from the template in PROMPT.md if missing).
 
       On every activation, in this order:
-      1. `git fetch origin --prune`.
+      1. `git fetch origin --prune`. On `build.start` only: if
+         `git show origin/main:.github/workflows/conformance.yml` still has `branches: [main]`
+         under `pull_request`, stacked PRs would skip conformance, CodeQL and OSV. Publish
+         `LOOP_COMPLETE` with "blocked: merge identity-model ci/pr-workflows-any-base first".
       2. **On `build.blocked`:** mark the payload's story `blocked` in the ledger with the
          reason, comment the reason on its issue, and continue. Later stories still stack on
          the last *shipped* branch, never on a blocked one.
@@ -122,7 +125,10 @@ hats:
       4. `gh pr checks <pr> --watch --fail-fast`. Red → publish `ci.failed` with the
          failing job and the `gh run view --log-failed` excerpt. A known flake listed in
          PROMPT.md gets one rerun (`gh run rerun --failed`) before it counts as red.
-      5. Green → ledger row `shipped` with the PR link, comment the PR link on the issue,
+      5. Before calling it green, confirm the PR has runs from all four workflows: Build,
+         Conformance, CodeQL, OSV-Scanner (`gh pr checks <pr> --json workflow`). A missing
+         one is not green: wait one more watch cycle, then publish `ci.failed` naming it.
+      6. Green → ledger row `shipped` with the PR link, comment the PR link on the issue,
          and publish `queue.advance`.
       Never run `gh pr merge`, `--auto`, `--admin` or a merge queue, and never change branch
       protection. Green and waiting on the owner is the finished state.
