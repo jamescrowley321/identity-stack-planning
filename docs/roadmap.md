@@ -42,9 +42,9 @@ own warning that it is hand-maintained and has drifted, so this was read off the
 Rust's extended tier is the largest gap; Go's is client authentication, PAR, and FAPI.
 
 **Live work.** Parity `identity-model#573` (stories `#574`–`#579`) · test hardening `#614`
-(`#607`–`#613`) · injected config `#751` · token harness `#462`
-(`#463`–`#474`) · spec HTTP vector runners `#801` (`#802`–`#813`) · FAPI 2.0 `#476` · RP certification `#242` · security gates `#633`, `#642`,
-`#643`.
+(`#607`–`#613`) · injected config `#751` · token harness `#462` · OIDC spec-citation
+correctness `#852` (`#853`–`#861`) · Cognito live provider `#843` (`#844`–`#850`) · FAPI 2.0
+`#476` · RP certification `#242` · security gates `#633`, `#642`, `#643`.
 
 **Loops.** [`identity-model-go-rust-parity.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/identity-model-go-rust-parity.md)
 and [`pim-conformance-evidence.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/pim-conformance-evidence.md).
