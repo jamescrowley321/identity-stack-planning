@@ -29,10 +29,11 @@ hats:
 
       On every activation, in this order:
       1. `git fetch origin --prune`.
-      2. **Restack.** Follow PROMPT.md "Stacking → Restack" for every ledger row whose
-         parent PR has merged. Retarget the child PR's base BEFORE anything deletes the
-         parent branch, then `git rebase --onto`, then `git push --force-with-lease`.
-         Only ever force-push branches this loop created (ledger rows).
+      2. **Restack.** Follow PROMPT.md "Stacking → Restack", walking open ledger rows
+         bottom-up: a row restacks when its parent merged OR its parent's tip moved. A merge
+         at the bottom must ripple through every descendant. Retarget a child's base BEFORE
+         anything deletes a merged parent, then `git rebase --onto`, then
+         `git push --force-with-lease`. Only force-push ledger branches.
       3. **On `build.blocked`:** mark the payload's story `blocked` in the ledger with the
          reason, comment the reason on its issue, and continue to step 4. Later stories
          still stack on the last *shipped* branch, never on a blocked one.

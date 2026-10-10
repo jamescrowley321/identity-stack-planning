@@ -86,14 +86,21 @@ You may `gh workflow run conformance-hosted.yml --ref <branch> -f publish=none` 
 ## Stacking
 
 - **Cap: 8** shipped-but-unmerged PRs. At the cap, Stacker pauses the loop (`LOOP_COMPLETE`
-  with "paused: stack full" in the ledger). The owner merges from the bottom and relaunches.
+  with "paused: stack full" in the ledger). The owner merges from the bottom and relaunches
+  with the same `run.sh` command, which reuses the existing worktree and ledger.
 - **Parent** = branch of the newest shipped row whose PR is still open, else `release/v5`.
-- **Restack** (Stacker, every activation). For each open ledger PR whose parent PR has merged:
-  1. `gh pr edit <child> --base <parent's base>`, done first so deleting the parent branch can't close the child.
-  2. `git rebase --onto origin/<parent's base> <old parent tip SHA from ledger> <child branch>`.
+- **Restack** (Stacker, every activation). Walk the open ledger rows bottom-up (oldest first).
+  A row needs restacking when its parent PR has merged, or when its parent was rewritten in this
+  pass (the parent's current tip ≠ the `parent tip` recorded on the row). For each such row:
+  1. If the parent merged: `gh pr edit <child> --base <parent's base>` first, so deleting the
+     parent branch can't close the child. The new parent is the parent's base.
+  2. `git rebase --onto origin/<new parent> <recorded parent tip> <child branch>`.
   3. Re-run the touched language's unit tests, then `git push --force-with-lease`.
-  4. Update the ledger (parent, parent tip SHA). Delete the merged parent branch on origin if
-     it still exists and is a ledger branch.
+  4. Update the row's `parent`, `parent tip` (the new parent's current tip) and `tip`. Moving
+     upward, the next row now sees its parent rewritten and restacks too, so a merge at the
+     bottom ripples through every descendant.
+  5. Delete a merged parent branch on origin only after its children are retargeted, and only
+     if it is a ledger branch.
   A conflict you can't resolve cleanly: `build.blocked` for that story, with the conflict.
 - Record each branch's tip SHA in the ledger whenever Shipper pushes; restack needs it.
 
@@ -138,6 +145,8 @@ gates stand in for them.
 
 ## PR body template
 
+Follow the repo's `.github/pull_request_template.md`:
+
 ```
 ## Summary
 - <what changed and why, with spec section>
@@ -148,14 +157,21 @@ Stacked on #<parent PR>    (omit when base = release/v5)
 ## Breaking change         (only for `!` stories)
 <what callers must change>
 
-## Test plan
-- [x] make lint
-- [x] <integration targets run>
-- [x] blind-peer-review lenses (comments below)
-- [ ] CI
+## AI provenance
+- [x] This PR was AI-assisted
+- Harness/agent: Claude Code, ralph-orchestrator loop `identity-model-stack` (hats: Stacker, Builder, Critic, Shipper)
+- Model(s): Claude Opus 5.5 (claude-opus-5-5); blind-peer-review lenses as run (see comments)
+- [ ] A human has reviewed this change and is accountable for it   ← leave unchecked; the owner (James Crowley) checks it at review
+
+## Checklist
+- [ ] CI is green
+- [x] Tests added/updated where appropriate (make lint, <integration targets run>)
+- [x] Docs updated if behavior changed
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
+
+Never check the human-accountability box yourself.
 
 ## Ledger template (`.ralph/stack-ledger.md`)
 

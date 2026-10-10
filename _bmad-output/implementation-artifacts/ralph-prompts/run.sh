@@ -5,7 +5,7 @@
 #          run.sh identity-model-stack identity-model release/v5
 # Creates a dedicated /tmp/<loop>-ralph worktree off origin/<base>, drops the
 # prompt in as PROMPT.md, and runs ralph. If hats/<loop>.yml exists it is loaded
-# as the hat collection. One loop per repo at a time.
+# as the hat collection. Relaunching reuses an existing worktree. One loop per repo at a time.
 set -euo pipefail
 loop="${1:?usage: run.sh <loop-name> [repo] [base]}"
 repo="${2:-py-identity-model}"
@@ -17,7 +17,12 @@ hats="${here}/hats/${loop}.yml"
 wt="/tmp/${loop}-ralph"
 cd ~/repos/auth/"$repo"
 git fetch origin
-git worktree add "$wt" -b "ralph/${loop}" "origin/${base}"
+if [[ -d "$wt" ]]; then
+  # Relaunch: keep the worktree and its .ralph/ state (e.g. a stack ledger).
+  echo "reusing existing worktree $wt"
+else
+  git worktree add "$wt" -b "ralph/${loop}" "origin/${base}"
+fi
 cp "$prompt" "$wt/PROMPT.md"
 cd "$wt"
 if [[ -f "$hats" ]]; then
