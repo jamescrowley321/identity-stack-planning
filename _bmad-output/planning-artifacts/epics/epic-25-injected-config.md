@@ -49,6 +49,16 @@ An invalid value is rejected when the `Config` (or the Go options / Rust builder
 - **JWKS:** `max-age` sets the lifetime, with the same clamp. `no-store` and `no-cache` are deliberately ignored, because honouring them on key sets turns every validation into a fetch (identity-model#396). With no header, `jwks_cache_ttl` applies.
 - **Cache size:** the JWKS cache and the discovery cache are each LRU, and each holds at most `cache_max_entries` providers. One setting, two caches, the same limit, as Python does today. A value below 1 is invalid in Python today, where it logs a warning and falls back to 64. Under this epic it is rejected when the `Config` is built. Go and Rust drop their separate `DISCO_CACHE_MAX_ENTRIES` / `JWKS_CACHE_MAX_ENTRIES` values and the "0 = unbounded" rule.
 
+### Cache ownership
+
+A cache belongs to the client that holds the `Config`, so every cache has exactly one set of settings.
+
+- **Python:** `HTTPClient` and `AsyncHTTPClient` take `config=` and own the discovery cache, the JWKS cache and the kid-miss cooldown state. These replace the module-level caches in `sync/token_validation.py` and `aio/token_validation.py`. Entry points (discovery, JWKS, token validation and the rest) take `http_client=`, not `config=`. Called without one, they use a library default client built from `Config()`, so caching works with no setup, and that shared cache has one limit.
+- **Go:** `discovery` and `jwks` each get a client type that holds its options and owns its cache. These replace `globalCache` and the per-call limit. The package-level functions use a default client built from the defaults.
+- **Rust:** already works this way. `DiscoveryClient` and `JwksClient` own their caches.
+
+Two clients don't share cached documents. Each fetches a provider's documents once.
+
 ## Priority ordering
 
 The Python stories are stacked in order: 25.1 → 25.1b → 25.2 → 25.3, with 25.4 and 25.5 alongside 25.2. Go (25.6) and Rust (25.7) follow the settings table on the 25.4 page and can start once it lands.
@@ -105,7 +115,9 @@ The Python stories are stacked in order: 25.1 → 25.1b → 25.2 → 25.3, with 
 ### Acceptance Criteria
 
 **Given** a client or entry point (sync and async HTTP clients, managed clients, discovery, JWKS, token validation),
-**Then** it accepts `config: Config | None`. `None` means `Config()` defaults, not the environment.
+**Then** it accepts `http_client=`, and `HTTPClient` / `AsyncHTTPClient` accept `config: Config | None`. With no client, the library default client is used. `None` means `Config()` defaults, not the environment.
+
+**And** the discovery cache, JWKS cache and kid-miss cooldown state live on the client, as described in Cache ownership. The module-level caches are deleted.
 
 **And** `get_retry_config`, `get_timeout`, `get_max_jwks_size`, `get_max_jwks_keys` (`core/http_utils.py`), the env TTL/entry readers (`core/jwks_cache.py`) and `get_ssl_verify` (`ssl_config.py`) are removed or take a `Config`.
 
@@ -148,6 +160,8 @@ The Python stories are stacked in order: 25.1 → 25.1b → 25.2 → 25.3, with 
 **Given** the settings table and cache rules above,
 **Then** `go/pkg` has the same settings with the same defaults, ranges and cache rules, set only through options. Durations use `time.Duration`.
 
+**And** `discovery` and `jwks` each have a client type that owns its cache, as described in Cache ownership. `globalCache` and the per-call max-entries are removed.
+
 **And** discovery and JWKS honour `Cache-Control` as described above, replacing today's fixed 24 h TTL.
 
 **And** the settings Go lacks today are added: HTTP retries with backoff, a CA bundle option, a configurable JWKS size limit (today a fixed 1 MiB) and the JWKS key-count limit.
@@ -163,7 +177,7 @@ The Python stories are stacked in order: 25.1 → 25.1b → 25.2 → 25.3, with 
 ## Story 25.7: Rust matches Python's settings
 
 **Given** the settings table and cache rules above,
-**Then** `rust/src` has the same settings with the same defaults, ranges and cache rules, set only through the client builders. Durations use `std::time::Duration`.
+**Then** `rust/src` has the same settings with the same defaults, ranges and cache rules, set only through the client builders. Durations use `std::time::Duration`. Caches stay owned by `DiscoveryClient` / `JwksClient`.
 
 **And** discovery and JWKS honour `Cache-Control` as described above, replacing today's fixed 24 h TTL.
 
