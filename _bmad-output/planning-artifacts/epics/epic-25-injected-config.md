@@ -15,7 +15,9 @@ inputDocuments:
 
 Settings are passed in; the library never reads the process environment or any other source. The dependency is fully inverted: the library defines a typed `Config` and consumes it. Where values come from is the caller's decision. The library offers optional standalone helpers (`config_from_env`, `config_from_mapping`) in a separate module. A caller can use them or write their own, and either way passes the resulting `Config` in explicitly. The library never calls a helper itself. Replaces the Configuration API epic (identity-model#616); see `sprint-change-proposal-2026-09-27.md` for why.
 
-**Goal / Definition of Done:** no library code in Python, Go or Rust reads the process environment, except the optional helpers, which only run when a caller calls them; every setting is reachable through an injected `Config` (or the language's existing options); a gate fails if an environment read comes back.
+**Goal / Definition of Done:** no library code in Python, Go or Rust reads the process environment, except the optional helpers, which only run when a caller calls them. Every setting is reachable through an injected `Config` (or the language's existing options). Python is the canonical reference: Go and Rust have the same settings, defaults, ranges, validation and cache rules as Python. A gate in each language fails if an environment read comes back.
+
+**Amendment 2026-10-10:** the epic now also makes the three languages' configuration identical, with Python as the reference. Go and Rust are pre-release, so they change to match without a deprecation path. The Python stories ship in py-identity-model 5.0.0 on the `release/v5` branch, together with identity-model#842 (discovery issuer match).
 
 ### GitHub tracking
 
@@ -23,20 +25,34 @@ Epic issue **identity-model#751**. Stories: 25.1 → #752, 25.1b → #759, 25.2 
 
 ### Settings
 
-The settings are the ones the library reads from the environment today:
+Python's current behaviour defines every value below. Go and Rust change to match it.
 
-| Group | Settings |
-|---|---|
-| HTTP | `http_timeout`, `http_retry_max_attempts`, `http_retry_base_delay`, SSL verify / CA bundle path |
-| JWKS | `jwks_max_size`, `jwks_max_keys`, `jwks_cache_ttl`, `jwks_kid_miss_cooldown`, `jwks_cache_max_entries` |
-| Discovery | `discovery_cache_ttl`, `discovery_cache_max_entries` |
-| Client (FastAPI package) | discovery URL, client ID, client secret, scope, audience, redirect URIs, excluded paths |
+| Setting | Default | Valid range / rule |
+|---|---|---|
+| `http_timeout` | 30 s | > 0 |
+| `http_retry_max_attempts` | 3 | ≥ 0 |
+| `http_retry_base_delay` | 1 s, exponential backoff, each retry capped at 120 s | ≥ 0 |
+| TLS verify / CA bundle path | verification on, with the HTTP stack's default CA bundle (httpx: certifi) | readable file |
+| `jwks_max_size` | 524288 bytes (512 KiB) | ≥ 1 |
+| `jwks_max_keys` | 100 | ≥ 1 |
+| `jwks_cache_ttl` | 24 h, used only when the response has no `Cache-Control: max-age` | 60 s – 24 h |
+| `jwks_kid_miss_cooldown` | 5 s | 0 – 3600 s; 0 disables the cooldown |
+| `jwks_cache_max_entries` | 64 | ≥ 1 |
+| `discovery_cache_ttl` | 1 h, used only when the response has no `Cache-Control: max-age` | 60 s – 24 h |
+| `discovery_cache_max_entries` | 64 | ≥ 1 |
+| Client (FastAPI package) | discovery URL, client ID, client secret, scope (`openid profile email`), audience (defaults to the client ID), redirect URIs, excluded paths | — |
 
-Defaults stay as they are today.
+An invalid value is rejected when the `Config` (or the Go options / Rust builder) is built. A value is never silently replaced by its default.
+
+**Cache rules (Python's `core/jwks_cache.py`):**
+
+- **Discovery:** the response's `Cache-Control: max-age` sets the lifetime, clamped to 60 s – 24 h. `no-store` or `no-cache` means the document is not cached. With no header, `discovery_cache_ttl` applies.
+- **JWKS:** `max-age` sets the lifetime, with the same clamp. `no-store` and `no-cache` are deliberately ignored, because honouring them on key sets turns every validation into a fetch (identity-model#396). With no header, `jwks_cache_ttl` applies.
+- **Cache size:** each cache is LRU, capped by its max-entries setting. Python today shares one cap between both caches and treats a value below 1 as the default. Story 25.1 splits it into the two settings above and rejects values below 1.
 
 ## Priority ordering
 
-The Python stories are stacked in order: 25.1 → 25.1b → 25.2 → 25.3, with 25.4 and 25.5 alongside 25.2. Go (25.6) and Rust (25.7) are independent and can go at any time.
+The Python stories are stacked in order: 25.1 → 25.1b → 25.2 → 25.3, with 25.4 and 25.5 alongside 25.2. Go (25.6) and Rust (25.7) follow the settings table on the 25.4 page and can start once it lands.
 
 ---
 
@@ -110,7 +126,7 @@ The Python stories are stacked in order: 25.1 → 25.1b → 25.2 → 25.3, with 
 ## Story 25.4: One plain spec page
 
 **Given** `spec/config.md`, `spec/vectors/config.json` and `spec/test-fixtures/config/`,
-**Then** they are replaced by one short page that lists the settings, their types and defaults, and states that the library does not read the environment. No case IDs.
+**Then** they are replaced by one short page: the settings table and cache rules from this epic, each setting's name in Python, Go and Rust, and a statement that the library does not read the environment. No case IDs. Go and Rust match the page; Python defines it.
 
 **And** `docs/api/config.md` and the Configuration row in `spec/capabilities.md` match it.
 
@@ -128,14 +144,34 @@ The Python stories are stacked in order: 25.1 → 25.1b → 25.2 → 25.3, with 
 
 ---
 
-## Story 25.6: Go — drop the cache-size env read
+## Story 25.6: Go matches Python's settings
 
-**Given** `go/pkg/discovery/options.go` and `go/pkg/jwks/options.go`,
-**Then** the max-cache-entries value comes only from options, with today's default. `os.Getenv` no longer appears in `go/pkg/`.
+**Given** the settings table and cache rules above,
+**Then** `go/pkg` has the same settings with the same defaults, ranges and cache rules, set only through options. Durations use `time.Duration`.
+
+**And** discovery and JWKS honour `Cache-Control` as described above, replacing today's fixed 24 h TTL.
+
+**And** the settings Go lacks today are added: HTTP retries with backoff, a CA bundle option, a configurable JWKS size limit (today a fixed 1 MiB) and the JWKS key-count limit.
+
+**And** an invalid option value returns an error when the client is built, instead of falling back to the default.
+
+**And** `os.Getenv` no longer appears in `go/pkg/` (the `DISCO_CACHE_MAX_ENTRIES` / `JWKS_CACHE_MAX_ENTRIES` reads in `go/pkg/discovery/options.go` and `go/pkg/jwks/options.go` are deleted), and golangci-lint's `forbidigo` bans `os.Getenv`, `os.LookupEnv` and `os.Environ` there.
+
+**And** a unit test asserts each default against the 25.4 page.
 
 ---
 
-## Story 25.7: Rust — drop the cache-size env read
+## Story 25.7: Rust matches Python's settings
 
-**Given** `rust/src/env.rs` and its callers in the discovery and JWKS clients,
-**Then** the max-cache-entries value comes only from the client builder, with today's default, and `env.rs` is deleted. `std::env::var` no longer appears in `rust/src/`.
+**Given** the settings table and cache rules above,
+**Then** `rust/src` has the same settings with the same defaults, ranges and cache rules, set only through the client builders. Durations use `std::time::Duration`.
+
+**And** discovery and JWKS honour `Cache-Control` as described above, replacing today's fixed 24 h TTL.
+
+**And** the settings Rust lacks today are added: HTTP retries with backoff, a CA bundle option, a configurable JWKS size limit (today a fixed 1 MiB) and the JWKS key-count limit.
+
+**And** an invalid builder value returns an error from `build()`, instead of being ignored.
+
+**And** `rust/src/env.rs` and its callers are deleted, and clippy's `disallowed-methods` bans `std::env::var`, `std::env::var_os` and `std::env::vars` in `rust/src`.
+
+**And** a unit test asserts each default against the 25.4 page.
