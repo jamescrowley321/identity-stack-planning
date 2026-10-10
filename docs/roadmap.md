@@ -46,9 +46,10 @@ Rust's extended tier is the largest gap; Go's is client authentication, PAR, and
 correctness `#852` (`#853`–`#861`) · Cognito live provider `#843` (`#844`–`#850`) · FAPI 2.0
 `#476` · RP certification `#242` · security gates `#633`, `#642`, `#643`.
 
-**Loops.** [`identity-model-go-rust-parity.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/identity-model-go-rust-parity.md)
-and [`pim-conformance-evidence.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/pim-conformance-evidence.md).
-Both target this repo — **run them one at a time.**
+**Loop.** [`identity-model-stack.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/identity-model-stack.md):
+a stacked-PR series on `release/v5`. It covers spec citations, then injected config, then the
+next certification round, then KnownGaps. It supersedes `pim-conformance-evidence.md`. Run one
+identity-model loop at a time.
 
 **Standing decision.** The hosted OIDF suite is the conformance standard; see
 [`oidc-certification-analysis.md`](oidc-certification-analysis.md).

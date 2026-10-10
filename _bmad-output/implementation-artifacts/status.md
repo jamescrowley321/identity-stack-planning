@@ -36,6 +36,7 @@ stale only when a new epic is written, never merely because work progressed.
 | `docs/oidc-certification-analysis.md` | [#242](https://github.com/jamescrowley321/identity-model/issues/242) certification; [#476](https://github.com/jamescrowley321/identity-model/issues/476) FAPI 2.0 |
 | `ralph-prompts/identity-model-go-rust-parity.md` | #573, #574, #575, #576, #578, #579 |
 | `ralph-prompts/pim-conformance-evidence.md` | #607, #471, #472, #473, #242, #475, #476 |
+| `ralph-prompts/identity-model-stack.md` + `hats/identity-model-stack.yml` | #869, #852 (CIT), #751 (Epic 25), #867, #607, #473, #471, #242, #868, #791, #777, #574, #783, #772, #768, #769, #766, #782, #770, #778, #784, #828, #870 |
 | `planning-artifacts/epics/epic-cognito-live-provider.md` | [#843](https://github.com/jamescrowley321/identity-model/issues/843) epic; stories #844–#850 |
 | `planning-artifacts/epics/epic-oidc-spec-citations.md` + `docs/oidc-citation-audit-2026-10-03/` | [#852](https://github.com/jamescrowley321/identity-model/issues/852) epic; stories #853–#861, plus #771, #773, #774 |
 

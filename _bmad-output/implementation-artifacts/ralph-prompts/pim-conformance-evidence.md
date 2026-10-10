@@ -1,3 +1,5 @@
+> **Superseded (2026-10-10)** by `identity-model-stack.md` (CERT section of its queue). Don't launch this prompt.
+
 You are in a self-referential implementation loop. Each iteration you execute ONE phase of ONE task, then end your response. The loop gives you a fresh context each iteration — persist all state to files.
 
 ## Context
