@@ -1,11 +1,11 @@
 # identity-model stacked-PR loop: hat collection.
 # Modeled on ralph builtin:code-assist (Planner -> Builder -> Critic -> Finalizer),
-# with a Stacker that owns branches, restacking and the ledger, and a Shipper that
+# with a Stacker that owns branches and the ledger, and a Shipper that
 # opens the PR and drives CI. Every hat leans on superpowers skills; the Critic runs
 # the blind-peer-review lenses. The queue, rules and gates live in PROMPT.md
 # (ralph-prompts/identity-model-stack.md).
 #
-# Launch: ralph-prompts/run.sh identity-model-stack identity-model release/v5
+# Launch: ralph-prompts/run.sh identity-model-stack identity-model
 
 event_loop:
   prompt_file: "PROMPT.md"
@@ -17,7 +17,7 @@ event_loop:
 hats:
   stacker:
     name: "📚 Stacker"
-    description: "Restacks merged parents, enforces the stack cap, picks the next story and cuts its branch on top of the stack."
+    description: "Picks the next story and cuts its branch on top of the stack."
     triggers: ["build.start", "queue.advance", "build.blocked"]
     publishes: ["tasks.ready", "LOOP_COMPLETE"]
     default_publishes: "tasks.ready"
@@ -29,30 +29,25 @@ hats:
 
       On every activation, in this order:
       1. `git fetch origin --prune`.
-      2. **Restack.** Follow PROMPT.md "Stacking → Restack", walking open ledger rows
-         bottom-up: a row restacks when its parent merged OR its parent's tip moved. A merge
-         at the bottom must ripple through every descendant. Retarget a child's base BEFORE
-         anything deletes a merged parent, then `git rebase --onto`, then
-         `git push --force-with-lease`. Only force-push ledger branches.
-      3. **On `build.blocked`:** mark the payload's story `blocked` in the ledger with the
-         reason, comment the reason on its issue, and continue to step 4. Later stories
-         still stack on the last *shipped* branch, never on a blocked one.
-      4. **Stack cap.** Count ledger rows with status `shipped` whose PR is still open.
-         At or above the cap in PROMPT.md: write a short "paused: stack full" summary to
-         the ledger and publish `LOOP_COMPLETE`.
-      5. **Pick.** First queue row that is not `shipped`/`merged`/`blocked`/`skipped`.
+      2. **On `build.blocked`:** mark the payload's story `blocked` in the ledger with the
+         reason, comment the reason on its issue, and continue. Later stories still stack on
+         the last *shipped* branch, never on a blocked one.
+      3. Never rebase, retarget or force-push a shipped branch. Merging is the owner's job.
+      4. **Resume.** A ledger row still `in_progress` (the loop restarted mid-story): check
+         out its existing branch WITHOUT resetting it and publish `tasks.ready` for it. Stop.
+         **Pick.** Otherwise, the first queue row that is not `shipped`/`blocked`/`skipped`.
          Verify it is still needed: `gh issue view <n>` is OPEN, and
          `gh pr list --state all --search "<n> in:body"` shows no merged or open PR
          already doing it. If it is already done, mark `skipped` with the PR link and
          pick again. Queue empty → publish `LOOP_COMPLETE`.
-      6. **Branch.** Parent = the branch of the newest `shipped` row whose PR is still
-         open, else the stack root (`release/v5`). Name it `<type>/<issue>-<slug>`.
+      5. **Branch.** Parent = the branch of the newest `shipped` row, else `main` (or
+         `main` if that branch is gone from origin). Name it `<type>/<issue>-<slug>`.
          `git checkout -B <branch> origin/<parent>` (or the local parent tip if the
          parent is unpushed; it never is, Shipper pushes before advancing).
-      7. Comment on the issue that the loop picked it up, naming the parent branch.
-      8. Write ledger row (`in_progress`, branch, parent) and `.ralph/specs/<issue>/context.md`
+      6. Comment on the issue that the loop picked it up, naming the parent branch.
+      7. Write ledger row (`in_progress`, branch, parent) and `.ralph/specs/<issue>/context.md`
          with the issue body, ACs, linked decisions and the files you expect to change.
-      9. Publish `tasks.ready` with `issue`, `branch`, `parent`.
+      8. Publish `tasks.ready` with `issue`, `branch`, `parent`.
 
   builder:
     name: "⚙️ Builder"
@@ -120,7 +115,7 @@ hats:
 
       1. `git push -u origin <branch>`.
       2. If no PR exists: `gh pr create --base <parent> --head <branch>` with the PROMPT.md
-         PR body template. Use `Closes #<issue>` only when the base is `release/v5`;
+         PR body template. Use `Closes #<issue>` only when the base is `main`;
          otherwise `Part of #<issue>`, since GitHub ignores closing keywords off the
          default branch and the owner closes stories as they merge.
       3. Post every `.claude/review-*.md` as a PR comment, then delete them locally.
