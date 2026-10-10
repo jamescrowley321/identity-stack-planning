@@ -13,8 +13,9 @@ Don't run either alongside this loop. One ralph workstream per repo.
 - The loop runs in its own worktree `/tmp/identity-model-stack-ralph`. Never touch
   `~/repos/auth/identity-model`, `main`, or another session's branches. Other Claude/Codex
   sessions work in this repo; fetch before every branch operation.
-- **Stack root: `release/v5`**, the py 5.0.0 integration branch. Everything in the queue
-  ships in 5.0.0. Don't push to `release/v5` itself; only the owner does.
+- **Stack root: `main`.** The loop's job is to get the work done as one chain of PRs. It
+  never merges. The owner handles merging, retargeting and release grouping (py 5.0.0 /
+  `release/v5`) later, in a separate resolution session. Never push to `main` or `release/v5`.
 - **Owner decisions (2026-10-10, recorded on #852):**
   - D1: azp becomes opt-in (`validate_azp`, default off), after CIT-5.
   - D2: `jwks_uri` is required unconditionally; `require_key_set=False` no longer skips it. Breaking, no deprecation cycle.
@@ -85,24 +86,13 @@ You may `gh workflow run conformance-hosted.yml --ref <branch> -f publish=none` 
 
 ## Stacking
 
-- **Cap: 8** shipped-but-unmerged PRs. At the cap, Stacker pauses the loop (`LOOP_COMPLETE`
-  with "paused: stack full" in the ledger). The owner merges from the bottom and relaunches
-  with the same `run.sh` command, which reuses the existing worktree and ledger.
-- **Parent** = branch of the newest shipped row whose PR is still open, else `release/v5`.
-- **Restack** (Stacker, every activation). Walk the open ledger rows bottom-up (oldest first).
-  A row needs restacking when its parent PR has merged, or when its parent was rewritten in this
-  pass (the parent's current tip ≠ the `parent tip` recorded on the row). For each such row:
-  1. If the parent merged: `gh pr edit <child> --base <parent's base>` first, so deleting the
-     parent branch can't close the child. The new parent is the parent's base.
-  2. `git rebase --onto origin/<new parent> <recorded parent tip> <child branch>`.
-  3. Re-run the touched language's unit tests, then `git push --force-with-lease`.
-  4. Update the row's `parent`, `parent tip` (the new parent's current tip) and `tip`. Moving
-     upward, the next row now sees its parent rewritten and restacks too, so a merge at the
-     bottom ripples through every descendant.
-  5. Delete a merged parent branch on origin only after its children are retargeted, and only
-     if it is a ledger branch.
-  A conflict you can't resolve cleanly: `build.blocked` for that story, with the conflict.
-- Record each branch's tip SHA in the ledger whenever Shipper pushes; restack needs it.
+- Every story's branch is cut from the previous story's branch. Each PR's base is that parent
+  branch; the first PR's base is `main`. Every PR runs the full CI suite, whatever its base.
+- **Parent** = branch of the newest `shipped` ledger row, else `main`. If that branch no longer
+  exists on origin (the owner merged it mid-run), use `origin/main`.
+- Don't rebase, retarget or force-push shipped branches. If the owner changes the stack
+  mid-run, build on whatever the ledger's newest shipped branch is now and record it.
+- Record each branch's tip SHA in the ledger when Shipper pushes; the resolution session uses it.
 
 ## Rules
 
@@ -140,8 +130,10 @@ Integration red is a hard block; never rationalize a failure. Known flakes, one 
 `node-oidc_*.json` there, then rerun). Local mutation gate: `rm -rf py/mutants/` after adding
 tests, or survivors look unchanged.
 
-Stacked PRs (base ≠ `main`) don't run `conformance.yml`, CodeQL or OSV in CI; the Critic's local
-gates stand in for them.
+Every PR, whatever its base, runs the full CI suite: Build, Conformance, CodeQL and OSV-Scanner.
+This needs identity-model `ci/pr-workflows-any-base` merged to `main`. Before that, those
+three workflows run only on PRs into `main`. Stacker refuses to start until it has merged, and
+Shipper checks that all four workflows ran on each PR.
 
 ## PR body template
 
@@ -151,8 +143,8 @@ Follow the repo's `.github/pull_request_template.md`:
 ## Summary
 - <what changed and why, with spec section>
 
-Closes #<issue>            (base = release/v5)   |   Part of #<issue>   (stacked)
-Stacked on #<parent PR>    (omit when base = release/v5)
+Closes #<issue>            (base = main)   |   Part of #<issue>   (stacked)
+Stacked on #<parent PR>    (omit when base = main)
 
 ## Breaking change         (only for `!` stories)
 <what callers must change>
@@ -179,4 +171,4 @@ Never check the human-accountability box yourself.
 | # | issue | status | branch | parent | parent tip | tip | PR | note |
 |---|---|---|---|---|---|---|---|---|
 ```
-Status: `in_progress` → `shipped` → (`merged` once the owner merges) | `blocked` | `skipped`.
+Status: `in_progress` → `shipped` | `blocked` | `skipped`.
