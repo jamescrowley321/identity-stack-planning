@@ -37,9 +37,8 @@ Python's current behaviour defines every value below. Go and Rust change to matc
 | `jwks_max_keys` | 100 | ≥ 1 |
 | `jwks_cache_ttl` | 24 h, used only when the response has no `Cache-Control: max-age` | 60 s – 24 h |
 | `jwks_kid_miss_cooldown` | 5 s | 0 – 3600 s; 0 disables the cooldown |
-| `jwks_cache_max_entries` | 64 | ≥ 1 |
 | `discovery_cache_ttl` | 1 h, used only when the response has no `Cache-Control: max-age` | 60 s – 24 h |
-| `discovery_cache_max_entries` | 64 | ≥ 1 |
+| `cache_max_entries` | 64, applied separately to the JWKS cache and the discovery cache | ≥ 1 |
 | Client (FastAPI package) | discovery URL, client ID, client secret, scope (`openid profile email`), audience (defaults to the client ID), redirect URIs, excluded paths | — |
 
 An invalid value is rejected when the `Config` (or the Go options / Rust builder) is built. A value is never silently replaced by its default.
@@ -48,7 +47,7 @@ An invalid value is rejected when the `Config` (or the Go options / Rust builder
 
 - **Discovery:** the response's `Cache-Control: max-age` sets the lifetime, clamped to 60 s – 24 h. `no-store` or `no-cache` means the document is not cached. With no header, `discovery_cache_ttl` applies.
 - **JWKS:** `max-age` sets the lifetime, with the same clamp. `no-store` and `no-cache` are deliberately ignored, because honouring them on key sets turns every validation into a fetch (identity-model#396). With no header, `jwks_cache_ttl` applies.
-- **Cache size:** each cache is LRU, capped by its max-entries setting. Python today shares one cap between both caches and treats a value below 1 as the default. Story 25.1 splits it into the two settings above and rejects values below 1.
+- **Cache size:** the JWKS cache and the discovery cache are each LRU, and each holds at most `cache_max_entries` providers. One setting, two caches, the same limit, as Python does today. A value below 1 is invalid in Python today, where it logs a warning and falls back to 64. Under this epic it is rejected when the `Config` is built. Go and Rust drop their separate `DISCO_CACHE_MAX_ENTRIES` / `JWKS_CACHE_MAX_ENTRIES` values and the "0 = unbounded" rule.
 
 ## Priority ordering
 
