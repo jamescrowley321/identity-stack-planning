@@ -13,6 +13,8 @@ event_loop:
   starting_event: "build.start"
   max_iterations: 400
   max_consecutive_failures: 5
+  # ralph defaults to 4h; a 41-story stack needs days.
+  max_runtime_seconds: 604800
 
 hats:
   stacker:
