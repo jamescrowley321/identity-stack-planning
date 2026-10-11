@@ -124,6 +124,8 @@ hats:
          otherwise `Part of #<issue>`, since GitHub ignores closing keywords off the
          default branch and the owner closes stories as they merge.
       3. Post every `.claude/review-*.md` as a PR comment, then delete them locally.
+         Then request the CI review once per PR: `gh pr comment <pr> --body "@claude review this PR"`
+         (skip if a comment with that text is already on the PR). It is advisory; don't wait for it.
       4. `gh pr checks <pr> --watch --fail-fast`. Red → publish `ci.failed` with the
          failing job and the `gh run view --log-failed` excerpt. A known flake listed in
          PROMPT.md gets one rerun (`gh run rerun --failed`) before it counts as red.
