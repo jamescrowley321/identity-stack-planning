@@ -249,6 +249,64 @@ For each PR:
 - [ ] Wait for CI to go green on the child before its review.
 - [ ] Delete the merged branch.
 
+## Phase D2 — Correct course, 2026-10-16: FAPI 2.0 and caching (blocks Phase E)
+
+The stack is merged and #915 is green. Two problems surfaced in the final review sweep.
+
+1. **FAPI 2.0 was not met.** `validate_fapi_discovery` treats absent metadata as compliant (#923). The allowed algorithm set omits EdDSA. The library has no FAPI profile at all: `validate_fapi_*` are advisory validators that take self-reported booleans, and only an example calls them. The passing OIDF FAPI2 runs come from posture hand-built in `conformance/app.py` (`:366` algorithms, `:1012` assertion `aud`, `:1157` `iss` required). `private_key_jwt` assertions default `aud` to the endpoint URL, not the issuer (FAPI 2.0 SP §5.3.3.1), at nine call sites.
+2. **Caching on HTTP clients is unsafe.** Since #895 the discovery and JWKS caches and the kid-miss cooldown live on each `HTTPClient`, next to a process-wide default client. Short-lived clients defeat the cooldown (#945). The default client's cleanup lock binds to one event loop (#944). It is shared across a pre-fork server's workers. A redirect-following wrapped client caches what it fetched (#935).
+
+5.0.0 is the cheap place for the breaking fixes. Python only: Go and Rust are pre-1.0, so their breaking changes are cheap at any time.
+
+### Decisions (James)
+
+- [ ] **G1.** 5.0.0 scope = the five stories below. Everything additive moves to the post-5.0 FAPI epic.
+- [ ] **G2.** `private_key_jwt` `aud` (V5-F2): default to the issuer whenever it is known (RFC 7523bis direction), or make `audience` required?
+- [ ] **G3.** Python default asymmetric-algorithm allowlist (V5-F4). This is hardening, so policy says opt-in. RFC 8725 §3.1 requires only that callers *can* restrict algorithms. Make it the default anyway, matching Go and Rust?
+- [ ] **G4.** Caching design (V5-C1): approve the transport/state split below.
+- [ ] **G5.** Also ride along in 5.0.0 (all breaking): #888 `use: enc` as a hard filter, #930 `validate_azp=True` without `client_id` becomes a config error, #934 delete `ClientAuthMethod.requires_secret`.
+
+### Stories for 5.0.0 (each a PR into `release/v5`; FAPI requirement audit 2026-10-16 is the source)
+
+**V5-F1 (#949). FAPI 2.0 discovery validator: absent means non-compliant** (py; breaking; folds in #923, #855)
+- Each of these produces a violation citing its section: absent `code_challenge_methods_supported` (SP 5.3.3.2(3), RFC 8414 §2); absent `pushed_authorization_request_endpoint` (SP 5.3.3.2(2)); `authorization_response_iss_parameter_supported` absent or false (SP 5.3.2.2(7), RFC 9207 §3); neither `dpop_signing_alg_values_supported` nor `tls_client_certificate_bound_access_tokens: true` (SP 5.3.2.1(4-5)).
+- `token_endpoint_auth_signing_alg_values_supported` must intersect the FAPI set.
+- Add `dpop_signing_alg_values_supported` to `DiscoveryDocumentResponse`. Add EdDSA to `FAPI2_ALLOWED_SIGNING_ALGORITHMS` (SP 5.4.1).
+- Correct the docstring at `fapi.py:155-159`. Flip `test_pkce_methods_none_passes`. One fail-closed test per field.
+
+**V5-F2 (#950). `private_key_jwt` `aud` is the issuer** (py; breaking; G2)
+- Every `default_audience=request.address` site (`par_logic.py:82`, `token_client_logic.py:81,177,240`, introspection, revocation, device ×2, token exchange) uses the issuer per G2.
+- Under the FAPI profile, `aud` is the issuer as a single string. Tests assert the claim at both the PAR and token endpoints.
+
+**V5-F3 (#951). FAPI 2.0 client profile, fail-closed** (py; breaking: the validator API is reshaped)
+- One profile object turns on, and refuses any attempt to weaken: S256 only; `response_type=code`; PAR required; client auth in {private_key_jwt, mTLS}; DPoP or mTLS present; `iss` required on the callback; ID Token, JARM and DPoP algorithms in {PS256, ES256, EdDSA}; `nonce` ≤ 64 characters; http loopback redirects only for native apps.
+- The `validate_fapi_*` functions check real request and config objects, not self-reported booleans.
+- `conformance/app.py` deletes its hand-rolled checks (`:366`, `:1012`, `:1157`) and uses the profile. All three FAPI2 plans still pass.
+
+**V5-F4 (#952). Algorithm and key-strength defaults** (py, go, rust; breaking; folds in #907, #880; G3)
+- Reject RSA keys under 2048 bits (RFC 7518 §3.3 MUST, so unconditional) and EC keys under 224 bits for verification, in all three languages, with shared vectors.
+- Go and Rust default allowlists gain EdDSA. Python's default allowlist depends on G3.
+
+**V5-C1 (#953). Split transport from cache state** (py; breaking; folds in #944, #945; G4)
+- `HTTPClient` / `AsyncHTTPClient` only send requests and hold no cache.
+- The discovery cache, JWKS cache and kid-miss / signature-failure cooldown move to an explicit, injectable cache object, keyed by issuer and `jwks_uri`. Its process-wide default resets in a forked child (pid check) and never holds loop-bound primitives across event loops.
+- The process-wide default HTTP client resets after fork the same way, or is removed.
+- The mTLS path no longer allocates `ClientCaches` per request.
+- The JWKS fallback TTL (no `Cache-Control`) drops from 24 h to 1 h, so a key the provider pulls stops validating within the hour.
+- Tests: the cooldown survives short-lived clients; a fork test; a two-loop shutdown test.
+- Update `spec/config.md`, `docs/upgrade-v5.md` and `docs/api/config.md`.
+
+Order: V5-C1 and V5-F4 are independent. V5-F1 → V5-F3 (the profile builds on the validator). V5-F2 goes before V5-F3.
+
+### Post-5.0: FAPI 2.0 completeness epic (#954; additive, 5.x)
+
+- PAR front-channel URL helper (`client_id` + `request_uri` only, SP 5.3.3.2(6)); a signed JAR request object sent to PAR (MS 5.3.2); JAR lifetime ≤ 60 min; run the MS plan with `fapi_request_method=signed`.
+- Sender-constraint completeness: DPoP on the refresh grant; fail on a Bearer downgrade under the profile; apply `mtls_endpoint_aliases` automatically; PS256 and EdDSA DPoP keys.
+- Python RS-side DPoP verification (#478).
+- Signed introspection responses (RFC 9701, MS 5.5.2).
+- Go and Rust FAPI client parity (#573 Phase 3), with shared FAPI spec vectors.
+- CI-gate all three FAPI2 plans, including a signed-request variant; regenerate the baselines (#906); close #880 and #855 once verified.
+
 ## Phase E — Release
 
 - [ ] Open `release/v5` → `main` PR titled `release: py-identity-model 5.0.0`, with a body listing the stack PRs.
