@@ -27,7 +27,8 @@ hats:
       ## STACKER: you own the stack, not the code
 
       Do not implement, review or open PRs. Read PROMPT.md ("Queue", "Stacking", "Rules")
-      and `.ralph/stack-ledger.md` (create it from the template in PROMPT.md if missing).
+      and `.ralph/stack-ledger.md` (if missing, create it from the template in PROMPT.md and
+      seed the "Already shipped" rows as `shipped`, per PROMPT.md "Resume").
 
       On every activation, in this order:
       1. `git fetch origin --prune`. On `build.start` only: if `origin/release/v5` is gone

@@ -298,10 +298,11 @@ Additive (FAPI completeness, identity-model#954):
 | 9 | identity-model#955 | PAR front-channel URL helper; signed request object sent to PAR | py |
 | 10 | identity-model#956 | DPoP on refresh, Bearer-downgrade check, automatic mTLS aliases, PS256/EdDSA DPoP keys | py |
 | 11 | identity-model#478 | Python RS-side DPoP verification | py |
-| 12 | identity-model#957 | Signed introspection responses (RFC 9701) | py, go, rust |
-| 13 | identity-model#958 | Go FAPI 2.0 client parity | go |
-| 14 | identity-model#959 | Rust FAPI 2.0 client parity | rust |
-| 15 | identity-model#906 | CI-gate all three FAPI2 plans, including a signed-request variant | ci |
+| 12 | identity-model#957 | Signed introspection responses (RFC 9701) | py (go/rust runners deferred) |
+| — | identity-model#906 | CI-gate all three FAPI2 plans, including a signed-request variant (shipped before #951) | ci |
+| — | identity-model#975 | #951 profile edge cases (runs before #955) | py |
+
+**2026-10-27 (James):** py 5.0.0 ships without Go/Rust FAPI parity. identity-model#958 and identity-model#959, plus the Go/Rust parts of identity-model#957, move to a separate post-5.0 parity loop.
 
 The acceptance criteria are in each issue. Execution runs in the `identity-model-v5-fapi` ralph loop (`ralph-prompts/identity-model-v5-fapi.md`), stacked off `release/v5`. The owner merges bottom-up into `release/v5` with merge commits; identity-model#915 then carries everything to `main`.
 

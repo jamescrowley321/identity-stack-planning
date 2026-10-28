@@ -21,6 +21,8 @@ One ralph workstream per repo: don't run `identity-model-stack` alongside this l
   Status lives in the issues (epic identity-model#904; FAPI completeness identity-model#954).
 - **Owner decisions (2026-10-16), recorded on the issues:**
   - Everything in the queue ships in py 5.0.0.
+  - **2026-10-27:** 5.0.0 ships without Go/Rust FAPI parity. #958 and #959, and the Go/Rust
+    parts of #957, move to a separate parity loop after the release. Python-only from here.
   - `private_key_jwt` assertion `aud` defaults to the issuer whenever it is known; an explicit
     `audience` still wins (#950).
   - Python gets a default asymmetric algorithm allowlist matching Go and Rust, including
@@ -40,25 +42,37 @@ Work top to bottom, one story per PR, each PR stacked on the previous one. Break
 (marked `!`) need `!` in the commit type and a `BREAKING CHANGE:` footer. The issue holds the
 acceptance criteria; the issue wins over this table.
 
+Already shipped (open PRs awaiting owner merge; do not rebuild):
+
+| # | Issue | Branch | PR |
+|---|---|---|---|
+| 1 | #934 `!` | `refactor/934-remove-requires-secret` | #960 |
+| 2 | #930 `!` | `fix/930-azp-requires-client-id` | #962 |
+| 3 | #888 `!` | `fix/888-enc-keys-never-verify` | #964 |
+| 4 | #953 `!` | `refactor/953-split-transport-cache-state` | #969 |
+| 5 | #952 `!` | `fix/952-key-strength-alg-defaults` | #970 |
+| 6 | #949 `!` | `fix/949-fapi-discovery-absent-metadata` | #971 |
+| 7 | #950 `!` | `fix/950-assertion-aud-issuer` | #972 |
+| 8 | #906 | `ci/906-fapi2-conformance-plans` | #973 |
+| 9 | #951 `!` | `feat/951-fapi-client-profile` | #976 |
+
+**Resume:** if `.ralph/stack-ledger.md` is missing, Stacker seeds it with rows 1–9 as
+`shipped` (branch, PR, and `tip` = `git rev-parse origin/<branch>`) before picking work.
+
+Remaining:
+
 | # | Issue | Story |
 |---|---|---|
-| 1 | #934 `!` | Delete `ClientAuthMethod.requires_secret` (py) |
-| 2 | #930 `!` | `validate_azp=True` without `client_id` is a config error (py, go, rust) |
-| 3 | #888 `!` | `use: enc` keys never verify signatures (py, go, rust) |
-| 4 | #953 `!` | Split HTTP transport from cache state; JWKS fallback TTL 24 h → 1 h (py) |
-| 5 | #952 `!` | Key-strength floor and algorithm defaults (py, go, rust) |
-| 6 | #949 `!` | FAPI discovery validator: absent metadata is non-compliant (py; absorbs #923, #855) |
-| 7 | #950 `!` | `private_key_jwt` `aud` defaults to the issuer (py) |
-| 8 | #951 `!` | Fail-closed FAPI 2.0 client profile; conformance app uses it (py) |
-| 9 | #955 | PAR front-channel URL helper; signed request object sent to PAR (py) |
-| 10 | #956 | DPoP on refresh, Bearer-downgrade check, automatic mTLS aliases, PS256/EdDSA DPoP keys (py) |
-| 11 | #478 | Python RS-side DPoP verification + `cnf.jkt` |
-| 12 | #957 | Signed introspection responses, RFC 9701 (py, go, rust) |
-| 13 | #958 | Go FAPI 2.0 client parity |
-| 14 | #959 | Rust FAPI 2.0 client parity |
-| 15 | #906 | CI-gate all three FAPI2 plans, including a signed-request variant |
+| 10 | #975 | #951 profile edge cases: DPoP alg vs advertised list, host-less endpoints, `&` delimiter (py) |
+| 11 | #955 | PAR front-channel URL helper; signed request object sent to PAR (py) |
+| 12 | #956 | DPoP on refresh, Bearer-downgrade check, automatic mTLS aliases, PS256/EdDSA DPoP keys (py) |
+| 13 | #478 | Python RS-side DPoP verification + `cnf.jkt` |
+| 14 | #957 | Signed introspection responses, RFC 9701 — **py only**: client, discovery field, shared `spec/vectors` case with the py runner. Go/Rust runners: file a sub-issue for the parity loop and mark the vector case skipped for go/rust with that issue number |
 
-Out of scope: the quick review follow-ups #921–#948 (except those in the queue), #842,
+Deferred to the post-5.0 parity loop: #958 (Go FAPI parity), #959 (Rust FAPI parity).
+When row 14 ships, the queue is empty: Stacker publishes `LOOP_COMPLETE`.
+
+Out of scope: #958, #959, the quick review follow-ups #921–#948 (except those in the queue), #842,
 Cognito (#843). A story that turns out to need one of them: `build.blocked`. A large story
 may be split into consecutive PRs on the stack. File the extra pieces as sub-issues of the
 story's issue, and record each piece as its own ledger row.
