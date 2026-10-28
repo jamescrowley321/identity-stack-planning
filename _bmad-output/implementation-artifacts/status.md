@@ -39,6 +39,7 @@ stale only when a new epic is written, never merely because work progressed.
 | `ralph-prompts/identity-model-stack.md` + `hats/identity-model-stack.yml` | #869, #852 (CIT), #751 (Epic 25), #867, #607, #473, #471, #242, #868, #791, #777, #574, #783, #772, #768, #769, #766, #782, #770, #778, #784, #828, #870 |
 | `planning-artifacts/epics/epic-cognito-live-provider.md` | [#843](https://github.com/jamescrowley321/identity-model/issues/843) epic; stories #844–#850 |
 | `planning-artifacts/epics/epic-oidc-spec-citations.md` + `docs/oidc-citation-audit-2026-10-03/` | [#852](https://github.com/jamescrowley321/identity-model/issues/852) epic; stories #853–#861, plus #771, #773, #774 |
+| `planning-artifacts/epics/epic-26-full-parity.md` | [#573](https://github.com/jamescrowley321/identity-model/issues/573) epic; #958, #959, #757, #758, #578, #579, #574–#576, #762, #828, #867, #868, #890, #932, #961, #963 |
 
 ### identity-stack (`jamescrowley321/identity-stack`) — Track 2
 
