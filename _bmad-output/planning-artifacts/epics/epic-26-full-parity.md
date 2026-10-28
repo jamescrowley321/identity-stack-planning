@@ -78,7 +78,7 @@ Each story's DoD: vector file added/extended; every runner claims it (no silent 
 |---|---|---|
 | A1 | KnownGaps raise only while the gap exists (four unconditional adapters) | #868 |
 | A2 | Every runner claims every vector: one dispatcher per language over `spec/vectors/*.json` (+ claims-validation fixtures), fails on an unclaimed vector; no `continue` paths | #762 |
-| A3 | Machine-readable status: `spec/status/{py,go,rs}.json` is the only source of xfails/skips; `tools/gen_capabilities.py` renders the matrix status cells and gap notes; `--check` byte-diff in `ci-complete` | new |
+| A3 | Machine-readable status: `spec/status/{py,go,rs}.json` is the only source of xfails/skips; `tools/gen_capabilities.py` renders the matrix status cells and gap notes; `--check` byte-diff in `ci-complete` | #991 |
 | A4 | Rust: drop `dpop` from `NOT_IMPLEMENTED`, run the DPoP logic vectors it already passes, KnownGap the HTTP three; fix stale `spec/README.md` counts | #828 (part) |
 
 ### Phase B — Python catches up (py; Go/Rust already pass)
@@ -97,7 +97,7 @@ Each story's DoD: vector file added/extended; every runner claims it (no silent 
 
 | # | Story | Issues |
 |---|---|---|
-| C1 | Empty-value semantics (`kid`, `use`, `client_id`) + `key_ops` handling, one decision each, new vectors | #932, #961, #963, new |
+| C1 | Empty-value semantics (`kid`, `use`, `client_id`) + `key_ops` handling, one decision each, new vectors | #992, #932, #961, #963, new |
 | C2 | Wrong-typed discovery fields classified consistently | #890 |
 | C3 | Duplicate-kid try-all | #575 |
 | C4 | ID-token vs access-token discrimination in the shared validators | #576 |
@@ -107,44 +107,44 @@ Each story's DoD: vector file added/extended; every runner claims it (no silent 
 
 | # | Story | Issues |
 |---|---|---|
-| D1 | Rust typed error taxonomy (replace `String` payloads; tests match variants) | new |
-| D2 | Injected Config: settings table with Python's defaults and ranges, validated build returning an error, env reads deleted and lint-banned; unit test checks `spec/config.md` | #757, #758 |
-| D3 | HTTP retry/backoff (429/5xx, `Retry-After`, 120 s cap) + CA bundle | #757, #758 |
-| D4 | Client-owned caches (Go: remove globals), Cache-Control TTL 60–86400 clamp, 1 h fallback, `max_size`/`max_keys`, one `cache_max_entries`, trust-scope cache keys | #757, #758 |
-| D5 | Discovery hardening: endpoint-authority binding, internal-IP rejection, `DiscoveryPolicy`, Rust discovery single-flight, `application/json` check, full metadata model | #578, #579 |
-| D6 | Validation extras: signature-failure JWKS refresh sharing the cooldown, multiple issuers + `subject`, discovery-driven validate, cache metrics | #578 |
-| D7 | Rust Debug redaction sweep (`IdTokenValidationOptions`, `PkceChallenge`, `JsonWebKey` private members) | new |
+| D1 | Rust typed error taxonomy (replace `String` payloads; tests match variants) | #993 |
+| D2 | Injected Config: settings table with Python's defaults and ranges, validated build returning an error, env reads deleted and lint-banned; unit test checks `spec/config.md` | #994, #757, #758 |
+| D3 | HTTP retry/backoff (429/5xx, `Retry-After`, 120 s cap) + CA bundle | #995, #757, #758 |
+| D4 | Client-owned caches (Go: remove globals), Cache-Control TTL 60–86400 clamp, 1 h fallback, `max_size`/`max_keys`, one `cache_max_entries`, trust-scope cache keys | #996, #757, #758 |
+| D5 | Discovery hardening: endpoint-authority binding, internal-IP rejection, `DiscoveryPolicy`, Rust discovery single-flight, `application/json` check, full metadata model | #997, #578, #579 |
+| D6 | Validation extras: signature-failure JWKS refresh sharing the cooldown, multiple issuers + `subject`, discovery-driven validate, cache metrics | #998, #578 |
+| D7 | Rust Debug redaction sweep (`IdTokenValidationOptions`, `PkceChallenge`, `JsonWebKey` private members) | #999 |
 
 ### Phase E — Go/Rust capabilities (go + rust per story, vectors new)
 
 | # | Story | Vector file |
 |---|---|---|
-| E1 | Shared client-auth abstraction + `private_key_jwt` (`aud` = issuer when known) | `client-auth.json` |
-| E2 | Refresh-token grant | `refresh-token.json` |
-| E3 | mTLS client auth, automatic `mtls_endpoint_aliases`, `cnf.x5t#S256` binding check | `mtls.json` |
-| E4 | DPoP completeness: Rust HTTP transport (nonce retry + per-host cache, `Authorization: DPoP`); ES384/ES512/PS256/EdDSA keys; DPoP on refresh; Bearer-downgrade error; Go `cnf.jkt` option + replay hook | `dpop.json` (closes #828) |
-| E5 | Authorization URL (nonce, extras), callback parse, constant-time state, RFC 9207 `iss` | `authorize-callback.json` |
-| E6 | PAR + front-channel URL with only `client_id` and `request_uri` | `par.json` |
-| E7 | JAR (request objects, JAR via PAR, ≤ 60 min lifetime under FAPI) | `jar.json` |
-| E8 | JARM (signed) | `jarm.json` |
-| E9 | Logout: end-session URL, post-logout state, back-channel logout token (`exp` required) | `logout.json` |
-| E10 | Device authorization (RFC 8628) | `device-authorization.json` |
-| E11 | Dynamic Client Registration (RFC 7591/7592) | `registration.json` |
-| E12 | Rust ES512 verification | `validation.json` |
+| E1 | #1000 Shared client-auth abstraction + `private_key_jwt` (`aud` = issuer when known) | `client-auth.json` |
+| E2 | #1001 Refresh-token grant | `refresh-token.json` |
+| E3 | #1002 mTLS client auth, automatic `mtls_endpoint_aliases`, `cnf.x5t#S256` binding check | `mtls.json` |
+| E4 | #1003 DPoP completeness: Rust HTTP transport (nonce retry + per-host cache, `Authorization: DPoP`); ES384/ES512/PS256/EdDSA keys; DPoP on refresh; Bearer-downgrade error; Go `cnf.jkt` option + replay hook | `dpop.json` (closes #828) |
+| E5 | #1004 Authorization URL (nonce, extras), callback parse, constant-time state, RFC 9207 `iss` | `authorize-callback.json` |
+| E6 | #1005 PAR + front-channel URL with only `client_id` and `request_uri` | `par.json` |
+| E7 | #1006 JAR (request objects, JAR via PAR, ≤ 60 min lifetime under FAPI) | `jar.json` |
+| E8 | #1007 JARM (signed) | `jarm.json` |
+| E9 | #1008 Logout: end-session URL, post-logout state, back-channel logout token (`exp` required) | `logout.json` |
+| E10 | #1009 Device authorization (RFC 8628) | `device-authorization.json` |
+| E11 | #1010 Dynamic Client Registration (RFC 7591/7592) | `registration.json` |
+| E12 | #1011 Rust ES512 verification | `validation.json` |
 
 ### Phase F — FAPI 2.0 (go + rust)
 
 | # | Story | Issues |
 |---|---|---|
-| F1 | FAPI 2.0 validators (discovery with absent metadata non-compliant, client config, request) | #958, #959, #949 |
-| F2 | Fail-closed FAPI 2.0 client profile | #958, #959, #951 |
-| F3 | Ports of the late 5.0.0 Python work: signed introspection RFC 9701 (#957), PAR/JAR completeness (#955), sender-constraint completeness (#956), RS-side DPoP (#478) | #955–#957, #478 |
+| F1 | FAPI 2.0 validators (discovery with absent metadata non-compliant, client config, request) | #1012, #958, #959, #949 |
+| F2 | Fail-closed FAPI 2.0 client profile | #1013, #958, #959, #951 |
+| F3 | Ports of the late 5.0.0 Python work: signed introspection RFC 9701 (#957), PAR/JAR completeness (#955), sender-constraint completeness (#956), RS-side DPoP (#478) | #1014, #955–#957, #478 |
 
 ~40 stories. Execution: two sequential loops on the same repo (one workstream per repo): **loop 1** = Phases A–C (enforcement + Python + semantics, mostly py); **loop 2** = Phases D–F (Go/Rust). Prompts are written after the decisions below.
 
 ## Owner decisions
 
-Recommendations in **bold**; all reversible except where noted.
+**Decided 2026-10-28 (James: "Do it"): all fourteen as recommended (bold).** Recorded on #573.
 
 1. **Status files + generated matrix (A3).** Re-introduces a machine layer #765 removed. The generator only renders; runners still own coverage. **Accept.**
 2. **Empty values (C1).** **Empty = absent** (Go's behavior) for `kid`, `use`, `client_id`. Breaking for Python (`!`).
