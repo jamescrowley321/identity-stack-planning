@@ -55,22 +55,23 @@ Already shipped (open PRs awaiting owner merge; do not rebuild):
 | 7 | #950 `!` | `fix/950-assertion-aud-issuer` | #972 |
 | 8 | #906 | `ci/906-fapi2-conformance-plans` | #973 |
 | 9 | #951 `!` | `feat/951-fapi-client-profile` | #976 |
+| 10 | #975 | `fix/975-fapi-profile-edge-cases` | #1015 |
+| 11 | #955 | `feat/955-par-front-channel-signed-request` | #1017 |
+| 12 | #956 | `feat/956-sender-constraint-completeness` | #1020 |
+| 13 | #478 (core + `validate_token`) | `feat/478-rs-dpop-verification` | #1027 |
 
-**Resume:** if `.ralph/stack-ledger.md` is missing, Stacker seeds it with rows 1–9 as
+**Resume:** if `.ralph/stack-ledger.md` is missing, Stacker seeds it with rows 1–13 as
 `shipped` (branch, PR, and `tip` = `git rev-parse origin/<branch>`) before picking work.
 
 Remaining:
 
 | # | Issue | Story |
 |---|---|---|
-| 10 | #975 | #951 profile edge cases: DPoP alg vs advertised list, host-less endpoints, `&` delimiter (py) |
-| 11 | #955 | PAR front-channel URL helper; signed request object sent to PAR (py) |
-| 12 | #956 | DPoP on refresh, Bearer-downgrade check, automatic mTLS aliases, PS256/EdDSA DPoP keys (py) |
-| 13 | #478 | Python RS-side DPoP verification + `cnf.jkt` |
-| 14 | #957 | Signed introspection responses, RFC 9701 — **py only**: client, discovery field, shared `spec/vectors` case with the py runner. Go/Rust runners: file a sub-issue for the parity loop and mark the vector case skipped for go/rust with that issue number |
+| 14 | #1028 | FastAPI middleware: `DPoP` auth scheme, `TokenPresentation` wiring, fail-closed `WWW-Authenticate: DPoP` (rest of #478; `feat(fastapi)`) |
+| 15 | #957 | Signed introspection responses, RFC 9701 — **py only**: client, discovery field, shared `spec/vectors` case with the py runner. Go/Rust runners: file a sub-issue for the parity loop and mark the vector case skipped for go/rust with that issue number |
 
 Deferred to the post-5.0 parity loop: #958 (Go FAPI parity), #959 (Rust FAPI parity).
-When row 14 ships, the queue is empty: Stacker publishes `LOOP_COMPLETE`.
+When row 15 ships, the queue is empty: Stacker publishes `LOOP_COMPLETE`.
 
 Out of scope: #958, #959, the quick review follow-ups #921–#948 (except those in the queue), #842,
 Cognito (#843). A story that turns out to need one of them: `build.blocked`. A large story
