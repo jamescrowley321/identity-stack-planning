@@ -60,15 +60,13 @@ Already shipped (open PRs awaiting owner merge; do not rebuild):
 | 12 | #956 | `feat/956-sender-constraint-completeness` | #1020 |
 | 13 | #478 (core + `validate_token`) | `feat/478-rs-dpop-verification` | #1027 |
 | 14 | #1021 `!` | `feat/1021-fastapi-dpop-middleware` | #1029 |
+| 15 | #957 (py; Go/Rust → #1030) | `feat/957-signed-introspection` | #1031 |
 
-**Resume:** if `.ralph/stack-ledger.md` is missing, Stacker seeds it with rows 1–14 as
+**Resume:** if `.ralph/stack-ledger.md` is missing, Stacker seeds it with rows 1–15 as
 `shipped` (branch, PR, and `tip` = `git rev-parse origin/<branch>`) before picking work.
 
-Remaining:
-
-| # | Issue | Story |
-|---|---|---|
-| 15 | #957 | Signed introspection responses, RFC 9701 — **py only**: client, discovery field, shared `spec/vectors` case with the py runner. Go/Rust runners: file a sub-issue for the parity loop and mark the vector case skipped for go/rust with that issue number |
+Remaining: none. Every story is open as a PR on the stack (#960 → #1031); the loop has
+nothing to build and Stacker publishes `LOOP_COMPLETE` on start.
 
 Deferred to the post-5.0 parity loop: #958 (Go FAPI parity), #959 (Rust FAPI parity).
 When row 15 ships, the queue is empty: Stacker publishes `LOOP_COMPLETE`.
