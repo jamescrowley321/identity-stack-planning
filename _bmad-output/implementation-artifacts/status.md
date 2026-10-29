@@ -40,7 +40,7 @@ stale only when a new epic is written, never merely because work progressed.
 | `planning-artifacts/epics/epic-cognito-live-provider.md` | [#843](https://github.com/jamescrowley321/identity-model/issues/843) epic; stories #844–#850 |
 | `planning-artifacts/epics/epic-oidc-spec-citations.md` + `docs/oidc-citation-audit-2026-10-03/` | [#852](https://github.com/jamescrowley321/identity-model/issues/852) epic; stories #853–#861, plus #771, #773, #774 |
 | `planning-artifacts/epics/epic-identity-model-v5-release.md` | [#904](https://github.com/jamescrowley321/identity-model/issues/904) epic; Phase D2 stories #934, #930, #888, #953, #952, #949, #950, #951; FAPI completeness [#954](https://github.com/jamescrowley321/identity-model/issues/954) (#955–#959, #478, #906) |
-| `ralph-prompts/identity-model-v5-fapi.md` + `hats/identity-model-v5-fapi.yml` | #934, #930, #888, #953, #952, #949, #950, #951, #955, #956, #975, #478, #1028, #957, #958, #959, #906 |
+| `ralph-prompts/identity-model-v5-fapi.md` + `hats/identity-model-v5-fapi.yml` | #934, #930, #888, #953, #952, #949, #950, #951, #955, #956, #975, #478, #1021, #957, #958, #959, #906 |
 
 ### identity-stack (`jamescrowley321/identity-stack`) — Track 2
 

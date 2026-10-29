@@ -67,7 +67,7 @@ Remaining:
 
 | # | Issue | Story |
 |---|---|---|
-| 14 | #1028 | FastAPI middleware: `DPoP` auth scheme, `TokenPresentation` wiring, fail-closed `WWW-Authenticate: DPoP` (rest of #478; `feat(fastapi)`) |
+| 14 | #1021 | FastAPI middleware: `DPoP` auth scheme, `TokenPresentation` wiring, fail-closed `WWW-Authenticate: DPoP` (rest of #478; `feat(fastapi)`) |
 | 15 | #957 | Signed introspection responses, RFC 9701 — **py only**: client, discovery field, shared `spec/vectors` case with the py runner. Go/Rust runners: file a sub-issue for the parity loop and mark the vector case skipped for go/rust with that issue number |
 
 Deferred to the post-5.0 parity loop: #958 (Go FAPI parity), #959 (Rust FAPI parity).
