@@ -45,6 +45,7 @@ Rust's extended tier is the largest gap; Go's is client authentication, PAR, and
 (`#607`–`#613`) · injected config `#751` · token harness `#462` · OIDC spec-citation
 correctness `#852` (`#853`–`#861`) · Cognito live provider `#843` (`#844`–`#850`) · FAPI 2.0
 `#476` · RP certification `#242` · security gates `#633`, `#642`, `#643`.
+Cloudflare Access as a live provider and Workers as a runtime `#1033` (`#1034`–`#1038`).
 
 **Loop.** [`identity-model-stack.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/identity-model-stack.md):
 a stacked-PR series off `main`; merging is a separate owner session. It covers spec citations, then injected config, then the
@@ -74,6 +75,7 @@ epics including `OrySyncAdapter` and provider-driven token validation.
 **Live work.** Ory provider-agnostic frontend and logout `identity-stack#377`, `#378` ·
 Ory Terraform state migration `#376` · TFC environments `#411` (`#413`–`#418`) ·
 app config `#406`, `#407` · the FastAPI rate-limit pin `#324`.
+Cloudflare Access as a configured provider `#531` (`#532`–`#535`).
 
 **Loop.** [`ory-frontend-logout.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/implementation-artifacts/ralph-prompts/ory-frontend-logout.md).
 
@@ -130,8 +132,8 @@ Not tracks. Recorded so the thinking is not lost, and explicitly not scheduled.
 - **[open-identity](idea-open-identity.md)** — a rebrand around provider-portable identity,
   planned thoroughly in September 2026 and never started. Ten locked decisions, market and
   trademark findings, and the readiness-audit lesson, condensed from seven documents.
-- **[Deployment ideas](ideas.md)** — free-tier hosting on Supabase or Cloudflare,
-  co-hosted alongside other projects.
+- **[Deployment ideas](ideas.md)** — free-tier hosting, co-hosted alongside other projects.
+  Narrowed to Cloudflare on 2026-10-29; the Workers CPU spike is now `identity-model#1037`.
 
 ---
 

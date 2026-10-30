@@ -16,6 +16,15 @@ tracked by a GitHub issue. Things graduate out of this file by becoming a track 
 
 ## Free-tier deployment (Supabase or Cloudflare)
 
+> **Update 2026-10-29: narrowed to Cloudflare, and one part is now planned work.** The owner
+> chose Cloudflare-only hosting; Supabase is dropped. The first consumer is the owner's own
+> app, not identity-stack: it dogfoods identity-model against Cloudflare Access as its OIDC
+> provider. The CPU spike below is filed as `identity-model#1037`, under the epic
+> [`epic-cloudflare-access-provider.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/planning-artifacts/epics/epic-cloudflare-access-provider.md).
+> Deploying identity-stack itself is still an idea, and the rest of this section stands as
+> written. Note that Cloudflare-only leaves the Postgres identity store without a free home
+> (D1 is SQLite), so "the database has an obvious home" below no longer holds.
+
 **The constraint.** Everything must be free. The only deployment clouds under consideration
 are **Supabase** and **Cloudflare**, co-hosted alongside other projects rather than run as
 dedicated infrastructure. Terraform is the source of truth for whatever gets deployed.
