@@ -39,6 +39,7 @@ stale only when a new epic is written, never merely because work progressed.
 | `ralph-prompts/identity-model-stack.md` + `hats/identity-model-stack.yml` | #869, #852 (CIT), #751 (Epic 25), #867, #607, #473, #471, #242, #868, #791, #777, #574, #783, #772, #768, #769, #766, #782, #770, #778, #784, #828, #870 |
 | `planning-artifacts/epics/epic-cognito-live-provider.md` | [#843](https://github.com/jamescrowley321/identity-model/issues/843) epic; stories #844–#850 |
 | `planning-artifacts/epics/epic-oidc-spec-citations.md` + `docs/oidc-citation-audit-2026-10-03/` | [#852](https://github.com/jamescrowley321/identity-model/issues/852) epic; stories #853–#861, plus #771, #773, #774 |
+| `planning-artifacts/epics/epic-cloudflare-access-provider.md` | [#1033](https://github.com/jamescrowley321/identity-model/issues/1033) epic; stories #1034–#1038 |
 
 ### identity-stack (`jamescrowley321/identity-stack`) — Track 2
 
@@ -48,6 +49,7 @@ stale only when a new epic is written, never merely because work progressed.
 | `planning-artifacts/epics-tfc-environments.md` | [#411](https://github.com/jamescrowley321/identity-stack/issues/411) epic; stories #413–#418 |
 | — (app side of `epic-25-injected-config.md`; design lives in the issues) | #406, #407 |
 | `docs/ory-sso-provider-context.md`, `docs/ory-iac-automation-plan.md` | #376–#378 |
+| `planning-artifacts/epics/epic-cloudflare-access-provider.md` | [#531](https://github.com/jamescrowley321/identity-stack/issues/531) epic; stories #532–#535 |
 | `ralph-prompts/ory-frontend-logout.md` | #377, #378 |
 
 ### terraform-provider-descope / oss-admin — Track 3
