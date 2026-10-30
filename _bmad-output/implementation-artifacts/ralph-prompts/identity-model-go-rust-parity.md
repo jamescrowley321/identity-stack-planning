@@ -1,3 +1,5 @@
+> **SUPERSEDED 2026-10-28** by `identity-model-parity-1.md` / `identity-model-parity-2.md` (Epic 26, #573). Its state table is stale; do not run.
+
 You are in a self-referential implementation loop. Each iteration you execute ONE phase of ONE task, then end your response. The loop gives you a fresh context each iteration — persist all state to files.
 
 ## Context
