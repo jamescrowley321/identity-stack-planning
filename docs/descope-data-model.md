@@ -337,9 +337,9 @@ This has **no OAuth2/OIDC equivalent** — it is an authorization model that com
 | Token Validation | `descope_project` (JWT settings) | `validate_token()` middleware | `validate_token()` sync/async |
 | Multi-Tenancy | `descope_tenant` | `dct` claim extraction | `ClaimsPrincipal` |
 | RBAC | `descope_permission`, `descope_role` | `require_role()` dependency | `to_principal()` |
-| Access Keys | `descope_accesskey` | CRUD via Management API | Client credentials token request |
+| Access Keys | `descope_access_key` | CRUD via Management API | Client credentials token request |
 | SSO | `descope_sso` | Planned (Phase 3a) | OIDC federation support |
-| OAuth Apps | `descope_inboundapp` | Frontend OIDC config | Auth code + PKCE (#90) |
+| OAuth Apps | `descope_inbound_app` | Frontend OIDC config | Auth code + PKCE (#90) |
 | Session Config | `descope_project` (settings) | Token lifetimes | Discovery cache (#219) |
-| Password Policy | `descope_passwordsettings` | — | — |
-| FGA | `descope_fga_schema` | — | — |
+| Password Policy | `descope_password_settings` | — | — |
+| FGA | `descope_fga_schema` | `/api/fga/schema`, `/api/fga/relations`, `/api/fga/check` (`routers/fga.py`) and `require_fga()` | — |

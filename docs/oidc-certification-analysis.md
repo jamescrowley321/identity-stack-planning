@@ -48,7 +48,7 @@ last_verified: 2026-09-15
 > external service, so an outage must be reported as an outage and not as a
 > conformance failure.
 >
-> **Known drift:** the certification names `3.1.0`; the library ships `3.18.1`.
+> **Known drift:** the certification names `3.1.0`; the library ships `4.1.1` (`py/pyproject.toml` on `main`, 2026-11-01).
 > Establishing what OIDF requires to refresh a listing is open work under #242.
 >
 > Execution: `ralph-prompts/pim-conformance-evidence.md`.
@@ -83,16 +83,16 @@ Before py-identity-model, only **two Python RP libraries** were certified (both 
 
 ## 2. Relevant Certification Profiles
 
-For py-identity-model as an RP/client library (state as of 2026-07-07):
+For py-identity-model as an RP/client library (state as of 2026-07-07; the three ⏳ rows re-checked against identity-model `main` on 2026-11-01):
 
 | Profile | Test Plan | Current State |
 |---------|-----------|---------------|
 | **Basic RP** | `oidcc-client-basic-certification-test-plan` | ✅ **Certified** (2 Jul 2026, v3.1.0) |
 | **Config RP** | `oidcc-client-config-certification-test-plan` | ✅ **Certified** (2 Jul 2026, v3.1.0) |
 | **Form Post Basic RP** | `oidcc-client-formpost-basic-certification-test-plan` | ✅ **Certified** (2 Jul 2026, v3.1.0) |
-| **Dynamic RP** | `oidcc-client-dynamic-certification-test-plan` | ⏳ Next — needs RFC 7591/7592 registration (#216) |
-| **RP-Initiated Logout RP** | `oidcc-client-rp-initiated-logout-certification-test-plan` | ⏳ Next — `end_session` URL builder (#214) |
-| **Back-Channel Logout RP** | `oidcc-client-backchannel-logout-certification-test-plan` | ⏳ Next — `validate_logout_token` (#442) |
+| **Dynamic RP** | `oidcc-client-dynamic-certification-test-plan` | ⏳ Implemented, not yet certified — `register_client` ships; `conformance/configs/dynamic-rp.json` exists (#216) |
+| **RP-Initiated Logout RP** | `oidcc-client-rp-initiated-logout-certification-test-plan` | ⏳ Implemented, not yet certified — `build_end_session_url` ships; `conformance/configs/rpinitiated-logout-rp.json` exists (#214) |
+| **Back-Channel Logout RP** | `oidcc-client-backchannel-logout-certification-test-plan` | ⏳ Implemented, not yet certified — `validate_logout_token` ships; `conformance/configs/backchannel-logout-rp.json` exists (#442) |
 | **Hybrid RP** | `oidcc-client-hybrid-certification-test-plan` | ❌ Dropped — deprecated in OAuth 2.1 |
 | **Implicit RP** | `oidcc-client-implicit-certification-test-plan` | ❌ Dropped — deprecated in OAuth 2.1 |
 | **Front-Channel Logout RP** | `oidcc-client-frontchannel-logout-certification-test-plan` | ❌ Dropped — browser-iframe; not applicable to a server-side library |
@@ -103,6 +103,11 @@ See **§8** for the detailed next-profiles plan, epic mapping, and the core-libr
 ---
 
 ## 3. Conformance Test Matrix
+
+> **Historical snapshot (March 2026, before certification).** §3 and §4 record the gaps as they
+> stood then. Many are now closed: py-identity-model is certified for Basic, Config and Form
+> Post Basic RP, and dynamic registration and both logout primitives ship. For current status
+> use identity-model's [`spec/capabilities.md`](https://github.com/jamescrowley321/identity-model/blob/main/spec/capabilities.md).
 
 ### 3.1 Basic RP Profile Tests (`response_type=code`)
 
@@ -319,9 +324,9 @@ The logout profiles are **not** purely a token-library concern. We split them:
   discovery metadata fields.
 - **`fastapi-identity-model` (middleware package)** owns the *HTTP surface & session lifecycle*:
   the `backchannel_logout_uri` POST receiver, the RP-initiated logout redirect, and
-  session termination keyed by `sid`/`sub`. This package is on the open branch
-  **`feat/fastapi-identity-model-package`** (`packages/fastapi-identity-model/`) — the
-  logout endpoint work should land there, consuming the core-lib primitives.
+  session termination keyed by `sid`/`sub`. This package is on `main` at
+  `py/packages/fastapi-identity-model/` (checked 2026-11-01) — the logout endpoint work
+  lands there, consuming the core-lib primitives.
 
 The OIDF RP certification itself continues to be driven by the disposable `conformance/`
 harness (it exercises whichever primitives a profile needs); the middleware package is a
@@ -347,6 +352,9 @@ downstream consumer, not the certified artifact.
   is **not certifiable** here.
 
 ### 8.4 Spec readiness
+
+> The `epic-0e-spec-*.md` files named here and in §8.2 are no longer in this repository
+> (checked 2026-11-01); the primitives they specified have since shipped.
 
 `epic-0e-spec-logout.md` (S.10a/S.10b) and `epic-0e-spec-dynamic-registration.md` (S.9)
 already define the cross-language spec + conformance tests for all three active profiles —

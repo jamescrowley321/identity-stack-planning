@@ -12,7 +12,7 @@ status: current
 purpose: >-
   Pre-BMAD context + technical research for adopting Ory Network as the SSO
   provider for identity-stack. Intended as an inputDocument for
-  /bmad-create-product-brief and the downstream PRD / architecture workflows.
+  /bmad-product-brief and the downstream PRD / architecture workflows.
 ---
 
 # Ory as SSO Provider — Planning Context & Technical Research
@@ -21,13 +21,23 @@ purpose: >-
 **Date:** 2026-08-13
 **Status:** Draft (pre-BMAD input)
 
+> **Since this was written (checked against identity-stack `main` on 2026-11-01).** Much of the
+> "current state" below has moved on; the work is tracked in identity-stack#376–#378.
+>
+> - The backend accepts Ory tokens: `backend/app/middleware/providers.py` builds provider
+>   configs from `ORY_ISSUER_URL` (and `ORY_AUDIENCE`). `_accepted_issuers` no longer exists.
+> - Logout dispatches by provider through `LOGOUT_STRATEGIES` (`app/services/logout.py`).
+> - `OrySyncAdapter` exists (`services/adapters/ory.py`), and `tenants.external_org_id` exists.
+> - `infra/ory/` holds the Ory Terraform root.
+> - The backend pins `py-identity-model>=3.8.5,<4`.
+
 ## Purpose
 
 This is a **feeder document** for the BMAD planning flow, not a finished artifact. It
 captures the locked scope, the current-state facts from our own repos, an Ory
 technical primer, and the key decisions the product brief / PRD / architecture
 workflows will need to resolve. Reference it as an `inputDocument` when running
-`/bmad-create-product-brief`.
+`/bmad-product-brief`.
 
 ## Locked Scope
 
@@ -164,7 +174,7 @@ the relevant pieces are:
 - **Token model:** **JWT access tokens**, audience-scoped — PIM validates them today, so the Ory
   project already runs the `access_token=jwt` strategy. Ensure the new SPA client also issues
   JWTs (project-wide strategy, or `access_token_strategy: "jwt"` on the client).
-- **Reuse:** `identity-stack` already depends on `py-identity-model` (>= 2.1.0) for token
+- **Reuse:** `identity-stack` already depends on `py-identity-model` (`>=3.8.5,<4` on 2026-11-01) for token
   validation, so Ory validation is *config + reuse of a path already proven against this
   exact Ory project* — not new validation code.
 - **Net-new for SSO (beyond PIM):** PIM exercises only **client-credentials (M2M)** — it never
@@ -201,7 +211,7 @@ defines the sync surface — so this is an adapter + mapping exercise, not new a
 |---|---|---|
 | Ory identity (Kratos) / OIDC `sub` | `idp_links.external_sub` (`provider_id` → the `ory` provider) → `users.id` | Unique `(provider_id, external_sub)` already enforced |
 | Ory identity email / traits | `users.email`, `given_name`, `family_name`; `idp_links.external_email` | `users` is SCIM-aligned |
-| Ory **Organization** (B2B) | `tenants` (`name`, `domains[]`, `status`) | **Gap:** `tenants` has no `external_id`/metadata column for the Ory org id — needs a migration or a tenant-level link |
+| Ory **Organization** (B2B) | `tenants` (`name`, `domains[]`, `status`) | **Gap (closed):** `tenants.external_org_id` now holds the provider org id |
 | Ory project / OAuth2 issuer | `providers` row: `type='ory'`, `issuer_url`, `base_url`, `config_ref` (HCP Terraform variable set) | `config_ref` keeps secrets out of Postgres |
 | Roles / permissions | `roles`, `permissions`, `user_tenant_roles` — **stay canonical** | Not pushed to Ory; resolved server-side post-auth |
 
@@ -274,21 +284,20 @@ provisions Ory state as the canonical model changes:
 - **Recommended flow** (run inside this worktree, where `/bmad-*` skills load):
   - Lean path: `/bmad-create-epics-and-stories` straight from this doc (reference it as an
     `inputDocument`) → ralph prompts.
-  - Only if you want more ceremony: `/bmad-create-product-brief` → `/bmad-create-prd` →
-    `/bmad-create-architecture` first.
+  - Only if you want more ceremony: `/bmad-product-brief` → `/bmad-prd` →
+    `/bmad-architecture` first.
 
 ## References (read before/while planning)
 
-- `_bmad-output/planning-artifacts/architecture-canonical-identity.md` — the adapter/provider seams
-- `_bmad-output/planning-artifacts/prd-multi-idp-demo.md` — prior multi-provider framing (names Ory Hydra)
+- `architecture-canonical-identity.md` and `prd-multi-idp-demo.md` — the adapter/provider seams and prior multi-provider framing; no longer in the working tree, see git history
 - `identity-stack/backend/app/middleware/auth.py`, `claims.py`, `factory.py` — issuer allow-list + gateway validation
 - `identity-stack/backend/app/services/provider.py` — provider registry (`issuer_url`, `list_all`)
-- `identity-stack/backend/app/services/adapters/{base,descope,noop}.py` — `IdentityProviderAdapter` ABC + impls to mirror for an Ory adapter
+- `identity-stack/backend/app/services/adapters/{base,descope,noop,ory}.py` — `IdentityProviderAdapter` ABC and its implementations, including the Ory adapter
 - `identity-stack/backend/app/models/identity/` — canonical schema (`ProviderType.ory`, `IdPLink`, `Tenant`, `UserTenantRole`)
 - `identity-stack/backend/app/services/identity_resolution.py` — sub→canonical-user resolution + JIT provisioning
 - `identity-stack/frontend/src/main.tsx` — OIDC login wiring (`react-oidc-context`/`oidc-client-ts`) to repoint at Ory
 - `identity-stack/frontend/src/hooks/useRBAC.ts`, `useTenants.ts` — Descope `tenants`/token claim parsing to make provider-agnostic
 - `identity-stack/backend/app/routers/auth.py` — Descope Management logout to make provider-aware (add Ory path)
 - `terraform-provider-descope/` — pattern to mirror for an Ory IaC track
-- `py-identity-model/src/tests/integration/` — the Ory validation path already proven in CI (reuse)
+- `identity-model/py/src/tests/integration/` — the Ory validation path already proven in CI (reuse)
 - `docs/idp-rbac-comparison.md`, `docs/descope-data-model.md` — existing IdP/claim reference
