@@ -5,17 +5,20 @@ Quick reference for running autonomous task execution with [Ralph Orchestrator](
 ## Architecture
 
 All prompts use the **router + shared phase file** pattern:
-- **Router** (`ralph-prompts/*.md`): task queue, routing logic, domain rules (~300-650 words)
-- **Phase files** (`ralph-prompts/phases/*.md`): generic, shared across all loops (~100-250 words each)
+- **Router** (`ralph-prompts/*.md`): task queue, routing logic, domain rules (396–2,332 words measured 2026-11-01)
+- **Phase files** (`ralph-prompts/phases/*.md`): generic, shared across all loops (~75–650 words each)
 - **Review agents** (`ralph-prompts/review-agents/*.md`): loaded only by subagents during review phase
 
 ## Running
 
 ```bash
-cd ~/repos/auth/identity-stack
-cp ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/run-next-task.md PROMPT.md
-ralph run
+# Creates /tmp/<loop>-ralph off origin/<base>, installs the prompt as PROMPT.md,
+# loads hats/<loop>.yml if it exists, and runs ralph.
+_bmad-output/implementation-artifacts/ralph-prompts/run.sh <loop-name> [repo] [base]
 ```
+
+`repo` is the local directory under `~/repos/auth/` (default `py-identity-model`, the local
+checkout of `identity-model`); `base` defaults to `main`. One loop per repo at a time.
 
 Each iteration completes one phase, persists state to `.claude/task-state.md`, and exits.
 
@@ -30,9 +33,11 @@ Each iteration completes one phase, persists state to `.claude/task-state.md`, a
 | `pim-capacity-breakpoint.md` | TH-4: capacity & breakpoint — ramp-to-SLO-breach, worker scaling, nightly full sweep (worktree-run) | py-identity-model |
 | `identity-model-go-rust-parity.md` | **Go/Rust catch-up** — Rust extended tier (revocation, token exchange, DPoP), Go advanced tier (client auth, PAR), cross-language correctness fixes. Supersedes `identity-model-rust-extended.md` (worktree-run) | identity-model |
 | `pim-conformance-evidence.md` | **Finish OIDF conformance** — make the hosted suite the CI standard across all twelve plans, then evidence packages for the next certification round + FAPI 2.0 (worktree-run) | identity-model |
+| `identity-model-stack.md` | Stacked-PR series off `main`, driven by the hat collection `hats/identity-model-stack.yml` (Stacker → Builder → Critic → Shipper); never merges | identity-model |
+| `planning-reality-audit.md` | Read-first, one-shot audit: finds where the planning artifacts, the sibling repos' actual state and their open GitHub issues disagree. Not a fix loop | identity-stack-planning (reads all repos) |
 | `retro-review-sweep.md` | **Retrospective review audit** — run the blind-peer-review lenses against already-merged, unreviewed PRs and file issues for confirmed findings. One-shot, fresh session, files issues but fixes nothing | identity-model (any repo) |
 
-> Completed one-shot loops (PRD 5 `canonical-identity`, PRD 2 `api-gateway`, `repository-base-refactor`, dated planning sessions) are archived under `_archive/ralph-planning/completed-epics/`.
+> Completed one-shot loops (PRD 5 `canonical-identity`, PRD 2 `api-gateway`, `repository-base-refactor`, dated planning sessions) are listed in [`_archive/README.md`](../../_archive/README.md); the files live in git history.
 
 > **One workstream per repo.** `identity-model-go-rust-parity.md` and `pim-conformance-evidence.md` both
 > target `identity-model`. Run them sequentially — wait for one to write LOOP_COMPLETE before starting the
@@ -40,7 +45,7 @@ Each iteration completes one phase, persists state to `.claude/task-state.md`, a
 
 ## Phase Pipeline
 
-Feature: `setup → analyze → implement → test → review → review-fix → pr → docs → ci → complete`
+Feature: `setup → analyze → implement → test → review → review-fix → pr → docs → ci → complete` (`run-next-task.md`: no `setup` or `docs`)
 Fix: `(setup →) fix → test → review → review-fix → ci → complete`
 
 Review phase spawns conditional subagents based on change scope (auth changes get all 5 reviewers; docs-only gets Acceptance only). Review-fix uses delta-only re-review (max 3 iterations).
