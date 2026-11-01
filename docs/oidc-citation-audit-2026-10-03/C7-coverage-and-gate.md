@@ -109,7 +109,7 @@ Worth **one S story**, landed **last** in the stack, on top of the fix stories, 
 - Acceptance criteria:
   - Given a line "OIDC Core §3.1.3.14", when `make test-tools` runs, then it fails naming file:line and "core: no section 3.1.3.14".
   - Given "auth_time (§3.1.3.7 step 12)", then it fails with "step 12 needs /acr/". Given "auth_time (§3.1.3.7 ⏎ step 13)", it passes.
-  - Given "[§5.3.4](…core-1_0.html#UserInfoResponse)", then it fails with "label §5.3.4 but #UserInfoResponse is §5.3.2".
+  - Given "`[§5.3.4](…core-1_0.html#UserInfoResponse)`", then it fails with "label §5.3.4 but #UserInfoResponse is §5.3.2".
   - Given "Back-Channel Logout 1.0 §2.4 step 2", then it fails with "has no numbered steps".
   - Given "RFC 7519 §4.1.3" or "OpenID Connect Discovery 1.0 document", it passes.
   - Given the repo at the head of the fix stack, the whole-repo test reports 0 violations.
