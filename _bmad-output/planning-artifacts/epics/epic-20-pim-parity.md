@@ -17,9 +17,9 @@ inputDocuments:
 
 `py-identity-model` (PIM) is the OIDF-certified reference implementation and **the source of truth — for both the feature set and the implementation**. This epic brings the Go and Rust ports of `identity-model` to **behavioral** parity with PIM — the same capability set, the same normative security checks, the same provider quirks — measured by an explicit capability matrix and a normative-behavior audit, decomposed into per-language implementation gaps.
 
-> **Consolidation: done.** PIM merged into this monorepo. The repo now carries `py/ go/ rust/ node/ spec/ infra/ conformance/` behind one harness, shipping as `py-v3.18.1`. The tracking epics — `identity-model#535`, `#536`, `#537` — are all closed. `py/` remains the reference implementation; it is no longer a separate repository.
+> **Consolidation: done.** PIM merged into this monorepo. The repo now carries `py/ go/ rust/ node/ spec/ infra/ conformance/` behind one harness, shipping as `py-v3.18.1` when this was written (`py-v4.1.1` on 2026-11-01). The tracking epics — `identity-model#535`, `#536`, `#537` — are all closed. `py/` remains the reference implementation; it is no longer a separate repository.
 
-It does **not** mandate mirroring PIM's Python file layout (see the Architecture Decision below). Full verified state, the matrix, and the audit live in [`docs/identity-model-reconciliation-2026-08-12.md`](../identity-model-parity-report-2026-09-05.md); this epic is the actionable decomposition.
+It does **not** mandate mirroring PIM's Python file layout (see the Architecture Decision below). Full verified state, the matrix, and the audit live in [`identity-model-parity-report-2026-09-05.md`](../identity-model-parity-report-2026-09-05.md); this epic is the actionable decomposition.
 
 ## Architecture Decision (ADR) — keep the flat idiomatic shape
 
@@ -108,7 +108,7 @@ Security-normative behaviors (Story 20.2) come first — they are gaps in alread
 
 **Given** the Rust Extended-tier gap,
 **When** the work is executed,
-**Then** it follows the decomposition in `epic-5-extended-tier.md` (stories 5.1-rust … 5.4-rust) via the loop prompt `ralph-prompts/identity-model-rust-extended.md`, mirroring `go/pkg/{introspection,revocation,dpop}` + the RFC 8693 exchange path, satisfying the existing `spec/conformance/{introspection,revocation,token-exchange,dpop}.json` prose contracts, and flipping the Rust column in the matrix as each lands.
+**Then** it follows the decomposition in `epic-5-extended-tier.md` (stories 5.1-rust … 5.4-rust) via the loop prompt `ralph-prompts/identity-model-rust-extended.md`, mirroring `go/pkg/{introspection,revocation,dpop}` + the RFC 8693 exchange path, satisfying the existing `spec/vectors/{introspection,revocation,token-exchange,dpop}.json` prose contracts, and flipping the Rust column in the matrix as each lands.
 
 *(This story is a pointer; the detail lives in Epic 5 and the loop prompt. It is the single biggest parity gap and the recommended next large loop.)*
 
