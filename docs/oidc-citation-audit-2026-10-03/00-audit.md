@@ -3,6 +3,15 @@
 Checked against: Core 1.0 (errata set 2), Discovery, Registration, RP-Initiated/Back-Channel Logout (final).
 ~365 OIDC citations checked across py/go/rust/spec/docs/conformance. Section numbers all exist; errors are wrong sub-section/step/strength.
 
+> **Note (2026-11-01, identity-model `main` @ `d8c3293`).** The Rust integration tests have
+> moved: `rust/tests/id_token_validation.rs` is now `rust/tests/it/live/id_token_validation.rs`,
+> `rust/tests/spec_conformance_id_token.rs` is now `rust/tests/it/conformance/id_token.rs`, and
+> `rust/tests/spec_http_vectors.rs` is now `rust/tests/it/live/spec_http_vectors.rs`. Line
+> numbers below are as of `1e3b6a6`. Spot checks on `main` show the findings still present
+> (for example "step 12" in `go/pkg/idtoken/doc.go:14`, and `exp` missing from the Logout Token
+> `_REQUIRED_CLAIMS` in `py/src/py_identity_model/core/logout_logic.py:57`); fixes are tracked
+> under identity-model#852.
+
 ## Incorrect
 
 1. §3.1.3.7 "step 12" for auth_time/max_age -> step 13 (12 is acr). Step 13 is SHOULD; "MUST be present" comes from Core §2 (auth_time).
