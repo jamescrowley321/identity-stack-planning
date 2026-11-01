@@ -87,7 +87,7 @@ Scope: every incorrect and fix-recommended line in `00-audit.md` and `C1`–`C7`
 
 - **Given** `spec/vectors/*.json`, **when** diffed, **then** only `spec`/`notes`/`then`/`references` strings change. No `input`/`expect` diffs.
 - **Given** the repo, **when** grepping `step 12`, `steps 4-6`, `5\.3\.4`, `worked example`, **then** no hit points at auth_time, azp, UserInfo sub, or a §3.3.2.11 example.
-- **Given** `spec/capabilities.md:111`, **then** the label reads §5.3.2 and matches `#UserInfoResponse`.
+- **Given** the UserInfo `sub`-match rule in `spec/capabilities.md` (line 111 at `1e3b6a6`), **then** the label reads §5.3.2 and matches `#UserInfoResponse`.
 - **Given** `conformance/app.py:1264`, **when** UserInfo fails for a non-sub reason, **then** the log does not claim a sub mismatch.
 - Wording rule: say what the spec requires, at the strength it requires it. Where the library is stricter, say so as library policy and do not attribute it to the spec.
 - All unit, integration and conformance suites pass with no test logic changed.
@@ -109,7 +109,7 @@ Scope: every incorrect and fix-recommended line in `00-audit.md` and `C1`–`C7`
 ### CIT-4 — Rust base validation stops reading azp
 
 - **Given** an access token `aud=["api", …]` with `azp="spa-client"` and expected audience `api`, **when** `validate_token` runs, **then** it succeeds.
-- The divergence note at `spec/capabilities.md:69-71` is removed.
+- The `azp` divergence note in `spec/capabilities.md` (lines 69-71 at `1e3b6a6`) is removed.
 - The cargo-mutants gate is green.
 
 ### CIT-5 — untrusted additional audiences (spec MUST, unconditional)

@@ -140,9 +140,10 @@ so nothing here should wait on a federation decision.
   issuer identifier the well-known URI was built from, and the response MUST NOT
   be used otherwise (RFC 8414 §3.3). Unconditional, with explicit alias and
   loopback exceptions.
-- Bounded discovery and JWKS caches; single-flight fetch, including Rust's
-  missing concurrent-fetch deduplication. Availability and resource hygiene,
-  with no multi-issuer precondition.
+- Published cache staleness and failure semantics. Bounded discovery and JWKS
+  caches and single-flight fetch already ship in Go and Rust (checked
+  2026-11-01). Availability and resource hygiene, with no multi-issuer
+  precondition.
 - Published cache staleness and failure semantics.
 
 **Phase 1b — multi-issuer defences.** Exploitable only once a second
