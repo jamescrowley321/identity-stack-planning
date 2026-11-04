@@ -47,6 +47,7 @@ stale only when a new epic is written, never merely because work progressed.
 | `planning-artifacts/epics-ory-sso-provider.md` | #376, #377, #378 |
 | `planning-artifacts/epics-tfc-environments.md` | [#411](https://github.com/jamescrowley321/identity-stack/issues/411) epic; stories #413–#418 |
 | — (app side of `epic-25-injected-config.md`; design lives in the issues) | #406, #407 |
+| `planning-artifacts/epics/epic-24-identity-capability-gaps.md` § Authorization gaps filed as issues | [#541](https://github.com/jamescrowley321/identity-stack/issues/541), [#542](https://github.com/jamescrowley321/identity-stack/issues/542), [#543](https://github.com/jamescrowley321/identity-stack/issues/543), [#544](https://github.com/jamescrowley321/identity-stack/issues/544) |
 | `docs/ory-sso-provider-context.md`, `docs/ory-iac-automation-plan.md` | #376–#378 |
 | `ralph-prompts/ory-frontend-logout.md` | #377, #378 |
 
@@ -74,7 +75,7 @@ Naming the gap is the point — a silent absence reads identically to an oversig
 
 | Planning artifact | Why there is no issue |
 |---|---|
-| `planning-artifacts/epics/epic-24-identity-capability-gaps.md` | `status: proposed` — not yet accepted into a repo's backlog |
+| `planning-artifacts/epics/epic-24-identity-capability-gaps.md` | Stories 24.0–24.8: `status: proposed`, not yet accepted into a repo's backlog. Its authorization-gap section is filed as identity-stack#541–#544 |
 | `planning-artifacts/epics/epic-17-fapi-attacker-model-tests.md` | Written 2026-08-02, never filed. Distinct from #476, which tracks FAPI2 *hardening*, not the attacker-model suite |
 | `planning-artifacts/epics/epic-16-audit-remediation.md` | Remediation shipped under the closed #300 umbrella; the epic doc is the record of what was decided |
 | `planning-artifacts/epics/epic-18-load-soak-testing.md`, `epic-21-cross-platform-serializer.md`, `epic-22-framework-middlewares.md` | Decomposition written ahead of the work; not yet filed |

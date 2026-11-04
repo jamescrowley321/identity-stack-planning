@@ -251,9 +251,30 @@ published with evidence.
 - [ ] **Given** the capability report is published, **when** a reader checks each interface, **then**
   its status, evidence locator, unsupported edges, and owning project are clear.
 
+## Authorization gaps filed as issues
+
+A consumer adopting `identity-stack` as its reference for roles and permissions needs four
+capabilities the stories above don't cover. Each is filed against `identity-stack`, verified at
+`5cf5adb`:
+
+| Issue | Gap | Current state |
+|---|---|---|
+| [identity-stack#541](https://github.com/jamescrowley321/identity-stack/issues/541) | Gate routes by permission, not role | `require_permission` exists (`backend/app/dependencies/rbac.py:198`); no router uses it, all 39 gates are `require_role` |
+| [identity-stack#542](https://github.com/jamescrowley321/identity-stack/issues/542) | Revoke access before the token expires | Canonical-RBAC providers re-read grants every request; claims-based providers keep a removed role until expiry. Deactivation is the only revocation signal (`rbac.py:119`) |
+| [identity-stack#543](https://github.com/jamescrowley321/identity-stack/issues/543) | Provider-neutral service principals over client credentials | Machine principals are Descope access keys only (`backend/app/routers/accesskeys.py`) |
+| [identity-stack#544](https://github.com/jamescrowley321/identity-stack/issues/544) | Narrowed grants for delegated actors (RFC 8693 `act`) | `py-identity-model` can exchange tokens; the backend never reads `act`. Builds on Story 24.5 |
+
+Keycloak as a provider is tracked separately by
+[identity-stack-planning#94](https://github.com/jamescrowley321/identity-stack-planning/issues/94),
+whose epic survives only in closed PR #47. It also needs a `realm_access`/`resource_access` claim
+mapper for the roles-in-token path.
+
 ## Dependency order
 
 `24.0 → 24.1 → 24.2 → 24.3 → 24.4 → 24.5 → 24.6 → 24.7 → 24.8`
+
+identity-stack#541 comes first among the filed issues: #543 and #544 gate through its permission
+checks, and #544 also needs Story 24.5's delegation evidence. #542 is independent.
 
 Stories 24.3 and 24.4 may proceed in parallel after the principal and protocol/security-profile
 boundaries are stable. Story 24.7 depends on the generic adapter shape, not on an application-specific
