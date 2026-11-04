@@ -254,7 +254,7 @@ published with evidence.
 ## Authorization gaps filed as issues
 
 A consumer adopting `identity-stack` as its reference for roles and permissions needs four
-capabilities the stories above don't cover. Each is filed against `identity-stack`, verified at
+capabilities the stories above don't cover. Each is filed against `identity-stack`, verified on 2026-11-03 at
 `5cf5adb`:
 
 | Issue | Gap | Current state |
