@@ -266,15 +266,16 @@ capabilities the stories above don't cover. Each is filed against `identity-stac
 
 Keycloak as a provider is tracked separately by
 [identity-stack-planning#94](https://github.com/jamescrowley321/identity-stack-planning/issues/94),
-whose epic survives only in closed PR #47. It also needs a `realm_access`/`resource_access` claim
+whose epic survives only in closed identity-stack-planning#47. It also needs a `realm_access`/`resource_access` claim
 mapper for the roles-in-token path.
 
 ## Dependency order
 
 `24.0 → 24.1 → 24.2 → 24.3 → 24.4 → 24.5 → 24.6 → 24.7 → 24.8`
 
-identity-stack#541 comes first among the filed issues: #543 and #544 gate through its permission
-checks, and #544 also needs Story 24.5's delegation evidence. #542 is independent.
+identity-stack#541 comes first among the filed issues: identity-stack#543 and identity-stack#544
+gate through its permission checks, and identity-stack#544 also needs Story 24.5's delegation
+evidence. identity-stack#542 is independent.
 
 Stories 24.3 and 24.4 may proceed in parallel after the principal and protocol/security-profile
 boundaries are stable. Story 24.7 depends on the generic adapter shape, not on an application-specific
