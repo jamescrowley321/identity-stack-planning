@@ -266,7 +266,7 @@ not to any brain deployment.
 | Callback `state` (or PKCE, or `nonce`) validation | Closes login-CSRF by binding the callback to the user-agent session | Go and Rust clients lack a callback builder/parser surface for this | Unconditional client conformance (RFC 9700 §4.7) — a single-issuer control, not a federation gate; add executable callback vectors |
 | Callback `iss` validation (RFC 9207) | Closes authorization-response mix-up, whose preconditions require a second, attacker-operated authorization server (RFC 9700 §4.4.1) | Same missing callback surface; distinct per-issuer redirect URIs (RFC 9700 §4.4.2.2) are the fallback defence where `iss` is unavailable | Federation-pilot gate, and only for front-channel authorization responses — see the sequencing note in the implementation plan |
 | Discovery endpoint-authority binding | Stops a malicious discovery document redirecting key or token requests | Not enforced consistently across implementations | Unconditional: RFC 8414 §3.3 requires the returned `issuer` to be identical to the issuer identifier the well-known URI was built from, and the response MUST NOT be used otherwise. Enforce with explicit alias and loopback exceptions |
-| Bounded discovery/JWKS caches, single-flight fetch | Limits memory growth and duplicate key fetches during rotation or cache miss | Cache-entry limits absent in Go and Rust paths; Rust also lacks concurrent-fetch dedup | Availability and resource hygiene with no multi-issuer precondition; implement independent of federation timing and publish staleness and failure semantics |
+| Bounded discovery/JWKS caches, single-flight fetch | Limits memory growth and duplicate key fetches during rotation or cache miss | Bounded caches and single-flight fetch ship in Go and Rust (`go/pkg/jwks/cache.go`, `rust/src/jwks/cache.rs`, checked 2026-11-01); staleness and failure semantics are not published across languages | Availability and resource hygiene with no multi-issuer precondition; implement independent of federation timing and publish staleness and failure semantics |
 | Introspection and revocation | Lets a target brain react when a token or grant dies before expiry | Not at cross-language parity; local grant revocation must not depend only on an upstream endpoint | Use revocation events plus local grant state as the authority; add introspection where the trust profile needs it |
 | Token Exchange (RFC 8693) | Lets a broker mint a target-brain token while preserving the delegation chain | Exchange support and actor semantics need cross-language and product-level tests | Use for bounded delegation; never as unrestricted impersonation |
 | DPoP or mTLS | Makes a copied token far less useful by binding it to a key or certificate | Sender-constrained flows are not a complete profile across clients and deployment modes | DPoP for suitable software clients, mTLS for managed links; test replay, rotation, proxy behavior |
@@ -279,7 +279,7 @@ not to any brain deployment.
 ### Reuse order
 
 1. **Close the security-normative client gaps:** callback `iss`/`state`,
-   discovery authority binding, bounded caches, concurrent JWKS fetch.
+   discovery authority binding, published cache staleness and failure semantics.
 2. **Define the shared brain contract:** canonical subject and actor mapping,
    `brain_access`, target resource and audience rules, grant lifecycle, denial
    codes, conformance vectors.

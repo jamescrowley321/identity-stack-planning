@@ -71,6 +71,14 @@ written to `.tf`, committed, or stored in Postgres. The SPA client is public (no
 
 ## Repository Layout
 
+> **As built (checked against identity-stack `main` on 2026-11-01).** `infra/ory/` exists with a
+> different layout from the plan below: `main.tf`, `versions.tf`, `variables.tf`, `outputs.tf`,
+> `environments/dev.tfvars`, a `modules/ory-oidc-app/` module and `scripts/rotate-workspace-key.sh`.
+> HCP Terraform workspaces are selected by tags (`["identity-stack", "ory"]`), and the Descope
+> root `infra/main.tf` now selects by tags too, not by the `identity-stack-dev` name. The
+> provider authenticates with `ORY_WORKSPACE_API_KEY` plus `ORY_WORKSPACE_ID` (env vars), which
+> settles the **[CONFIRM]** items about the provider variable name.
+
 Add a **parallel root module** rather than folding Ory into the Descope module — it isolates Ory's
 create-only/no-import caveats and its own apply cadence, and keeps the Descope state untouched.
 

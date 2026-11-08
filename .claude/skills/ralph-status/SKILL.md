@@ -8,8 +8,11 @@ allowed-tools: Bash, Read, Glob, Grep
 
 Show the current state of all ralph loops running across the auth workspace (`~/repos/auth/`).
 
-The workspace has five git repos: `identity-stack`, `py-identity-model`,
-`terraform-provider-descope`, `identity-stack-planning`, and `identity-model`.
+The workspace's active local checkouts are `identity-stack`, `py-identity-model`,
+`terraform-provider-descope` and `identity-stack-planning`. Local directory names do not all
+match GitHub: `~/repos/auth/py-identity-model/` is the GitHub repository **`identity-model`**
+(see `AGENTS.md`). So the local loops below iterate directory names, and the `gh` loops iterate
+GitHub names.
 
 ## Step 1: Enumerate every worktree across all repos
 
@@ -22,7 +25,7 @@ primary checkouts' `.claude/` misses every `/tmp` loop and reports a false
 List all worktrees (primary checkout + `/tmp/` isolation worktrees) for every repo:
 
 ```bash
-for repo in identity-stack py-identity-model terraform-provider-descope identity-stack-planning identity-model; do
+for repo in identity-stack py-identity-model terraform-provider-descope identity-stack-planning; do
   git -C ~/repos/auth/$repo worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2}'
 done | sort -u
 ```
@@ -33,7 +36,7 @@ For each worktree path from Step 1, search its `.claude/` for task-state files.
 This is the step that catches loops running in `/tmp`:
 
 ```bash
-for repo in identity-stack py-identity-model terraform-provider-descope identity-stack-planning identity-model; do
+for repo in identity-stack py-identity-model terraform-provider-descope identity-stack-planning; do
   git -C ~/repos/auth/$repo worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2}'
 done | sort -u | while read -r wt; do
   find "$wt/.claude" -maxdepth 2 -name 'task-state*.md' 2>/dev/null
@@ -62,7 +65,7 @@ tracks the current task while the code lives in `/tmp/pim-T252`). Flag:
 For each repo, check for open PRs:
 
 ```bash
-for repo in identity-stack py-identity-model terraform-provider-descope identity-stack-planning identity-model; do
+for repo in identity-stack identity-model terraform-provider-descope identity-stack-planning; do
   echo "== $repo =="
   gh pr list --repo jamescrowley321/$repo --state open \
     --json number,title,headRefName,isDraft,mergeStateStatus,statusCheckRollup --limit 20 2>/dev/null
@@ -117,13 +120,14 @@ Flag orphaned worktrees (no task-state) or stale references (task-state points t
 
 ### Task Queue Progress
 
-| Repo | Done | In Progress | Pending | Blocked | Won't Fix | Total |
-|------|------|-------------|---------|---------|-----------|-------|
-| terraform-provider-descope | ... | ... | ... | ... | ... | ... |
-| identity-stack | ... | ... | ... | ... | ... | ... |
-| py-identity-model | ... | ... | ... | ... | ... | ... |
+| Repo | Open issues |
+|------|-------------|
+| identity-model | ... |
+| identity-stack | ... |
+| terraform-provider-descope | ... |
+| identity-stack-planning | ... |
 
-Show separate counts for feature tasks and review fix tasks.
+Step 4 counts open issues only; expand an epic when a loop is driving it.
 
 ### Open PRs
 
@@ -137,11 +141,11 @@ For each repo with open PRs, list them with CI status:
 
 Valid phases in order of execution:
 
-**Feature/Story loops:** setup > analyze > implement > test > review > review-fix > pr > ci > complete
+**Feature/Story loops:** setup > analyze > implement > test > review > review-fix > pr > docs > ci > complete (`run-next-task.md` has no setup or docs)
 
 **Fix loops:** (setup >) fix > test > review > review-fix > ci > complete
 
-**Legacy phases** (may appear in old task-state files): analysis, plan, anchor, execute, review-blind, review-edge, review-acceptance, review-security, docs, ci-fix, checkout
+**Legacy phases** (may appear in old task-state files): analysis, plan, anchor, execute, review-blind, review-edge, review-acceptance, review-security, ci-fix, checkout
 
 ## Notes
 
@@ -154,5 +158,8 @@ Valid phases in order of execution:
   may hold the task-state in its home worktree while spawning a separate per-task
   code worktree.
 - The `phase` field tells you exactly where the loop is in its workflow cycle.
+- Hat-based loops (those with a `ralph-prompts/hats/<loop>.yml`, such as
+  `identity-model-stack`) keep no task-state file. Their state is `.ralph/stack-ledger.md`
+  and `.ralph/specs/<issue>/` in the loop worktree (`/tmp/<loop>-ralph`).
 - If a task-state exists but the ralph process is not running, the loop is
   paused/crashed — the state file allows resumption.

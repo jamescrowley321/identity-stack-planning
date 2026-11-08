@@ -2,12 +2,12 @@
 title: "System Architecture"
 description: "C4 context and component architecture, the canonical identity ER model, the request lifecycle, and the consolidated ADR index."
 status: current
-last_verified: 2026-09-15
+last_verified: 2026-11-01
 ---
 
 # System Architecture
 
-Unified technical overview of the auth workspace. For detailed architecture decisions, see the per-PRD architecture documents linked from the [roadmap](roadmap.md).
+Unified technical overview of the auth workspace. For the decisions behind it, see the [consolidated ADR index](#consolidated-adr-index) below; for the tracks, the [roadmap](roadmap.md).
 
 ## System Context
 
@@ -18,10 +18,9 @@ graph TB
 
     subgraph workspace["Auth Workspace"]
         ap["identity-stack-planning<br/>BMAD planning hub"]
-        pim["py-identity-model<br/>OIDC/OAuth2 Python library"]
         tfp["terraform-provider-descope<br/>Terraform provider"]
         is["identity-stack<br/>FastAPI + React SaaS app"]
-        im["identity-model<br/>Polyglot OIDC/OAuth2 client libs (Go/Rust)"]
+        im["identity-model<br/>Polyglot OIDC/OAuth2 client libs (Python/Go/Rust)"]
     end
 
     subgraph external["External Services"]
@@ -39,8 +38,7 @@ graph TB
     dev --> im
     user --> is
 
-    is --> pim
-    im -.->|mirrors| pim
+    is -->|py-identity-model| im
     is --> descope
     is --> pg
     tfp --> descope
@@ -53,7 +51,7 @@ graph TB
 
 ## Component Architecture
 
-### py-identity-model
+### identity-model — Python (`py/`, package `py-identity-model`)
 
 ```
 +---------------------------------------------------------+
@@ -69,18 +67,20 @@ graph TB
 |  sync/introspection.py      aio/introspection.py        |
 |  sync/revocation.py         aio/revocation.py           |
 |  sync/userinfo.py           aio/userinfo.py             |
-|  + dpop, par, jar, device_auth, token_exchange, refresh |
+|  + par, jarm, device_auth, token_exchange, id_token,    |
+|    logout, registration, managed_client                 |
 +---------------------------------------------------------+
 |                 Shared Business Logic                    |
 |  core/discovery_logic.py    core/jwks_logic.py          |
 |  core/token_validation_logic.py                         |
 |  core/validators.py         core/models.py              |
-|  core/auth_code_pkce_logic.py                           |
-|  core/dpop_logic.py         core/fapi_logic.py          |
+|  core/pkce.py               core/token_client_logic.py  |
+|  core/dpop.py               core/fapi.py                |
 |  core/introspection_logic.py                            |
-|  core/revocation_logic.py   core/refresh_logic.py       |
-|  core/jar_logic.py          core/par_logic.py           |
+|  core/revocation_logic.py   core/id_token_logic.py      |
+|  core/jar.py                core/par_logic.py           |
 |  core/device_auth_logic.py  core/token_exchange_logic.py|
+|  core/logout_logic.py       core/registration_logic.py  |
 +---------------------------------------------------------+
 |                    HTTP Layer                            |
 |  sync/http_client.py        aio/http_client.py          |
@@ -96,7 +96,7 @@ graph TB
 
 ### identity-model
 
-The polyglot evolution of `py-identity-model` (PRD 6): one cross-language OIDC/OAuth2 client-library monorepo with a shared conformance `spec/`. **Go** ships the Core + Extended tiers; **Rust** ships the Core tier (hardened). `py-identity-model` is the reference implementation the Go/Rust ports mirror, and folds in as `python/` once the monorepo matures. Toolchains: Go 1.26, Rust MSRV 1.96. Current source-verified state and the sequenced plan live in [`identity-model-reconciliation-2026-08-12.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/planning-artifacts/identity-model-parity-report-2026-09-05.md).
+One cross-language OIDC/OAuth2 client-library monorepo with a shared conformance `spec/`. Python lives in `py/` (package `py-identity-model`) and is the reference implementation the Go and Rust libraries match. **Go** and **Rust** ship Core (except configuration) plus introspection, revocation and token exchange; Go also ships DPoP, which is in progress in Rust. Per-language status is in [`spec/capabilities.md`](https://github.com/jamescrowley321/identity-model/blob/main/spec/capabilities.md) (checked 2026-11-01). Toolchains: Go 1.26, Rust MSRV 1.96. The 2026-09-05 source-verified state and the sequenced plan live in [`identity-model-parity-report-2026-09-05.md`](https://github.com/jamescrowley321/identity-stack-planning/blob/main/_bmad-output/planning-artifacts/identity-model-parity-report-2026-09-05.md).
 
 ### identity-stack
 
@@ -105,7 +105,7 @@ The polyglot evolution of `py-identity-model` (PRD 6): one cross-language OIDC/O
 |                        React Frontend                          |
 |  react-oidc-context + oidc-client-ts                          |
 |  shadcn/ui + Tailwind CSS v4                                  |
-|  OAuth2 authorization code flow → Descope hosted login        |
+|  OAuth2 authorization code flow → Descope (or Ory) login      |
 +---------------------------------------------------------------+
         |                                      |
         | /api/* (proxy in dev)                | OIDC login
@@ -115,31 +115,33 @@ The polyglot evolution of `py-identity-model` (PRD 6): one cross-language OIDC/O
 |                                                                |
 |  Middleware Stack (outermost → innermost):                     |
 |  1. ProxyHeadersMiddleware    (X-Forwarded-For)               |
-|  2. CorrelationIdMiddleware   (X-Correlation-ID / traceparent)|
-|  3. SecurityHeadersMiddleware (CSP, HSTS, X-Frame-Options)    |
+|  2. SecurityHeadersMiddleware (CSP, HSTS, X-Frame-Options)    |
+|  3. SlowAPIMiddleware         (rate limiting) *               |
 |  4. TokenValidationMiddleware (py-identity-model) *           |
 |  5. CORSMiddleware                                            |
 |                                                                |
-|  * Offloaded to Tyk in gateway deployment mode                |
+|  * Gateway mode drops SlowAPI and replaces token validation   |
+|    with GatewayClaimsMiddleware (Tyk validates the JWT)       |
 |                                                                |
 |  +------------------+  +------------------+  +---------------+|
-|  | Auth Routers     |  | Admin Routers    |  | Health/Ops    ||
-|  | /api/auth/*      |  | /api/admin/*     |  | /health       ||
-|  | session, tenant  |  | users, roles     |  | /ready        ||
-|  | switch, logout   |  | permissions, fga |  |               ||
+|  | Auth Routers     |  | Domain Routers   |  | Health        ||
+|  | /api/auth/*      |  | /api/... users,  |  | /api/health   ||
+|  | session, tenant  |  | roles, perms,    |  |               ||
+|  | switch, logout   |  | tenants, fga     |  |               ||
 |  +--------+---------+  +--------+---------+  +---------------+|
 |           |                      |                             |
 |           v                      v                             |
 |  +--------------------------------------------------+         |
-|  |            IdentityService (ABC)                  |         |
-|  |  create_user()  assign_role()  create_tenant()    |         |
+|  |   Per-domain services (services/user.py, ...)     |         |
 |  |  Returns Result[T, IdentityError]                 |         |
+|  |  (IdentityService ABC defined, not implemented)   |         |
 |  +--------------------------------------------------+         |
 |           |                      |                             |
 |  +--------v----------+  +-------v-----------------+           |
 |  | PostgreSQL 16     |  | IdentityProviderAdapter |           |
 |  | (canonical store) |  |   DescopeSyncAdapter    |           |
-|  | 8 SCIM tables     |  |   NoOpSyncAdapter       |           |
+|  | 9 identity tables |  |   OrySyncAdapter        |           |
+|  |                   |  |   NoOpSyncAdapter       |           |
 |  +-------------------+  +-------------------------+           |
 +---------------------------------------------------------------+
         |                           |
@@ -159,7 +161,10 @@ The polyglot evolution of `py-identity-model` (PRD 6): one cross-language OIDC/O
 |  descope_project      descope_sso        |
 |  descope_permission   descope_role       |
 |  descope_tenant       descope_access_key |
-|  descope_fga_schema   descope_fga_rel    |
+|  descope_fga_schema   descope_descoper   |
+|  descope_management_key  descope_engine  |
+|  descope_inbound_app                     |
+|  descope_sso_application                 |
 |  descope_password_settings               |
 |  descope_outbound_application            |
 |  descope_third_party_application         |
@@ -295,35 +300,29 @@ sequenceDiagram
 
 ```mermaid
 graph LR
-    subgraph standalone["Standalone"]
+    subgraph standalone["Default (no profile)"]
         SPA1[React SPA :3000] --> API1[FastAPI :8000]
+        API1 --> PG1[PostgreSQL :5432]
         API1 --> DESC1[Descope API]
     end
 
     subgraph gateway["Gateway (--profile gateway)"]
         SPA2[React SPA :3000] --> TYK[Tyk Gateway :8080]
         TYK --> API2[FastAPI :8000]
-        TYK --> REDIS[Redis :6379]
+        TYK --> REDIS[tyk-redis]
+        API2 --> PG2[PostgreSQL :5432]
         API2 --> DESC2[Descope API]
-    end
-
-    subgraph full["Full (--profile full)"]
-        SPA3[React SPA :3000] --> TYK2[Tyk Gateway :8080]
-        TYK2 --> API3[FastAPI :8000]
-        TYK2 --> REDIS2[Redis :6379]
-        API3 --> PG[PostgreSQL :5432]
-        API3 --> DESC3[Descope API]
-        OIDC[node-oidc-provider :9000] --> TYK2
-        ASPIRE[Aspire Dashboard :18888]
-        ASPIRE -.-> API3
     end
 ```
 
 | Profile | Containers | Use Case |
 |---------|-----------|----------|
-| standalone | React + FastAPI (+ SQLite) | Developer experience, zero infrastructure |
-| gateway | + Tyk + Redis | Enterprise authentication patterns |
-| full | + PostgreSQL + node-oidc-provider + Aspire | Full platform with canonical identity + multi-provider |
+| default | frontend + backend + postgres | Minimum functional dev stack |
+| gateway | + tyk-init + tyk-gateway + tyk-redis | Tyk validates JWTs in front of the backend |
+| full | Same as gateway (placeholder) | Reserved for future services |
+| infra | redis + aspire-dashboard (opt-in, combinable) | Observability and cache |
+
+Checked against `identity-stack/docker-compose.yml` on 2026-11-01.
 
 ## Secrets
 
@@ -350,6 +349,9 @@ client per month — against a constraint that everything must be free.
 
 ## Consolidated ADR Index
 
+The source documents named below are no longer in the working tree (checked 2026-11-01); they
+live in git history, and this table is the surviving record.
+
 | ADR | Document | Decision | Rationale |
 |-----|----------|----------|-----------|
 | ADR-1 | architecture.md | Platform vs Runtime split | Terraform for deploy-time config; runtime APIs for lifecycle ops |
@@ -370,5 +372,5 @@ client per month — against a constraint that everything must be free.
 | ADR-CANON-7 | architecture-canonical-identity.md | Write-through sync | Postgres first, IdP second; never rollback on sync failure |
 | ADR-CANON-8 | architecture-canonical-identity.md | Repository-level tenant isolation | Explicit tenant_id params, no implicit context |
 | ADR-IS-1 | architecture-infrastructure-secrets.md | HCP Terraform for state | Encrypted, versioned, locked; free tier sufficient |
-| ADR-IS-2 | architecture-infrastructure-secrets.md | Infisical over Vault | Right-sized complexity; better UX for small teams |
-| ADR-IS-3 | architecture-infrastructure-secrets.md | CLI injection pattern | `infisical run` injects env vars; zero application code changes |
+| ADR-IS-2 | architecture-infrastructure-secrets.md | ~~Infisical over Vault~~ — superseded | Infisical was rejected; secrets are HCP Terraform variable sets (see Secrets above) |
+| ADR-IS-3 | architecture-infrastructure-secrets.md | ~~CLI injection pattern~~ — superseded | `infisical run` went with Infisical; secrets are HCP Terraform variable sets |

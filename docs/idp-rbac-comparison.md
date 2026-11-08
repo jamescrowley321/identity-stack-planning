@@ -28,7 +28,7 @@ Authorization models fall on a spectrum:
 | **RBAC + ReBAC** | RBAC in app DB, ReBAC in graph engine | Both questions above | Multi-tenant SaaS with document/resource-level sharing | Two systems to operate, two mental models |
 | **Pure ReBAC** | Relation tuples (`object#relation@subject`) | "What is this user's relationship to this resource?" | Fine-grained, resource-level access (Google Docs sharing model) | Overkill for "is this user an admin?", higher operational complexity |
 
-The identity-stack reference architecture uses the middle approach: **RBAC owned in Postgres, ReBAC proxied to Zanzibar-style engines** (Descope FGA, Ory Keto, OpenFGA). This is a pragmatic choice, not the only valid one.
+The identity-stack reference architecture uses the middle approach: **RBAC owned in Postgres, ReBAC proxied to a Zanzibar-style engine** (Descope FGA today; Ory Keto and OpenFGA are candidate engines, not wired in). This is a pragmatic choice, not the only valid one.
 
 ## Summary
 
@@ -231,27 +231,27 @@ The identity-stack reference architecture splits authorization into two layers, 
 
 | Layer | Question | Data Store | Enforcement | Why Here |
 |-------|----------|-----------|-------------|----------|
-| **RBAC** | Who are you, what role in this tenant? | Canonical Postgres | `require_role()` / `require_permission()` | Roles are identity primitives — they change slowly, map cleanly to relational tables, and must survive provider swaps |
-| **ReBAC/FGA** | What is your relationship to this resource? | Zanzibar engine (Descope FGA, Ory Keto, OpenFGA) | `require_fga("document", "can_view")` | Relationship graphs are what Zanzibar engines are built for — graph evaluation at scale, not something to reimplement in SQL |
+| **RBAC** | Who are you, what role in this tenant? | Canonical Postgres for providers listed in `CANONICAL_RBAC_PROVIDERS` (default `ory`); Descope roles still come from its signed `dct`/`tenants` claims | `require_role()` / `require_permission()` | Roles are identity primitives — they change slowly, map cleanly to relational tables, and must survive provider swaps |
+| **ReBAC/FGA** | What is your relationship to this resource? | Zanzibar engine (Descope FGA today) | `require_fga("document", "can_view")` | Relationship graphs are what Zanzibar engines are built for — graph evaluation at scale, not something to reimplement in SQL |
 
 ### Why RBAC in the application
 
 - **Normalized model** — Roles and permissions live in Postgres (`roles`, `permissions`, `role_permissions`, `user_tenant_roles`), not in IdP-specific claim structures.
-- **Provider-agnostic** — Adding a new IdP means implementing one sync adapter, not rewriting authorization logic. The application enforces `require_role()` / `require_permission()` against its own store.
+- **Provider-agnostic** — Adding a new IdP means implementing one sync adapter, not rewriting authorization logic. The application enforces `require_role()` / `require_permission()`; for providers in `CANONICAL_RBAC_PROVIDERS` (default `ory`) it resolves them from its own store, while Descope principals are still decided from their signed claims (`backend/app/dependencies/rbac.py`, checked 2026-11-01).
 - **Tenant-scoped by design** — User-tenant-role assignments are first-class relations, not bolted on via groups or custom claims.
-- **No token bloat** — The JWT proves identity (who you are). The application resolves permissions from its own store (what you can do).
+- **No token bloat** — The JWT proves identity (who you are). The target is that the application resolves permissions from its own store (what you can do); today that holds for providers in `CANONICAL_RBAC_PROVIDERS`.
 - **Multi-IdP correlation** — A single user can be linked to multiple IdP identities via `idp_links`. Authorization is unified regardless of which provider issued the token.
 - **Owned audit trail** — `assigned_by`, `assigned_at`, `updated_at` in the application database, not scattered across provider consoles.
 
 ### Why ReBAC in a dedicated engine
 
 - **Graph evaluation at scale** — "Can user X view document Y through any chain of relationships?" is a graph traversal problem. Zanzibar engines are purpose-built for this; SQL is not.
-- **Proxied, not owned** — The canonical model doesn't store relation tuples locally. It calls the FGA engine's check API through an abstraction layer. Swapping Descope FGA for Ory Keto or OpenFGA means changing the adapter, not the data model.
+- **Proxied, not owned** — The canonical model doesn't store relation tuples locally. Today `require_fga` calls the Descope FGA check API directly (`backend/app/dependencies/fga.py`, checked 2026-11-01). The intent is a provider-neutral port, so that swapping Descope FGA for Ory Keto or OpenFGA means changing the adapter, not the data model; that port is not built.
 - **Different lifecycle** — RBAC assignments change when an admin updates a role. FGA tuples change when a user shares a document. Different write patterns, different consistency requirements.
 
 ### What stays in the IdP
 
-IdPs handle authentication — they are purpose-built for login flows, MFA, passkeys, social login, session management. The application handles authorization. The provider landscape demonstrates that these are genuinely different concerns. See [system architecture](system-architecture.md) for the full two-layer model (ADR-2).
+IdPs handle authentication — they are purpose-built for login flows, MFA, passkeys, social login, session management. The application handles authorization. The provider landscape demonstrates that these are genuinely different concerns. See [system architecture](system-architecture.md) for the component architecture and ADR index.
 
 ### When you might choose differently
 
@@ -282,6 +282,5 @@ This two-layer approach adds complexity. Situations where a simpler model might 
 - [Ory Keto](https://www.ory.sh/docs/keto) — First open-source Zanzibar implementation
 
 ### Internal Architecture
-- [System Architecture](system-architecture.md) — ADR-2 (Two-Layer Authorization), ADR-3 (Provider Abstraction Tiers)
-- [Canonical Identity PRD](system-architecture.md) — Why the platform owns identity data
+- [System Architecture](system-architecture.md) — ADR-3 (Three-tier abstraction model), and the canonical identity ER diagram
 - [Descope Data Model](descope-data-model.md) — Descope JWT claim structure and tenant model
