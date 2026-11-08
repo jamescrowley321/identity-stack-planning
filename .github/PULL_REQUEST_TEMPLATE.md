@@ -14,12 +14,10 @@ verification; those are the documents under suspicion.
 
 <!--
 If any part of this PR was AI-assisted, check the box and fill in the harness and model.
-An agent must NOT check the accountability box on a human's behalf.
 -->
 - [ ] This PR was AI-assisted
 - Harness/agent:
 - Model(s):
-- [ ] A human has reviewed this change and is accountable for it
 
 ## Checklist
 
