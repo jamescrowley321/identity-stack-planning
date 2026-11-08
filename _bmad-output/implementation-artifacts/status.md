@@ -34,11 +34,13 @@ stale only when a new epic is written, never merely because work progressed.
 | `planning-artifacts/epics/epic-19-mechanical-security-gates.md` | #511, #633, #642, #643 |
 | `planning-artifacts/identity-model-parity-report-2026-09-05.md` | [#639](https://github.com/jamescrowley321/identity-model/issues/639) audit |
 | `docs/oidc-certification-analysis.md` | [#242](https://github.com/jamescrowley321/identity-model/issues/242) certification; [#476](https://github.com/jamescrowley321/identity-model/issues/476) FAPI 2.0 |
-| `ralph-prompts/identity-model-go-rust-parity.md` | #573, #574, #575, #576, #578, #579 |
+| `ralph-prompts/identity-model-parity-1.md` + `hats/identity-model-parity-1.yml` | #573: #868, #762, #991, #828, #791, #574, #783, #772, #768, #766, #770, #778, #901, #784, #992, #890, #575, #576, #867 |
+| `ralph-prompts/identity-model-parity-2.md` + `hats/identity-model-parity-2.yml` | #573: #993–#1014 |
 | `ralph-prompts/pim-conformance-evidence.md` | #607, #471, #472, #473, #242, #475, #476 |
 | `ralph-prompts/identity-model-stack.md` + `hats/identity-model-stack.yml` | #869, #852 (CIT), #751 (Epic 25), #867, #607, #473, #471, #242, #868, #791, #777, #574, #783, #772, #768, #769, #766, #782, #770, #778, #784, #828, #870 |
 | `planning-artifacts/epics/epic-cognito-live-provider.md` | [#843](https://github.com/jamescrowley321/identity-model/issues/843) epic; stories #844–#850 |
 | `planning-artifacts/epics/epic-oidc-spec-citations.md` + `docs/oidc-citation-audit-2026-10-03/` | [#852](https://github.com/jamescrowley321/identity-model/issues/852) epic; stories #853–#861, plus #771, #773, #774 |
+| `planning-artifacts/epics/epic-26-full-parity.md` | [#573](https://github.com/jamescrowley321/identity-model/issues/573) epic; #958, #959, #757, #758, #578, #579, #574–#576, #762, #828, #867, #868, #890, #932, #961, #963 |
 
 ### identity-stack (`jamescrowley321/identity-stack`) — Track 2
 

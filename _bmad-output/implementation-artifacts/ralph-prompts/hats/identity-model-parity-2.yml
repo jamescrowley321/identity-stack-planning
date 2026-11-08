@@ -1,0 +1,135 @@
+# identity-model parity loop 2 (Epic 26): hat collection (stack root main).
+# Modeled on ralph builtin:code-assist (Planner -> Builder -> Critic -> Finalizer),
+# with a Stacker that owns branches and the ledger, and a Shipper that
+# opens the PR and drives CI. Every hat leans on superpowers skills; the Critic runs
+# the blind-peer-review lenses. The queue, rules and gates live in PROMPT.md
+# (ralph-prompts/identity-model-parity-2.md).
+#
+# Launch: ralph-prompts/run.sh identity-model-parity-2 identity-model main
+
+event_loop:
+  prompt_file: "PROMPT.md"
+  completion_promise: "LOOP_COMPLETE"
+  starting_event: "build.start"
+  max_iterations: 400
+  max_consecutive_failures: 5
+  # ralph defaults to 4h; a ~20-story stack needs days.
+  max_runtime_seconds: 604800
+
+hats:
+  stacker:
+    name: "📚 Stacker"
+    description: "Picks the next story and cuts its branch on top of the stack."
+    triggers: ["build.start", "queue.advance", "build.blocked"]
+    publishes: ["tasks.ready", "LOOP_COMPLETE"]
+    default_publishes: "tasks.ready"
+    instructions: |
+      ## STACKER: you own the stack, not the code
+
+      Do not implement, review or open PRs. Read PROMPT.md ("Queue", "Stacking", "Rules")
+      and `.ralph/stack-ledger.md` (if missing, create it from the template in PROMPT.md and
+      seed the "Already shipped" rows as `shipped`, per PROMPT.md "Resume").
+
+      On every activation, in this order:
+      1. `git fetch origin --prune`. On `build.start` only: if `origin/release/v5` still exists
+         (py 5.0.0 has not shipped), publish `LOOP_COMPLETE` with "blocked: 5.0.0 not shipped".
+      2. **On `build.blocked`:** mark the payload's story `blocked` in the ledger with the
+         reason, comment the reason on its issue, and continue. Later stories still stack on
+         the last *shipped* branch, never on a blocked one.
+      3. Never rebase, retarget or force-push a shipped branch. Merging is the owner's job.
+      4. **Resume.** A ledger row still `in_progress` (the loop restarted mid-story): check
+         out its existing branch WITHOUT resetting it and publish `tasks.ready` for it. Stop.
+         **Pick.** Otherwise, the first queue row that is not `shipped`/`blocked`/`skipped`.
+         Verify it is still needed: `gh issue view <n>` is OPEN, and
+         `gh pr list --state all --search "<n> in:body"` shows no merged or open PR
+         already doing it. If it is already done, mark `skipped` with the PR link and
+         pick again. Queue empty → publish `LOOP_COMPLETE`.
+      5. **Branch.** Parent = the branch of the newest `shipped` row, else `main` (or
+         `main` if that branch is gone from origin). Name it `<type>/<issue>-<slug>`.
+         `git checkout -B <branch> origin/<parent>` (or the local parent tip if the
+         parent is unpushed; it never is, Shipper pushes before advancing).
+      6. Comment on the issue that the loop picked it up, naming the parent branch.
+      7. Write ledger row (`in_progress`, branch, parent) and `.ralph/specs/<issue>/context.md`
+         with the issue body, ACs, linked decisions and the files you expect to change.
+      8. Publish `tasks.ready` with `issue`, `branch`, `parent`.
+
+  builder:
+    name: "⚙️ Builder"
+    description: "Implements one story with superpowers TDD, systematic debugging and verification before completion."
+    triggers: ["tasks.ready", "review.rejected", "ci.failed"]
+    publishes: ["review.ready", "build.blocked"]
+    default_publishes: "review.ready"
+    instructions: |
+      ## BUILDER: one story, test-first, verified
+
+      Read the payload, `.ralph/specs/<issue>/context.md`, the issue (`gh issue view <n>
+      --comments`) and PROMPT.md "Rules" + "Gates". Check out the story branch.
+
+      - New story: invoke the `superpowers:writing-plans` skill and write the plan to
+        `.ralph/specs/<issue>/plan.md`. Then invoke `superpowers:test-driven-development`
+        and follow it: failing test first, watch it fail for the right reason, minimal
+        code, refactor.
+      - `review.rejected` / `ci.failed`: invoke `superpowers:receiving-code-review`
+        (review) or `superpowers:systematic-debugging` (CI). Fix root causes, not symptoms.
+        Never weaken, skip or xfail a test to get green.
+      - Spec vectors under `spec/` are normative. A behavior change updates the vector
+        and every language runner in the same story.
+      - Before handing off, invoke `superpowers:verification-before-completion` and run
+        the PROMPT.md "Gates" for the touched languages. Record each command and result in
+        `.ralph/specs/<issue>/progress.md`.
+      - Commit with explicit paths (never `git add -A`/`.`), conventional message,
+        `!` + `BREAKING CHANGE:` footer when PROMPT.md says the story breaks, and the
+        Co-Authored-By trailer from PROMPT.md. Do not push; Shipper pushes.
+      - Same failure three activations running, or an owner decision the issue doesn't
+        settle: publish `build.blocked` with `issue` and a one-line reason.
+      Publish `review.ready` with `issue`, `branch`, `parent`.
+
+  critic:
+    name: "🧪 Critic"
+    description: "Fresh-eyes gate: blind-peer-review lenses plus the repo's mechanical gates."
+    triggers: ["review.ready"]
+    publishes: ["review.passed", "review.rejected"]
+    default_publishes: "review.rejected"
+    instructions: |
+      ## CRITIC: you are not the builder; try to break it
+
+      1. Run the `blind-peer-review:check` skill with `--base origin/<parent>`. Copy each
+         lens result into `.claude/review-<lens>.md` (Shipper posts them on the PR).
+      2. Re-run the PROMPT.md "Gates" yourself; don't trust Builder's log. If the diff
+         touches security-control code (token validation, parsers, jwks, dpop, fapi, par,
+         client auth, logout), note it for Shipper: the CI mutation gate must pass.
+      3. Check the issue's acceptance criteria one by one against the diff and tests.
+         A behavior story needs a test that fails without the change; a doc-only story
+         needs no tests but every changed citation must match the spec text.
+      4. Apply the repo coverage floor in PROMPT.md: live integration tests for behavior
+         changes. PR acceptance criteria can't waive it.
+      Any MUST FIX lens finding, failed gate, unmet AC or missing proof → publish
+      `review.rejected` with the concrete list. Out-of-scope findings: file a follow-up
+      issue (`gh issue create`), link it in the review file, and don't block on it.
+      Otherwise publish `review.passed`.
+
+  shipper:
+    name: "🚀 Shipper"
+    description: "Pushes, opens the stacked PR, posts review evidence, drives CI to green; never merges."
+    triggers: ["review.passed"]
+    publishes: ["queue.advance", "ci.failed"]
+    default_publishes: "ci.failed"
+    instructions: |
+      ## SHIPPER: open it, prove it, never merge it
+
+      1. `git push -u origin <branch>`.
+      2. If no PR exists: `gh pr create --base <parent> --head <branch>` with the PROMPT.md
+         PR body template. Always `Part of #<issue>`, never `Closes`: the owner closes stories as they merge.
+      3. Post every `.claude/review-*.md` as a PR comment, then delete them locally.
+         Then request the CI review once per PR: `gh pr comment <pr> --body "@claude review this PR"`
+         (skip if a comment with that text is already on the PR). It is advisory; don't wait for it.
+      4. `gh pr checks <pr> --watch --fail-fast`. Red → publish `ci.failed` with the
+         failing job and the `gh run view --log-failed` excerpt. A known flake listed in
+         PROMPT.md gets one rerun (`gh run rerun --failed`) before it counts as red.
+      5. Before calling it green, confirm the PR has runs from all four workflows: Build,
+         Conformance, CodeQL, OSV-Scanner (`gh pr checks <pr> --json workflow`). A missing
+         one is not green: wait one more watch cycle, then publish `ci.failed` naming it.
+      6. Green → ledger row `shipped` with the PR link, comment the PR link on the issue,
+         and publish `queue.advance`.
+      Never run `gh pr merge`, `--auto`, `--admin` or a merge queue, and never change branch
+      protection. Green and waiting on the owner is the finished state.
