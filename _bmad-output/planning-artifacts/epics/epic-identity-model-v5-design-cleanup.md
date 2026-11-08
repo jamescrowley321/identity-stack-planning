@@ -1,7 +1,7 @@
 # identity-model 5.0 — design cleanup before release
 
 **Date:** 2026-11-08
-**Status:** Stack #960→#1031 merged into `release/v5` (merge commits). #915 (`release/v5` → `main`, py 5.0.0) is held until Gate A below is clear.
+**Status:** Decisions D1–D3 made 2026-11-08. Stack #960→#1031 merged into `release/v5` (merge commits). #915 (`release/v5` → `main`, py 5.0.0) is held until Gate A below is clear.
 
 ## Why
 
@@ -11,15 +11,24 @@ The rule for what blocks the release: **if fixing it after 5.0.0 would break the
 
 Finding IDs are `<PR>-<letter>`; each points to the PR where the problem was introduced.
 
-## Owner decisions
+## Owner decisions (decided 2026-11-08)
 
-| # | Decision | Recommendation |
-|---|----------|----------------|
-| D1 | 1027-A: core `check_token_binding` accepts a token with `cnf.jkt` / `x5t#S256` as plain Bearer when no presentation is passed. RFC 9449 §7.1 / RFC 8705 §3 make the binding check a MUST. | Spec MUST → unconditional: a bound token with no presentation is rejected. Matches fastapi (#1029), which always passes a presentation. |
-| D2 | Gate A is ~12 stories. Ship all of it in 5.0, or cut? | Keep every item marked *breaking*; the "cheap-now" items are optional. |
-| D3 | 962-B / #992: empty `client_id` / `kid` / `use` mean different things per language; #992 is parked in Epic 26 (post-5.0). | Pull the **py** half of #992 into 5.0. Go/Rust stay in Epic 26. |
+| # | Decision | Outcome |
+|---|----------|---------|
+| D1 | 1027-A: core `check_token_binding` returns early when `presentation is None` (`token_binding.py`), so a token with `cnf.jkt` / `x5t#S256` is accepted as plain Bearer. | **Reject, unconditionally.** A bound token with no presentation is refused with a typed error; no option. |
+| D2 | Gate A scope | **All of Gate A ships in 5.0**, including the "cheap now" item. |
+| D3 | 962-B / #992 empty-string semantics | **py half of #992 lands in 5.0.** Go/Rust stay in Epic 26. |
+
+### D1 spec cross-reference
+- RFC 9449 §7.2: a protected resource that supports both schemes "MUST reject a DPoP-bound access token received as a bearer token". The library supports DPoP, so this applies. The only carve-out (§7.2 para 3) describes a Bearer-only resource unaware of DPoP, which "would most presumably accept" it. That is descriptive, not a rule for a DPoP-capable verifier.
+- RFC 9449 §6: resource servers "MUST be able to reliably identify whether an access token is DPoP-bound" and "MUST ensure that the public key from the DPoP proof matches the one bound to the access token".
+- RFC 9449 §7.1: "The resource server MUST NOT grant access to the resource unless all checks are successful."
+- RFC 8705 §3: the protected resource "MUST obtain, from its TLS implementation layer, the client certificate" and "MUST verify that the certificate matches the certificate associated with the access token"; otherwise "the resource access attempt MUST be rejected with an error" (401 `invalid_token`). The text covers a mismatch and does not mention a missing certificate. But the MUST-verify cannot be met without a certificate, so a missing certificate is rejected too.
+- Project rule: spec MUSTs are unconditional, not opt-in (#574). fastapi (#1029) already always passes a presentation, so this also aligns core with the middleware.
 
 ## Gate A — lands on `release/v5` before #915
+
+Epic: [#1057](https://github.com/jamescrowley321/identity-model/issues/1057).
 
 Ordered by dependency. Each story is one PR based on `release/v5`.
 
@@ -32,53 +41,53 @@ Ordered by dependency. Each story is one PR based on `release/v5`.
 ### A2. Key-strength floor — in progress (`fix/970-key-floor-bypass`)
 - 970-A: Go measures the converted key; py uses PyJWT's base64url decoder; Rust leaves empty material to key conversion. Follow-up check: py and Rust still measure the JWK, so the two strategies can drift.
 
-### A3. Algorithm allowlist policy — breaking
+### A3. Algorithm allowlist policy — breaking — [#1058](https://github.com/jamescrowley321/identity-model/issues/1058)
 One documented policy per purpose (verify, sign, FAPI) and one meaning for `algorithms=None`.
 - 970-B: `None` = default set on py discovery path, but "required" in py manual mode; Go/Rust default everywhere; Rust default lacks ES512. `DEFAULT_ALLOWED_ALGORITHMS` is an alias of the signing set, so new signing algs widen verification.
 - 1027-C: DPoP verifier defaults to the client key-generation set (`dpop._SUPPORTED_ALGORITHMS`).
 - 1031-A (default part): signed introspection defaults to the FAPI set even outside FAPI, so a plain RS256 AS fails.
 - Count today: `SUPPORTED_SIGNING_ALGORITHMS`, `DEFAULT_ALLOWED_ALGORITHMS`, `FAPI2_ALLOWED_SIGNING_ALGORITHMS`, `dpop._SUPPORTED_ALGORITHMS`, `id_token._EDDSA_ALGS`.
 
-### A4. Typed errors — breaking
+### A4. Typed errors — breaking — [#1059](https://github.com/jamescrowley321/identity-model/issues/1059)
 - 971-A: `FAPIValidationResult.violations` and `FAPIProfileError.violations` are `list[str]`; tests match message prefixes. → typed violation code enum + message.
 - 1027-D (breaking part): `check_token_binding` raises bare `ValueError`; `CertificateBindingError` has no kind enum. (Non-breaking part — `NONCE_MISMATCH` → `use_dpop_nonce`, `REPLAY_CACHE_FULL` as a server error — can ride along.)
 - Must land before the Go/Rust FAPI ports (#1012–#1014) copy the shape.
 
-### A5. Config and cache surface — breaking
+### A5. Config and cache surface — breaking — [#1060](https://github.com/jamescrowley321/identity-model/issues/1060)
 - 969-A: one `Config` holds transport and cache fields; each consumer silently ignores the other's. → split into an HTTP config and a cache config.
 - 969-B: `ValidationCache` exposes `disco`, `jwks`, both write locks and `kid_miss_last_attempt` as public mutable attributes. → private, plus a Protocol like `DPoPReplayCache`.
 - 1027-B: DPoP replay cache defaults to a process-wide global, keyed by `jti` only; the Protocol is sync but called from async; replay is signalled by either `False` or raising. → caller-owned, one signalling path, async variant.
 - 969-C: reword [#996](https://github.com/jamescrowley321/identity-model/issues/996) ACs ("clients own their caches") to match py's injected-cache direction; settle the JWKS fallback TTL (py 1 h vs Go/Rust 24 h).
 
-### A6. Value types and PAR shape — breaking
+### A6. Value types and PAR shape — breaking — [#1061](https://github.com/jamescrowley321/identity-model/issues/1061)
 - 976-F: `PrivateKeyJwt`, `MtlsClientAuth`, `RequestObjectKey` are mutable, so the profile copies and re-checks them on every request. → frozen dataclasses; delete `_client_auth_copies` and the re-check.
 - 1017-A: `PushedAuthorizationRequest` is plain-mode or signed-mode in one type; non-`None` defaults make the mixing guard unable to tell unset from default; `request=""` silently falls back. → separate signed-request type (or `None` sentinels).
 - 1017-B / [#1016](https://github.com/jamescrowley321/identity-model/issues/1016): `validate_fapi_authorization_request` rejects compliant signed PARs.
 
-### A7. Resource-server binding — D1
-- 1027-A per D1.
+### A7. Resource-server binding — D1 (spec MUST) — [#1062](https://github.com/jamescrowley321/identity-model/issues/1062)
+- 1027-A: reject a token with `cnf.jkt` or `cnf["x5t#S256"]` when no presentation is passed, with a typed error (`DPoPErrorKind.NOT_BOUND`-style / a `CertificateBindingError` kind). Unconditional. Update the docstring ("With no presentation nothing is checked") and the 4→5 upgrade note.
 
-### A8. DPoP client options — breaking
+### A8. DPoP client options — breaking — [#1063](https://github.com/jamescrowley321/identity-model/issues/1063)
 - 1020-A: `require_dpop_token_type` duplicates what `dpop_key` says. Flag without key fails every response; key without flag silently accepts Bearer. → derive from `dpop_key` (or one DPoP options object per request).
 - 1020-B: a refused downgrade drops the token response (`token=None`), losing a rotated refresh token and leaving issued Bearer tokens unrevocable. → keep the response on the error.
 - 1020-C: `DPoPKey` can only be generated, not loaded; alg is a bare `str`. → `from_pem` / `from_jwk`, alg enum. (Additive, but DPoP-on-refresh is unusable across restarts without it.)
 - 1020-E / [#1019](https://github.com/jamescrowley321/identity-model/issues/1019): proof built outside the retry decorator, so retries resend the same `jti`.
 
-### A9. fastapi settings and middleware options — breaking
+### A9. fastapi settings and middleware options — breaking — [#1064](https://github.com/jamescrowley321/identity-model/issues/1064)
 - 1029-A: `OIDCSettings.required_binding` has no reader; settings can't express `mtls`.
 - 1029-B: middleware and `build_ws_authenticator` each grow the same argument list (`PLR0913` already suppressed); #1048–#1050 add more. → one shared options object. Coordinate with [#1049](https://github.com/jamescrowley321/identity-model/issues/1049).
 - 1029-C (part): add an expected-origin option for `htu`; today it trusts `Host`.
 
-### A10. Empty-string semantics (py) — D3
+### A10. Empty-string semantics (py) — D3 — [#1065](https://github.com/jamescrowley321/identity-model/issues/1065)
 - 962-B: py/Rust treat `client_id=""` as set, Go as unset. Pull py half of [#992](https://github.com/jamescrowley321/identity-model/issues/992) forward.
 
-### A11. FAPI validators vs profile
+### A11. FAPI validators vs profile — [#1066](https://github.com/jamescrowley321/identity-model/issues/1066)
 - 976-C: `validate_fapi_client_config` accepts `mtls` + `dpop_key` and `private_key_jwt` + `mtls`; the profile refuses both and adds checks the validators skip. → validators delegate to the profile's checks, or document that they're narrower.
 
-### A12. Signed introspection inputs
+### A12. Signed introspection inputs — [#1067](https://github.com/jamescrowley321/identity-model/issues/1067)
 - 1031-A (rest): options hold a fixed `JwksResponse` and a manual issuer (no rotation / kid-miss refresh); `introspection_signing_alg_values_supported` is parsed but unread; leeway 0; verified `iat`/`iss` discarded. Making `jwks` optional is borderline-breaking — decide shape now.
 
-### Cheap now, optional
+### A13. Cheap now (in scope per D2) — [#1068](https://github.com/jamescrowley321/identity-model/issues/1068)
 - 971-B: PAR endpoint check is truthiness-only (`true` passes) → string check.
 
 ## Gate B — 5.x (post-release), file as issues
