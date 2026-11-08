@@ -1,6 +1,6 @@
 # identity-model py 5.0.0 Release Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. Status lives in the GitHub epic, not here.
+> **Historical record — do not execute.** Phases A–D are done: the stack is open as identity-model#960 → identity-model#1031 on `release/v5`, and identity-model#915 cuts 5.0.0. Don't re-run any task here (Task 7 pushes to `release/v5`). Status lives in the GitHub epic.
 
 **Goal:** Ship `py-identity-model` 5.0.0 (plus `fastapi-identity-model`'s matching major): the OIDC citation fixes (#852), the required Discovery metadata (#771, D2), and the injected `Config` (Epic 25, #751). All of it lands through `release/v5`, so `main` gets one push and semantic-release cuts one version.
 
@@ -298,7 +298,8 @@ Additive (FAPI completeness, identity-model#954):
 | 9 | identity-model#955 | PAR front-channel URL helper; signed request object sent to PAR | py |
 | 10 | identity-model#956 | DPoP on refresh, Bearer-downgrade check, automatic mTLS aliases, PS256/EdDSA DPoP keys | py |
 | 11 | identity-model#478 | Python RS-side DPoP verification | py |
-| 12 | identity-model#957 | Signed introspection responses (RFC 9701) | py (go/rust runners deferred) |
+| 12 | identity-model#1021 | FastAPI middleware accepts the DPoP scheme and enforces sender-constrained tokens (breaking) | py (fastapi) |
+| 13 | identity-model#957 | Signed introspection responses (RFC 9701) | py (go/rust runners deferred) |
 | — | identity-model#906 | CI-gate all three FAPI2 plans, including a signed-request variant (shipped before #951) | ci |
 | — | identity-model#975 | #951 profile edge cases (runs before #955) | py |
 
