@@ -1,7 +1,7 @@
 # identity-model 5.0 — design cleanup before release
 
 **Date:** 2026-11-08
-**Status:** Decisions D1–D3 made 2026-11-08. Stack #960→#1031 merged into `release/v5` (merge commits). #915 (`release/v5` → `main`, py 5.0.0) is held until Gate A below is clear.
+**Status:** Decisions D1–D3 made 2026-11-08. Stack #960→#1031 merged into `release/v5` (merge commits). #915 (`release/v5` → `main`, py 5.0.0) is held until Gate A below is clear. Gate A fixes are in progress; see **Progress** below.
 
 ## Why
 
@@ -31,6 +31,24 @@ Finding IDs are `<PR>-<letter>`; each points to the PR where the problem was int
 Epic: [#1057](https://github.com/jamescrowley321/identity-model/issues/1057).
 
 Ordered by dependency. Each story is one PR based on `release/v5`.
+
+### Progress (2026-11-08)
+
+| Story | Issue | PR | State |
+|-------|-------|----|-------|
+| A1 client auth | [#1056](https://github.com/jamescrowley321/identity-model/issues/1056) | — | owner WIP (`/tmp/im-1056`) |
+| A2 key floor | — | — | owner WIP (`fix/970-key-floor-bypass`) |
+| A3 alg policy | [#1058](https://github.com/jamescrowley321/identity-model/issues/1058) | [#1095](https://github.com/jamescrowley321/identity-model/pull/1095) | open, awaiting review. The DPoP verify default got *wider* (RS384/512, PS*) |
+| A7 RS binding | [#1062](https://github.com/jamescrowley321/identity-model/issues/1062) | [#1093](https://github.com/jamescrowley321/identity-model/pull/1093) | open, awaiting review. Scoped to access tokens (see A7) |
+| A9 fastapi options | [#1064](https://github.com/jamescrowley321/identity-model/issues/1064) | [#1091](https://github.com/jamescrowley321/identity-model/pull/1091) | open, awaiting review. `AuthOptions`; PLR0913 per-file rule remains until #1049 |
+| A10 empty = absent (py) | [#1065](https://github.com/jamescrowley321/identity-model/issues/1065) | [#1092](https://github.com/jamescrowley321/identity-model/pull/1092) | open, awaiting review. No spec vectors (Rust runner can't skip one); stays with #992 |
+| A14 introspected `cnf` | [#1094](https://github.com/jamescrowley321/identity-model/issues/1094) | — | in progress, stacked on #1093 |
+| A15 login-callback audiences | [#1099](https://github.com/jamescrowley321/identity-model/issues/1099) | — | filed; stack on / fold into #1093 |
+| A4, A5, A6, A8, A11, A12, A13 | [#1059](https://github.com/jamescrowley321/identity-model/issues/1059) [#1060](https://github.com/jamescrowley321/identity-model/issues/1060) [#1061](https://github.com/jamescrowley321/identity-model/issues/1061) [#1063](https://github.com/jamescrowley321/identity-model/issues/1063) [#1066](https://github.com/jamescrowley321/identity-model/issues/1066) [#1067](https://github.com/jamescrowley321/identity-model/issues/1067) [#1068](https://github.com/jamescrowley321/identity-model/issues/1068) | — | waiting on #1056 (shared files: config, models, fapi, par_logic, token_client_logic, exceptions) |
+
+Release-PR CI: #915's `rust-mutation-gate` failed on an equivalent mutant in `resolve_kidless` (`len() > 1` guard redundant with `narrow()`'s fallback). Fixed by [#1096](https://github.com/jamescrowley321/identity-model/pull/1096) (merged). #915 is retitled `feat(py)!: release py-identity-model 5.0.0`.
+
+Local `make lint` needs `GOTOOLCHAIN=go1.26.10` (golangci-lint panics on Go 1.27) and `~/go/bin` on PATH (actionlint).
 
 ### A1. Client auth — [#1056](https://github.com/jamescrowley321/identity-model/issues/1056) (in progress)
 - 960-A: one `ClientAuthMethod` enum (six methods), `EndpointAuthenticationMethods` deleted, explicit `client_auth_method` on all 9 requests, `CLIENT_SECRET_POST`.
@@ -66,6 +84,8 @@ One documented policy per purpose (verify, sign, FAPI) and one meaning for `algo
 
 ### A7. Resource-server binding — D1 (spec MUST) — [#1062](https://github.com/jamescrowley321/identity-model/issues/1062)
 - 1027-A: reject a token with `cnf.jkt` or `cnf["x5t#S256"]` when no presentation is passed, with a typed error (`DPoPErrorKind.NOT_BOUND`-style / a `CertificateBindingError` kind). Unconditional. Update the docstring ("With no presentation nothing is checked") and the 4→5 upgrade note.
+- **Scope (decided 2026-11-08):** the check runs only on **access-token** validation (`validate_token`, fastapi middleware/WebSocket). ID tokens (OIDC Core §3.1.3.7) and logout tokens (Back-Channel Logout §2.6) are never presented to a resource server with a proof, so `validate_id_token` / `validate_logout_token` skip it; otherwise an ID token carrying `cnf` would break login.
+- **Side effect:** the fastapi login callback now calls `validate_id_token`, so §3.1.3.7 step 2 applies ("MUST be rejected if … it contains additional audiences not trusted by the Client"). Multi-audience ID tokens fail login until A15 lands.
 
 ### A8. DPoP client options — breaking — [#1063](https://github.com/jamescrowley321/identity-model/issues/1063)
 - 1020-A: `require_dpop_token_type` duplicates what `dpop_key` says. Flag without key fails every response; key without flag silently accepts Bearer. → derive from `dpop_key` (or one DPoP options object per request).
@@ -90,33 +110,44 @@ One documented policy per purpose (verify, sign, FAPI) and one meaning for `algo
 ### A13. Cheap now (in scope per D2) — [#1068](https://github.com/jamescrowley321/identity-model/issues/1068)
 - 971-B: PAR endpoint check is truthiness-only (`true` passes) → string check.
 
-## Gate B — 5.x (post-release), file as issues
+### A14. Introspected `cnf` — D1 (spec MUST) — [#1094](https://github.com/jamescrowley321/identity-model/issues/1094)
+- Found during A7. For opaque tokens the binding arrives in the introspection response (`cnf.jkt`, RFC 9449 §6.2; `cnf["x5t#S256"]`, RFC 8705 §3.2), and py never checks it against the presentation, so a bound opaque token is accepted as a bearer token. Same rules and typed errors as A7. Stacked on #1093.
 
-| ID | Finding |
-|----|---------|
-| 962-A | `validate_id_token` has no `client_id` kwarg; uses `audience` (Go `WithClientID`, Rust `.client_id()`) |
-| 962-C | azp misconfig checked per call, not at config build |
-| 964-A | Go/Rust public resolvers still return `enc` keys alongside `ResolveSigningKey` |
-| 964-B | "no kid" encoded as `""` in Go/Rust errors (→ #993) |
-| 964-C | signing-key rule ignores `key_ops` |
-| 964-D | `KeyNotFoundException` unpicklable (widen #927) |
-| 969-D | JWKS cooldown keyed by `jwks_uri`, cache by trust scope + `jwks_uri` (half in #967) |
-| 969-E | cache metrics process-wide and async-only |
-| 969-F | implicit default cache; `TrustScope` not exported |
-| 970-C | py EC floor rarely fires (P-192 dropped at parse); docs wording |
-| 972-B | no spec vector for `aud` precedence before Go/Rust `private_key_jwt` (#1000) |
-| 973-A | `--only-module` run writes `all_passed: true` to `*-latest.json` |
-| 973-B | committed conformance `*-latest.json` with dead `log_url`s; basic job uploads FAPI files |
-| 976-D | client auth decides sender-constraint (no `private_key_jwt` + mTLS-bound) |
-| 976-E | ID Token / JARM alg limits only if caller opts in; `signing_algorithms` docstring wrong |
-| 1015-A | profile builds when no `DPoPKey` alg matches the server's advertised DPoP algs |
-| 1017-C | signing ignores `request_parameter_supported`; key errors escape `FAPIProfileError` |
-| 1020-D | mTLS aliases applied only inside `FAPI2ClientProfile` |
-| 1027-E | `TokenBinding` has no "any" member |
-| 1029-C | fastapi re-implements challenge/scheme parsing; `NONE` challenges only `Bearer`; ID-token × binding (#1052) |
-| 1031-B | `error_kind` set only for signed-response refusals |
+### A15. Login-callback trusted audiences — [#1099](https://github.com/jamescrowley321/identity-model/issues/1099)
+- Follows from A7's side effect. The login callback is configured through `OIDCSettings` / `build_oidc_router`, so #1091's `AuthOptions` (middleware/WebSocket) is the wrong home.
+- `OIDCSettings.trusted_audiences: list[str] = []` (`OIDC_TRUSTED_AUDIENCES`; `""` rejected per A10). Empty by default, so spec-strict stays the default.
+- `OIDCSettings.validate_azp: bool = False`. §3.1.3.7 step 3 is a SHOULD, so it is opt-in per the hardening rule; the docs recommend turning it on with `trusted_audiences`.
+- `_validate_id_token` in `rp.py` passes both to `validate_id_token`.
+- Same name as #1052's per-client `trusted_audiences` mapping for the middleware ID-token path; share the validation helper.
+- Ships with #1093 (stacked or folded), so the behaviour change and the setting that allows extra audiences land together.
 
-## Housekeeping
+## Gate B — 5.x (post-release) — epic [#1069](https://github.com/jamescrowley321/identity-model/issues/1069)
+
+| ID | Issue | Finding |
+|----|-------|---------|
+| 962-A | [#1070](https://github.com/jamescrowley321/identity-model/issues/1070) | `validate_id_token` has no `client_id` kwarg; uses `audience` (Go `WithClientID`, Rust `.client_id()`) |
+| 962-C | [#1071](https://github.com/jamescrowley321/identity-model/issues/1071) | azp misconfig checked per call, not at config build |
+| 964-A | [#1072](https://github.com/jamescrowley321/identity-model/issues/1072) | Go/Rust public resolvers still return `enc` keys alongside `ResolveSigningKey` |
+| 964-B | [#1073](https://github.com/jamescrowley321/identity-model/issues/1073) | "no kid" encoded as `""` in Go/Rust errors (→ #993) |
+| 964-C | [#1074](https://github.com/jamescrowley321/identity-model/issues/1074) | signing-key rule ignores `key_ops` |
+| 964-D | [#1075](https://github.com/jamescrowley321/identity-model/issues/1075) | `KeyNotFoundException` unpicklable (widen #927) |
+| 969-D | [#1076](https://github.com/jamescrowley321/identity-model/issues/1076) | JWKS cooldown keyed by `jwks_uri`, cache by trust scope + `jwks_uri` (half in #967) |
+| 969-E | [#1077](https://github.com/jamescrowley321/identity-model/issues/1077) | cache metrics process-wide and async-only |
+| 969-F | [#1078](https://github.com/jamescrowley321/identity-model/issues/1078) | implicit default cache; `TrustScope` not exported |
+| 970-C | [#1079](https://github.com/jamescrowley321/identity-model/issues/1079) | py EC floor rarely fires (P-192 dropped at parse); docs wording |
+| 972-B | [#1080](https://github.com/jamescrowley321/identity-model/issues/1080) | no spec vector for `aud` precedence before Go/Rust `private_key_jwt` (#1000) |
+| 973-A | [#1081](https://github.com/jamescrowley321/identity-model/issues/1081) | `--only-module` run writes `all_passed: true` to `*-latest.json` |
+| 973-B | [#1082](https://github.com/jamescrowley321/identity-model/issues/1082) | committed conformance `*-latest.json` with dead `log_url`s; basic job uploads FAPI files |
+| 976-D | [#1083](https://github.com/jamescrowley321/identity-model/issues/1083) | client auth decides sender-constraint (no `private_key_jwt` + mTLS-bound) |
+| 976-E | [#1084](https://github.com/jamescrowley321/identity-model/issues/1084) | ID Token / JARM alg limits only if caller opts in; `signing_algorithms` docstring wrong |
+| 1015-A | [#1085](https://github.com/jamescrowley321/identity-model/issues/1085) | profile builds when no `DPoPKey` alg matches the server's advertised DPoP algs |
+| 1017-C | [#1086](https://github.com/jamescrowley321/identity-model/issues/1086) | signing ignores `request_parameter_supported`; key errors escape `FAPIProfileError` |
+| 1020-D | [#1087](https://github.com/jamescrowley321/identity-model/issues/1087) | mTLS aliases applied only inside `FAPI2ClientProfile` |
+| 1027-E | [#1088](https://github.com/jamescrowley321/identity-model/issues/1088) | `TokenBinding` has no "any" member |
+| 1029-C | [#1089](https://github.com/jamescrowley321/identity-model/issues/1089) | fastapi re-implements challenge/scheme parsing; `NONE` challenges only `Bearer`; ID-token × binding (#1052) |
+| 1031-B | [#1090](https://github.com/jamescrowley321/identity-model/issues/1090) | `error_kind` set only for signed-response refusals |
+
+## Housekeeping (comments posted 2026-11-08)
 - [#966](https://github.com/jamescrowley321/identity-model/issues/966): #969 implemented option 2 (trust-scope keying) — close or re-scope.
 - [#927](https://github.com/jamescrowley321/identity-model/issues/927): add `KeyNotFoundException` and the new exception classes.
 - [#996](https://github.com/jamescrowley321/identity-model/issues/996): reword ACs (A5).
