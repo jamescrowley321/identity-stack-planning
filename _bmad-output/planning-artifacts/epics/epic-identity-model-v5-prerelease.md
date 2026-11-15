@@ -25,6 +25,18 @@ Status lives in the GitHub issues, and each issue's acceptance criteria win over
 
 The owner confirms the names at pick time.
 
+## Story P1b: Discovery takes the issuer, and the issuer match is exact — [#1154](https://github.com/jamescrowley321/identity-model/issues/1154)
+
+Decided by the owner on 2026-11-15. It supersedes M8 of #1128 (full discovery URL plus a helper).
+
+**Given** a configured issuer, **when** the library fetches discovery, **then**:
+- it builds the URL by OIDC Discovery §4.1 by default, or by RFC 8414 §3 when the caller explicitly opts in;
+- it compares the document's `issuer` to the configured issuer exactly (§4.3, §5, §7.2; RFC 8414 §3.3), with no trailing-slash trim, in Python, Go and Rust;
+- the same issuer drives the ID Token `iss` check;
+- passing a full discovery URL where the issuer is expected is a configuration error.
+
+FastAPI's `OIDCSettings` takes the issuer. Shared vectors cover trailing-slash differences and issuers with a path. Go/Rust RFC 8414 support is the parity story [#1155](https://github.com/jamescrowley321/identity-model/issues/1155).
+
 ## Story P2: `release/v5` can publish alphas of both packages — [#1147](https://github.com/jamescrowley321/identity-model/issues/1147)
 
 **Given** a dispatch of `release.yml` on `release/v5`, **when** PSR runs, **then**:
@@ -48,7 +60,7 @@ The `docs:` commit cuts no 4.x release.
 
 ## Story P4: Cut `5.0.0a1` — [#1149](https://github.com/jamescrowley321/identity-model/issues/1149)
 
-**Given** D3, P1 and P2 merged, [#1140](https://github.com/jamescrowley321/identity-model/issues/1140) gating applied, a green hosted Basic/Config/Form Post run on `release/v5` and a full E2E, **when** the owner runs `gh workflow run release.yml -f branch=release/v5`, **then**:
+**Given** D3, P1, P1b and P2 merged, [#1140](https://github.com/jamescrowley321/identity-model/issues/1140) gating applied, a green hosted Basic/Config/Form Post run on `release/v5` and a full E2E, **when** the owner runs `gh workflow run release.yml -f branch=release/v5`, **then**:
 - exactly one py `5.0.0a1` and one fastapi alpha reach PyPI;
 - `pip install --pre` of both in a scratch venv runs `py/examples/`.
 
