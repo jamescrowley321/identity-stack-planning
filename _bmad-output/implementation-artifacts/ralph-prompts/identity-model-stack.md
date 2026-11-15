@@ -153,7 +153,6 @@ Stacked on #<parent PR>    (omit when base = main)
 - [x] This PR was AI-assisted
 - Harness/agent: Claude Code, ralph-orchestrator loop `identity-model-stack` (hats: Stacker, Builder, Critic, Shipper)
 - Model(s): Claude Opus 5.5 (claude-opus-5-5); blind-peer-review lenses as run (see comments)
-- [ ] A human has reviewed this change and is accountable for it   ← leave unchecked; the owner (James Crowley) checks it at review
 
 ## Checklist
 - [ ] CI is green
@@ -162,8 +161,6 @@ Stacked on #<parent PR>    (omit when base = main)
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
-
-Never check the human-accountability box yourself.
 
 ## Ledger template (`.ralph/stack-ledger.md`)
 

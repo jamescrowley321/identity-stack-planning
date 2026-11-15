@@ -19,24 +19,23 @@ PROMPT.md (router)          phases/<phase>.md (shared)
 │ Task queue        │   ──▶  │ Phase instructions │
 │ Routing logic     │        │ (generic, ~100    │
 │ Rules             │        │  words each)      │
-│ ~300-650 words    │        └──────────────────┘
+│ ~400-2,300 words  │        └──────────────────┘
 └──────────────────┘
 ```
 
 - **Router prompt** contains: task queue, routing (check task-state → determine phase → read phase file), setup instructions, and domain-specific rules
-- **Phase files** are shared across all loops — generic, parameterized, ~100-250 words each
+- **Phase files** are shared across all loops — generic, parameterized, ~75-650 words each (`pr.md` is the largest)
 - **Review agent templates** (`review-agents/*.md`) are loaded only by subagents, not every iteration
 
 ### Phase Pipeline
 
-Feature tasks: `setup → analyze → implement → test → review → review-fix → pr → ci → complete`
+Feature tasks: `setup → analyze → implement → test → review → review-fix → pr → docs → ci → complete` (`run-next-task.md` omits `setup` and `docs`)
 Fix tasks: `setup → fix → test → review → review-fix → ci → complete` (or without setup if no worktree)
 
 ### What Was Removed
 
 - **Anchor phase** — replaced by a SHA drift check in `implement` (saves ~9,000 tokens/story)
 - **Separate plan phase** — merged into `analyze` (saves ~15,000 tokens/story)
-- **Docs phase** — removed as separate phase; documentation updates happen during `implement`
 - **BMAD persona file reads** — replaced with 1-sentence inline persona directives in each phase file (saves ~7,000-9,000 tokens/story)
 - **Self-contained prompt bloat** — all prompts externalized to router pattern (saves 32,000-53,000 tokens/story)
 
@@ -50,7 +49,7 @@ Fix tasks: `setup → fix → test → review → review-fix → ci → complete
 ### 2. Prompt size
 
 **Risk:** Self-contained prompts load all phase instructions every iteration.
-**Mitigation:** Router + phase file pattern. Only ~300-650 words loaded per iteration instead of 1,400-3,200.
+**Mitigation:** Router + phase file pattern. Each iteration loads the router plus one phase file, not every phase's instructions. Routers measured 396–2,332 words on 2026-11-01 (`wc -w`); only `run-next-task.md` is under 650, so the larger routers are the open regression this audit exists to catch.
 
 ### 3. Mandatory review agents
 

@@ -14,7 +14,7 @@ Definitions for terms used across identity-stack-planning documents. Grouped for
 ## Code index — a decoder for legacy codes, not a registry
 
 **These code families are retired. Do not add to this table and do not mint new ones.** GitHub issue
-numbers are the only identifier for work; see `CLAUDE.md` → Writing Conventions. The table exists so a
+numbers are the only identifier for work; see `AGENTS.md` → Naming. The table exists so a
 reader meeting `TH-1.5` or `T300` in an older document can work out what it meant.
 
 About 558 occurrences survive across roughly 27 files, concentrated in the token-harness, FAPI 2.0 and
@@ -89,9 +89,9 @@ global meaning. Prefer the GitHub issue number.
 
 **Canonical identity** — The Postgres-backed identity model that serves as the source of truth for users, tenants, roles, and permissions. Identity providers (Descope, Ory, etc.) become sync targets rather than the source of truth. Defined in PRD 5. See [system architecture](system-architecture.md#canonical-identity-data-model-prd-5).
 
-**Claim normalization** — The process of mapping provider-specific JWT claims into a uniform format. Descope uses `dct` and `tenants` claims; Ory uses `realm_access.roles`; Entra uses `groups`. A Tyk Go plugin normalizes these into headers (`X-User-ID`, `X-User-Email`, `X-User-Roles`, `X-Tenant-ID`). Defined in PRD 4.
+**Claim normalization** — The process of mapping provider-specific JWT claims into a uniform format. Descope uses `dct` and `tenants` claims; Ory uses `realm_access.roles`; Entra uses `groups`. PRD 4 designed a Tyk Go plugin to normalize these into headers (`X-User-ID`, `X-User-Email`, `X-User-Roles`, `X-Tenant-ID`); it is not implemented (`identity-stack/tyk/middleware/` is empty, checked 2026-11-01).
 
-**ClaimMapper** — Go interface in the Tyk claim normalization plugin. Each identity provider has a concrete implementation (`DescopeMapper`, `OryMapper`, `GenericOIDCMapper`) that extracts user identity from provider-specific JWT structures. Defined in the PRD 4 architecture.
+**ClaimMapper** — Go interface designed for the Tyk claim normalization plugin (not implemented). Each identity provider has a concrete implementation (`DescopeMapper`, `OryMapper`, `GenericOIDCMapper`) that extracts user identity from provider-specific JWT structures. Defined in the PRD 4 architecture.
 
 **DEPLOYMENT_MODE** — Environment variable (`standalone` | `gateway`) evaluated once at FastAPI startup. Controls which middleware is active: standalone mode runs JWT validation in FastAPI; gateway mode offloads it to Tyk. See ADR-GW-4 and ADR-GW-5.
 
@@ -113,9 +113,9 @@ global meaning. Prefer the GitHub issue number.
 
 **JSON Web Token (JWT)** — A compact, URL-safe representation of claims that can be signed and/or encrypted. Defined by [RFC 7519](https://www.rfc-editor.org/rfc/rfc7519.html).
 
-**IdentityProviderAdapter** — Abstract base class (ABC) defining the interface for syncing canonical identity operations to an external identity provider. Implementations: `DescopeSyncAdapter` (production), `NoOpSyncAdapter` (testing). Defined in PRD 5 architecture.
+**IdentityProviderAdapter** — Abstract base class (ABC) defining the interface for syncing canonical identity operations to an external identity provider. Implementations: `DescopeSyncAdapter` and `OrySyncAdapter` (production), `NoOpSyncAdapter` (testing). Defined in PRD 5 architecture.
 
-**IdentityService** — Abstract base class (ABC) defining the core contract for canonical identity operations (create_user, assign_role, create_tenant, etc.). Methods return `Result[T, IdentityError]` — never raise exceptions. The concrete implementation is `PostgresIdentityService`. Defined in PRD 5 architecture.
+**IdentityService** — Abstract base class (ABC) defining the core contract for canonical identity operations (create_user, assign_role, create_tenant, etc.). Methods return `Result[T, IdentityError]` — never raise exceptions. No concrete implementation exists: routers use per-domain services (`services/user.py`, `services/role.py`, …) instead (checked 2026-11-01). Defined in PRD 5 architecture.
 
 **idp_links** — Database table linking a canonical user to their identity at a specific provider. Contains `external_sub` (the provider's subject identifier), `provider_id`, and JSONB metadata. Enables one user to authenticate through multiple providers.
 
@@ -145,7 +145,7 @@ global meaning. Prefer the GitHub issue number.
 
 **PKCE (Proof Key for Code Exchange)** — An OAuth extension that protects the authorization-code flow by binding the exchange to a verifier held by the client. Defined by [RFC 7636](https://www.rfc-editor.org/rfc/rfc7636.html).
 
-**Phase** — A single unit of work within a ralph loop iteration. Each iteration completes one phase, then exits. Common phases: `analyze`, `plan`, `implement`, `test`, `review-blind`, `review-edge`, `review-acceptance`, `review-security`, `review-fix`, `docs`, `ci`, `complete`. See [ralph loop process](ralph-loop-process.md).
+**Phase** — A single unit of work within a ralph loop iteration. Each iteration completes one phase, then exits. The phase files are `setup`, `analyze`, `implement`, `test`, `review`, `review-fix`, `fix`, `docs`, `pr`, `ci` and `complete` (`ralph-prompts/phases/`); `review` spawns the reviewer subagents. See [ralph loop process](ralph-loop-process.md).
 
 **Problem Detail** — RFC 9457 standard error response format. Used by the canonical identity service. Includes `type` (URI), `title`, `status`, `detail`, `instance` (request path), and `traceId` (OpenTelemetry). Content-Type: `application/problem+json`.
 

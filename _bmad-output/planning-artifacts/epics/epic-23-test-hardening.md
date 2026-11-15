@@ -64,7 +64,7 @@ P0 first: **23.1** (configured profiles we already support but never run — hig
 
 **Given** the audit findings,
 **When** the matrix is authored (e.g. `docs/security/harder-tier-coverage.md` or a section of the existing control matrix),
-**Then** it lists each OIDF profile (gated / configured-only / absent), each `spec/conformance/*.json` capability (executable vectors per py/go/rust), and each harness resource server (py / go / rust), each cell linked to its make target + CI job or the story that adds it.
+**Then** it lists each OIDF profile (gated / configured-only / absent), each `spec/vectors/*.json` capability (executable vectors per py/go/rust), and each harness resource server (py / go / rust), each cell linked to its make target + CI job or the story that adds it.
 
 **Given** a harder-tier gate lands,
 **When** its PR merges,
@@ -108,9 +108,9 @@ P0 first: **23.1** (configured profiles we already support but never run — hig
 
 ### Acceptance Criteria
 
-**Given** today only `spec/conformance/validation.json` has executable vectors (12+1 native) and the other 9 files are descriptive-only,
+**Given** today only `spec/vectors/validation.json` has executable vectors (12+1 native) and the other 9 files are descriptive-only,
 **When** each capability's vectors are made executable (reusing the existing `spec/test-fixtures/` corpora — esp. `dpop/`, `token-exchange/`),
-**Then** the Python (`test_spec_conformance.py`), Go (`go/internal/conformance`), and Rust (`rust/tests/spec_conformance.rs`) runners each execute every executable vector id, and `tools/spec_coverage_gate.py` asserts 100% per language across **all 10 capabilities**.
+**Then** the Python (`test_spec_conformance.py`), Go (`go/internal/conformance`), and Rust (`rust/tests/it/conformance/`) runners each execute every executable vector id, and a coverage gate (formerly `tools/spec_coverage_gate.py`, no longer in the tree on 2026-11-01) asserts 100% per language across **all 10 capabilities**.
 
 **Given** a language cannot yet execute a vector,
 **When** the gate runs,
@@ -284,4 +284,4 @@ Ralph loop prompt: `_bmad-output/implementation-artifacts/ralph-prompts/pim-test
 - Audit (2026-09-03): test-tier map + open-issue reconciliation (this epic's `inputDocuments`).
 - GH tracking issues: #462 (harness), #471–473/#475 (conformance/cert), #573–579 (parity), #511/#592 (mutation gate), #585 (injectable discovery policy), #598–601 (middleware auth-bypass).
 - OIDF profiles: `conformance/configs/*.json`; runner `conformance/run_tests.py`.
-- Cross-language vectors: `spec/conformance/*.json`; gate `tools/spec_coverage_gate.py`; CI `spec-vector-coverage`.
+- Cross-language vectors: `spec/vectors/*.json`; gate: none on 2026-11-01 (the former `tools/spec_coverage_gate.py` and its `spec-vector-coverage` CI job are gone).
