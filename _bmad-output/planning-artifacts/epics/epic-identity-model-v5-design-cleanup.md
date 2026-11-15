@@ -1,7 +1,7 @@
 # identity-model 5.0 — design cleanup before release
 
 **Date:** 2026-11-08
-**Status:** Decisions D1–D3 made 2026-11-08. Stack #960→#1031 merged into `release/v5` (merge commits). #915 (`release/v5` → `main`, py 5.0.0) is held until Gate A below is clear. Gate A fixes are in progress; see **Progress** below.
+**Status:** Decisions D1–D3 made 2026-11-08. **Gate A complete:** every story is merged into `release/v5` (A1–A15, epic #1057; the last merges landed on 2026-11-13). Gate B is filed as epic #1069 for 5.x. The release approach changed on 2026-11-15: 5.0 ships first as alpha pre-releases, then goes final via #915 after a feedback period. See `epic-identity-model-v5-prerelease.md`.
 
 ## Why
 
@@ -26,25 +26,15 @@ Finding IDs are `<PR>-<letter>`; each points to the PR where the problem was int
 - RFC 8705 §3: the protected resource "MUST obtain, from its TLS implementation layer, the client certificate" and "MUST verify that the certificate matches the certificate associated with the access token"; otherwise "the resource access attempt MUST be rejected with an error" (401 `invalid_token`). The text covers a mismatch and does not mention a missing certificate. But the MUST-verify cannot be met without a certificate, so a missing certificate is rejected too.
 - Project rule: spec MUSTs are unconditional, not opt-in (#574). fastapi (#1029) already always passes a presentation, so this also aligns core with the middleware.
 
-## Gate A — lands on `release/v5` before #915
+## Gate A — lands on `release/v5` before #915 (done)
 
 Epic: [#1057](https://github.com/jamescrowley321/identity-model/issues/1057).
 
 Ordered by dependency. Each story is one PR based on `release/v5`.
 
-### Progress (2026-11-08)
+### Outcome
 
-| Story | Issue | PR | State |
-|-------|-------|----|-------|
-| A1 client auth | [#1056](https://github.com/jamescrowley321/identity-model/issues/1056) | — | owner WIP (`/tmp/im-1056`) |
-| A2 key floor | — | — | owner WIP (`fix/970-key-floor-bypass`) |
-| A3 alg policy | [#1058](https://github.com/jamescrowley321/identity-model/issues/1058) | [#1095](https://github.com/jamescrowley321/identity-model/pull/1095) | open, awaiting review. The DPoP verify default got *wider* (RS384/512, PS*) |
-| A7 RS binding | [#1062](https://github.com/jamescrowley321/identity-model/issues/1062) | [#1093](https://github.com/jamescrowley321/identity-model/pull/1093) | open, awaiting review. Scoped to access tokens (see A7) |
-| A9 fastapi options | [#1064](https://github.com/jamescrowley321/identity-model/issues/1064) | [#1091](https://github.com/jamescrowley321/identity-model/pull/1091) | open, awaiting review. `AuthOptions`; PLR0913 per-file rule remains until #1049 |
-| A10 empty = absent (py) | [#1065](https://github.com/jamescrowley321/identity-model/issues/1065) | [#1092](https://github.com/jamescrowley321/identity-model/pull/1092) | open, awaiting review. No spec vectors (Rust runner can't skip one); stays with #992 |
-| A14 introspected `cnf` | [#1094](https://github.com/jamescrowley321/identity-model/issues/1094) | — | in progress, stacked on #1093 |
-| A15 login-callback audiences | [#1099](https://github.com/jamescrowley321/identity-model/issues/1099) | — | filed; stack on / fold into #1093 |
-| A4, A5, A6, A8, A11, A12, A13 | [#1059](https://github.com/jamescrowley321/identity-model/issues/1059) [#1060](https://github.com/jamescrowley321/identity-model/issues/1060) [#1061](https://github.com/jamescrowley321/identity-model/issues/1061) [#1063](https://github.com/jamescrowley321/identity-model/issues/1063) [#1066](https://github.com/jamescrowley321/identity-model/issues/1066) [#1067](https://github.com/jamescrowley321/identity-model/issues/1067) [#1068](https://github.com/jamescrowley321/identity-model/issues/1068) | — | waiting on #1056 (shared files: config, models, fapi, par_logic, token_client_logic, exceptions) |
+All Gate A stories merged into `release/v5` by 2026-11-13. Status and PR links are on the sub-issues of [#1057](https://github.com/jamescrowley321/identity-model/issues/1057). The pre-5.0 spec, design and conformance reviews that followed are tracked in `sprint-change-proposal-2026-11-15.md`.
 
 Release-PR CI: #915's `rust-mutation-gate` failed on an equivalent mutant in `resolve_kidless` (`len() > 1` guard redundant with `narrow()`'s fallback). Fixed by [#1096](https://github.com/jamescrowley321/identity-model/pull/1096) (merged). #915 is retitled `feat(py)!: release py-identity-model 5.0.0`.
 
