@@ -24,8 +24,8 @@ inputDocuments:
 [identity-stack#559], [identity-stack#561], [identity-stack#562].
 
 Promoted by [identity-stack-planning#94] (the planning issue for this provider). Supersedes the
-draft in closed pull request [identity-stack-planning#47], which targeted the library's
-integration-test matrix and predates the model below, and the closed
+draft in pull request [identity-stack-planning#47], which targeted the library's
+integration-test matrix and predates the model below, and the earlier
 [identity-stack#79] (the pre-Organizations "implement Keycloak provider" issue).
 
 ## Why
@@ -56,32 +56,36 @@ Realm roles are not used. There is no token exchange and no multi-tenant token.
 Sources: the Keycloak documentation at tag `26.8.2` (the version
 [the server administration guide](https://www.keycloak.org/docs/latest/server_admin/index.html)
 showed as latest that day), the server guides, and the Terraform provider docs at `v5.10.0`.
-Nothing here has been run. Rows marked **unverified** are settled by the story named.
+Rows marked **measured** were observed on `quay.io/keycloak/keycloak:26.8.2` on 2026-11-15 and
+are recorded in `keycloak/fixtures/README.md` in identity-stack, written by
+[identity-stack#553] (local Keycloak in docker compose). Rows marked **unverified** are settled
+by the story named.
 
 | Claim | What the docs say | Status |
 |---|---|---|
 | Organizations are per realm | "To use organizations, you have to enable the feature for the current realm." ([managing organizations](https://github.com/keycloak/keycloak/blob/26.8.2/docs/documentation/server_admin/topics/organizations/managing-organization.adoc)) | verified |
 | `organization` scope | Built-in optional client scope, added to every client by default, with an *Organization Membership* mapper ([mapping organization claims](https://github.com/keycloak/keycloak/blob/26.8.2/docs/documentation/server_admin/topics/organizations/mapping-organization-claims.adoc)) | verified |
-| `organization:<alias>` | Maps one organization. A non-existent alias is rejected with `invalid_scope`. A non-member request is **not** rejected: Keycloak 26.8.2 issues a token with no `organization` claim and drops the scope (measured in [identity-stack#579](https://github.com/jamescrowley321/identity-stack/pull/579), the local Keycloak compose PR), so the backend must refuse a missing or different claim. **Several can be requested at once** (`organization:org-a organization:org-b`), so a token can name more than one. `organization` alone prompts a multi-organization user to pick; `organization:*` maps all. Formats cannot be mixed (same page) | verified |
-| Shape of the `organization` claim | The only example is a map keyed by alias, holding `id` and attributes, with a note that id and attributes are off by default. The default shape (a list of aliases, per [identity-stack-planning#94]) is not shown | **unverified**: [identity-stack#553] |
+| `organization:<alias>` | Maps one organization. A non-existent alias is rejected with `invalid_scope`. A non-member request is **not** rejected: Keycloak 26.8.2 issues a token with no `organization` claim and drops the scope (measured in [identity-stack#579](https://github.com/jamescrowley321/identity-stack/pull/579), the local Keycloak compose PR), so the backend must refuse a missing or different claim. **Several can be requested at once** (`organization:org-a organization:org-b`), so a token can name more than one. `organization` alone prompts a multi-organization user to pick; `organization:*` maps all. Formats cannot be mixed (same page) | verified; non-member behaviour measured |
+| Shape of the `organization` claim | An array of alias strings, `["acme"]`, on access and ID tokens. The docs show only a map keyed by alias, which appears when the mapper adds id or attributes. Absent when no organization scope is requested | measured ([identity-stack#553] fixture README) |
 | Alias is a stable key | Unique in the realm, URL-friendly, "cannot be changed afterwards" (managing organizations) | verified |
-| Client roles in the token | Client roles go to `resource_access`; the roles in a token are the user's roles intersected with the client's role scope mappings ([role mappings in the token](https://github.com/keycloak/keycloak/blob/26.8.2/docs/documentation/server_admin/topics/clients/oidc/con-token-role-mappings.adoc)). The nesting `resource_access.<client>.roles` is not spelled out in the section read | verified; nesting **unverified**: [identity-stack#553] |
+| Client roles in the token | Client roles go to `resource_access`; the roles in a token are the user's roles intersected with the client's role scope mappings ([role mappings in the token](https://github.com/keycloak/keycloak/blob/26.8.2/docs/documentation/server_admin/topics/clients/oidc/con-token-role-mappings.adoc)). The nesting is `resource_access.<client>.roles`, an array of strings, holding only the scope-mapped type client | verified; nesting measured ([identity-stack#553] fixture README) |
 | `aud` is the type client | *Audience Resolve*, in the default `roles` scope, adds each client the token holds a client role for. The frontend client is not added. A user with no role on the type client gets no such audience ([audience support](https://github.com/keycloak/keycloak/blob/26.8.2/docs/documentation/server_admin/topics/clients/oidc/con-audience.adoc)) | verified |
-| `aud` is *only* the type client | Follows from *Full scope allowed* off plus scope mappings to one client. Not stated as such | **inferred**: [identity-stack#553] |
-| `azp` on access tokens is the app client | Not in the sections read (the audience page mentions `azp` for refresh tokens only) | **unverified**: [identity-stack#553] |
-| Endpoints | `/realms/{realm}/.well-known/openid-configuration`, `/realms/{realm}/protocol/openid-connect/logout` ([available endpoints](https://github.com/keycloak/keycloak/blob/26.8.2/docs/guides/securing-apps/partials/oidc/available-endpoints.adoc)). Issuer `<hostname>/realms/<realm>` is implied by the paths | verified; issuer string **inferred** |
+| `aud` is *only* the type client | A JSON string, not an array, naming the one type client; no `account`. A user with no role on the type client gets a token with **no `aud` and no `resource_access`**, still carrying `azp` and `organization` | measured ([identity-stack#553] fixture README) |
+| `azp` on access tokens is the app client | Present, equal to the app client | measured ([identity-stack#553] fixture README) |
+| Endpoints | `/realms/{realm}/.well-known/openid-configuration`, `/realms/{realm}/protocol/openid-connect/logout` ([available endpoints](https://github.com/keycloak/keycloak/blob/26.8.2/docs/guides/securing-apps/partials/oidc/available-endpoints.adoc)). Issuer is `<KC_HOSTNAME>/realms/<realm>`, no trailing slash, equal to discovery's `issuer` from the host and from the backend container | verified; issuer string measured ([identity-stack#553] fixture README) |
 | RP-initiated logout parameters | The endpoints page defers to a section not read. `id_token_hint`, `post_logout_redirect_uri` and `client_id` are from OpenID Connect RP-Initiated Logout 1.0 | **unverified**: [identity-stack#556] |
 | `hostname` | "Can be a full URL, or just a hostname." When set, `hostname-strict` is ignored. Backchannel URLs equal frontchannel URLs unless `hostname-backchannel-dynamic` is on ([hostname guide](https://www.keycloak.org/server/hostname)) | verified |
-| Full-URL `hostname` with `http://` | Not stated | **unverified**: [identity-stack#553] |
+| Full-URL `hostname` with `http://` | Works. Every discovery endpoint uses that origin, and a `keycloak.localhost` compose network alias answers from the host and from Debian and Alpine containers | measured ([identity-stack#553] fixture README) |
 | Realm import | `--import-realm` reads `.json` files from `/opt/keycloak/data/import`; skipped if the realm exists; environment placeholders supported ([import and export guide](https://www.keycloak.org/server/importExport)) | verified |
 | Container | `quay.io/keycloak/keycloak`, `start-dev`, `KC_BOOTSTRAP_ADMIN_USERNAME`/`_PASSWORD` ([containers guide](https://www.keycloak.org/server/containers)); health on management port 9000 when `health-enabled`; the image has no `curl` ([health guide](https://github.com/keycloak/keycloak/blob/26.8.2/docs/guides/observability/health.adoc)) | verified |
 | Plain HTTP | Realm SSL mode *External requests* allows HTTP only from private addresses; *None* is for development ([SSL modes](https://github.com/keycloak/keycloak/blob/26.8.2/docs/documentation/server_admin/topics/realms/ssl.adoc)) | verified |
 | Terraform | `keycloak_organization`, `keycloak_organization_memberships` (authoritative over members), `keycloak_realm.organizations_enabled` (default `false`), `keycloak_openid_client` with `access_type`, `full_scope_allowed`, `pkce_code_challenge_method`, and `keycloak_generic_role_mapper` ([provider docs at v5.10.0](https://github.com/keycloak/terraform-provider-keycloak/tree/v5.10.0/docs/resources)) | verified |
 | Listing a user's organizations | `GET /admin/realms/{realm}/organizations/members/{member-id}/organizations` ([Admin REST API](https://www.keycloak.org/docs-api/latest/rest-api/index.html)). The admin role it needs was not read | verified; role **unverified**: [identity-stack#559] |
-| Tenant switch needs no new login | Not stated | **unverified**: [identity-stack#553] |
-| A refreshed token keeps its organization | Not stated | **unverified**: [identity-stack#553] |
-| Public client gets a refresh token in the standard flow | Not read | **unverified**: [identity-stack#561] |
+| Tenant switch needs no new login | For a member of both organizations, a second authorize request with the other `organization:<alias>` returns a code with no login form, also with `prompt=none`, and the same `sid`. For a non-member on a live session, the password page is shown and the token then has no `organization` claim; with `prompt=none` the answer is `login_required` | measured ([identity-stack#553] fixture README) |
+| A refreshed token keeps its organization | Yes. A refresh that asks for another `organization:<alias>` succeeds but returns a token with no `organization` claim, so refresh cannot switch | measured ([identity-stack#553] fixture README) |
+| Public client gets a refresh token in the standard flow | Yes (`expires_in` 300, `refresh_expires_in` 1800 with realm defaults) | measured ([identity-stack#553] fixture README) |
 | Roles per organization | Organization groups can carry client roles, mapped into the `organization` claim per organization ([managing groups](https://github.com/keycloak/keycloak/blob/26.8.2/docs/documentation/server_admin/topics/organizations/managing-groups.adoc)). This is not the decided model | verified; see constraints |
+| Session cookies over plain HTTP | Set `Secure; SameSite=None` although the origin is HTTP. Chromium keeps them for `keycloak.localhost`; `curl` with a cookie jar does not send them back | measured ([identity-stack#553] fixture README) |
 
 ### identity-stack, read at `origin/main` `afdb347` on 2026-11-15
 
@@ -92,7 +96,7 @@ Nothing here has been run. Rows marked **unverified** are settled by the story n
 | Plain HTTP at a non-loopback host needs new library work | No. `TokenValidationConfig.require_https` and `.algorithms`, and `DiscoveryDocumentRequest.policy`, exist in 3.8.5 and at tag `py-v3.18.2`. The loopback exception covers only `localhost`, `127.0.0.1` and `::1` |
 | Audience | `ProviderTokenConfig.audience` is one string; `audience_ok` is membership, so a multi-valued `aud` containing it passes |
 | Tenant | `dependencies/tenant.py` reads `dct` only. Both middlewares set `request.state.tenant_id = claims.get("dct")` |
-| RBAC | `dependencies/rbac.py` reads `dct` + `tenants`, or the canonical model for `CANONICAL_RBAC_PROVIDERS`. No client-role path. 39 `require_role` gates, 0 `require_permission` |
+| RBAC | `dependencies/rbac.py` reads the canonical model for `CANONICAL_RBAC_PROVIDERS` and `dct` + `tenants` for **every other provider**, so a new provider lands on the Descope claim path by default. No client-role path. 39 `require_role` gates, 0 `require_permission` |
 | Provider list wiring | `build_provider_configs` is called from `middleware/auth.py`, `middleware/claims.py` and `routers/auth.py`, each passing the Ory arguments by name |
 | Logout | `rp_initiated` reads `ORY_CLIENT_ID` and `ORY_POST_LOGOUT_REDIRECT_URI`, and fetches discovery with no policy |
 | Provider registry | `ProviderType` is `descope`, `ory`, `entra`, `cognito`, `oidc`. No `keycloak` |
@@ -105,8 +109,8 @@ Nothing here has been run. Rows marked **unverified** are settled by the story n
 
 - **The model is fixed.** Stories implement it; they do not reopen it.
 - **No dependency on unreleased library work.** [identity-stack-planning#147] (umbrella for
-  `fastapi-identity-model` gaps) tracks identity-model issues that are all open. None is needed:
-  they change a package this backend does not use. Each story says so. The fail-closed branches
+  `fastapi-identity-model` gaps) tracks identity-model issues for a package this backend does
+  not use. None is needed. Each story says so. The fail-closed branches
   in [identity-model#1050] (single-audience mode) and [identity-model#1051] (Keycloak claim
   helpers) are copied into [identity-stack#557] so a later swap is mechanical.
 - **Fit the structure as it is.** The DDD migration ([identity-stack#514], the plan) moves
@@ -114,46 +118,79 @@ Nothing here has been run. Rows marked **unverified** are settled by the story n
   story.
 - **Fail closed, by the house rules.** conventions §17: every branch without an unambiguous
   answer refuses. conventions §3: a switch is named for its secure state.
-- **Status codes follow [identity-stack-planning#147].** A token whose `aud` names no configured
-  type client is 401 from the middleware. More than one `aud`, a bad `organization`, a bad `azp`
-  or a missing permission is 403 from a dependency.
-- **Permissions are per user and type, not per tenant.** Client roles are assigned to the user,
-  so a user holds the same permissions in every organization. Keycloak's per-organization group
-  roles land in a different claim and are outside the model.
+- **The token binding holds on every request, not only tenant-scoped ones.** The middleware's
+  audience check is a membership test, so a token with `member` among several audiences, or one
+  minted for another client in the realm, would otherwise authenticate on every route that
+  skips the tenant dependency, including `GET /api/identity`. For a Keycloak principal, exactly
+  one `aud` and an `azp` mapped to it are checked at authentication, in both middlewares, before
+  any claim becomes an identity, a tenant or a permission ([identity-stack#557]).
+- **Status codes.** A missing or unknown `aud`, more than one `aud`, or an `azp` that is not the
+  app client for that `aud` is 401 at authentication (RFC 6750 `invalid_token`). A bad
+  `organization` or a missing permission is 403 from a dependency. This moves two checks earlier
+  than [identity-stack-planning#147] places them (owner decision 11).
+- **A Keycloak principal never reaches the Descope claim path.** The source of tenant and
+  grants is chosen by the provider that authenticated the request, never by which claims are
+  present, and a provider with no declared source is refused. `dct` and `tenants` on a Keycloak
+  token are ignored ([identity-stack#555], [identity-stack#557]).
+- **Client roles are realm-wide; the tenant is per token.** Client roles are assigned to the
+  user, not to the user in an organization. A user who holds `tenant-admin` roles and belongs to
+  `acme` and `globex` can request `organization:globex` and receive a `tenant-admin` token for
+  `globex`, whoever granted the role and for whichever organization. The fixture realm has
+  exactly this user. The model as decided therefore lets a privileged type carry across every
+  organization the user is in. The stories close this by default (owner decision 10).
 - **Local only.** There is no hosted Keycloak. Compose is the environment.
 - **Descope and Ory do not change.** Their tests pass unmodified in every story.
 
 ## Owner decisions needed
 
-Each has a default the stories are written to. None blocks [identity-stack#553] or
-[identity-stack#555].
+Each has a default the stories are written to. None blocks [identity-stack#553]. Decision 8
+decides whether [identity-stack#555] is built at all.
 
 1. **`require_role` for Keycloak principals.** The token has permissions and a type, no role.
    Default: refuse, so role-gated routes stay closed to Keycloak until [identity-stack#541]
    (route gates move to permissions) lands. Alternative: treat the type (`aud`) as the role.
 2. **Where the SPA's organization list comes from.** A token names one organization. Default:
    the backend asks the Admin REST API, read-only, with a service-account client. Alternatives:
-   request `organization` with no alias and let Keycloak prompt (re-prompt on a live session is
-   unverified), or keep canonical memberships in step (needs sync, out of scope).
-3. **Local hostname.** Default: a `*.localhost` name set as a compose network alias, which
-   browsers resolve to loopback with no hosts-file edit. Whether every container resolver sends
-   it to the alias is unverified. Fallback: the service name plus a hosts-file line.
+   request `organization` with no alias and let Keycloak show its organization picker, or keep
+   canonical memberships in step (needs sync, out of scope).
+3. **Local hostname.** No decision left: `keycloak.localhost` as a compose network alias was
+   measured to work from the host and from containers, with no hosts-file edit.
 4. **One realm definition or two.** Default: the import file serves compose and CI, Terraform
    builds the same realm, and parity is one test run against the Terraform-built realm
    ([identity-stack#562]). Alternative: a near-empty import and Terraform everywhere, which puts
    Terraform in every test run.
 5. **A hosted Keycloak.** Default: none; the Terraform root has no remote state until there is.
-6. **Converging on the library.** After `fastapi-identity-model` ships the
-   [identity-stack-planning#147] work, either adopt it here or keep the app's own layer. No
-   story is filed; it needs the v5 migration first.
+6. **Converging on the library.** Default: keep the app's own layer, and file no story.
+   Alternative: adopt `fastapi-identity-model` once it carries the
+   [identity-stack-planning#147] work, which first needs this backend on `py-identity-model` 5.
 7. **503 when discovery or JWKS is unreachable.** [identity-stack-planning#147] wants it. The
    middleware answers 401 for every provider today. Default: leave it; changing it is a
    cross-provider behaviour change with its own issue.
 8. **Which seam issue survives.** [identity-stack#555] (this epic) or [identity-stack#566]
-   (the Zitadel epic). Default: keep the one whose epic starts first and close the other.
+   (the Zitadel epic). Default: build the one whose epic starts first and drop the other.
+   [identity-stack#555] is conditional on this: if [identity-stack#566] is chosen, every
+   dependency on [identity-stack#555] below reads as a dependency on [identity-stack#566], and
+   the criteria [identity-stack#555] adds for Keycloak (source chosen by provider, undeclared
+   source refused) move to [identity-stack#557].
 9. **Permission names.** `<domain>:<action>` here; Descope's are dotted (`documents.read`) and
    [identity-stack#541] proposes its own vocabulary. Default: the realm uses colon names taken
    from that issue's list once it exists, otherwise the Descope names with a colon.
+10. **Privileged types across organizations.** See the constraint on realm-wide client roles.
+    Default, fail closed: each configured type is declared organization-bound or portable, and
+    startup refuses an undeclared one. A token of an organization-bound type is accepted only
+    when the user belongs to exactly one organization and it is the token's. `tenant-admin` is
+    organization-bound; a tenant admin who is in two organizations is a tenant admin in neither
+    until this is decided. Alternatives: grant privileged roles per organization through
+    Keycloak organization groups and read them from the `organization` claim (changes "RBAC
+    from `resource_access`" for those types); hold the per-organization grant in the canonical
+    model; or accept realm-wide privilege and document it.
+11. **401 at authentication for the token binding.** Default: more than one `aud` or a wrong
+    `azp` is refused in the middleware with 401, so it holds on every route.
+    [identity-stack-planning#147] lists the same checks as 403 from route dependencies, and
+    notes that a middleware-level single-audience check answers 401.
+12. **The token's organization is missing from the Admin API list.** Default: refuse with 403.
+    The membership changed after the token was issued, and the token is not believed over the
+    directory.
 
 ## Requirements Inventory
 
@@ -168,7 +205,10 @@ words, not numbered, per `AGENTS.md`.
 - **Token validation.** The backend accepts Keycloak tokens by issuer, set of audiences and
   signature, over plain HTTP locally when told to.
 - **Tenant from the token.** The organization alias is the tenant; exactly one.
-- **Permissions from the token.** `resource_access[aud].roles`, single `aud`, `azp` bound to it.
+- **Permissions from the token.** `resource_access[aud].roles`.
+- **Token binding.** Single `aud` and `azp` bound to it, on every authenticated request.
+- **Provider isolation.** A Keycloak principal is never decided from `dct` or `tenants`.
+- **No privilege carried between organizations** by default.
 - **Canonical identity.** `GET /api/identity` answers for a Keycloak principal with the token's
   tenant and permissions, and lists the user's organizations.
 - **Login, refresh, logout.** The SPA does all three by configuration.
@@ -204,7 +244,8 @@ None. No UX contract exists; the only UI change is the tenant switcher's behavio
 | Realm as code | [identity-stack#554] |
 | Provider-neutral seam | [identity-stack#555] |
 | Token validation; logout (backend) | [identity-stack#556] |
-| Tenant and permissions from the token | [identity-stack#557] |
+| Tenant and permissions from the token; token binding; no carried privilege | [identity-stack#557] |
+| Provider isolation | [identity-stack#555], [identity-stack#557] |
 | Canonical identity; admin-side scope | [identity-stack#559] |
 | Login, refresh, logout, tenant switch (SPA) | [identity-stack#561] |
 | Proof | [identity-stack#562] |
@@ -238,15 +279,14 @@ Depends on: nothing. Library: none. **Implementable today.**
 - **Given** a user outside `globex`, **when** `organization:globex` is requested, **then**
   Keycloak refuses.
 - **Given** the fixture README, **when** it is read, **then** it records the claim shapes and
-  answers the unverified rows above that name this story.
+  answers the evidence rows above that name this story.
 
 ### [identity-stack#555]: One seam for tenant, role and permission claims (provider-neutral)
 
 As a maintainer adding a provider, I want one place that turns verified claims into a tenant
 and grants, so that a new claim shape is one function and not an edit to every dependency.
 
-Depends on: nothing. Library: none. **Implementable today**, in parallel with
-[identity-stack#553].
+Depends on: nothing. Library: none. Needs no other story. **Conditional on owner decision 8.**
 
 **Shared groundwork, filed twice.** The Zitadel provider epic (`epic-zitadel-provider.md`,
 written in parallel) filed [identity-stack#566] (provider-neutral registration and tenant
@@ -267,6 +307,13 @@ Collisions: `dependencies/rbac.py` is also changed by [identity-stack#541] and s
   the same status and detail.
 - **Given** a fake source registered in a test, **when** `get_tenant_id` and
   `require_permission` run, **then** they return its tenant and honour its permission.
+- **Given** a principal from one provider whose claims carry another source's shapes (for
+  example `dct` and `tenants` on a non-Descope principal), **when** any dependency runs,
+  **then** the source is the provider's declared one and the foreign claims are not read.
+- **Given** a provider with no declared source, **when** a dependency runs, **then** 403. The
+  Descope claim path is no longer the fallback for an unlisted provider.
+- **Given** a request, **when** the middleware sets `request.state.tenant_id`, **then** the
+  value comes from the seam and not from `dct` directly.
 
 ### [identity-stack#554]: `infra/keycloak/` Terraform root
 
@@ -287,6 +334,10 @@ Depends on: [identity-stack#553]. Library: none. Can run in parallel with
 - **Given** an applied root, **when** `terraform plan` runs again, **then** it is empty.
 - **Given** `infra/PROVIDERS.md`, **when** it is read, **then** it lists the root and its
   credential source.
+- **Given** the realm, **when** its protocol mappers are listed, **then** none writes a user
+  attribute to `aud`, `azp`, `organization`, `resource_access`, `dct` or `tenants`.
+- **Given** the service-account client for the organization lookup, **when** its roles are
+  listed, **then** it holds only the read role that lookup needs.
 
 ### [identity-stack#556]: Provider token config and RP-initiated logout
 
@@ -322,21 +373,51 @@ strategy table.
 As a tenant member, I want the API to act in the organization and with the permissions my token
 states, so that one login is one tenant and one user type and nothing else.
 
-Depends on: [identity-stack#555], [identity-stack#556]. Library: none; mirrors the branches of
-[identity-model#1050] and [identity-model#1051].
+Depends on: [identity-stack#555] (or [identity-stack#566], owner decision 8),
+[identity-stack#556]. Library: none; mirrors the branches of [identity-model#1050] and
+[identity-model#1051].
 
-Collisions: [identity-stack#513] and [identity-stack#541], as for the seam.
+Collisions: [identity-stack#513] and [identity-stack#541], as for the seam. The
+authentication-time criteria below add a step to both middlewares after the audience check
+that [identity-stack#556] builds; they are here, not there, so that story's text is unchanged.
 
 **Acceptance Criteria:**
 
-- **Given** a token with more than one `aud`, **when** a tenant-scoped route is called,
-  **then** 403.
+At authentication, in `TokenValidationMiddleware` and `GatewayClaimsMiddleware`, for every
+route:
+
+- **Given** a Keycloak token whose `aud` is a list of more than one value, even when every
+  value is a configured type client, **when** any protected route is called, including
+  `GET /api/identity`, `GET /api/me` and a permission-gated route that is not tenant-scoped,
+  **then** the uniform 401.
+- **Given** an `azp` that is missing, not a string, or not the app client configured for the
+  token's `aud`, **when** any protected route is called, **then** the uniform 401.
+- **Given** the `azp`-to-`aud` mapping is not configured, **when** the backend starts,
+  **then** it refuses to start.
+
+In the dependencies:
+
 - **Given** an `organization` claim that is missing, empty, multi-valued or holds a non-string,
-  in list or map shape, **when** a tenant-scoped route is called, **then** 403.
-- **Given** an `azp` that is missing or not the app client configured for `aud`, **when** a
-  tenant-scoped route is called, **then** 403.
+  in list or map shape, **when** a route reads the tenant or a permission, **then** 403.
 - **Given** `resource_access[aud].roles` missing or the wrong type, **when** a permission is
   required, **then** 403.
+- **Given** a Keycloak principal whose claims also carry `dct` and `tenants` naming another
+  tenant with an `owner` role, **when** `get_tenant_id`, `get_tenant_claims`, `require_role`
+  and `require_permission` run, **then** none reads them, the tenant is the organization alias
+  **and** `request.state.tenant_id` is not the forged `dct`.
+- **Given** a user who holds `tenant-admin` roles and belongs to `acme` and `globex`, **when**
+  a `tenant-admin` token for `globex` is used on a route needing a `tenant-admin` permission,
+  **then** 403, **and** the same for `acme` (owner decision 10). **Given** a user who is in one
+  organization only, **then** the same route answers.
+- **Given** a configured type that is declared neither organization-bound nor portable,
+  **when** the backend starts, **then** it refuses to start.
+- **Given** the organization lookup is unavailable, **when** an organization-bound token is
+  used, **then** 403. Until [identity-stack#559] supplies the lookup, the check has no data
+  source and refuses every organization-bound token.
+- **Given** the app, **when** its routes are listed, **then** two depend on
+  `require_permission` and make no provider call: one needs `documents:read`, one
+  `documents:write`. If [identity-stack#541] has already gated real routes by permission, use
+  those and add none.
 - **Given** a valid token, **when** `get_tenant_id` runs, **then** it returns the organization
   alias **and** `require_permission` passes only for roles in `resource_access[aud].roles`.
 - **Given** the two-organization user, **when** tokens for `acme` and `globex` are used,
@@ -351,7 +432,10 @@ shows my tenant, my permissions and the organizations I can switch to.
 
 Depends on: [identity-stack#557]. Library: none.
 
-Admin side. **In:** a read-only lookup of the user's organizations; Terraform owns the rest.
+Admin side. **In:** a read-only lookup of the user's organizations, by a service-account
+client holding only the read role that lookup needs. Its secret is a fixture value in the
+compose realm, is read through `app.knobs`, and is listed in `infra/PROVIDERS.md`. Terraform
+owns the rest.
 **Out:** a `KeycloakSyncAdapter`, inbound sync, reconciliation, and the Descope-backed admin
 routers ([identity-stack#519], which moves those behind one adapter, is untouched).
 
@@ -366,7 +450,20 @@ Collision: `routers/protected.py` and identity resolution move in [identity-stac
   they are not reported as the caller's grants.
 - **Given** the two-organization user, **when** the response is built, **then**
   `tenant_memberships` lists both.
+- **Given** any request, **when** the organization lookup is made, **then** the member id is
+  the verified token's `sub` and nothing from the path, query, headers or body.
+- **Given** the token's organization is not in the list the Admin API returns, **when** the
+  endpoint is called, **then** 403 (owner decision 12).
 - **Given** the Admin API is unreachable, **when** the endpoint is called, **then** 502.
+- **Given** the Admin API answers 401 or 403 to the service account, **when** the endpoint is
+  called, **then** 502 **and** the log names the status and not the secret.
+- **Given** the service-account client, **when** it calls a write endpoint (add a member,
+  create an organization, map a role), **then** Keycloak refuses.
+- **Given** the lookup, **when** [identity-stack#557]'s organization-bound check runs,
+  **then** it uses this lookup: exactly one organization, equal to the token's.
+- **Given** a provider whose tenant comes from the token, **when** the response is built,
+  **then** it says so in one provider-neutral field, which the SPA uses to decide whether a
+  switch needs a new token.
 - **Given** a Descope or Ory principal, **when** the endpoint is called, **then** the response
   is byte-identical to before.
 
@@ -383,8 +480,17 @@ from [identity-stack#377] (provider-agnostic frontend) are already on `main`.
 - **Given** only `VITE_OIDC_*` changes, **when** the SPA is built, **then** login with PKCE,
   refresh and logout work against Keycloak **and** there is no Keycloak-specific code path.
 - **Given** the tenant scope template is set, **when** a tenant is chosen, **then**
-  `signinRedirect` is called with the templated scope; **given** it unset, **then** the switch
-  stays client-side as today.
+  `signinRedirect` is called with the templated scope.
+- **Given** identity says the tenant comes from the token and the template is unset, **when**
+  the switcher renders, **then** it shows the current tenant and offers no switch. The UI never
+  shows one tenant while the API acts in another.
+- **Given** identity says the tenant does not come from the token, **when** a tenant is chosen,
+  **then** the switch stays client-side as today.
+- **Given** a switch returns a token whose organization is missing or is not the one asked
+  for, **when** the callback completes, **then** the SPA reports the failure and does not show
+  the requested tenant. Keycloak answers a non-member request this way instead of refusing.
+- **Given** a silent renew, **when** it completes, **then** the organization is unchanged;
+  refresh is never used to switch.
 - **Given** a completed switch, **when** identity reloads, **then** the UI shows the new tenant
   and its permissions.
 - **Given** compose, **when** the frontend image is built, **then** the `VITE_OIDC_*` values
@@ -395,34 +501,44 @@ from [identity-stack#377] (provider-agnostic frontend) are already on `main`.
 As the owner, I want one automated run of the whole path, so that "Keycloak works" is a CI
 result and each limit found is written down.
 
-Depends on: [identity-stack#554], [identity-stack#561]. Library: none.
+Depends on: [identity-stack#554], [identity-stack#561]. Library: none. The suite drives
+Chromium: Keycloak sets `Secure` session cookies on its plain-HTTP origin, which Chromium keeps
+for `keycloak.localhost`.
 
 **Acceptance Criteria:**
 
 - **Given** the E2E job, **when** it runs on a pull request, **then** it logs in, reads
-  identity, calls a permission-gated route, is refused on one it lacks, switches organization
-  with no login prompt, and logs out.
+  identity, calls the `documents:read` route from [identity-stack#557], is refused on the
+  `documents:write` one it lacks, switches organization, and logs out. The switch shows no
+  login form, as measured for a member of both organizations.
+- **Given** the user who holds `tenant-admin` roles and is in both organizations, **when** they
+  sign in through the `tenant-admin` app for either organization, **then** every
+  `tenant-admin` permission is refused; **given** a tenant admin in one organization, **then**
+  it is allowed there.
+- **Given** a user outside `globex`, **when** they ask to switch to it, **then** no request is
+  served in `globex`.
+- **Given** the user with no client role, **when** they sign in, **then** every protected
+  route answers 401, because the token has no `aud`.
 - **Given** Keycloak is absent in CI, **when** the suite runs, **then** it fails and does not
   skip.
 - **Given** a realm built by Terraform, **when** the backend integration suite runs against it,
   **then** it passes.
-- **Given** the run, **when** it finishes, **then** every unverified row above is settled or
-  names a follow-up issue.
+- **Given** the run, **when** it finishes, **then** every evidence row still marked unverified
+  is settled or names a follow-up issue.
 
 ## Dependency order
 
 ```
-#553 ─┬─> #554 ───────────────────────────┐
-      └─> #556 ──┬─> #557 ─> #559 ─> #561 ─┴─> #562
-#555 ────────────┘
+identity-stack#553 ─┬─> identity-stack#554 ──────────────────────────────────────────────┐
+                    └─> identity-stack#556 ─┬─> identity-stack#557 ─> identity-stack#559 ─┤
+identity-stack#555 ─────────────────────────┘                                             │
+                         identity-stack#559 ─> identity-stack#561 ─> identity-stack#562 <─┘
 ```
 
 [identity-stack#556] also feeds [identity-stack#561] directly (logout).
 
-Numbers are identity-stack issues.
-
-- **Start together:** [identity-stack#553] and [identity-stack#555]. Neither needs the other or
-  any library release.
+- **Start together:** [identity-stack#553] and, subject to owner decision 8,
+  [identity-stack#555]. Neither needs the other or any library release.
 - **Then together:** [identity-stack#554] and [identity-stack#556].
 - **Then in sequence:** [identity-stack#557], [identity-stack#559], [identity-stack#561],
   [identity-stack#562]. [identity-stack#554] may finish any time before the last.
@@ -434,6 +550,8 @@ Numbers are identity-stack issues.
 - From compose and env config alone, the SPA logs in against Keycloak, `GET /api/identity`
   returns the token's tenant and permissions, a permission-gated route answers, an organization
   switch issues a new token, and logout ends the Keycloak session.
+- A tenant admin of one organization gains nothing in another, and a Keycloak token carrying
+  forged `dct` or `tenants` gains nothing.
 - The evidence table has no unverified row without a recorded answer.
 - Descope and Ory tests are unchanged and green.
 
@@ -443,7 +561,8 @@ Numbers are identity-stack issues.
 - Admin routers (users, roles, access keys, FGA) operating on Keycloak.
 - Gateway mode: no Tyk API definition for Keycloak.
 - A per-route user-type gate. Permission names carry the type; add it when a route needs it.
-- Per-organization permissions through organization groups.
+- Per-organization permissions through organization groups (an alternative under owner
+  decision 10).
 - Service principals on Keycloak ([identity-stack#543], provider-neutral service principals)
   and early revocation ([identity-stack#542], revocation for claims-based providers).
 - The library's Keycloak integration-test fixture, which was the subject of the superseded
