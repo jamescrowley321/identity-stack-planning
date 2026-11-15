@@ -39,6 +39,8 @@ Source audit on 2026-10-28 at `4935907` (tip of the 5.0.0 stack, #976), three pa
 | Advanced: private_key_jwt, mTLS, PAR, JAR, JARM, RFC 9207, logout, FAPI validators/profile | yes | **no** | **no** |
 | Config / retry / CA bundle / Cache-Control TTL / size bounds | yes | **no** (#757) | **no** (#758) |
 | Discovery SSRF policy (endpoint authority, internal IP) | yes | **no** (#578) | **no** (#578) |
+| Discovery input = issuer; exact `issuer` match | 5.0 (#1154) | issuer input; exact match fixed in 5.0 (#1154) | issuer input; exact match fixed in 5.0 (#1154) |
+| RFC 8414 metadata location option | 5.0 (#1154) | **no** (#1155) | **no** (#1155) |
 | Typed OAuth errors and typed responses | **no** (#791, #783, #772, #768); typed discovery/JWKS errors in 5.0 (#1129) | yes | yes |
 | `client_secret_post` | yes (5.0, #1097) | yes | yes |
 | Base `expected_nonce` | **no**; 5.0 makes `nonce` a required `validate_id_token` argument instead (#1132) | yes (base option; removed in D9) | yes (base option; removed in D9) |
@@ -126,7 +128,7 @@ The DPoP nonce cache (#784) and key import (#786) shipped in 5.0 (#1126, #1110),
 | D2 | Injected Config: settings table with Python's defaults and ranges, validated build returning an error, env reads deleted and lint-banned; unit test checks `spec/config.md` | #994, #757, #758 |
 | D3 | HTTP retry/backoff (429/5xx, `Retry-After`, 120 s cap) + CA bundle. Never retry authorization code, refresh or a device poll (Python 5.0, #1126); fresh DPoP proof and client assertion per attempt (#1110) | #995, #757, #758 |
 | D4 | Client-owned caches (Go: remove globals), Cache-Control TTL 60–86400 clamp, 1 h fallback, `max_size`/`max_keys`, one `cache_max_entries`, trust-scope cache keys | #996, #757, #758 |
-| D5 | Discovery hardening: endpoint-authority binding, internal-IP rejection, `DiscoveryPolicy`, Rust discovery single-flight, `application/json` check, full metadata model | #997, #578, #579 |
+| D5 | Discovery hardening: endpoint-authority binding, internal-IP rejection, `DiscoveryPolicy`, Rust discovery single-flight, `application/json` check, full metadata model. RFC 8414 metadata location option (Python 5.0 has it via #1154; the exact issuer match lands in all three languages in 5.0, #1154) | #997, #578, #579, #1155 |
 | D6 | Validation extras: signature-failure JWKS refresh sharing the cooldown, multiple issuers + `subject`, discovery-driven validate, cache metrics | #998, #578 |
 | D7 | Rust Debug redaction sweep (`IdTokenValidationOptions`, `PkceChallenge`, `JsonWebKey` private members) | #999 |
 | D8 | UserInfo `sub` (Python 5.0 rules): required `expected_sub`, typed missing/mismatch/unverifiable errors, unverified JWT on the error (redacted); `userinfo.json` runners match kinds; docs in all three name the signed-response API. Rust variant follows D1 | #1137, #928 |

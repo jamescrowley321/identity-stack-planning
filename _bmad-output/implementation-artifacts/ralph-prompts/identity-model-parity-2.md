@@ -54,7 +54,7 @@ title has `!` are breaking: `!` in the commit type and a `BREAKING CHANGE:` foot
 | D2 | #994 `!` | Injected Config with validated build; env reads banned | go, rust |
 | D3 | #995 | HTTP retry/backoff + CA bundle; never retry auth code, refresh or device poll; fresh proof/assertion per attempt | go, rust |
 | D4 | #996 `!` | Client-owned caches, Cache-Control TTL, size bounds | go, rust |
-| D5 | #997 | Discovery hardening + full metadata model (#578, #579) | go, rust |
+| D5 | #997 | Discovery hardening + full metadata model (#578, #579); RFC 8414 location option (#1155) | go, rust |
 | D6 | #998 | Signature-failure refresh, multiple issuers, discovery-driven validate, cache metrics | go, rust |
 | D7 | #999 | Rust Debug redaction | rust |
 | D8 | #1137 `!` | UserInfo `sub`: required `expected_sub`, typed errors, unverified JWT (#928) | go, rust, py docs, spec |
