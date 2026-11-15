@@ -107,7 +107,7 @@ Rationale: "Tests must come prior to v5" (James, 2026-11-15).
 - **Scope:** Moderate.
 - **Owner (James):** approve this proposal; merge the eight fix PRs; launch the loop from a terminal (agents never launch ralph); apply #1140 gating; merge the loop's PRs bottom-up into `release/v5` with merge commits.
 - **Loop:** `ralph-prompts/identity-model-v5-conformance.md` + `hats/identity-model-v5-conformance.yml` (BMAD story context + superpowers TDD / debugging / verification / review; Stacker → Builder → Critic → Shipper; never merges).
-- **Launch:** `~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/run.sh identity-model-v5-conformance identity-model release/v5`. Run it from this branch's worktree until it merges.
+- **Launch:** `<planning checkout>/_bmad-output/implementation-artifacts/ralph-prompts/run.sh identity-model-v5-conformance identity-model release/v5`. Until this proposal merges, `<planning checkout>` is `/tmp/isp-v5-conformance`; after that, `~/repos/auth/identity-stack-planning`. `run.sh` reads the prompt from its own directory.
 
 **Success criteria:**
 - Every applicable Python RP plan in suite 5.3.4 runs in CI, blocking.
