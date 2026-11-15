@@ -115,3 +115,14 @@ Rationale: "Tests must come prior to v5" (James, 2026-11-15).
 - Nonce modules fail when the library's nonce check is removed.
 - The hosted Basic / Config / Form Post run is green on `release/v5`.
 - `conformance-fapi2` is required on main.
+
+---
+
+## Amendment — 2026-11-15: alpha pre-releases before 5.0.0 final
+
+James changed the release approach the same day:
+- 5.0 ships as **alpha pre-releases** (`5.0.0a1`, …) to PyPI from `release/v5`, and gets used in several real places to collect feedback. 5.0.0 final follows the feedback period.
+- Order: the eight fix PRs merge, then Phase D3, then the first alpha. **Phase D3 now gates `5.0.0a1`** (and therefore also final).
+- Release plumbing for alphas: PSR `prerelease_token = "a"`, a `publish-dist.yml` tag pattern for `-a.N`, fastapi prerelease support with floor `>=5.0.0a1`, and `Development Status :: 3 - Alpha` classifiers.
+- A pointer on the `main` README: 5.0 is in development, install with `--pre`, report feedback via a `v5-feedback` template.
+- `main` stays on 4.x until 5.0.0 final.
