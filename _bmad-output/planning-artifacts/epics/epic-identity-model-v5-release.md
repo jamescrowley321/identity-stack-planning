@@ -307,7 +307,23 @@ Additive (FAPI completeness, identity-model#954):
 
 The acceptance criteria are in each issue. Execution runs in the `identity-model-v5-fapi` ralph loop (`ralph-prompts/identity-model-v5-fapi.md`), stacked off `release/v5`. The owner merges bottom-up into `release/v5` with merge commits; identity-model#915 then carries everything to `main`.
 
-## Phase E — Release
+## Phase D3 — Conformance coverage (2026-11-15, blocks Phase P)
+
+"Tests must come prior to v5" (James). Every applicable Python OIDF RP plan runs in CI, blocking, with typed rejection reasons. Proposal: `sprint-change-proposal-2026-11-15.md`. Stories D3.1–D3.10: `epics/epic-identity-model-v5-conformance.md` (identity-model#1138–#1144, #1131, #1139, #607, #473, #1082, #880). Loop: `ralph-prompts/identity-model-v5-conformance.md`, which starts once the eight spec-fix PRs (#1121, #1124, #1126, #1128, #1129, #1130, #1132, #1136) are merged into `release/v5`.
+
+## Phase P — Alpha pre-releases and feedback (2026-11-15)
+
+James changed the approach: 5.0 ships first as **alpha** pre-releases (`5.0.0a1`, …) to PyPI from `release/v5`, gets used in real places, and goes final only after a feedback period. `main` stays on 4.x. Stories: `epics/epic-identity-model-v5-prerelease.md`:
+- P1 FastAPI rename, #1146.
+- P2 alpha release plumbing, #1147.
+- P3 `main` README note, #1148.
+- P4 cut `5.0.0a1`, #1149.
+- P5 feedback intake, #1150.
+
+## Phase E — Release (5.0.0 final, after the Phase P feedback period)
+
+**Superseded in part by Phase P (2026-11-15):** the prerelease wheel step below is replaced by the PyPI alphas. The final release also needs the classifiers set back to `5 - Production/Stable`, the fastapi floor back to `>=5.0.0`, and a `feat(fastapi)!`/`fix(fastapi)` line in the #915 body.
+
 
 - [ ] Open `release/v5` → `main` PR titled `release: py-identity-model 5.0.0`, with a body listing the stack PRs.
 - [ ] Smoke-test the PR's prerelease wheel (`publish-prerelease.yml` comment) in a scratch venv: `pip install <rc wheel>` and run `examples/` against node-oidc (`make test-integration-node-oidc` on the release branch already covers the library).
