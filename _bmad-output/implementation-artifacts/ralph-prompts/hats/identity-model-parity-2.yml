@@ -31,8 +31,9 @@ hats:
       seed the "Already shipped" rows as `shipped`, per PROMPT.md "Resume").
 
       On every activation, in this order:
-      1. `git fetch origin --prune`. On `build.start` only: if `origin/release/v5` still exists
-         (py 5.0.0 has not shipped), publish `LOOP_COMPLETE` with "blocked: 5.0.0 not shipped".
+      1. `git fetch origin --prune`. On `build.start` only: if `origin/release/v5` still exists,
+         py 5.0.0 final has not shipped (alphas `5.0.0aN` are cut from that branch; it is
+         deleted only after final). Publish `LOOP_COMPLETE` with "blocked: 5.0.0 final not shipped".
       2. **On `build.blocked`:** mark the payload's story `blocked` in the ledger with the
          reason, comment the reason on its issue, and continue. Later stories still stack on
          the last *shipped* branch, never on a blocked one.
@@ -50,7 +51,9 @@ hats:
          parent is unpushed; it never is, Shipper pushes before advancing).
       6. Comment on the issue that the loop picked it up, naming the parent branch.
       7. Write ledger row (`in_progress`, branch, parent) and `.ralph/specs/<issue>/context.md`
-         with the issue body, ACs, linked decisions and the files you expect to change.
+         with the issue body, ACs, linked decisions and the files you expect to change, plus
+         the Python reference diff from PROMPT.md: what `main` ships vs the issue's Python 5.0
+         rules. Comment any difference on the issue.
       8. Publish `tasks.ready` with `issue`, `branch`, `parent`.
 
   builder:

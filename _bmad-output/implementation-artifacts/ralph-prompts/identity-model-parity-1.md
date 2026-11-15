@@ -13,6 +13,15 @@ One ralph workstream per repo: never run this alongside another identity-model l
   every branch operation.
 - **Stack root: `main`.** The loop never merges. The owner merges bottom-up. Merging a
   `feat`/`fix` to main cuts a release for that language; that is expected.
+- **Gate: py 5.0.0 final.** 5.0 ships first as alpha pre-releases (`5.0.0aN`) from
+  `release/v5`, then as 5.0.0 final via #915, after which `release/v5` is deleted. The loop
+  starts only once `origin/release/v5` is gone, i.e. after the alpha feedback period and the
+  final release, never on an alpha.
+- **Python reference = what 5.0.0 final ships.** The epic's Python 5.0 rows were written
+  against `release/v5` and its open spec-fix PRs, and the alphas may change them. Before
+  building each story, diff its Python reference (issue + epic) against `main`'s code and
+  `docs/upgrade-v5.md`. Where they differ, `main` wins: port that, and comment the
+  difference on the issue.
 - **Why:** Epic 26, complete feature parity (#573). Plan, evidence and the fourteen owner
   decisions: `identity-stack-planning/_bmad-output/planning-artifacts/epics/epic-26-full-parity.md`.
   The issue holds each story's acceptance criteria and wins over this prompt.
@@ -24,7 +33,7 @@ One ralph workstream per repo: never run this alongside another identity-model l
   xfails linked to an issue for any language it doesn't; new modules added to `GO_SURFACE` /
   `RUST_SURFACE` in `tools/mutation_security_native.py`; capability matrix updated (once #991
   lands: regenerated with `tools/gen_capabilities.py`).
-- **Loop 1 of 2:** enforcement, Python catch-up, semantic alignment (Phases A–C). Loop 2
+- **Loop 1 of 2:** enforcement, Python catch-up, semantic alignment (Phases A–C; A5 runs in loop 2 after E5). Loop 2
   (`identity-model-parity-2`) runs after this one completes.
 
 ## Queue
@@ -39,22 +48,23 @@ title has `!` are breaking: `!` in the commit type and a `BREAKING CHANGE:` foot
 | A3 | #991 | Status files + generated capability matrix, `--check` in `ci-complete` | spec, tools, ci |
 | A4 | #828 | Rust runs the DPoP logic vectors it already passes; HTTP three stay KnownGaps (do NOT close #828; E4 closes it) | rust tests |
 | B1 | #791 | Typed OAuth error incl. `error_uri` (+#777) | py |
-| B2 | #574 | `client_secret_post` everywhere + base `expected_nonce`; record §3 done via #842 | py |
-| B3 | #783 | Typed token responses (auth code, exchange, CC, refresh, device) | py |
-| B4 | #772 | Typed introspection + reject missing/non-boolean `active` (+#782) | py |
+| B2 | #574 | Base `expected_nonce` only (§1 shipped in 5.0 via #1097, §3 via #842). Needs the owner's call on #1151 first; without it, `blocked` | py |
+| B3 | #783 | Typed token responses (auth code, exchange, CC, refresh, device); keep 5.0's `INVALID_TOKEN_RESPONSE` | py |
+| B4 | #772 | Typed introspection + reject missing/non-boolean `active` (+#782); overlaps Gate B #1090 | py |
 | B5 | #768 | UserInfo typed claims + `WWW-Authenticate` (+#769) + injected-client test (#775) | py |
 | B6 | #766 | `revocation_endpoint` from discovery | py |
-| B7 | #770 | JWKS non-JSON body → parse error | py |
-| B8 | #778 | Client-credentials extra form params | py |
-| B9 | #901 | Cache-Control `max-age` parsing (py; Go/Rust get TTL in loop 2) | py |
-| B10 | #784 | DPoP nonce cache (+#786 key import from JWK/PEM) | py |
-| C1 | #992 `!` | Empty `kid`/`use`/`client_id` = absent; accept `key_ops` (absorbs #932 kid part, #961, #963) | py, go, rust |
+| B7 | #778 | Client-credentials extra form params | py |
+| B8 | #901 | Cache-Control `max-age` parsing (py; Go/Rust get TTL in loop 2) | py |
+| C1 | #992 | Empty = absent: Python shipped in 5.0 (#1092). Left: Rust `client_id: ""` (`fix(rust)!`), JWKS/IDT vectors in all three, `capabilities.md` rule, mistyped `key_ops` (agree with Gate B #1074) | rust, spec, tests |
 | C2 | #890 | Wrong-typed required discovery fields classified consistently | py, go, rust |
 | C3 | #575 | Duplicate-kid try-all | py, go, rust |
+| C6 | #1153 | Same-`kid` keys of different `kty`: pick the one whose `kty`/`alg`/`crv` fit (Python 5.0, #1130) | go, rust, spec |
 | C4 | #576 | ID-token vs access-token discrimination in the shared validators | py, go, rust |
 | C5 | #867 `!` | Refuse every HTTP redirect (Go, Rust) | go, rust |
 
-Out of scope: RAR (#220), CIBA (#217), the review follow-ups #921–#948 unless queued, anything in loop 2.
+Shipped in 5.0, not queued: #784 and #786 (DPoP nonce cache, key import), #770 (JWKS parse error).
+
+Out of scope: RAR (#220), CIBA (#217), the review follow-ups #921–#948 unless queued, Gate B (#1069; overlaps are listed in the epic), anything in loop 2.
 
 Certification rules: never press "Publish for certification", and never run the hosted
 workflow with `publish` set to anything but `none`.

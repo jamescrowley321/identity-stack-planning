@@ -13,6 +13,15 @@ One ralph workstream per repo: never run this alongside another identity-model l
   every branch operation.
 - **Stack root: `main`.** The loop never merges. The owner merges bottom-up. Merging a
   `feat`/`fix` to main cuts a release for that language; that is expected.
+- **Gate: py 5.0.0 final.** 5.0 ships first as alpha pre-releases (`5.0.0aN`) from
+  `release/v5`, then as 5.0.0 final via #915, after which `release/v5` is deleted. The loop
+  starts only once `origin/release/v5` is gone, i.e. after the alpha feedback period and the
+  final release, never on an alpha.
+- **Python reference = what 5.0.0 final ships.** The epic's Python 5.0 rows were written
+  against `release/v5` and its open spec-fix PRs, and the alphas may change them. Before
+  building each story, diff its Python reference (issue + epic) against `main`'s code and
+  `docs/upgrade-v5.md`. Where they differ, `main` wins: port that, and comment the
+  difference on the issue.
 - **Why:** Epic 26, complete feature parity (#573). Plan, evidence and the fourteen owner
   decisions: `identity-stack-planning/_bmad-output/planning-artifacts/epics/epic-26-full-parity.md`.
   The issue holds each story's acceptance criteria and wins over this prompt.
@@ -43,17 +52,20 @@ title has `!` are breaking: `!` in the commit type and a `BREAKING CHANGE:` foot
 |---|---|---|---|
 | D1 | #993 `!` | Rust typed error taxonomy | rust |
 | D2 | #994 `!` | Injected Config with validated build; env reads banned | go, rust |
-| D3 | #995 | HTTP retry/backoff + CA bundle | go, rust |
+| D3 | #995 | HTTP retry/backoff + CA bundle; never retry auth code, refresh or device poll; fresh proof/assertion per attempt | go, rust |
 | D4 | #996 `!` | Client-owned caches, Cache-Control TTL, size bounds | go, rust |
 | D5 | #997 | Discovery hardening + full metadata model (#578, #579) | go, rust |
 | D6 | #998 | Signature-failure refresh, multiple issuers, discovery-driven validate, cache metrics | go, rust |
 | D7 | #999 | Rust Debug redaction | rust |
 | D8 | #1137 `!` | UserInfo `sub`: required `expected_sub`, typed errors, unverified JWT (#928) | go, rust, py docs, spec |
-| E1 | #1000 | Shared client auth + `private_key_jwt` | go, rust, spec |
+| D9 | #1151 `!` | ID Token rules: required `nonce` (string / none / refresh), `exp`/`iat` required, issuer required without discovery. Needs the owner's #574 §2 call | go, rust, spec |
+| D10 | #1152 `!` | PKCE for public clients, required `access_token`/`token_type`, absolute token-exchange `resource` | go, rust, spec |
+| E1 | #1000 | Shared client auth + `private_key_jwt` (`aud` = issuer, required; overlaps Gate B #1080) | go, rust, spec |
 | E2 | #1001 | Refresh-token grant | go, rust, spec |
 | E3 | #1002 | mTLS client auth + certificate-bound tokens | go, rust, spec |
 | E4 | #1003 | DPoP completeness (closes #828) | go, rust, spec |
 | E5 | #1004 | Authorization URL, callback, state, RFC 9207 `iss` | go, rust, spec |
+| A5 | #1145 | Go and Rust OIDF conformance harnesses (Basic, Config, Form Post), blocking in CI | go, rust, conformance, ci |
 | E6 | #1005 | PAR | go, rust, spec |
 | E7 | #1006 | JAR | go, rust, spec |
 | E8 | #1007 | JARM (signed) | go, rust, spec |
@@ -66,7 +78,7 @@ title has `!` are breaking: `!` in the commit type and a `BREAKING CHANGE:` foot
 | F2 | #1013 | Fail-closed FAPI 2.0 client profile | go, rust, spec |
 | F3 | #1014 | Ports of #955–#957 and #478 (only once they are on `main`; else `blocked`) | go, rust |
 
-Out of scope: RAR (#220), CIBA (#217), the FastAPI package (Epic 22).
+Out of scope: RAR (#220), CIBA (#217), the FastAPI package (Epic 22), Gate B (#1069; overlaps are listed in the epic; build on whichever landed first).
 
 Certification rules: never press "Publish for certification", and never run the hosted
 workflow with `publish` set to anything but `none`.
