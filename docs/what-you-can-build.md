@@ -3,7 +3,7 @@ title: "What you can build with it"
 sidebar_label: "What you can build"
 description: "What identity-model actually lets you do, organised by the problem you are trying to solve, with the RFC behind each and where it is available today."
 status: current
-last_verified: 2026-09-16
+last_verified: 2026-11-01
 ---
 
 # What you can build with it
@@ -17,8 +17,14 @@ which is the authoritative source. Python carries the full surface and is the ce
 reference; Go and Rust carry core and most of the extended tier. Where a row says Python
 only, that is a parity gap being closed, not a design decision.
 
-Every capability below has a runnable example in
-[`py/examples/`](https://github.com/jamescrowley321/identity-model/tree/main/py/examples).
+"yes" below means the capability is present in that language's source. The matrix is
+stricter: on 2026-11-01 it marks Python `in-progress` for discovery, JWKS, authorization code,
+UserInfo, client credentials, introspection, revocation, token exchange and DPoP, because
+Python still fails some of the shared conformance vectors for each (the matrix lists them).
+
+Most capabilities below have a runnable example in
+[`py/examples/`](https://github.com/jamescrowley321/identity-model/tree/main/py/examples);
+dynamic client registration and logout do not yet.
 
 ---
 
@@ -69,7 +75,7 @@ worthless without the key.
 
 | You get | Specification | Python | Go | Rust |
 |---|---|---|---|---|
-| DPoP — proof-of-possession at the application layer | RFC 9449 | yes | yes | planned |
+| DPoP — proof-of-possession at the application layer | RFC 9449 | yes | yes | in progress |
 | mTLS + certificate-bound tokens | RFC 8705 | yes | planned | planned |
 
 ## Call another service as the user
@@ -130,7 +136,8 @@ specification-compliant provider, so the code that validates a token does not kn
 who issued it.
 
 The conformance harness runs the same suite against **Keycloak**, **IdentityServer**,
-**node-oidc-provider** and **Descope** from one compose file, plus the OpenID Foundation's
+**node-oidc-provider** (one compose file, `infra/docker-compose.yml`) and a hosted
+**Descope** tenant (`infra/descope/`), plus the OpenID Foundation's
 hosted suite. `identity-stack` exercises the library against Descope and Ory end to end in
 a real application rather than against test doubles.
 

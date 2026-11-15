@@ -18,7 +18,7 @@ for f in ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifa
 done | sort -rn
 ```
 
-**Flag:** Any prompt >800 words (except completed epics and one-shot prompts like `pim-blind-peer-review.md`). Self-contained prompts (>1,000 words with inline phase instructions) should be converted to the router + phase file pattern.
+**Flag:** Any prompt >800 words (except completed epics and one-shot prompts like `planning-reality-audit.md` or `retro-review-sweep.md`). Self-contained prompts (>1,000 words with inline phase instructions) should be converted to the router + phase file pattern.
 
 **Check for inline phases:** For each prompt >800 words, grep for `### review-blind` or `### review-edge` or `### execute` — presence indicates inline phases that should be externalized.
 
@@ -103,7 +103,7 @@ Calculate estimated tokens per story for the most common loop type:
 
 ```
 Iterations per story:
-  setup(1) + analyze(1) + implement(1) + test(1) + review(1 + N subagents) + review-fix(1-3) + pr(1) + ci(1) + complete(1) = 9-12 iterations
+  setup(1) + analyze(1) + implement(1) + test(1) + review(1 + N subagents) + review-fix(1-3) + pr(1) + docs(1) + ci(1) + complete(1) = 10-13 iterations
 
 Per iteration baseline:
   CLAUDE.md (workspace + repo): ~X tokens

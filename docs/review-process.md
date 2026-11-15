@@ -124,7 +124,7 @@ flowchart TD
     RECHECK -->|No, retries left| FIX
     RECHECK -->|Exhausted| BLOCK[Block for manual review]
 
-    TRIAGE -.->|Auth changes?| VIP[Red Team Red Team] -.-> TRIAGE
+    DIFF -.->|Auth changes?| VIP[Red Team] -.-> TRIAGE
 
     style BH fill:#e76f51,color:#fff
     style ECH fill:#e76f51,color:#fff
@@ -135,26 +135,21 @@ flowchart TD
 ```
 
 **Key properties:**
-- All 4 standard reviewers run in parallel (no shared context between them)
-- Red Team is conditional — only triggered for auth/middleware/token/infrastructure changes
+- Reviewers are selected by diff scope (`phases/review.md` Step 2) and spawned in parallel, with no shared context between them; a docs-only diff gets Acceptance Criteria alone
+- Red Team is conditional: it joins the same parallel batch for auth/middleware/token/infrastructure changes
 - Each reviewer is a separate Claude Code subagent spawned with a fresh context
-- The fix loop re-reviews ALL findings after fixes (not just the ones that were "fixed")
-- Blocking findings that survive 3 fix iterations require manual intervention
+- The fix loop re-reviews only the delta: it re-runs the reviewers that had P0/P1 findings, scoped to the fix commits (`phases/review-fix.md`)
+- P0 findings that survive 3 fix iterations block the task for manual intervention
 
 ## Finding Severity Triage
 
-When multiple reviewers report overlapping findings, the review-fix phase triages by priority:
+The review-fix phase triages every finding into three tiers (`phases/review-fix.md`):
 
-1. **BLOCK / CONFIRMED** (Security Review) — Exploitable security vulnerabilities
-2. **FAIL** (Acceptance Criteria) — Missing or incorrect requirements implementation
-3. **MUST FIX** (Cold Read) — Bugs, crashes, data loss
-4. **CRITICAL / HIGH** (Red Team) — Red team exploitation paths
-5. **Edge cases with [CRASH] or [DATA]** (Edge Cases) — Unhandled paths causing crashes or data loss
-6. **WARN / LIKELY** (Security Review) — Security issues requiring unusual conditions
-7. **SHOULD FIX** (Cold Read) — Code quality risks
-8. **PARTIAL** (Acceptance Criteria) — Incomplete implementations
-9. **Edge cases with [WRONG] or [DEGRADED]** (Edge Cases) — Incorrect results or degraded behavior
-10. **NITPICK / INFO** — Deferred unless trivial to fix
+| Tier | Findings | Handling |
+|---|---|---|
+| **P0** (blocks merge) | Security BLOCK, Acceptance FAIL, MUST FIX, Edge Cases [CRASH] / [DATA], Red Team CRITICAL / HIGH | Always fixed |
+| **P1** (should fix) | WARN, SHOULD FIX, PARTIAL, [DEGRADED], [WRONG], MEDIUM | Fixed where straightforward |
+| **P2** | NITPICK, LOW, INFO | Skipped unless trivial |
 
 ## Manual Blind Peer Review
 
@@ -167,7 +162,7 @@ This replaces the standalone `pim-adversarial-review.md` prompt, which required 
 4. Edge case exhaustion (boundary inputs across every public function)
 5. Test coverage audit (untested attack scenarios, missing error path tests)
 
-**To use:** Open a new Claude Code session in `~/repos/auth/py-identity-model/` and paste the prompt contents.
+**To use:** in a Claude Code session in the target repository, run the `blind-peer-review:check` skill (pass `--base origin/<branch>` to review a branch). In CI, `@claude review this PR` on a pull request runs the same skill (`.github/workflows/claude.yml`).
 
 ## Review Findings History
 

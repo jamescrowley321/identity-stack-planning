@@ -16,17 +16,17 @@ inputDocuments:
 
 ## Overview
 
-identity-model is a Go + Rust monorepo; `py-identity-model` (PIM) is the OIDF-certified reference implementation and a Node port is planned. Shared cross-language contracts live in `spec/`, with prose conformance definitions in `spec/conformance/*.json`. Today those ports each hand-write their own JWK and discovery parsers, and there is **no** normative document that says which members those types carry, what their canonical names are, how names differ across languages, or how a parser must behave when it meets a member it does not recognize. The result is silent divergence risk: two ports can each "work" against their own test provider yet disagree on the wire.
+identity-model is a polyglot monorepo (`py/`, `go/`, `rust/`); `py/` (`py-identity-model`, PIM) is the OIDF-certified reference implementation and a Node port is planned. Shared cross-language contracts live in `spec/`, with conformance definitions in `spec/vectors/*.json` (the directory was `spec/conformance/` when this epic was written). Today those ports each hand-write their own JWK and discovery parsers, and there is **no** normative document that says which members those types carry, what their canonical names are, how names differ across languages, or how a parser must behave when it meets a member it does not recognize. The result is silent divergence risk: two ports can each "work" against their own test provider yet disagree on the wire.
 
 This epic closes that gap. It delivers:
 
 1. A language-neutral **serialization specification** (`spec/serialization.md`) covering the JWK member set (RFC 7517), the OIDC discovery / RFC 8414 AS-metadata document (~45 fields), and the claim/constant enums (`JwtClaimTypes`, `oidc_constants`, `ConfirmationMethods`), with two behaviors pinned normatively:
    - **JWK and discovery parsers drop unknown members** — an unrecognized member is ignored, not an error.
    - **Token, introspection, and userinfo responses are loose pass-through** — extra claims round-trip unchanged and there is deliberately **no** typed claim model to port for those responses.
-2. **Executable round-trip conformance vectors** (parse → re-serialize → structural-equal) that extend the existing `spec/conformance/*.json` vector schema.
+2. **Executable round-trip conformance vectors** (parse → re-serialize → structural-equal) that extend the existing `spec/vectors/*.json` vector schema.
 3. **Go and Rust serializer conformance** wired to run those vectors green, proving cross-language structural parity.
 
-It also resolves an existing overlap. A JSON-vector conformance runner already exists — `go/internal/conformance/` executing `spec/conformance/*.json` (merged as PR #36) — but only `validation.json` carries executable vectors; the other nine files are prose. This epic is where the cross-language JSON-vector model gets its real home: the serializer round-trip vectors **subsume and feed** that runner, and Story 21.5 records the source-of-truth decision and the reconciliation between the JSON-vector runner and the OIDF RP certification harness.
+It also resolves an existing overlap. A JSON-vector conformance runner already exists — `go/internal/conformance/` executing `spec/vectors/*.json` (merged as PR #36) — but only `validation.json` carries executable vectors; the other nine files are prose. This epic is where the cross-language JSON-vector model gets its real home: the serializer round-trip vectors **subsume and feed** that runner, and Story 21.5 records the source-of-truth decision and the reconciliation between the JSON-vector runner and the OIDF RP certification harness.
 
 Scope is strictly **serialization**: field names, name mappings, member sets, and unknown-member policy for the three vocabularies above. This epic does not add protocol behavior, signature verification, network fetching, or new capabilities.
 
@@ -54,7 +54,7 @@ The spec MUST state, as normative rules:
 
 - **Unknown-member policy, per type.** JWK parsing and discovery/AS-metadata parsing **drop** unknown members: an unrecognized member is silently ignored and parsing succeeds. Token, introspection, and userinfo responses **preserve** unknown members: extra claims are retained and round-trip unchanged via loose pass-through, and there is deliberately no typed claim model for those responses.
 - **Canonical field names + cross-language name mappings.** For every member of every type, the canonical wire name is authoritative; any language-specific field name (e.g. `x5t_s256`) is recorded as a mapping to that canonical name so serialization emits the wire name regardless of internal identifier.
-- **Machine-readable round-trip vector format.** Define a round-trip vector shape that extends the existing `spec/conformance/*.json` vector schema, sufficient to express "parse this input, re-serialize it, assert structural equality (modulo dropped unknown members for drop-policy types; including preserved unknown members for pass-through types)".
+- **Machine-readable round-trip vector format.** Define a round-trip vector shape that extends the existing `spec/vectors/*.json` vector schema, sufficient to express "parse this input, re-serialize it, assert structural equality (modulo dropped unknown members for drop-policy types; including preserved unknown members for pass-through types)".
 
 ### Acceptance Criteria
 
@@ -64,7 +64,7 @@ The spec MUST state, as normative rules:
 - **AC-21.1.4** Given the unknown-member policy section, when a reader checks the policy for each type, then the spec states unambiguously that JWK and discovery/AS-metadata parsing **drops** unknown members (parse succeeds, member ignored) while token/introspection/userinfo responses **preserve** unknown members via loose pass-through with no typed claim model.
 - **AC-21.1.5** Given a JWK document containing a member no port recognizes, when the spec's drop rule is applied, then parsing succeeds and re-serialization omits the unrecognized member — and the spec says so explicitly.
 - **AC-21.1.6** Given an introspection or userinfo response containing an extra, non-standard claim, when the spec's pass-through rule is applied, then that claim is retained and re-serialized unchanged — and the spec says so explicitly.
-- **AC-21.1.7** Given the round-trip vector format section, when it is reviewed, then it defines a vector shape that extends the existing `spec/conformance/*.json` schema and is precise enough for a maintainer to author parse → re-serialize → structural-equal vectors in any language without ambiguity, including how structural equality treats dropped vs. preserved unknown members.
+- **AC-21.1.7** Given the round-trip vector format section, when it is reviewed, then it defines a vector shape that extends the existing `spec/vectors/*.json` schema and is precise enough for a maintainer to author parse → re-serialize → structural-equal vectors in any language without ambiguity, including how structural equality treats dropped vs. preserved unknown members.
 - **AC-21.1.8** Given the whole spec, when its normative statements are checked, then each cites an explicit source (RFC 7517 section, RFC 8414 Section 2, OIDC Discovery 1.0 Section 3, or RFC 7800 for `cnf`), and the document introduces no protocol behavior beyond serialization.
 
 ### RFC References
@@ -85,7 +85,7 @@ Author the executable serialization vectors that turn `spec/serialization.md` fr
 ### User Story
 
 As a **port maintainer**,
-I want executable round-trip serialization vectors for JWK, the discovery document, and the claim/constant enums in `spec/conformance/`,
+I want executable round-trip serialization vectors for JWK, the discovery document, and the claim/constant enums in `spec/vectors/`,
 So that every port can prove — mechanically, in CI — that it parses and re-serializes the shared vocabulary identically, rather than relying on prose review.
 
 ### Scope
@@ -96,12 +96,12 @@ So that every port can prove — mechanically, in CI — that it parses and re-s
   - **Claim / constant enums** — vectors asserting the canonical string values of `JwtClaimTypes`, `oidc_constants`, and `ConfirmationMethods` are emitted and parsed identically.
 - Include **drop-policy** vectors: JWK and discovery inputs carrying unknown members, with expected re-serialized output that omits them (parse succeeds, unknown dropped).
 - Include **pass-through** vectors: introspection/userinfo response inputs carrying extra claims, with expected output that preserves them unchanged.
-- Extend the existing `spec/conformance/` vector schema (the one `go/internal/conformance` already executes for `validation.json`) rather than inventing a parallel format; the new vectors live under `spec/conformance/` (e.g. `serialization.json` or per-type files) and validate against that schema.
-- The vectors are the executable realization of the Story 21.1 format; where prior `spec/conformance/*.json` files are prose-only, this story's vectors demonstrate the executable pattern those files should follow.
+- Extend the existing `spec/vectors/` vector schema (the one `go/internal/conformance` already executes for `validation.json`) rather than inventing a parallel format; the new vectors live under `spec/vectors/` (e.g. `serialization.json` or per-type files) and validate against that schema.
+- The vectors are the executable realization of the Story 21.1 format; where prior `spec/vectors/*.json` files are prose-only, this story's vectors demonstrate the executable pattern those files should follow.
 
 ### Acceptance Criteria
 
-- **AC-21.2.1** Given the new serialization vectors, when each is validated, then it conforms to the extended `spec/conformance/` vector schema and declares an input, an expected re-serialized output, and a structural-equality assertion mode.
+- **AC-21.2.1** Given the new serialization vectors, when each is validated, then it conforms to the extended `spec/vectors/` vector schema and declares an input, an expected re-serialized output, and a structural-equality assertion mode.
 - **AC-21.2.2** Given a JWK round-trip vector for each `kty` (RSA, EC, OKP, oct), when parse → re-serialize is applied, then the output is structurally equal to the input over the canonical JWK member set, and the `x5t#S256` member survives the `x5t_s256` internal mapping with its canonical wire name intact.
 - **AC-21.2.3** Given the full ~45-field discovery vector, when parse → re-serialize is applied, then every enumerated OIDC/RFC 8414 metadata member round-trips under its canonical name; and given the minimal discovery vector, then only the present members appear in the output.
 - **AC-21.2.4** Given a JWK or discovery **drop-policy** vector containing an unknown member, when parse → re-serialize is applied, then parsing succeeds and the expected output omits the unknown member — asserting the drop policy mechanically.
@@ -131,7 +131,7 @@ So that the Go JWK and discovery serializers are proven to match the normative s
 
 ### Scope
 
-- Extend the existing `go/internal/conformance` runner (which already executes `spec/conformance/validation.json`) to load and execute the Story 21.2 serialization vectors; or introduce a new `go/pkg` seam if a public serializer surface is the cleaner home. Prefer reusing the existing runner to avoid a second execution path.
+- Extend the existing `go/internal/conformance` runner (which already executes `spec/vectors/validation.json`) to load and execute the Story 21.2 serialization vectors; or introduce a new `go/pkg` seam if a public serializer surface is the cleaner home. Prefer reusing the existing runner to avoid a second execution path.
 - Drive each vector through the Go port's real JWK and discovery types (parse → re-serialize) and assert structural equality per the vector's mode.
 - **Reconcile with existing parsers.** Where a vector exposes a mismatch — a member the Go parser drops that should round-trip, a name it emits that differs from canonical, or an unknown member it errors on instead of dropping — fix the Go serializer to match the spec, or (if the spec is wrong) raise a spec correction back into Story 21.1. Do not weaken a vector to make Go pass.
 - Verify the `x5t#S256` ↔ `x5t_s256` mapping: the Go struct field may be `x5t_s256` (or a tagged equivalent) but the emitted JSON member MUST be the canonical `x5t#S256`.
@@ -167,7 +167,7 @@ So that Rust and Go are proven to parse and emit the same JWK, discovery, and en
 
 ### Scope
 
-- Add a Rust conformance test harness that loads the Story 21.2 vectors from `spec/conformance/` and drives them through the Rust port's serde-based JWK and discovery types (parse → re-serialize → structural-equal).
+- Add a Rust conformance test harness that loads the Story 21.2 vectors from `spec/vectors/` and drives them through the Rust port's serde-based JWK and discovery types (parse → re-serialize → structural-equal).
 - Honor the canonical name mappings via serde attributes: the Rust field may be `x5t_s256` with `#[serde(rename = "x5t#S256")]` (or equivalent) so the emitted member is the canonical `x5t#S256`.
 - Implement drop-policy behavior for JWK and discovery (serde ignores unknown members by default — assert this is the case and not overridden by `deny_unknown_fields`), and pass-through behavior for introspection/userinfo responses (unknown claims retained, e.g. via a flattened extra-claims map).
 - **Prove parity, not just per-language pass.** The Rust harness executes the same vector files the Go harness executes; a vector that passes in Go MUST pass in Rust and vice versa. Any port-specific divergence is reconciled in the serializer, never by forking the vectors.
@@ -204,7 +204,7 @@ So that future ports (Node, and PIM parity) follow one agreed model rather than 
 
 **Question.** Should the per-language serializers be **hand-written per language** (governed by shared behavioral vectors), or generated from a **shared JSON-Schema / codegen source of truth**?
 
-**Recommendation — hand-written per-language serializers, governed by shared conformance vectors as the behavioral source of truth.** The `spec/conformance/` round-trip vectors (Stories 21.2–21.4) are the authoritative shared artifact; the language types (Go structs with tags, Rust serde structs) remain hand-written and idiomatic.
+**Recommendation — hand-written per-language serializers, governed by shared conformance vectors as the behavioral source of truth.** The `spec/vectors/` round-trip vectors (Stories 21.2–21.4) are the authoritative shared artifact; the language types (Go structs with tags, Rust serde structs) remain hand-written and idiomatic.
 
 **Justification.**
 - **The schema is small, stable, and standards-frozen.** The JWK member set (RFC 7517), the ~45-field discovery/AS-metadata document (RFC 8414 / OIDC Discovery 1.0), and the claim/constant enums change rarely and only when a standard changes. The maintenance cost that would justify a codegen pipeline is not present.
@@ -213,14 +213,14 @@ So that future ports (Node, and PIM parity) follow one agreed model rather than 
 - **Two-toolchain build cost.** A shared codegen step would impose a generator dependency and a generate-check on both the Go and Rust builds (and Node/Python later). Shared **vectors** impose only a test dependency — every language already runs tests in CI — which is strictly cheaper and language-agnostic.
 - **Behavioral parity is what actually matters.** Structural parity is guaranteed by both ports passing the *same* vectors (AC-21.4.5), which a codegen approach does not by itself guarantee (identical structs can still serialize differently). The vectors test the property we care about directly.
 
-**Consequence.** New ports (Node, PIM-parity checks) adopt the serializers by making the shared `spec/conformance/` vectors pass, not by consuming generated code. `spec/serialization.md` remains the human-readable normative source; the vectors are its executable enforcement. A JSON-Schema representation MAY still be published later as documentation, but is explicitly **not** the codegen source of truth for the serializers.
+**Consequence.** New ports (Node, PIM-parity checks) adopt the serializers by making the shared `spec/vectors/` vectors pass, not by consuming generated code. `spec/serialization.md` remains the human-readable normative source; the vectors are its executable enforcement. A JSON-Schema representation MAY still be published later as documentation, but is explicitly **not** the codegen source of truth for the serializers.
 
 ### Design Decision B — Reconciling the two conformance mechanisms
 
-**Question.** identity-model now has two overlapping mechanisms: (1) the JSON-vector conformance runner (`go/internal/conformance` + `spec/conformance/*.json`, merged as PR #36, where only `validation.json` is executable today and the other nine files are prose), and (2) the OIDF RP certification harness under `conformance/`. Which owns what?
+**Question.** identity-model now has two overlapping mechanisms: (1) the JSON-vector conformance runner (`go/internal/conformance` + `spec/vectors/*.json`, merged as PR #36, where only `validation.json` is executable today and the other nine files are prose), and (2) the OIDF RP certification harness under `conformance/`. Which owns what?
 
 **Resolution (state explicitly).**
-- **The JSON-vector runner is the fast, in-CI, cross-language serializer / parity check.** It owns structural round-trip and parity — it is where the Story 21.2 vectors live and what Stories 21.3–21.4 execute. It runs on every PR in every language, requires no network or live provider, and is the mechanism that catches serialization drift. The serializer round-trip vectors **subsume and feed** this runner: they are the executable content the nine currently-prose `spec/conformance/*.json` files should grow toward, starting with serialization.
+- **The JSON-vector runner is the fast, in-CI, cross-language serializer / parity check.** It owns structural round-trip and parity — it is where the Story 21.2 vectors live and what Stories 21.3–21.4 execute. It runs on every PR in every language, requires no network or live provider, and is the mechanism that catches serialization drift. The serializer round-trip vectors **subsume and feed** this runner: they are the executable content the nine currently-prose `spec/vectors/*.json` files should grow toward, starting with serialization.
 - **The OIDF RP certification harness (`conformance/`) remains the certification track.** It owns end-to-end protocol conformance against the OpenID Foundation test suite and is the basis for the "OpenID Certified" mark (PIM's track). It is heavier, network-bound, and run on a certification cadence — not per-PR-per-language.
 - **No merge, no duplication of purpose.** The two are complementary, not redundant: the JSON-vector runner answers "do the ports agree on the wire, fast?"; the RP harness answers "does the implementation pass the official certification suite?". Serialization vectors belong to the former and never to the latter.
 
@@ -229,7 +229,7 @@ So that future ports (Node, and PIM parity) follow one agreed model rather than 
 - **AC-21.5.1** Given the epic body, when Story 21.5 is reviewed, then Design Decision A records a clear recommendation (hand-written per-language, vectors as source of truth) with the justification enumerated, and the decision is mirrored into `spec/serialization.md`.
 - **AC-21.5.2** Given Design Decision A, when a maintainer reads it, then it explicitly explains why codegen was **not** chosen, citing the `x5t#S256` rename, the drop-vs-preserve policy, the no-typed-model pass-through, and the two-toolchain build cost.
 - **AC-21.5.3** Given Design Decision B, when reviewed, then it states unambiguously that the JSON-vector runner is the fast in-CI cross-language serializer/parity check and the OIDF RP harness (`conformance/`) is the certification track, and that the two are complementary rather than redundant.
-- **AC-21.5.4** Given Design Decision B, when reviewed, then it states that the Story 21.2 serialization vectors subsume and feed the existing `spec/conformance/*.json` runner (PR #36), and that the nine currently-prose conformance files are the backlog the executable-vector pattern extends to.
+- **AC-21.5.4** Given Design Decision B, when reviewed, then it states that the Story 21.2 serialization vectors subsume and feed the existing `spec/vectors/*.json` runner (PR #36), and that the nine currently-prose conformance files are the backlog the executable-vector pattern extends to.
 - **AC-21.5.5** Given both decisions, when a future port maintainer (Node, PIM parity) consults them, then the adoption path is unambiguous: make the shared vectors pass; do not generate serializers; do not route serialization checks through the RP harness.
 
 ### RFC References
@@ -244,7 +244,7 @@ So that future ports (Node, and PIM parity) follow one agreed model rather than 
 
 | Story | Depends On |
 |-------|-----------|
-| 21.1 (Serialization Spec) | Existing `spec/conformance/` vector schema (PR #36); Epic 0B (Discovery/JWKS spec) for member provenance |
+| 21.1 (Serialization Spec) | Existing `spec/vectors/` vector schema (PR #36); Epic 0B (Discovery/JWKS spec) for member provenance |
 | 21.2 (Round-Trip Vectors) | 21.1 (spec defines members, mappings, policy, vector format) |
 | 21.3 (Go Serializer Conformance) | 21.2 (vectors exist); existing `go/internal/conformance` runner |
 | 21.4 (Rust Serializer Conformance) | 21.2 (vectors exist); Rust serde types |
@@ -253,7 +253,7 @@ So that future ports (Node, and PIM parity) follow one agreed model rather than 
 ## Design Principles
 
 1. **Serialization only** — This epic pins field names, name mappings, member sets, and unknown-member policy. It adds no protocol behavior, signature verification, network fetching, or new capabilities.
-2. **Vectors are the executable contract** — `spec/serialization.md` is the human-readable norm; the `spec/conformance/` round-trip vectors are its mechanical enforcement, and both languages pass the *same* vectors to prove parity.
+2. **Vectors are the executable contract** — `spec/serialization.md` is the human-readable norm; the `spec/vectors/` round-trip vectors are its mechanical enforcement, and both languages pass the *same* vectors to prove parity.
 3. **Canonical wire name wins** — Internal field identifiers (e.g. `x5t_s256`) are mappings; the emitted member is always the canonical wire name (e.g. `x5t#S256`).
 4. **Policy is per-type and explicit** — JWK and discovery drop unknown members; token/introspection/userinfo preserve them via loose pass-through. The policy is stated per type and tested per type.
 5. **Two mechanisms, two jobs** — The JSON-vector runner is the fast in-CI parity check; the OIDF RP harness is the certification track. Serialization lives in the former.

@@ -15,6 +15,13 @@ This document identifies reusable capability gaps across `identity-model`, `py-i
 protected-resource consumers without defining any consumer's domain resources, federation protocol,
 consent model, purpose model, or final authorization policy.
 
+> **Note (2026-11-01).** `py-identity-model` is not a separate project. It is the PyPI package
+> built from `identity-model/py/`, next to the Go module in `go/` and the `rs-identity-model`
+> crate in `rust/` (checked against identity-model `d8c3293`). Where this document says
+> `identity-model` and `py-identity-model`, read the Python, Go and Rust libraries in
+> `identity-model`; their per-language status is in its
+> [`spec/capabilities.md`](https://github.com/jamescrowley321/identity-model/blob/main/spec/capabilities.md).
+
 ## Executive decision
 
 The open-source identity work should converge on four explicit boundaries:
