@@ -48,7 +48,6 @@ title has `!` are breaking: `!` in the commit type and a `BREAKING CHANGE:` foot
 | A3 | #991 | Status files + generated capability matrix, `--check` in `ci-complete` | spec, tools, ci |
 | A4 | #828 | Rust runs the DPoP logic vectors it already passes; HTTP three stay KnownGaps (do NOT close #828; E4 closes it) | rust tests |
 | B1 | #791 | Typed OAuth error incl. `error_uri` (+#777) | py |
-| B2 | #574 | Base `expected_nonce` only (§1 shipped in 5.0 via #1097, §3 via #842). Needs the owner's call on #1151 first; without it, `blocked` | py |
 | B3 | #783 | Typed token responses (auth code, exchange, CC, refresh, device); keep 5.0's `INVALID_TOKEN_RESPONSE` | py |
 | B4 | #772 | Typed introspection + reject missing/non-boolean `active` (+#782); overlaps Gate B #1090 | py |
 | B5 | #768 | UserInfo typed claims + `WWW-Authenticate` (+#769) + injected-client test (#775) | py |

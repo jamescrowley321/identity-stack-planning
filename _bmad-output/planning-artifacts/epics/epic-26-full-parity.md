@@ -41,7 +41,7 @@ Source audit on 2026-10-28 at `4935907` (tip of the 5.0.0 stack, #976), three pa
 | Discovery SSRF policy (endpoint authority, internal IP) | yes | **no** (#578) | **no** (#578) |
 | Typed OAuth errors and typed responses | **no** (#791, #783, #772, #768); typed discovery/JWKS errors in 5.0 (#1129) | yes | yes |
 | `client_secret_post` | yes (5.0, #1097) | yes | yes |
-| Base `expected_nonce` | **no**; 5.0 makes `nonce` a required `validate_id_token` argument instead (#1132) | yes (base option) | yes (base option) |
+| Base `expected_nonce` | **no**; 5.0 makes `nonce` a required `validate_id_token` argument instead (#1132) | yes (base option; removed in D9) | yes (base option; removed in D9) |
 | Typed error taxonomy | yes | yes | **partial** — ~250 `String`-payload variants; expiry/aud/iss/signature distinguishable only by message |
 | Redirects | refuse all 3xx | follow | follow same-scheme (#867) |
 | Retry of single-use requests | auth code, refresh and device poll never retried (5.0, #1126) | no retry at all (D3) | no retry at all (D3) |
@@ -101,7 +101,7 @@ The DPoP nonce cache (#784) and key import (#786) shipped in 5.0 (#1126, #1110),
 | # | Story | Issues |
 |---|---|---|
 | B1 | Typed OAuth error (`error`, `error_description`, `error_uri`) | #791, #777 |
-| B2 | Base `expected_nonce` (#574 §2). `client_secret_post` (§1) shipped in 5.0 via #1097 and the issuer match (§3) via #842. 5.0 puts `nonce` on `validate_id_token` only (#1132), so this needs an owner call first: add a base option to Python, or drop Go/Rust's in D9 | #574 |
+| B2 | ~~Base `expected_nonce` (#574 §2)~~: **decided 2026-11-15, not wanted.** `nonce` is ID-token-only (OIDC Core §2, §3.1.3.7 step 11, §12.2), so Python keeps it on `validate_id_token` (#1132) and Go/Rust drop their base option in D9. §1 shipped via #1097 and §3 via #842; #574 closes when #1132 merges. No loop work. | #574 |
 | B3 | Typed token responses (auth code, exchange, client credentials, refresh, device). 5.0 already refuses a response without `access_token`/`token_type` (`INVALID_TOKEN_RESPONSE`, #1126) | #783 |
 | B4 | Typed introspection members; reject missing/non-boolean `active`. Overlaps Gate B #1090 (`error_kind` on every introspection failure) | #772, #782 |
 | B5 | UserInfo typed claims + `WWW-Authenticate`; injected-client test | #768, #769, #775 |
@@ -130,7 +130,7 @@ The DPoP nonce cache (#784) and key import (#786) shipped in 5.0 (#1126, #1110),
 | D6 | Validation extras: signature-failure JWKS refresh sharing the cooldown, multiple issuers + `subject`, discovery-driven validate, cache metrics | #998, #578 |
 | D7 | Rust Debug redaction sweep (`IdTokenValidationOptions`, `PkceChallenge`, `JsonWebKey` private members) | #999 |
 | D8 | UserInfo `sub` (Python 5.0 rules): required `expected_sub`, typed missing/mismatch/unverifiable errors, unverified JWT on the error (redacted); `userinfo.json` runners match kinds; docs in all three name the signed-response API. Rust variant follows D1 | #1137, #928 |
-| D9 | ID Token rules (Python 5.0, #1132): required `nonce` argument (string, none, or refresh nonce), `exp`/`iat` required, issuer required without discovery; `id-token.json` vectors. Carries the #574 §2 decision | #1151 |
+| D9 | ID Token rules (Python 5.0, #1132): required `nonce` argument (string, none, or refresh nonce), `exp`/`iat` required, issuer required without discovery; `id-token.json` vectors. **Go/Rust remove their base `expected_nonce`** (decided 2026-11-15, see #574/#1151); JWT-004 moves to ID-token validation | #1151 |
 | D10 | OAuth request MUSTs on the grants Go/Rust already have (Python 5.0, #1126): PKCE required for public clients (the #1133 vector), token responses must carry `access_token` and `token_type`, token-exchange `resource` absolute without fragment | #1152 |
 
 ### Phase E — Go/Rust capabilities (go + rust per story, vectors new)
