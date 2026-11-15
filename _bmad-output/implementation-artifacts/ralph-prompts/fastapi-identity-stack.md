@@ -18,11 +18,22 @@ alongside this one.
   sessions work in this repo; fetch before every branch operation.
 - The loop never merges. The owner reviews every PR and merges the stack bottom-up later.
 
+## When this loop runs
+
+py 5.0 ships as alpha pre-releases from `release/v5` for a feedback period before 5.0.0 final
+(`identity-stack-planning` `epics/epic-identity-model-v5-prerelease.md`). This queue is opt-in and
+non-breaking, so it rides the alphas. Stacker refuses to start until all three hold:
+- identity-model#1149 (cut `5.0.0a1`) is CLOSED. Before that, the conformance loop
+  (`identity-model-v5-conformance`) owns the repo.
+- identity-model#1146 (FastAPI rename) is CLOSED. After it, the login router is `login.py`
+  (was `rp.py`) and WebSocket auth is `websocket.py` (was `ws.py`). Use the new names everywhere.
+- No other identity-model loop is running (one workstream per repo).
+
 ## Owner decisions (2026-11-08)
 
-- **D1, stack root:** build on top of the unmerged v5 stack, because it already rewrites
-  `middleware.py` and `ws.py` (DPoP schemes, validation cache, `http_client`, `_rejection`).
-  Never edit, rebase or push v5 stack branches.
+- **D1, stack root:** `release/v5`. The v5 stack that rewrote `middleware.py` and `ws.py` (DPoP
+  schemes, validation cache, `http_client`, `_rejection`) is merged there (2026-11-08 → 11-13).
+  Never push to `release/v5` itself.
 - **D2, both token types:** the middleware and the WebSocket authenticator accept access tokens
   **and** ID tokens. ID tokens are for first-party UI-only clients: a SPA or mobile app calling
   its own backend, or a BFF passing the token on. Each type is validated under its own profile.
@@ -58,10 +69,7 @@ anything in the v5 stack itself. A story that needs one of them: `build.blocked`
 
 ## Stacking
 
-- **Stack root**: the first of these branches that exists on origin:
-  1. `feat/957-signed-introspection` (top of the v5 stack, PR #1031)
-  2. `release/v5`
-  3. `main`
+- **Stack root**: `release/v5`. If it no longer exists on origin (5.0.0 final shipped), use `main`.
 - Every story's branch is cut from the previous story's branch. Each PR's base is that parent
   branch; the first PR's base is the stack root. Every PR runs the full CI suite, whatever its base.
 - **Parent** = branch of the newest `shipped` ledger row, else the stack root. If that branch no

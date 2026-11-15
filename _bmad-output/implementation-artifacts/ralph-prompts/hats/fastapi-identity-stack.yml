@@ -7,7 +7,7 @@
 # the blind-peer-review lenses. The queue, rules and gates live in PROMPT.md
 # (ralph-prompts/fastapi-identity-stack.md).
 #
-# Launch: ralph-prompts/run.sh fastapi-identity-stack identity-model feat/957-signed-introspection
+# Launch: ralph-prompts/run.sh fastapi-identity-stack identity-model release/v5
 
 event_loop:
   prompt_file: "PROMPT.md"
@@ -35,6 +35,8 @@ hats:
       1. `git fetch origin --prune`. Resolve the **stack root** with the fallback chain in
          PROMPT.md "Stacking" (the first of those branches that still exists on origin).
          Record it in the ledger header when it changes.
+         On `build.start` only: check PROMPT.md "When this loop runs". If identity-model#1149
+         or #1146 is still OPEN, publish `LOOP_COMPLETE` with "blocked: waiting on <issues>".
       2. **On `build.blocked`:** mark the payload's story `blocked` in the ledger with the
          reason, comment the reason on its issue, and continue. Later stories still stack on
          the last *shipped* branch, never on a blocked one.
