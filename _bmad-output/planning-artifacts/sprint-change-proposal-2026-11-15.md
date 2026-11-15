@@ -4,7 +4,7 @@
 **Trigger:** Owner (James) reviewing a conformance-coverage audit of `release/v5` (post-[identity-model#1130](https://github.com/jamescrowley321/identity-model/pull/1130)): "Tests must come prior to v5."
 **Mode:** Batch
 **Scope Classification:** Moderate — backlog reorganization. No goal changes; the release gains a test phase.
-**Status:** Proposed
+**Status:** Approved (James, 2026-11-15), amended the same day: 5.0 ships as alpha pre-releases, and D3 gates `5.0.0a1`. See the amendment at the end.
 
 ---
 
@@ -29,7 +29,7 @@ The full audit with file:line citations is in the session record behind [identit
 
 | Item | Impact |
 |---|---|
-| [identity-model#904](https://github.com/jamescrowley321/identity-model/issues/904) (5.0.0 epic) | Gains Phase D3, a conformance-coverage phase. It blocks [#915](https://github.com/jamescrowley321/identity-model/pull/915). |
+| [identity-model#904](https://github.com/jamescrowley321/identity-model/issues/904) (5.0.0 epic) | Gains Phase D3, a conformance-coverage phase. It blocks the first alpha, [#1149](https://github.com/jamescrowley321/identity-model/issues/1149) `5.0.0a1`, and so also [#915](https://github.com/jamescrowley321/identity-model/pull/915). |
 | [#1138](https://github.com/jamescrowley321/identity-model/issues/1138), [#1139](https://github.com/jamescrowley321/identity-model/issues/1139), [#1140](https://github.com/jamescrowley321/identity-model/issues/1140) | Already under #904. Unchanged. |
 | [#1141](https://github.com/jamescrowley321/identity-model/issues/1141)–[#1144](https://github.com/jamescrowley321/identity-model/issues/1144) | Move from Epic 23 ([#614](https://github.com/jamescrowley321/identity-model/issues/614)) to #904. |
 | [#607](https://github.com/jamescrowley321/identity-model/issues/607) (Story 23.1), [#473](https://github.com/jamescrowley321/identity-model/issues/473) | Dynamic + logout CI wiring becomes 5.0-blocking. They keep their parents and are cross-linked. The FAPI2 part of #607 shipped via #906. |
@@ -126,3 +126,15 @@ James changed the release approach the same day:
 - Release plumbing for alphas: PSR `prerelease_token = "a"`, a `publish-dist.yml` tag pattern for `-a.N`, fastapi prerelease support with floor `>=5.0.0a1`, and `Development Status :: 3 - Alpha` classifiers.
 - A pointer on the `main` README: 5.0 is in development, install with `--pre`, report feedback via a `v5-feedback` template.
 - `main` stays on 4.x until 5.0.0 final.
+
+Phase P stories, in `epics/epic-identity-model-v5-prerelease.md`, all sub-issues of #904:
+
+| Story | Issue |
+|---|---|
+| P1 FastAPI rename `rp.py` → `login.py`, `ws.py` → `websocket.py` | [#1146](https://github.com/jamescrowley321/identity-model/issues/1146) |
+| P2 Alpha release plumbing (both packages) | [#1147](https://github.com/jamescrowley321/identity-model/issues/1147) |
+| P3 `main` README status note | [#1148](https://github.com/jamescrowley321/identity-model/issues/1148) |
+| P4 Cut `5.0.0a1` (owner) | [#1149](https://github.com/jamescrowley321/identity-model/issues/1149) |
+| P5 Feedback intake and adoption list | [#1150](https://github.com/jamescrowley321/identity-model/issues/1150) |
+
+Execution: owner sessions work one item at a time from a local worklist, and the `identity-model-v5-conformance` loop takes D3 back once the eight fix PRs are merged.

@@ -1,6 +1,6 @@
 # Epic: identity-model py 5.0.0 — Conformance Coverage (Phase D3)
 
-**Source:** `sprint-change-proposal-2026-11-15.md`. **GitHub:** [identity-model#904](https://github.com/jamescrowley321/identity-model/issues/904) (sub-issues listed below). **Blocks:** [identity-model#915](https://github.com/jamescrowley321/identity-model/pull/915).
+**Source:** `sprint-change-proposal-2026-11-15.md`. **GitHub:** [identity-model#904](https://github.com/jamescrowley321/identity-model/issues/904) (sub-issues listed below). **Blocks:** the first alpha, [identity-model#1149](https://github.com/jamescrowley321/identity-model/issues/1149) `5.0.0a1` (amendment 2026-11-15), and so also [identity-model#915](https://github.com/jamescrowley321/identity-model/pull/915) (5.0.0 final).
 **Loop:** `ralph-prompts/identity-model-v5-conformance.md`, stacked on `release/v5`.
 
 ## Overview

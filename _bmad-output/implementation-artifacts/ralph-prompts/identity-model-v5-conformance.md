@@ -14,8 +14,10 @@ One ralph workstream per repo: don't run another identity-model loop alongside t
 - The loop runs in its own worktree, `/tmp/identity-model-v5-conformance-ralph`. Never touch
   `~/repos/auth/identity-model`, `main`, `release/v5` itself, or another session's branches.
   Other sessions work in this repo, so fetch before every branch operation.
-- **Stack root: `release/v5`.** py 5.0.0 collects there, and identity-model#915 (`release/v5` →
-  `main`) ships it. The loop never merges. The owner merges each PR bottom-up into
+- **Stack root: `release/v5`.** py 5.0 collects there. It ships first as alpha pre-releases
+  (identity-model#1149 cuts `5.0.0a1`; this loop's queue gates it), then as 5.0.0 final via
+  identity-model#915 (`release/v5` → `main`) after a feedback period. The loop never merges, never
+  cuts a release, and never runs `release.yml`. The owner merges each PR bottom-up into
   `release/v5` with a merge commit. Never push to `main` or `release/v5`.
 - **Why this loop exists:** "Tests must come prior to v5" (James, 2026-11-15). CI runs 6 of
   about 32 applicable OIDF RP plans, and some runs can pass for the wrong reason.
