@@ -56,6 +56,7 @@ stale only when a new epic is written, never merely because work progressed.
 | — (app side of `epic-25-injected-config.md`; design lives in the issues) | #406, #407 |
 | `docs/ory-sso-provider-context.md`, `docs/ory-iac-automation-plan.md` | #376–#378 |
 | `planning-artifacts/epics/epic-cloudflare-access-provider.md` | [#531](https://github.com/jamescrowley321/identity-stack/issues/531) epic; stories #532–#535 |
+| `planning-artifacts/epics/epic-zitadel-provider.md` | [#563](https://github.com/jamescrowley321/identity-stack/issues/563) epic; stories #564–#570 |
 | `ralph-prompts/ory-frontend-logout.md` | #377, #378 |
 
 ### terraform-provider-descope / oss-admin — Track 3
