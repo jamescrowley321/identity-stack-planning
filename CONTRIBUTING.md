@@ -56,6 +56,9 @@ npm run build          # builds the site; fails on any broken internal link
 
 The site build is the only mechanical check, and it is real: `onBrokenLinks` is set to `throw`,
 so a link to a file that does not exist fails the build rather than shipping a dead link.
+Broken anchors only warn (`onBrokenAnchors: 'warn'`). CI runs the build only on push to `main`
+(`.github/workflows/deploy.yml`), not on pull requests, so run it locally before you open one.
+`package.json` asks for Node 26 or newer, which is what CI uses; run `npm ci` once first.
 
 ## Adding a document
 

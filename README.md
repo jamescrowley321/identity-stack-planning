@@ -36,7 +36,7 @@ graph LR
     end
     subgraph t2["Track 2 — proving ground"]
         IS["identity-stack<br/>FastAPI · React · canonical identity"]
-        PROV["Keycloak · IdentityServer<br/>node-oidc-provider · Descope · Ory"]
+        PROV["Descope · Ory"]
     end
     subgraph t3["Track 3 — expertise"]
         TFP["terraform-provider-descope"]
@@ -84,10 +84,12 @@ links; it does not restate.
 | Path | Holds |
 |---|---|
 | [`docs/`](docs/index.md) | The knowledge base, published as the site — program map, architecture, identity-domain analysis, governed-brain research |
-| [`_bmad-output/planning-artifacts/`](_bmad-output/planning-artifacts/) | Epics and product briefs, each linked to its tracking issue |
+| [`_bmad-output/planning-artifacts/`](_bmad-output/planning-artifacts/) | Epics, architecture notes and parity reports, each linked to its tracking issue |
 | [`_bmad-output/implementation-artifacts/`](_bmad-output/implementation-artifacts/) | Ralph loop prompts, the runner guide, and the artifact → issue map |
 | [`_archive/README.md`](_archive/README.md) | What was retired, why, and the `git show` that prints it back. The files live only in git history |
 | [`AGENTS.md`](AGENTS.md) | Instructions for AI agents working in this repo |
+| `static/` | `llms.txt` and `workspace.yml`, published at the site root |
+| `.claude/skills/` | This repo's own skills, `ralph-audit` and `ralph-status` |
 | `_bmad/` | Vendored BMAD-METHOD v6 install — not edited by hand |
 
 ## How work gets done

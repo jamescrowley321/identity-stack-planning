@@ -22,11 +22,11 @@ flowchart LR
 
 ### 1. PRD defines the initiative
 
-A Product Requirements Document specifies functional requirements, non-functional requirements, user journeys, and success criteria. Created via `/bmad-create-prd` or `/bmad-pm`.
+A Product Requirements Document specifies functional requirements, non-functional requirements, user journeys, and success criteria. Created via `/bmad-prd` or `/bmad-agent-pm`.
 
 ### 2. Architecture documents the design
 
-Architecture decisions (ADRs), component diagrams, data models, and interface contracts. Created via `/bmad-create-architecture` or `/bmad-architect`.
+Architecture decisions (ADRs), component diagrams, data models, and interface contracts. Created via `/bmad-architecture` or `/bmad-agent-architect`.
 
 ### 3. Epics break work into stories
 
@@ -61,11 +61,12 @@ flowchart TD
     A[analyze] --> I[implement]
     I --> T[test]
 
-    subgraph review["Review Phase"]
+    subgraph review["review phase (subagents chosen by diff)"]
         RB[blind]
         RE[edge-case]
         RA[acceptance]
-        RS[security]
+        RS[sentinel]
+        RV[viper]
     end
 
     T --> review
@@ -79,6 +80,7 @@ flowchart TD
     style RE fill:#e76f51,color:#fff
     style RA fill:#e76f51,color:#fff
     style RS fill:#e76f51,color:#fff
+    style RV fill:#e76f51,color:#fff
     style review fill:none,stroke:#e76f51,stroke-width:2px
 ```
 
@@ -87,13 +89,10 @@ flowchart TD
 | **analyze** | Read story spec, acceptance criteria, and related code. Identify scope, plan implementation approach, and verify codebase state. | Winston (Architect) |
 | **implement** | Write the code according to the plan. Follow existing patterns, conventions, and CLAUDE.md instructions. | Amelia (Developer) |
 | **test** | Write and run tests. Unit tests for all new code, integration tests where applicable. All tests must pass with 80%+ coverage. | Quinn (QA) |
-| **review-blind** | Independent Cold Read review (diff only, fresh context). | Cold Read subagent |
-| **review-edge** | Independent Edge Cases review (diff + repo access, fresh context). | Edge Cases subagent |
-| **review-acceptance** | Independent Acceptance Criteria review (spec + repo access, fresh context). | Acceptance Criteria subagent |
-| **review-security** | Independent Security Review review (security lens, fresh context). Conditional Red Team red team for auth changes. | Security Review subagent |
-| **review-fix** | Triage all findings by priority. Fix blocking issues. Re-review. Max 3 iterations. | Amelia (Developer) |
+| **review** | One phase that spawns independent reviewer subagents in fresh contexts. Which ones run depends on the diff (`phases/review.md` Step 2): Cold Read, Edge Cases and Acceptance for code; Sentinel (security) for routes and services; Viper (red team) as well for auth, middleware and infra. | Reviewer subagents |
+| **review-fix** | Triage findings P0/P1/P2. Fix blocking issues. Delta-only re-review of the reviewers that had P0/P1 findings. | Amelia (Developer) |
 | **pr** | Push branch, create PR. | Automated |
-| **docs** | Update documentation if the story requires it. | Paige (Tech Writer) |
+| **docs** | Update documentation if the story requires it. The worktree loop prompts include it; `run-next-task.md` skips it. | Paige (Tech Writer) |
 | **ci** | Wait for CI checks. If CI fails: diagnose, fix, re-push. | Amelia (Developer) |
 | **complete** | Mark task done in queue, delete task-state file, clean up worktree. | Automated |
 
@@ -102,7 +101,7 @@ flowchart TD
 Fix tasks (review finding fixes for existing PRs) use a shorter pipeline:
 
 ```
-checkout → fix → test → review-blind → review-edge → review-security → review-fix → ci → complete
+setup → fix → test → review → review-fix → ci → complete
 ```
 
 No analyze phases — the fix scope is already defined by the review findings.
@@ -193,21 +192,22 @@ flowchart TD
 ### Prerequisites
 
 - [Ralph Orchestrator](https://github.com/mikeyobrien/ralph-orchestrator) installed
-- `ralph.yml` in the target repo (already present in identity-stack and py-identity-model)
-- A ralph prompt file copied to `PROMPT.md` in the target repo
+- `ralph.yml` in the target repo (present in identity-stack and identity-model)
+- A clone of the target repo under `~/repos/auth/`
 
 ### Starting a loop
 
 ```bash
-# Navigate to the target repo
-cd ~/repos/auth/identity-stack
+# From the planning repo: creates /tmp/<loop>-ralph off origin/<base>,
+# installs the prompt as PROMPT.md, loads hats/<loop>.yml if present, runs ralph
+_bmad-output/implementation-artifacts/ralph-prompts/run.sh <loop-name> [repo] [base]
 
-# Copy the appropriate prompt
-cp ~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts/canonical-identity.md PROMPT.md
-
-# Start the loop
-ralph run
+# e.g.
+_bmad-output/implementation-artifacts/ralph-prompts/run.sh ory-frontend-logout identity-stack
 ```
+
+`repo` is the local directory name under `~/repos/auth/` and defaults to `py-identity-model`
+(the local checkout of `identity-model`); `base` defaults to `main`.
 
 ### Monitoring
 
@@ -227,12 +227,11 @@ git worktree list
 
 ### Available Prompts
 
-The prompt set is the source of truth — see [`_bmad-output/implementation-artifacts/ralph-prompts/`](https://github.com/jamescrowley321/identity-stack-planning/tree/main/_bmad-output/implementation-artifacts/ralph-prompts/) (~28 prompts spanning all four code repos, plus `phases/` and `review-agents/`). The directory listing is authoritative; this list is not enumerated here because it drifts. Representative prompts by target:
+The prompt set is the source of truth — see [`_bmad-output/implementation-artifacts/ralph-prompts/`](https://github.com/jamescrowley321/identity-stack-planning/tree/main/_bmad-output/implementation-artifacts/ralph-prompts/) (plus `phases/`, `review-agents/` and `hats/`). The directory listing is authoritative; this list drifts. On 2026-11-01 it held:
 
-- **General:** `run-next-task.md`, `fix-review-findings.md`, `repository-base-refactor.md`
-- **identity-stack:** `canonical-identity.md`, `api-gateway.md`, `design-system.md`, `epic3-fga-authz.md`
-- **py-identity-model:** `pim-integration-tests.md`, `pim-fix-review-chain.md`, `pim-blind-peer-review.md`, `pim-conformance-finish.md`, `pim-fapi2-hardening.md`, `token-harness.md`, `RED-BLUE-GATE.md`
-- **identity-model:** `identity-model-go-core.md`, `identity-model-go-extended.md`, `identity-model-rust-extended.md`, `identity-model-rust-hardening.md`, `identity-model-conformance-harness.md`
+- **General:** `run-next-task.md`, `planning-reality-audit.md`, `retro-review-sweep.md`
+- **identity-stack:** `ory-frontend-logout.md`
+- **identity-model:** `identity-model-stack.md` (with `hats/identity-model-stack.yml`), `identity-model-go-rust-parity.md`, `pim-fapi2-hardening.md`, `pim-conformance-evidence.md`, `pim-capacity-breakpoint.md`, `token-harness.md`, `RED-BLUE-GATE.md`
 
 ### Stopping a loop
 
@@ -299,14 +298,17 @@ Next task:    No state file → Read queue → Pick next task → repeat
 Each application repo has a `ralph.yml`:
 
 ```yaml
-backend: claude
-timeout: 900          # 15 minutes per iteration
+cli:
+  backend: "claude"
+  timeout: 900          # 15 minutes per iteration
 event_loop:
-  prompt_file: PROMPT.md
-  completion_promise: LOOP_COMPLETE
+  prompt_file: "PROMPT.md"
+  completion_promise: "LOOP_COMPLETE"
   max_iterations: 100
-  max_consecutive_failures: 10
+  max_consecutive_failures: 5
 ```
+
+(As in `identity-stack/ralph.yml` and `identity-model/ralph.yml`, checked 2026-11-01.)
 
 | Field | Description |
 |-------|-------------|
