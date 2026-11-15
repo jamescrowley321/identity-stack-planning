@@ -48,6 +48,7 @@ title has `!` are breaking: `!` in the commit type and a `BREAKING CHANGE:` foot
 | D5 | #997 | Discovery hardening + full metadata model (#578, #579) | go, rust |
 | D6 | #998 | Signature-failure refresh, multiple issuers, discovery-driven validate, cache metrics | go, rust |
 | D7 | #999 | Rust Debug redaction | rust |
+| D8 | #1137 `!` | UserInfo `sub`: required `expected_sub`, typed errors, unverified JWT (#928) | go, rust, py docs, spec |
 | E1 | #1000 | Shared client auth + `private_key_jwt` | go, rust, spec |
 | E2 | #1001 | Refresh-token grant | go, rust, spec |
 | E3 | #1002 | mTLS client auth + certificate-bound tokens | go, rust, spec |
@@ -60,6 +61,7 @@ title has `!` are breaking: `!` in the commit type and a `BREAKING CHANGE:` foot
 | E10 | #1009 | Device authorization | go, rust, spec |
 | E11 | #1010 | Dynamic client registration | go, rust, spec |
 | E12 | #1011 | Rust ES512 verification | rust |
+| E13 | #941 | Verified signed UserInfo with the issuer JWKS; FastAPI login uses it | py, go, rust, spec |
 | F1 | #1012 | FAPI 2.0 validators | go, rust, spec |
 | F2 | #1013 | Fail-closed FAPI 2.0 client profile | go, rust, spec |
 | F3 | #1014 | Ports of #955–#957 and #478 (only once they are on `main`; else `blocked`) | go, rust |

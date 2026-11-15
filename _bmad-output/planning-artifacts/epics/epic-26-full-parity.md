@@ -60,7 +60,8 @@ Confirmed on all three at the tip: #952 key-strength floor + EdDSA, #930 azp-nee
 | `use` + `key_ops`, unknown `key_ops` | key dropped | accepted | accepted | new |
 | Wrong-typed required discovery field | `missing_fields` / passes on number | `invalid_json` | `invalid_json` | #890 |
 | Cache-Control `max-age` | honoured (buggy regex, #901) | ignored, 24 h | ignored, 24 h | #757/#758 |
-| UserInfo `application/jwt` | raw JWT unless `expected_sub` | error | error | #928 |
+| UserInfo `expected_sub` | required | optional | optional | #928 |
+| UserInfo `application/jwt` | typed `UNVERIFIABLE_SUB`, JWT kept | untyped error, JWT dropped | untyped error, JWT dropped | #928 |
 | HTTP on loopback | allowed | needs opt-in | needs `allow_http` | — |
 | Duplicate kid | first key only | first key only | first key only | #575 |
 
@@ -114,6 +115,7 @@ Each story's DoD: vector file added/extended; every runner claims it (no silent 
 | D5 | Discovery hardening: endpoint-authority binding, internal-IP rejection, `DiscoveryPolicy`, Rust discovery single-flight, `application/json` check, full metadata model | #997, #578, #579 |
 | D6 | Validation extras: signature-failure JWKS refresh sharing the cooldown, multiple issuers + `subject`, discovery-driven validate, cache metrics | #998, #578 |
 | D7 | Rust Debug redaction sweep (`IdTokenValidationOptions`, `PkceChallenge`, `JsonWebKey` private members) | #999 |
+| D8 | UserInfo `sub` (Python 5.0 rules): required `expected_sub`, typed missing/mismatch/unverifiable errors, unverified JWT on the error (redacted); `userinfo.json` runners match kinds; docs in all three name the signed-response API. Rust variant follows D1 | #1137, #928 |
 
 ### Phase E — Go/Rust capabilities (go + rust per story, vectors new)
 
@@ -131,6 +133,9 @@ Each story's DoD: vector file added/extended; every runner claims it (no silent 
 | E10 | #1009 Device authorization (RFC 8628) | `device-authorization.json` |
 | E11 | #1010 Dynamic Client Registration (RFC 7591/7592) | `registration.json` |
 | E12 | #1011 Rust ES512 verification | `validation.json` |
+| E13 | #941 Verified signed UserInfo (py, go, rust): verify an `application/jwt` response with the issuer JWKS (`aud` = client_id, `iss` = issuer), then compare `sub`; without verification inputs D8's unverifiable error stands. FastAPI login uses it. After D6 and D8 | `userinfo.json` |
+
+E13 is a new capability in all three languages, so it runs here, not in Gate B (#1069): shipped in Python alone it would reopen the #928 divergence. The FastAPI router change rides along because it only switches to the new call.
 
 ### Phase F — FAPI 2.0 (go + rust)
 
@@ -140,7 +145,7 @@ Each story's DoD: vector file added/extended; every runner claims it (no silent 
 | F2 | Fail-closed FAPI 2.0 client profile | #1013, #958, #959, #951 |
 | F3 | Ports of the late 5.0.0 Python work: signed introspection RFC 9701 (#957), PAR/JAR completeness (#955), sender-constraint completeness (#956), RS-side DPoP (#478) | #1014, #955–#957, #478 |
 
-~40 stories. Execution: two sequential loops on the same repo (one workstream per repo): **loop 1** = Phases A–C (enforcement + Python + semantics, mostly py); **loop 2** = Phases D–F (Go/Rust). Prompts are written after the decisions below.
+~42 stories. Execution: two sequential loops on the same repo (one workstream per repo): **loop 1** = Phases A–C (enforcement + Python + semantics, mostly py); **loop 2** = Phases D–F (Go/Rust). Prompts are written after the decisions below.
 
 ## Owner decisions
 
