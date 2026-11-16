@@ -50,10 +50,11 @@ of them. The ones that shape code:
 - **No hosted provider.** Terraform roots target the compose instances.
 - **py-identity-model 5 pre-release.** The backend moves to the v5 pre-release now, ahead of
   5.0.0 final. v5 pre-releases are GitHub release assets of `jamescrowley321/identity-model`,
-  not on PyPI. Pin the newest `5.0.0*` pre-release wheel by its release URL with a hash in the
-  lock (on 2026-11-15: tag `5.0.0-rc.915.40a607c`, asset
-  `py_identity_model-5.0.0rc915-py3-none-any.whl`). identity-stack#584 stays open after the
-  story for the move to 5.0.0 final.
+  not on PyPI, and each one is deleted when the next is cut, so a release URL cannot be
+  pinned. Pin a commit instead:
+  `py-identity-model @ git+https://github.com/jamescrowley321/identity-model@<full sha>#subdirectory=py`,
+  with the sha named in the newest `UNBLOCKED:` comment on identity-stack#584.
+  identity-stack#584 stays open after the story for the move to 5.0.0 final.
 
 A question none of these settles: choose the fail-closed option, record the choice and the
 alternative in the PR body under `## Decisions taken`, and continue. Publish `build.blocked`
@@ -66,7 +67,7 @@ Builder: `deep` for auth-path and cross-provider design work, `std` for the rest
 
 | # | Issue | Story | Tier | Notes |
 |---|---|---|---|---|
-| 0 | #584 | Backend on the py-identity-model 5 pre-release | deep | `Part of #584`, never `Closes`. Adapt to the 5.x breaking changes (read the library's changelog and migration notes in `~/repos/auth/identity-model`, read-only). Do corrections 2 and 4 of the issue: drop `algorithm_rejected()` where the library now refuses, and pin and test the Descope and Ory algorithm sets. A defect found in the pre-release: file it on identity-model with a failing reproduction, and `build.blocked` only if no workaround is safe |
+| 0 | #584 | Backend on the py-identity-model 5 pre-release | deep | **Parkable**: while this row is `blocked` the queue goes on without it, on py-identity-model 4.1.1; it is resumed first once the issue has an `UNBLOCKED:` comment, on its existing branch `chore/584-py-identity-model-5-prerelease` (already on origin; rebase it on `origin/main` when resuming). `Part of #584`, never `Closes`. Adapt to the 5.x breaking changes (read the library's changelog and migration notes in `~/repos/auth/identity-model`, read-only). Do corrections 2 and 4 of the issue: drop `algorithm_rejected()` where the library now refuses, and pin and test the Descope and Ory algorithm sets. A defect found in the pre-release: file it on identity-model with a failing reproduction, and `build.blocked` only if no workaround is safe |
 | 1 | #566 | Provider-neutral provider registration and tenant resolution | deep | Covers #555. When shipped, comment on #555 that #566 supersedes it; don't close it. Descope and Ory behaviour unchanged |
 | 2 | #557 | Keycloak Organizations as tenants, client roles as permissions | deep | Takes #555's Keycloak criteria. Startup refuses a half-configured provider |
 | 3 | #559 | Canonical identity for Keycloak principals | deep | Measures the leave-organization window (decision 13) and records it |
@@ -86,8 +87,8 @@ Out of scope: hosted deployments, Cloudflare Access (#531–#535), the remaining
 (#515–#518), any code change in identity-model. A story that needs one
 of them: `build.blocked`.
 
-A blocked story stops the queue, because later rows build on it. Stacker ends the loop with the
-reason; the operator fixes it and relaunches.
+A blocked story stops the queue, because later rows build on it, unless its row says
+**Parkable**. Stacker ends the loop with the reason; the operator fixes it and relaunches.
 
 ## Branching and merging
 

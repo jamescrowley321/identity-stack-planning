@@ -5,7 +5,7 @@
 #     the queue's Tier column picks one, and rework goes back to the same one.
 #   - Shipper waits for the @claude review and sends every MUST FIX and SHOULD FIX back.
 #   - No stack: Shipper waits for the operator to merge each clean PR before the queue advances.
-#   - A blocked story ends the loop: later rows build on it.
+#   - A blocked story ends the loop, unless its queue row is marked parkable.
 # The queue, rules, gates and review policy live in PROMPT.md (ralph-prompts/keycloak-zitadel.md).
 #
 # Launch (not run.sh: the worktree must be under $HOME for Docker bind mounts, and the
@@ -45,15 +45,18 @@ hats:
       On every activation, in this order:
       1. `git fetch origin --prune`.
       2. **On `build.blocked`:** mark the payload's story `blocked` in the ledger with the
-         reason, comment the reason on its issue, and publish `LOOP_COMPLETE` with
-         "blocked: #<issue>: <reason>". Stop.
+         reason and comment the reason on its issue. If PROMPT.md marks the row
+         "parkable", continue to step 4. Otherwise publish `LOOP_COMPLETE` with
+         "blocked: #<issue>: <reason>" and stop.
       3. Never merge. A row marked `clean` whose PR is not MERGED yet: do not pick a new
          story; publish `LOOP_COMPLETE` with "waiting: PR <n> not merged".
       4. **Resume.** A ledger row still `in_progress` (the loop restarted mid-story): check
          out its existing branch WITHOUT resetting it and publish `tasks.<tier>` for it. Stop.
          A row marked `blocked` whose issue has a newer comment starting `UNBLOCKED:`: set it
          back to `in_progress`, check out its branch and publish `tasks.<tier>`. Stop.
-         **Pick.** Otherwise, the first queue row that is not `shipped`/`skipped`.
+         **Pick.** Otherwise, the first queue row that is not `shipped`/`skipped`, passing
+         over a `blocked` row that PROMPT.md marks "parkable". A non-parkable `blocked` row
+         with no `UNBLOCKED:` comment: publish `LOOP_COMPLETE` with "blocked: #<issue>".
          Verify it is still needed: `gh issue view <n>` is OPEN, and
          `gh pr list --state all --search "<n> in:body"` shows no merged or open PR
          already doing it. If it is already done, mark `skipped` with the PR link and
