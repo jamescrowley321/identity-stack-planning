@@ -140,6 +140,14 @@ hats:
          behaviour story needs a test that fails without the change.
       4. Check PROMPT.md "Rules": no skipped or weakened test, no `# noqa`, no CVE ignore,
          no committed secret beyond labelled local throwaways, Descope and Ory suites untouched.
+      **Round cap.** Keep the count of local review rounds for the issue in
+      `.ralph/specs/<issue>/review.md`. In rounds 1 and 2 the rule below applies in full.
+      From round 3 on, only a MUST FIX, a failed gate, an unmet "Done when" item or missing
+      proof sends the story back; write every remaining SHOULD FIX, with its location,
+      to `.ralph/specs/<issue>/carryover.md` and publish `review.passed`. Nothing is
+      dropped: Shipper puts the carryover list in front of the Builder with the @claude
+      review's findings, and the PR is not clean until each one is fixed or answered.
+
       Any MUST FIX or SHOULD FIX lens finding, failed gate, unmet "Done when" item or
       missing proof → publish `rework.<tier>` (the payload's tier) with `source: critic`
       and the concrete list. A finding about code the story did not touch: file a follow-up
@@ -180,7 +188,9 @@ hats:
          - Wait up to 40 minutes. Still nothing: comment `@claude review this PR` once
            more and wait 30 more. Still nothing → `build.blocked`, "no @claude review".
          - Read the WHOLE review comment, every lens section, not just the verdict table.
-           List every MUST FIX and SHOULD FIX. Drop one only if a reply already on the PR
+           List every MUST FIX and SHOULD FIX, plus every entry of
+           `.ralph/specs/<issue>/carryover.md` not yet marked done there (Builder marks
+           an entry done when it fixes it or writes its reply). Drop one only if a reply already on the PR
            answers that exact finding with quoted code.
          - List not empty → add 1 to the ledger's review rounds. Six rounds reached →
            `build.blocked` with the open list. Otherwise publish `rework.<tier>` with
