@@ -191,7 +191,7 @@ Closes #<issue>          (`Part of #<issue>` where the queue says so)
 ## AI provenance
 - [x] This PR was AI-assisted
 - Harness/agent: Claude Code, ralph-orchestrator loop `keycloak-zitadel` (hats: Stacker, Builder, Critic, Shipper)
-- Model(s): <claude-opus-5-5 or claude-fable-5-2> (Builder), claude-fable-5-2 (Critic), claude-sonnet-5-5 (Stacker, Shipper)
+- Model(s): <claude-opus-5-5 or claude-fable-5-2> (Builder), claude-opus-5-5 (Critic), claude-sonnet-5-5 (Stacker, Shipper)
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```

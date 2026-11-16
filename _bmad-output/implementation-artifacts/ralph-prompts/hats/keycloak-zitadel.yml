@@ -120,13 +120,13 @@ hats:
 
   critic:
     name: "🧪 Critic"
-    description: "Fresh-eyes gate: in-host blind-peer-review lenses plus the repo's gates. Fable."
+    description: "Fresh-eyes gate: in-host blind-peer-review lenses plus the repo's gates. Opus."
     triggers: ["review.ready"]
     publishes: ["review.passed", "rework.std", "rework.deep"]
     default_publishes: "rework.deep"
     backend:
       type: "claude"
-      args: ["--model", "claude-fable-5-2"]
+      args: ["--model", "claude-opus-5-5"]
     instructions: |
       ## CRITIC: you are not the builder; try to break it
 
