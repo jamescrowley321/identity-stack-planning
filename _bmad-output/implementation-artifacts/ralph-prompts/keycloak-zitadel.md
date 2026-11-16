@@ -162,7 +162,7 @@ close a finding is a reply on the PR that quotes the code showing it is a false 
 "out of scope" is not a reason unless the finding is about code the story did not touch, in
 which case file an issue and link it in the reply. NITPICKs are optional.
 
-After six `@claude` rounds on one PR with findings still open, publish `build.blocked` with the
+After ten `@claude` rounds on one PR with findings still open, publish `build.blocked` with the
 open list.
 
 ## PR body template

@@ -198,7 +198,7 @@ hats:
            `.ralph/specs/<issue>/carryover.md` not yet marked done there (Builder marks
            an entry done when it fixes it or writes its reply). Drop one only if a reply already on the PR
            answers that exact finding with quoted code.
-         - List not empty → add 1 to the ledger's review rounds. Six rounds reached →
+         - List not empty → add 1 to the ledger's review rounds. Ten rounds reached →
            `build.blocked` with the open list. Otherwise publish `rework.<tier>` with
            `source: claude-review` and the list, each finding quoted with its location.
       6. List empty, CI green on `H`, review present for `H` → ledger row `clean` with
