@@ -1,0 +1,6 @@
+# Core config for the keycloak-zitadel loop. Used instead of identity-stack's ralph.yml:
+# one activation can run compose e2e suites and wait on CI plus the @claude review,
+# which the repo default of 900 s cuts off.
+cli:
+  backend: "claude"
+  timeout: 5400
