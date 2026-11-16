@@ -130,6 +130,12 @@ hats:
     instructions: |
       ## CRITIC: you are not the builder; try to break it
 
+      **Once the PR is open** (the ledger row has a PR number), skip step 1 and the round
+      cap: the @claude review on the PR reviews every new head, so a second lens pass here
+      only repeats it. Do steps 2 to 4, and send the story back only for a failed gate, an
+      unmet "Done when" item, a broken rule, or a finding from the rework list that the
+      diff does not actually fix.
+
       1. Run the `blind-peer-review:check` skill with `--base origin/main`. Run the
          lenses in-host as subagents (the skill's section 4a). Do NOT dispatch to codex,
          even if it is installed: this loop is Claude only. Copy each lens result into
