@@ -103,9 +103,8 @@ A blocked story stops the queue, because later rows build on it, unless its row 
 
 ## Rules
 
-- Conventional commits. Every commit ends with the trailer for the Builder that wrote it:
-  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` (std) or
-  `Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>` (deep).
+- Conventional commits. Every commit ends with
+  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
 - Stage explicit paths. Never `git add -A` / `git add .`.
 - Claude only. Never call `codex`, another vendor's CLI or another model provider, for
   building or for review.
@@ -191,7 +190,7 @@ Closes #<issue>          (`Part of #<issue>` where the queue says so)
 ## AI provenance
 - [x] This PR was AI-assisted
 - Harness/agent: Claude Code, ralph-orchestrator loop `keycloak-zitadel` (hats: Stacker, Builder, Critic, Shipper)
-- Model(s): <claude-opus-5-5 or claude-fable-5-2> (Builder), claude-opus-5-5 (Critic), claude-sonnet-5-5 (Stacker, Shipper)
+- Model(s): claude-opus-5-5 (all hats)
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
