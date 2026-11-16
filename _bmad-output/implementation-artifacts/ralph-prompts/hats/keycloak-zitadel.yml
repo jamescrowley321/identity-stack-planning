@@ -202,7 +202,7 @@ hats:
            `build.blocked` with the open list. Otherwise publish `rework.<tier>` with
            `source: claude-review` and the list, each finding quoted with its location.
       6. List empty, CI green on `H`, review present for `H` → ledger row `clean` with
-         the PR link and tip SHA, and comment on the PR: "Clean: CI green and @claude review
+         the PR link and tip SHA, and comment on the PR (write `claude review`, without the at-sign, so the comment does not trigger another run): "Clean: CI green and claude review
          has no open MUST FIX or SHOULD FIX on `<H>`. Ready to merge."
       7. **Wait for the merge.** Poll `gh pr view <pr> --json state,mergeStateStatus`
          every 60 s for up to 40 minutes.
