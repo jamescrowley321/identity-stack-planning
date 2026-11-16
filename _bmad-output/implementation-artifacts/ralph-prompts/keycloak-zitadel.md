@@ -1,4 +1,4 @@
-You are the identity-stack Keycloak and Zitadel stacked-PR loop. Hats
+You are the identity-stack Keycloak and Zitadel loop. Hats
 (`hats/keycloak-zitadel.yml`) split the work: Stacker → Builder → Critic → Shipper. Each
 activation starts with a fresh context, so everything you need next time goes in files:
 `.ralph/stack-ledger.md` and `.ralph/specs/<issue>/`.
@@ -27,7 +27,8 @@ deploys either provider to a hosted service.
   It must stay under `$HOME`: the Docker host cannot bind-mount `/tmp`. Never touch
   `~/repos/auth/identity-stack`, `main` or another session's branches. Fetch before every
   branch operation.
-- The loop never merges.
+- The loop never merges. The operator merges each PR once it is green and reviewed clean, and
+  the next story starts from the new `main`.
 
 ## Owner decisions (2026-11-15)
 
@@ -47,6 +48,12 @@ of them. The ones that shape code:
 - **Parity:** identity-stack#586 adds a Keycloak admin adapter to match #569. This reverses
   the Keycloak epic's "admin routers out of scope" line for organizations and users only.
 - **No hosted provider.** Terraform roots target the compose instances.
+- **py-identity-model 5 pre-release.** The backend moves to the v5 pre-release now, ahead of
+  5.0.0 final. v5 pre-releases are GitHub release assets of `jamescrowley321/identity-model`,
+  not on PyPI. Pin the newest `5.0.0*` pre-release wheel by its release URL with a hash in the
+  lock (on 2026-11-15: tag `5.0.0-rc.915.40a607c`, asset
+  `py_identity_model-5.0.0rc915-py3-none-any.whl`). identity-stack#584 stays open after the
+  story for the move to 5.0.0 final.
 
 A question none of these settles: choose the fail-closed option, record the choice and the
 alternative in the PR body under `## Decisions taken`, and continue. Publish `build.blocked`
@@ -54,11 +61,12 @@ only when no safe default exists.
 
 ## Queue
 
-Work top to bottom, one row per PR, each PR stacked on the previous one. `Tier` picks the
+Work top to bottom, one row per PR. Each story starts from `main` after the previous PR merged. `Tier` picks the
 Builder: `deep` for auth-path and cross-provider design work, `std` for the rest.
 
 | # | Issue | Story | Tier | Notes |
 |---|---|---|---|---|
+| 0 | #584 | Backend on the py-identity-model 5 pre-release | deep | `Part of #584`, never `Closes`. Adapt to the 5.x breaking changes (read the library's changelog and migration notes in `~/repos/auth/identity-model`, read-only). Do corrections 2 and 4 of the issue: drop `algorithm_rejected()` where the library now refuses, and pin and test the Descope and Ory algorithm sets. A defect found in the pre-release: file it on identity-model with a failing reproduction, and `build.blocked` only if no workaround is safe |
 | 1 | #566 | Provider-neutral provider registration and tenant resolution | deep | Covers #555. When shipped, comment on #555 that #566 supersedes it; don't close it. Descope and Ory behaviour unchanged |
 | 2 | #557 | Keycloak Organizations as tenants, client roles as permissions | deep | Takes #555's Keycloak criteria. Startup refuses a half-configured provider |
 | 3 | #559 | Canonical identity for Keycloak principals | deep | Measures the leave-organization window (decision 13) and records it |
@@ -75,21 +83,22 @@ Builder: `deep` for auth-path and cross-provider design work, `std` for the rest
 | 14 | #588 | Provider comparison and feature matrix (`docs/providers.md`) | std | Every cell backed by a test, a fixture or an issue number |
 
 Out of scope: hosted deployments, Cloudflare Access (#531–#535), the remaining refactor stories
-(#515–#518), py-identity-model 5.0 (#584), anything in identity-model. A story that needs one
+(#515–#518), any code change in identity-model. A story that needs one
 of them: `build.blocked`.
 
 A blocked story stops the queue, because later rows build on it. Stacker ends the loop with the
 reason; the operator fixes it and relaunches.
 
-## Stacking
+## Branching and merging
 
-- **Stack root**: `main`.
-- Every story's branch is cut from the previous story's branch. Each PR's base is that parent
-  branch; the first PR's base is `main`.
-- **Parent** = branch of the newest `shipped` ledger row, else `main`. If that branch no longer
-  exists on origin (the owner merged it mid-run), use `main`.
-- Don't rebase, retarget or force-push shipped branches. Record each branch's tip SHA in the
-  ledger when Shipper pushes.
+- Every story's branch is cut from `origin/main`, and every PR's base is `main`, so each PR
+  runs the full CI set (including CodeQL and OSV-Scanner) and the automatic `@claude` review.
+- When a PR is green and reviewed clean, Shipper marks it `clean` and waits for the operator to
+  merge it. The next story is not started until the PR is MERGED.
+- identity-stack merges by rebase with a strict up-to-date rule. If `main` moved under an
+  unmerged PR, Shipper rebases the branch on `origin/main`, pushes with `--force-with-lease`,
+  and re-runs CI and the review for the new head.
+- Never run `gh pr merge` yourself.
 
 ## Rules
 
@@ -167,8 +176,7 @@ Follow `.github/pull_request_template.md`:
 ## Plan
 <the plan, written by hand>
 
-Part of #<issue>          (use `Closes #<issue>` only when the base is main)
-Stacked on #<parent PR>
+Closes #<issue>          (`Part of #<issue>` where the queue says so)
 
 ## Done when
 <the issue's list, each item ticked with the test or command that proves it>
@@ -190,9 +198,7 @@ Stacked on #<parent PR>
 ## Ledger template (`.ralph/stack-ledger.md`)
 
 ```
-Stack root: main (<sha>)
-
-| # | issue | tier | status | branch | parent | tip | PR | review rounds | note |
-|---|---|---|---|---|---|---|---|---|---|
+| # | issue | tier | status | branch | tip | PR | review rounds | note |
+|---|---|---|---|---|---|---|---|---|
 ```
-Status: `in_progress` → `shipped` | `blocked` | `skipped`.
+Status: `in_progress` → `clean` → `shipped` (merged) | `blocked` | `skipped`.

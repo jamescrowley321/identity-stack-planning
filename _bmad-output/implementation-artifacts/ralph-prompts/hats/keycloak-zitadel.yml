@@ -1,9 +1,10 @@
-# identity-stack Keycloak + Zitadel stacked-PR loop: hat collection (stack root main).
+# identity-stack Keycloak + Zitadel loop: hat collection (every story branches from main).
 # Same shape as hats/identity-model-stack.yml (Stacker -> Builder -> Critic -> Shipper).
 # Differences:
 #   - Claude only, with the model set per hat. Two Builders: `std` (Opus) and `deep` (Fable);
 #     the queue's Tier column picks one, and rework goes back to the same one.
 #   - Shipper waits for the @claude review and sends every MUST FIX and SHOULD FIX back.
+#   - No stack: Shipper waits for the operator to merge each clean PR before the queue advances.
 #   - A blocked story ends the loop: later rows build on it.
 # The queue, rules, gates and review policy live in PROMPT.md (ralph-prompts/keycloak-zitadel.md).
 #
@@ -28,7 +29,7 @@ event_loop:
 hats:
   stacker:
     name: "📚 Stacker"
-    description: "Picks the next story, cuts its branch on top of the stack and routes it to a Builder by tier."
+    description: "Picks the next story, cuts its branch from main and routes it to a Builder by tier."
     triggers: ["build.start", "queue.advance", "build.blocked"]
     publishes: ["tasks.std", "tasks.deep", "LOOP_COMPLETE"]
     default_publishes: "tasks.std"
@@ -36,9 +37,9 @@ hats:
       type: "claude"
       args: ["--model", "claude-sonnet-5-5"]
     instructions: |
-      ## STACKER: you own the stack, not the code
+      ## STACKER: you own the queue, not the code
 
-      Do not implement, review or open PRs. Read PROMPT.md ("Queue", "Stacking", "Rules")
+      Do not implement, review or open PRs. Read PROMPT.md ("Queue", "Branching and merging", "Rules")
       and `.ralph/stack-ledger.md` (create it from the template in PROMPT.md if missing).
 
       On every activation, in this order:
@@ -46,7 +47,8 @@ hats:
       2. **On `build.blocked`:** mark the payload's story `blocked` in the ledger with the
          reason, comment the reason on its issue, and publish `LOOP_COMPLETE` with
          "blocked: #<issue>: <reason>". Stop.
-      3. Never rebase, retarget or force-push a shipped branch. Merging is the owner's job.
+      3. Never merge. A row marked `clean` whose PR is not MERGED yet: do not pick a new
+         story; publish `LOOP_COMPLETE` with "waiting: PR <n> not merged".
       4. **Resume.** A ledger row still `in_progress` (the loop restarted mid-story): check
          out its existing branch WITHOUT resetting it and publish `tasks.<tier>` for it. Stop.
          A row marked `blocked` whose issue has a newer comment starting `UNBLOCKED:`: set it
@@ -56,15 +58,12 @@ hats:
          `gh pr list --state all --search "<n> in:body"` shows no merged or open PR
          already doing it. If it is already done, mark `skipped` with the PR link and
          pick again. Queue empty → publish `LOOP_COMPLETE`.
-      5. **Branch.** Parent = the branch of the newest `shipped` row, else `main` (or
-         `main` if that branch is gone from origin). Name it `<type>/<issue>-<slug>`.
-         `git checkout -B <branch> origin/<parent>`.
-      6. Comment on the issue that the loop picked it up, naming the parent branch.
-      7. Write the ledger row (`in_progress`, tier, branch, parent) and
+      5. **Branch.** Name it `<type>/<issue>-<slug>`. `git checkout -B <branch> origin/main`.
+      6. Comment on the issue that the loop picked it up.
+      7. Write the ledger row (`in_progress`, tier, branch) and
          `.ralph/specs/<issue>/context.md` with the issue body and comments, the story's
          section of its epic, the owner decisions that apply, and the files you expect to change.
-      8. Publish `tasks.std` or `tasks.deep` per the row's Tier, with `issue`, `branch`,
-         `parent`, `tier`.
+      8. Publish `tasks.std` or `tasks.deep` per the row's Tier, with `issue`, `branch`, `tier`.
 
   builder_std:
     name: "⚙️ Builder (std)"
@@ -103,7 +102,7 @@ hats:
         Co-Authored-By trailer for your tier from PROMPT.md. Do not push; Shipper pushes.
       - Same failure three activations running, or no safe default exists: publish
         `build.blocked` with `issue` and a one-line reason.
-      Publish `review.ready` with `issue`, `branch`, `parent`, `tier`.
+      Publish `review.ready` with `issue`, `branch`, `tier`.
 
   builder_deep:
     name: "🧠 Builder (deep)"
@@ -128,7 +127,7 @@ hats:
     instructions: |
       ## CRITIC: you are not the builder; try to break it
 
-      1. Run the `blind-peer-review:check` skill with `--base origin/<parent>`. Run the
+      1. Run the `blind-peer-review:check` skill with `--base origin/main`. Run the
          lenses in-host as subagents (the skill's section 4a). Do NOT dispatch to codex,
          even if it is installed: this loop is Claude only. Copy each lens result into
          `.claude/review-<lens>.md` (Shipper posts them on the PR).
@@ -142,13 +141,13 @@ hats:
       missing proof → publish `rework.<tier>` (the payload's tier) with `source: critic`
       and the concrete list. A finding about code the story did not touch: file a follow-up
       issue (`gh issue create`), link it in the review file, and don't block on it.
-      Otherwise publish `review.passed` with `issue`, `branch`, `parent`, `tier`.
+      Otherwise publish `review.passed` with `issue`, `branch`, `tier`.
 
   shipper:
     name: "🚀 Shipper"
-    description: "Pushes, opens the stacked PR, drives CI and the @claude review to clean; never merges. Sonnet."
-    triggers: ["review.passed"]
-    publishes: ["queue.advance", "rework.std", "rework.deep", "build.blocked"]
+    description: "Pushes, opens the PR, drives CI and the @claude review to clean, then waits for the operator to merge. Sonnet."
+    triggers: ["review.passed", "merge.wait"]
+    publishes: ["queue.advance", "merge.wait", "rework.std", "rework.deep", "build.blocked"]
     default_publishes: "rework.deep"
     backend:
       type: "claude"
@@ -156,10 +155,10 @@ hats:
     instructions: |
       ## SHIPPER: open it, prove it, get it reviewed clean, never merge it
 
-      1. `git push -u origin <branch>` (plain push; the branch only moves forward).
-      2. If no PR exists: `gh pr create --base <parent> --head <branch>` with the PROMPT.md
-         PR body template (`--body-file`). `Closes #<issue>` only when the base is `main`,
-         otherwise `Part of #<issue>`.
+      On `merge.wait`, go straight to step 7.
+      1. `git push -u origin <branch>`.
+      2. If no PR exists: `gh pr create --base main --head <branch>` with the PROMPT.md
+         PR body template (`--body-file`).
       3. Post every `.claude/review-*.md` as one PR comment headed "Local blind peer review",
          then delete them locally. Post each entry of `.ralph/specs/<issue>/replies.md` as
          a PR comment and empty the file.
@@ -183,7 +182,17 @@ hats:
          - List not empty → add 1 to the ledger's review rounds. Six rounds reached →
            `build.blocked` with the open list. Otherwise publish `rework.<tier>` with
            `source: claude-review` and the list, each finding quoted with its location.
-      6. List empty, CI green on `H`, review present for `H` → ledger row `shipped` with
-         the PR link and tip SHA, comment the PR link on the issue, publish `queue.advance`.
+      6. List empty, CI green on `H`, review present for `H` → ledger row `clean` with
+         the PR link and tip SHA, and comment on the PR: "Clean: CI green and @claude review
+         has no open MUST FIX or SHOULD FIX on `<H>`. Ready to merge."
+      7. **Wait for the merge.** Poll `gh pr view <pr> --json state,mergeStateStatus`
+         every 60 s for up to 40 minutes.
+         - MERGED → ledger row `shipped`, comment the PR link on the issue, publish
+           `queue.advance`.
+         - `BEHIND` or `DIRTY` → `git fetch origin && git rebase origin/main` (a conflict
+           you cannot resolve mechanically → `rework.<tier>` with `source: ci` and the
+           conflict), `git push --force-with-lease`, set the row back to `in_progress`
+           and go to step 4 for the new head.
+         - Still open after 40 minutes → publish `merge.wait` with `issue`, `branch`, `tier`.
       Never run `gh pr merge`, `--auto`, `--admin` or a merge queue, and never change branch
-      protection. Green, reviewed clean and waiting on the owner is the finished state.
+      protection.
