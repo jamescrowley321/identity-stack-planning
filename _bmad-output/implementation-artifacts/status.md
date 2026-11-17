@@ -58,7 +58,7 @@ stale only when a new epic is written, never merely because work progressed.
 | `planning-artifacts/epics/epic-cloudflare-access-provider.md` | [#531](https://github.com/jamescrowley321/identity-stack/issues/531) epic; stories #532–#535 |
 | `planning-artifacts/epics/epic-zitadel-provider.md` | [#563](https://github.com/jamescrowley321/identity-stack/issues/563) epic; stories #564–#570 |
 | `planning-artifacts/epics/epic-keycloak-provider.md` | [#552](https://github.com/jamescrowley321/identity-stack/issues/552) epic; stories #553–#557, #559, #561, #562 |
-| `ralph-prompts/keycloak-zitadel.md` + `hats/keycloak-zitadel.yml` | #584, #566, #557, #559, #554, #561, #562, #586, #606, #607, #587, #588 |
+| `ralph-prompts/keycloak-zitadel.md` + `hats/keycloak-zitadel.yml` | #584, #566, #557, #559, #554, #561, #562, #586, #613, #617, #618, #606, #607, #587, #588 |
 | `ralph-prompts/zitadel.md` + `hats/keycloak-zitadel.yml` | #565, #567, #568, #569, #570 |
 | `ralph-prompts/ory-frontend-logout.md` | #377, #378 |
 
