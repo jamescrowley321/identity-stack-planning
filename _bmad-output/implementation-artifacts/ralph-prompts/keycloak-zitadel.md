@@ -75,6 +75,8 @@ Builder: `deep` for auth-path and cross-provider design work, `std` for the rest
 | 5 | #561 | Frontend against Keycloak: log in, refresh, switch organization, log out | std | |
 | 6 | #562 | End-to-end proof against the compose Keycloak | std | Chromium. Fails, never skips, when Keycloak is absent |
 | 7 | #586 | Keycloak admin adapter for organizations and users | std | Selected in `dependencies/`, no router changes |
+| 12a | #606 | One shared fixture of test tenants and users for the provider Terraform roots | std | Part of #608. Touches `infra/keycloak` and `infra/zitadel`; the Keycloak import file stays and `make keycloak-terraform-check` still passes |
+| 12b | #607 | The same outputs and variable names in every provider Terraform root | std | Part of #608. `backend_environment`, `frontend_environment`, `test_credentials`; `issuer_url` and `frontend_url`. Hosted roots (Descope, Ory) only if their workspaces need no change |
 | 13 | #587 | UI and API e2e suites run against Keycloak and Zitadel from Docker and in CI | deep | The goal's proof. Both CI jobs green on the PR |
 | 14 | #588 | Provider comparison and feature matrix (`docs/providers.md`) | std | Every cell backed by a test, a fixture or an issue number |
 
@@ -82,7 +84,7 @@ Out of scope: hosted deployments, Cloudflare Access (#531–#535), the remaining
 (#515–#518), any code change in identity-model. A story that needs one
 of them: `build.blocked`.
 
-**#587 waits for Zitadel.** Before picking #587, Stacker checks `gh issue view 570 --json state`. While identity-stack#570 is OPEN, Stacker publishes `LOOP_COMPLETE` with "waiting: identity-stack#570" and picks nothing; the operator's watchdog relaunches the loop later.
+**#606, #607 and #587 wait for Zitadel.** They change or use `infra/zitadel` and the Zitadel suites, which the `zitadel` loop is still writing. Before picking #606, Stacker checks `gh issue view 570 --json state`. While identity-stack#570 is OPEN, Stacker publishes `LOOP_COMPLETE` with "waiting: identity-stack#570" and picks nothing; the operator's watchdog relaunches the loop later.
 
 A blocked story stops the queue, because later rows build on it, unless its row says
 **Parkable**. Stacker ends the loop with the reason; the operator fixes it and relaunches.
