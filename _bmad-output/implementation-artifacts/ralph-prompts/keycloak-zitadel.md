@@ -71,7 +71,7 @@ Builder: `deep` for auth-path and cross-provider design work, `std` for the rest
 | 1 | #566 | Provider-neutral provider registration and tenant resolution | deep | Covers #555. When shipped, comment on #555 that #566 supersedes it; don't close it. Descope and Ory behaviour unchanged |
 | 2 | #557 | Keycloak Organizations as tenants, client roles as permissions | deep | Takes #555's Keycloak criteria. Startup refuses a half-configured provider |
 | 3 | #559 | Canonical identity for Keycloak principals | deep | Measures the leave-organization window (decision 13) and records it |
-| 4 | #554 | `infra/keycloak/` Terraform root | std | Local state. Same realm as the import file |
+| 4 | #554 | `infra/keycloak/` Terraform root | std | Local state. Same realm as the import file. PR #601: delete `scripts/with-compose-lock.sh` and every lock or container start/stop/remove step in `infra/keycloak/scripts/check-against-compose.sh` and the Makefile changes that use them (see "No tooling around the tests"). The check script compares Terraform's realm with a running, freshly imported `keycloak-test` and says in its failure message to recreate the container when the import file changed |
 | 5 | #561 | Frontend against Keycloak: log in, refresh, switch organization, log out | std | |
 | 6 | #562 | End-to-end proof against the compose Keycloak | std | Chromium. Fails, never skips, when Keycloak is absent |
 | 7 | #586 | Keycloak admin adapter for organizations and users | std | Selected in `dependencies/`, no router changes |
@@ -119,6 +119,13 @@ A blocked story stops the queue, because later rows build on it, unless its row 
 - Secrets in compose and fixture files are local throwaways and are labelled so where they
   are defined. Nothing else that looks like a secret is committed.
 - Minimal change for the story. Out-of-scope findings become follow-up issues.
+- **No tooling around the tests.** A story does not add lock helpers, container-lifecycle
+  management, retry wrappers or portability shims to scripts and Makefile targets. A check
+  script requires the instance it needs to be up and healthy and fails clearly when it is not;
+  it never starts, stops, removes or locks a container. The shared `flock` in "Gates" is how
+  this machine's sessions share Docker: it is typed by whoever runs the command and is not
+  built into the repo. Linux and CI only. A review finding about such machinery is closed by
+  deleting the machinery, not by hardening it.
 - Docs and PR text describe the system and its use, not the loop's process.
 - Name no client or outside project in commits, PRs, issues or docs.
 - Issue and PR body edits go through `--body-file` plus a non-empty check.
