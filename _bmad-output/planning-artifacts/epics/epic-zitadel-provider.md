@@ -81,7 +81,7 @@ Three bases, each dated 2026-11-15:
 | `email` and `email_verified` | Absent from the JWT access token and from the ID token, for a human with a verified email and scopes `openid profile email`. UserInfo returns both | `human-access-token-project.json`, `human-id-token-project.json`, `human-userinfo-project.json` | Measured |
 | Token lifetimes | Access and ID token 12 h (`exp - iat` in the fixtures is 43 200 s); refresh token idle 30 d by default | fixtures, [`defaults.yaml`](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml) | Measured and read |
 | Logout | `end_session_endpoint` at `/oidc/v1/end_session`; takes `id_token_hint`, `client_id`, `post_logout_redirect_uri`, `state`. `backchannel_logout_supported` is true | [endpoints](https://zitadel.com/docs/apis/openidoauth/endpoints), `discovery.json` | Read and measured |
-| What logout revokes | Not stated: whether ending the session also invalidates the refresh token and issued JWT access tokens | — | Unsettled. [identity-stack#570](https://github.com/jamescrowley321/identity-stack/issues/570) records it |
+| What logout revokes | Neither token: after logout the old refresh token is still exchanged and the old JWT access token is still accepted until it expires | [`zitadel-g5-measured-2026-11-17.md`](../zitadel-g5-measured-2026-11-17.md) | Measured by [identity-stack#570](https://github.com/jamescrowley321/identity-stack/issues/570) |
 | SPA login | "User Agent" application type, authorization code with PKCE (`S256` only), auth method none; refresh-token grant is a per-app grant type; `dev_mode` permits `http` redirect URIs | [applications](https://zitadel.com/docs/guides/manage/console/applications), [`application_oidc`](https://github.com/zitadel/terraform-provider-zitadel/blob/main/docs/resources/application_oidc.md), `discovery.json` | Read and measured |
 | Self-registration | A login policy per organization carries `allow_register`; the provider's example sets it `true` | [`login_policy`](https://github.com/zitadel/terraform-provider-zitadel/blob/main/docs/resources/login_policy.md) | Read. The instance default was not measured |
 | Machine-to-machine | Service (machine) users; `client_credentials` and JWT profile grants; `private_key_jwt` client authentication; personal access tokens | endpoints page, fixtures | Read and measured |
@@ -103,7 +103,7 @@ Three bases, each dated 2026-11-15:
 | Delegated exchange | Present, experimental, off by default; emits `act` | Read |
 | Sender-constrained tokens | Absent: neither DPoP nor mutual TLS is advertised | Measured (discovery) |
 | Tenancy against the canonical-store rule | Compatible if organizations are a projection of canonical tenants and no request-time decision reads a Zitadel claim. One provisioning-time exception remains: owner decision 4 | Design choice |
-| Operational cost | Four containers and one Postgres database locally, about 30 s to healthy. Memory and upgrade cost come from [identity-stack#570](https://github.com/jamescrowley321/identity-stack/issues/570) | Measured in part |
+| Operational cost | Four containers; about 444 MiB at idle and 29 to 42 s from reset to healthy; an upgrade is a tag change, a reset, a fixture re-record and the Terraform and end-to-end checks | Measured: [`zitadel-g5-measured-2026-11-17.md`](../zitadel-g5-measured-2026-11-17.md) |
 
 Zitadel fails two of the three flow-matrix rows. That is a finding for G5, not a reason to skip
 the epic: identity-stack needs only standard login, refresh and logout from it, and the tenancy
