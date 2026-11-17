@@ -81,6 +81,7 @@ Builder: `deep` for auth-path and cross-provider design work, `std` for the rest
 | 12b | #607 | The same outputs and variable names in every provider Terraform root | std | Part of #608. `backend_environment`, `frontend_environment`, `test_credentials`; `issuer_url` and `frontend_url`. Hosted roots (Descope, Ory) only if their workspaces need no change |
 | 13 | #587 | UI and API e2e suites run against Keycloak and Zitadel from Docker and in CI | deep | The goal's proof. Both CI jobs green on the PR |
 | 14 | #588 | Provider comparison and feature matrix (`docs/providers.md`) | std | Every cell backed by a test, a fixture or an issue number |
+| 15 | #584 | Move the py-identity-model pin to the merged `release/v5` commit | std | identity-model#1184 merged on 2026-11-17 as `7ddc426243ca7a386e3b190c411abb99dff1b040` on `release/v5`. Change the git pin in `backend/pyproject.toml` and the lock from `23cf375…` (the PR's head) to that commit; no code change is expected. New branch `chore/584-repin-release-v5` from `origin/main`. `Part of #584`, never `Closes` |
 
 Out of scope: hosted deployments, Cloudflare Access (#531–#535), the remaining refactor stories
 (#515–#518), any code change in identity-model. A story that needs one
