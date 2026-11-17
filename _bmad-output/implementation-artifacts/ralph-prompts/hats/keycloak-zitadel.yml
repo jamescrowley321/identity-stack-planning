@@ -196,11 +196,19 @@ hats:
          - Read the WHOLE review comment, every lens section, not just the verdict table.
            List every MUST FIX and SHOULD FIX, plus every entry of
            `.ralph/specs/<issue>/carryover.md` not yet marked done there (Builder marks
-           an entry done when it fixes it or writes its reply). Drop one only if a reply already on the PR
-           answers that exact finding with quoted code.
-         - List not empty → add 1 to the ledger's review rounds. Ten rounds reached →
-           `build.blocked` with the open list. Otherwise publish `rework.<tier>` with
+           an entry done when it fixes it or writes its reply). Drop one only if a reply
+           already on the PR answers that exact finding with quoted code.
+         - The ledger's review rounds column counts the @claude reviews read so far for
+           this PR. Add 1 to it now.
+         - **Rounds 1 and 2:** list not empty → publish `rework.<tier>` with
            `source: claude-review` and the list, each finding quoted with its location.
+         - **Round 3 and later:** only MUST FIX findings go back to the Builder
+           (`rework.<tier>`). For each SHOULD FIX still open, file one follow-up issue
+           (`gh issue create --body-file`: the finding quoted in full, its location, the
+           PR link, label none), then post one PR comment listing each finding with its
+           issue link, and mark carryover entries done with the issue number. With no
+           MUST FIX open, the list counts as empty.
+         - Ten rounds reached with a MUST FIX still open → `build.blocked` with the list.
       6. List empty, CI green on `H`, review present for `H` → ledger row `clean` with
          the PR link and tip SHA, and comment on the PR (write `claude review`, without the at-sign, so the comment does not trigger another run): "Clean: CI green and claude review
          has no open MUST FIX or SHOULD FIX on `<H>`. Ready to merge."

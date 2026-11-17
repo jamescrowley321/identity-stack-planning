@@ -3,7 +3,7 @@ You are the identity-stack Keycloak and Zitadel loop. Hats
 activation starts with a fresh context, so everything you need next time goes in files:
 `.ralph/stack-ledger.md` and `.ralph/specs/<issue>/`.
 
-One ralph workstream per repo. Don't run another identity-stack loop alongside this one.
+Two loops share this repo: this one and `zitadel` (the Zitadel stories #565, #567, #568, #569, #570), each in its own worktree. `main` moves under you when the other loop's PR merges: Shipper rebases as "Branching and merging" says, and a conflict with the other loop's merged work is resolved by keeping both. Never touch the other loop's branches or worktree.
 
 ## Goal
 
@@ -75,17 +75,14 @@ Builder: `deep` for auth-path and cross-provider design work, `std` for the rest
 | 5 | #561 | Frontend against Keycloak: log in, refresh, switch organization, log out | std | |
 | 6 | #562 | End-to-end proof against the compose Keycloak | std | Chromium. Fails, never skips, when Keycloak is absent |
 | 7 | #586 | Keycloak admin adapter for organizations and users | std | Selected in `dependencies/`, no router changes |
-| 8 | #565 | `infra/zitadel/` Terraform root and the canonical tenant seed | std | Local state; 15-minute access tokens |
-| 9 | #567 | Zitadel provider, token binding, organization-mapped provisioning, canonical roles | deep | Zitadel JWT access tokens carry no `scope` and no `azp`; use the recorded fixtures in `backend/tests/fixtures/zitadel/` |
-| 10 | #568 | Frontend against Zitadel: log in, refresh, log out, switch tenant | std | |
-| 11 | #569 | Zitadel admin adapter for organizations and users | std | |
-| 12 | #570 | End-to-end proof against local Zitadel | std | The planning-repo PR it asks for: open it against `identity-stack-planning` from a `/tmp` worktree and link it; never merge it |
 | 13 | #587 | UI and API e2e suites run against Keycloak and Zitadel from Docker and in CI | deep | The goal's proof. Both CI jobs green on the PR |
 | 14 | #588 | Provider comparison and feature matrix (`docs/providers.md`) | std | Every cell backed by a test, a fixture or an issue number |
 
 Out of scope: hosted deployments, Cloudflare Access (#531–#535), the remaining refactor stories
 (#515–#518), any code change in identity-model. A story that needs one
 of them: `build.blocked`.
+
+**#587 waits for Zitadel.** Before picking #587, Stacker checks `gh issue view 570 --json state`. While identity-stack#570 is OPEN, Stacker publishes `LOOP_COMPLETE` with "waiting: identity-stack#570" and picks nothing; the operator's watchdog relaunches the loop later.
 
 A blocked story stops the queue, because later rows build on it, unless its row says
 **Parkable**. Stacker ends the loop with the reason; the operator fixes it and relaunches.
@@ -163,14 +160,19 @@ Two reviews, both Claude, and both must come back clean before a story ships.
 2. **On the PR (Shipper):** the `@claude` blind peer review from `claude.yml`. Every PR must
    carry one for its final head commit.
 
-**Every MUST FIX and every SHOULD FIX is fixed**, in both reviews, at its cause. This overrides
-the repo's "fix a SHOULD FIX when it's cheap" and its three-round stop. The only other way to
-close a finding is a reply on the PR that quotes the code showing it is a false positive;
-"out of scope" is not a reason unless the finding is about code the story did not touch, in
-which case file an issue and link it in the reply. NITPICKs are optional.
+**Every MUST FIX is fixed**, in both reviews, at its cause, however many rounds it takes (ten
+`@claude` rounds with one still open: `build.blocked`).
 
-After ten `@claude` rounds on one PR with findings still open, publish `build.blocked` with the
-open list.
+**SHOULD FIX findings are fixed for two rounds, then filed.** In the first two `@claude` rounds
+on a PR, every SHOULD FIX is fixed like a MUST FIX. From the third round on, Shipper files each
+remaining SHOULD FIX as its own follow-up issue, links the issues in a PR comment, and the PR
+counts as clean once no MUST FIX is open. The local Critic does the same after its second round
+(carryover). This overrides the repo's three-round stop.
+
+The only other way to close a finding is a reply on the PR that quotes the code showing it is a
+false positive. NITPICKs are optional. Do not answer a finding by adding machinery (see "No
+tooling around the tests"): the smallest change that removes the problem, or the follow-up
+issue.
 
 ## PR body template
 
