@@ -19,6 +19,8 @@ inputDocuments:
 
 # Epic: Keycloak as a configured OIDC provider (Organizations as tenants)
 
+> **Superseded authorization model (2026-11-18).** Keycloak is now authorized from the canonical model, like Ory and Zitadel: see [epic-keycloak-canonical-authorization.md](epic-keycloak-canonical-authorization.md). The type-client model below (client roles as permissions, portable and organization-bound types, `organization:<alias>` switching) is kept as the record of what was built and removed.
+
 **GitHub tracking:** [identity-stack#552] (epic). Stories: [identity-stack#553],
 [identity-stack#554], [identity-stack#555], [identity-stack#556], [identity-stack#557],
 [identity-stack#559], [identity-stack#561], [identity-stack#562].
