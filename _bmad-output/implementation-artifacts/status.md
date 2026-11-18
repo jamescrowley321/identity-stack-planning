@@ -58,7 +58,7 @@ stale only when a new epic is written, never merely because work progressed.
 | `planning-artifacts/epics/epic-cloudflare-access-provider.md` | [#531](https://github.com/jamescrowley321/identity-stack/issues/531) epic; stories #532–#535 |
 | `planning-artifacts/epics/epic-zitadel-provider.md` | [#563](https://github.com/jamescrowley321/identity-stack/issues/563) epic; stories #564–#570 |
 | `planning-artifacts/epics/epic-keycloak-provider.md` | [#552](https://github.com/jamescrowley321/identity-stack/issues/552) epic; stories #553–#557, #559, #561, #562 (authorization model superseded) |
-| `planning-artifacts/epics/epic-keycloak-canonical-authorization.md` | [#552](https://github.com/jamescrowley321/identity-stack/issues/552) epic; stories #655–#659 |
+| `planning-artifacts/epics/epic-keycloak-canonical-authorization.md` | [#552](https://github.com/jamescrowley321/identity-stack/issues/552) epic; stories #655–#661 |
 | `ralph-prompts/ory-frontend-logout.md` | #377, #378 |
 
 ### terraform-provider-descope / oss-admin — Track 3
