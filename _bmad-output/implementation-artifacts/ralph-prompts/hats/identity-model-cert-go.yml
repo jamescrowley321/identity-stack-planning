@@ -129,7 +129,7 @@ hats:
     name: "🚀 Shipper"
     description: "Pushes, opens the stacked PR, posts review evidence, drives CI to green; never merges."
     triggers: ["review.passed"]
-    publishes: ["queue.advance", "ci.failed"]
+    publishes: ["queue.advance", "ci.failed", "build.blocked"]
     default_publishes: "ci.failed"
     instructions: |
       ## SHIPPER: open it, prove it, never merge it
