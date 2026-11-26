@@ -74,11 +74,13 @@ Re-check this section against the stack root before building; the code wins.
 | R4 | #1145 | Final hosted run green for all three plans on the newest shipped branch, rp-logs reasons checked | Evidence story: see "Exit criteria". |
 | R5 | #998 | Rust only: refetch JWKS once on signature failure (+ rotated-key vector) | **Conditional:** only if a rotation module fails in R1/R4. Else `skipped` with the run link. |
 
+**The queue continues with "Phase 2" below (rows P1–P5, each a plan group): the loop is not done until phase 2 is.**
+
 A failure that fits none of these: add a story row for the issue that covers it (search
 `gh issue list -l parity`), or file one, and record why in the ledger note. Stay inside the
 three plans.
 
-Out of scope (don't build): #1151, #1152, #1137, #1000, #1162, #1165, #992, #963, #1004
+Out of scope for phase 1 (phase 2 below takes the FAPI, Dynamic and logout issues): #1151, #1152, #1137, #1000, #1162, #1165, #992, #963, #1004
 (RFC 9207 `iss`, shared authorize-callback vectors), #1001–#1014, Dynamic/logout/FAPI plans,
 the FastAPI package, anything in `go/`.
 
@@ -121,6 +123,57 @@ claim or strict-xfail them; add strict xfails linked to the issue in those runne
 commit set, as `test(spec)`). Everything else (`conformance/run_tests.py`,
 `conformance/expected_modules.json`, `Makefile`, `.github/workflows/`, `py/`, `go/`) is
 read-only. If a fix needs one, mark the story `blocked` with what the change is.
+
+## Phase 2: every other OIDF RP plan, OIDF-first
+
+After phase 1 (Basic, Config, Form Post), take the Rust crate (`rust/`) through every OIDF RP plan Python passes on the
+local suite: FAPI 2.0 Security Profile, FAPI 2.0 Message Signing, FAPI 2.0 mTLS, Dynamic,
+RP-Initiated Logout, Back-Channel Logout. The suite drives the work: run the plan first, then build
+exactly what its failing modules need. Do not build features no module or spec MUST asks for.
+
+**Gate (Stacker, before the first phase-2 row):** the shared plumbing that lets a harness run any
+plan is merged into the stack root:
+`gh pr list -R jamescrowley321/identity-model --state merged --head test/harness-all-oidf-plans --json number -q 'length'`
+returns 1. Until then, after phase 1 is done, publish `LOOP_COMPLETE` with
+"blocked: harness-all-oidf-plans PR not merged".
+
+**Per plan group, in this order:**
+1. **Baseline.** On a branch off the parent, add `conformance/configs/rust-<plan>.json`
+   **uncommitted** and run `make conformance-test HARNESS=rust PLANS=<plan>` (local suite). Write
+   every module's verdict and logged reason to `.ralph/specs/<plan>/baseline.md`. This decides
+   which of the group's stories are needed and in what order; record the mapping module → story.
+2. **Stories.** One PR per issue below (rust half only: `Part of #N`), each adding the library
+   feature plus the harness route it needs, and showing the modules it targets now pass locally
+   (paste the verdicts in the PR). Stacked as usual.
+3. **Wire it.** The group's last story commits `conformance/configs/rust-<plan>.json`, which turns
+   on the plan in the `conformance-harness (rust)` CI leg. Every module must match
+   `expected_modules.json` (same rp-logs reason rule as phase 1).
+4. **Hosted evidence.** `gh workflow run conformance-hosted.yml -r <branch> -f harness=rust
+   -f plans=<plan> -f publish=none` (use the exact input names the plumbing PR defines; read
+   `conformance/adding-conformance-profiles.md`). Dynamic and both logout plans need a public RP URL
+   for the hosted OP to call back; if the workflow cannot provide one, record the local evidence,
+   mark the hosted row `blocked: needs public RP URL (owner)`, and continue.
+
+| # | Plan | Issues (rust half) | Notes |
+|---|---|---|---|
+| P1 | `fapi2-rp` (Security Profile: PAR, `private_key_jwt`, DPoP) | #1000, #1005, #1003, #1012, #1013 | `!` where the issue says breaking |
+| P2 | `fapi2-message-signing-rp` (JAR + JARM) | #1006, #1007 | |
+| P3 | `fapi2-mtls-rp` | #1002 | |
+| P4 | `dynamic-rp` (DCR + `request_uri`) | #1010 (JAR from P2) | hosted needs public URL |
+| P5 | `rpinitiated-logout-rp`, `backchannel-logout-rp` | #1008 | hosted needs public URL |
+
+**Foundations.** If a story needs a foundation that parity-2 owns (#994 injected Config, #995
+retry, #996 caches, #993 Rust error taxonomy), build only the slice the story needs, say so on that
+issue, and continue. Spec MUSTs are unconditional, and never scope out a MUST because the harness
+happens to mask it.
+
+**Spec vectors (two loops, one `spec/`).** Only the owning loop adds new vectors for an issue:
+Go owns #1000, #1003, #1005, #1012, #1013; Rust owns #1002, #1006, #1007, #1008, #1010. The owner
+adds strict xfails linked to the issue in the other two runners in the same commit set. The
+non-owning loop's story does not add vectors; once the owner's PR is on the stack root it removes
+its xfail in a follow-up row. Phase-2 file ownership adds `conformance/configs/rust-*.json` for
+every plan and, for owned issues only, appends to `spec/vectors/` plus strict xfails in the other
+runners.
 
 ## Exit criteria
 
