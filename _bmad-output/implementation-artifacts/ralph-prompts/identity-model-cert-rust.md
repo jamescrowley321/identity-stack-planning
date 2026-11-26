@@ -84,7 +84,7 @@ the FastAPI package, anything in `go/`.
 
 ## R1: harness contract
 
-Follow `conformance/adding-conformance-profiles.md` (the native-harness protocol #1198
+Follow `conformance/adding-conformance-profiles.md` (the harness protocol #1198
 documents) and `conformance/app.py` behavior. In short:
 
 - **Interface fixed by #1198 (PR #1200):** port **8891**; each config is the Python config
@@ -95,7 +95,7 @@ documents) and `conformance/app.py` behavior. In short:
   `--no-deps`: trust `/certs/nginx-selfsigned.crt` in addition to system roots and tolerate it
   being absent. `/results/{test_id}` returns 404 when nothing is recorded; record
   `{"status":"success"}` or `{"status":"error","error":"<reason_class>: …"}`. Runner:
-  `run_tests.py --harness rust`; make: `make conformance-test-native HARNESS=rust [HOSTED=1]`.
+  `run_tests.py --harness rust`; make: `make conformance-test HARNESS=rust [HOSTED=1]`.
 
 - Separate axum crate at `conformance/rust/` with a path dependency on `../../rust`, outside
   the published crate's package. Image `conformance/Dockerfile.rust`; compose overlay
@@ -124,9 +124,9 @@ read-only. If a fix needs one, mark the story `blocked` with what the change is.
 
 ## Exit criteria
 
-1. `conformance-native.yml` leg `rust` is **success** (not skipped) on the R1 PR, with every
+1. `conformance.yml` job `conformance-harness (rust)` is **success** (not skipped) on the R1 PR, with every
    module's verdict matching `expected_modules.json`.
-2. Hosted: `gh workflow run conformance-native.yml -r <branch> -f harness=rust -f publish=none` is green for all three plans, run
+2. Hosted: `gh workflow run conformance-hosted.yml -r <branch> -f harness=rust -f publish=none` is green for all three plans, run
    on the newest shipped branch. Download the rp-logs artifact and confirm every negative
    module's log shows the expected reason, not some other failure (a green negative test proves
    only that *a* rejection happened). Record the run URL and per-module reasons in
@@ -169,7 +169,7 @@ golangci-lint and actionlint for the whole repo).
 | any | `make lint` | same |
 | `rust/` | `make test-unit-rust` | `make test-integration-rust` |
 | `spec/vectors/` | `make test-unit` and `make test-unit-go` too (every runner claims or strict-xfails) | same |
-| `conformance/rust/` or a crate change on the cert path | — | `make conformance-test-native HARNESS=rust` (all three plans, manifest verdicts) |
+| `conformance/rust/` or a crate change on the cert path | — | `make conformance-test HARNESS=rust` (all three plans, manifest verdicts) |
 | security-control code (`jwks`, `jwt`) | — | CI mutation gate; check the job after push |
 
 Integration red is a hard block. Known flake, one rerun: ~22 integration failures from a stale

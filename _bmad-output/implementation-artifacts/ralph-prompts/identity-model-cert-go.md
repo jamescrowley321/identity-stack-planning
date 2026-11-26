@@ -72,7 +72,7 @@ Dynamic/logout/FAPI plans, the FastAPI package, anything in `rust/`.
 
 ## G1: harness contract
 
-Follow `conformance/adding-conformance-profiles.md` (the native-harness protocol #1198
+Follow `conformance/adding-conformance-profiles.md` (the harness protocol #1198
 documents) and `conformance/app.py` behavior. In short:
 
 - **Interface fixed by #1198 (PR #1200):** port **8890**; each config is the Python config
@@ -83,7 +83,7 @@ documents) and `conformance/app.py` behavior. In short:
   `--no-deps`: trust `/certs/nginx-selfsigned.crt` in addition to system roots and tolerate it
   being absent. `/results/{test_id}` returns 404 when nothing is recorded; record
   `{"status":"success"}` or `{"status":"error","error":"<reason_class>: …"}`. Runner:
-  `run_tests.py --harness go`; make: `make conformance-test-native HARNESS=go [HOSTED=1]`.
+  `run_tests.py --harness go`; make: `make conformance-test HARNESS=go [HOSTED=1]`.
 
 - Separate Go module at `conformance/go/` with a `replace` to `../../go`, so the library's
   module and release are untouched. Image `conformance/Dockerfile.go`; compose overlay
@@ -113,9 +113,9 @@ make Go pass. If the Rust PR adding the vector is not on `main`, mark the story
 
 ## Exit criteria
 
-1. `conformance-native.yml` leg `go` is **success** (not skipped) on the G1 PR, with every
+1. `conformance.yml` job `conformance-harness (go)` is **success** (not skipped) on the G1 PR, with every
    module's verdict matching `expected_modules.json`.
-2. Hosted: `gh workflow run conformance-native.yml -r <branch> -f harness=go -f publish=none` is green for all three plans.
+2. Hosted: `gh workflow run conformance-hosted.yml -r <branch> -f harness=go -f publish=none` is green for all three plans.
    Download the rp-logs artifact and confirm every negative module's log shows the expected
    reason, not some other failure (a green negative test proves only
    that *a* rejection happened). Record the run URL and per-module reasons in
@@ -156,7 +156,7 @@ panics golangci-lint; actionlint lives in `~/go/bin`).
 |---|---|---|
 | any | `make lint` | same |
 | `go/` | `make test-unit-go` | `make test-integration-go` |
-| `conformance/go/` or a library change on the cert path | — | `make conformance-test-native HARNESS=go` (all three plans, manifest verdicts) |
+| `conformance/go/` or a library change on the cert path | — | `make conformance-test HARNESS=go` (all three plans, manifest verdicts) |
 | security-control code (`jwks`, `jwt`, `idtoken`) | — | CI mutation gate; check the job after push |
 
 Integration red is a hard block. Known flake, one rerun: ~22 integration failures from a stale
