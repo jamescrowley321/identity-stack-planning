@@ -46,7 +46,13 @@ hats:
          Verify it is still needed: `gh issue view <n>` is OPEN, and
          `gh pr list --state all --search "<n> in:body"` shows no merged or open PR
          already doing it. If it is already done, mark `skipped` with the PR link and
-         pick again. Queue empty → publish `LOOP_COMPLETE`.
+         pick again. The queue is the PROMPT.md "Queue" table **plus the phase-2 rows P1–P5**;
+         a P row is one plan group, expanded into ledger rows per PROMPT.md "Phase-2 rules"
+         (one per issue, then `wire <plan>` and `hosted <plan>` per plan; `hosted` rows are
+         evidence stories). Before any P row, check the phase-2 gate; unmet → leave the ledger
+         unchanged (a gate miss is never `blocked`) and publish `LOOP_COMPLETE` with
+         "gated: #1213 not on the stack root". Never publish a "done/complete" `LOOP_COMPLETE` while any P row is pending.
+         Queue truly empty (every row shipped/skipped/blocked) → publish `LOOP_COMPLETE`.
       5. **Branch.** Parent = the branch of the newest `shipped` row, else the stack root
          (or the stack root if that branch is gone from origin). Name it `<type>/<issue>-<slug>`.
          `git checkout -B <branch> origin/<parent>` (or the local parent tip if the
@@ -124,7 +130,7 @@ hats:
     name: "🚀 Shipper"
     description: "Pushes, opens the stacked PR, posts review evidence, drives CI to green; never merges."
     triggers: ["review.passed"]
-    publishes: ["queue.advance", "ci.failed"]
+    publishes: ["queue.advance", "ci.failed", "build.blocked"]
     default_publishes: "ci.failed"
     instructions: |
       ## SHIPPER: open it, prove it, never merge it
@@ -150,9 +156,11 @@ hats:
          green: wait one more watch cycle, then publish `ci.failed` naming it.
       5a. Evidence stories (PROMPT.md "Exit criteria", hosted run): dispatch the hosted run as
          PROMPT.md says, `gh run watch` it, download the rp-logs artifact, write
-         `.ralph/specs/1145/hosted.md` (run URL, per-module verdict and logged reason) and post
+         `.ralph/specs/<plan or 1145>/hosted.md` (phase 2: `.ralph/specs/<plan>/hosted.md`) (run URL, per-module verdict and logged reason) and post
          it as a PR comment on the newest shipped PR. Any module failing or rejecting for the
-         wrong reason → publish `ci.failed` with the module and reason.
+         wrong reason → publish `ci.failed` with the module and reason. A run refused only
+         because no public RP URL was given → publish `build.blocked` ("needs public RP URL
+         (owner)"), not `ci.failed`.
       6. Green → ledger row `shipped` with the PR link, comment the PR link on the issue,
          and publish `queue.advance`.
       Never run `gh pr merge`, `--auto`, `--admin` or a merge queue, and never change branch

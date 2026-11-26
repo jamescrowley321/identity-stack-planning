@@ -60,22 +60,22 @@ title has `!` are breaking: `!` in the commit type and a `BREAKING CHANGE:` foot
 | D8 | #1137 `!` | UserInfo `sub`: required `expected_sub`, typed errors, unverified JWT (#928) | go, rust, py docs, spec |
 | D9 | #1151 `!` | ID Token rules: required `nonce` (string / none / refresh), `exp`/`iat` required, issuer required without discovery. Needs the owner's #574 §2 call | go, rust, spec |
 | D10 | #1152 `!` | PKCE for public clients, required `access_token`/`token_type`, absolute token-exchange `resource` | go, rust, spec |
-| E1 | #1000 | Shared client auth + `private_key_jwt` (`aud` = issuer, required; overlaps Gate B #1080) | go, rust, spec |
+| E1 | #1000 | Shared client auth + `private_key_jwt` (`aud` = issuer, required; overlaps Gate B #1080) **Owned by the `identity-model-cert-go`/`-rust` loops (phase 2):** treat their open or merged PRs (`gh pr list --state all --search "Part of #N"`) as done for that language; build only what neither covers, else `skipped` with their PR links | go, rust, spec |
 | E2 | #1001 | Refresh-token grant | go, rust, spec |
-| E3 | #1002 | mTLS client auth + certificate-bound tokens | go, rust, spec |
-| E4 | #1003 | DPoP completeness (closes #828) | go, rust, spec |
+| E3 | #1002 | mTLS client auth + certificate-bound tokens **Owned by the `identity-model-cert-go`/`-rust` loops (phase 2):** treat their open or merged PRs (`gh pr list --state all --search "Part of #N"`) as done for that language; build only what neither covers, else `skipped` with their PR links | go, rust, spec |
+| E4 | #1003 | DPoP completeness (closes #828) **Owned by the `identity-model-cert-go`/`-rust` loops (phase 2):** treat their open or merged PRs (`gh pr list --state all --search "Part of #N"`) as done for that language; build only what neither covers, else `skipped` with their PR links | go, rust, spec |
 | E5 | #1004 | Authorization URL, callback, state, RFC 9207 `iss` | go, rust, spec |
 | A5 | #1145 | Go and Rust OIDF conformance harnesses (Basic, Config, Form Post), blocking in CI. **Owned by the `identity-model-cert-go`/`-rust` loops:** if their harness PRs are merged, only what they left (making the native legs required checks) remains; else `skipped` with their PR links | go, rust, conformance, ci |
-| E6 | #1005 | PAR | go, rust, spec |
-| E7 | #1006 | JAR | go, rust, spec |
-| E8 | #1007 | JARM (signed) | go, rust, spec |
-| E9 | #1008 | RP-initiated + back-channel logout | go, rust, spec |
+| E6 | #1005 | PAR **Owned by the `identity-model-cert-go`/`-rust` loops (phase 2):** treat their open or merged PRs (`gh pr list --state all --search "Part of #N"`) as done for that language; build only what neither covers, else `skipped` with their PR links | go, rust, spec |
+| E7 | #1006 | JAR **Owned by the `identity-model-cert-go`/`-rust` loops (phase 2):** treat their open or merged PRs (`gh pr list --state all --search "Part of #N"`) as done for that language; build only what neither covers, else `skipped` with their PR links | go, rust, spec |
+| E8 | #1007 | JARM (signed) **Owned by the `identity-model-cert-go`/`-rust` loops (phase 2):** treat their open or merged PRs (`gh pr list --state all --search "Part of #N"`) as done for that language; build only what neither covers, else `skipped` with their PR links | go, rust, spec |
+| E9 | #1008 | RP-initiated + back-channel logout **Owned by the `identity-model-cert-go`/`-rust` loops (phase 2):** treat their open or merged PRs (`gh pr list --state all --search "Part of #N"`) as done for that language; build only what neither covers, else `skipped` with their PR links | go, rust, spec |
 | E10 | #1009 | Device authorization | go, rust, spec |
-| E11 | #1010 | Dynamic client registration | go, rust, spec |
+| E11 | #1010 | Dynamic client registration **Owned by the `identity-model-cert-go`/`-rust` loops (phase 2):** treat their open or merged PRs (`gh pr list --state all --search "Part of #N"`) as done for that language; build only what neither covers, else `skipped` with their PR links | go, rust, spec |
 | E12 | #1011 | Rust ES512 verification | rust |
 | E13 | #941 | Verified signed UserInfo with the issuer JWKS; FastAPI login uses it | py, go, rust, spec |
-| F1 | #1012 | FAPI 2.0 validators | go, rust, spec |
-| F2 | #1013 | Fail-closed FAPI 2.0 client profile | go, rust, spec |
+| F1 | #1012 | FAPI 2.0 validators **Owned by the `identity-model-cert-go`/`-rust` loops (phase 2):** treat their open or merged PRs (`gh pr list --state all --search "Part of #N"`) as done for that language; build only what neither covers, else `skipped` with their PR links | go, rust, spec |
+| F2 | #1013 | Fail-closed FAPI 2.0 client profile **Owned by the `identity-model-cert-go`/`-rust` loops (phase 2):** treat their open or merged PRs (`gh pr list --state all --search "Part of #N"`) as done for that language; build only what neither covers, else `skipped` with their PR links | go, rust, spec |
 | F3 | #1014 | Ports of #955–#957 and #478 (only once they are on `main`; else `blocked`) | go, rust |
 
 Out of scope: RAR (#220), CIBA (#217), the FastAPI package (Epic 22), Gate B (#1069; overlaps are listed in the epic; build on whichever landed first).
