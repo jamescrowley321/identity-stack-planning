@@ -28,7 +28,7 @@ Authorization models fall on a spectrum:
 | **RBAC + ReBAC** | RBAC in app DB, ReBAC in graph engine | Both questions above | Multi-tenant SaaS with document/resource-level sharing | Two systems to operate, two mental models |
 | **Pure ReBAC** | Relation tuples (`object#relation@subject`) | "What is this user's relationship to this resource?" | Fine-grained, resource-level access (Google Docs sharing model) | Overkill for "is this user an admin?", higher operational complexity |
 
-The identity-stack reference architecture uses the middle approach: **RBAC owned in Postgres, ReBAC proxied to a Zanzibar-style engine** (Descope FGA today; Ory Keto and OpenFGA are candidate engines, not wired in). This is a pragmatic choice, not the only valid one.
+The identity-stack reference architecture uses the middle approach: **RBAC owned in Postgres, ReBAC proxied to a Zanzibar-style engine** (Descope FGA for a Descope deployment; OpenFGA, keyed on canonical ids, for Ory, Keycloak and Zitadel; Ory Keto is not wired in). The [provider comparison](https://github.com/jamescrowley321/identity-stack/blob/main/docs/providers.md) cites the tests for each. This is a pragmatic choice, not the only valid one.
 
 ## Summary
 
