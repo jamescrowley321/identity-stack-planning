@@ -74,7 +74,18 @@ Re-check this section against the stack root before building; the code wins.
 | R4 | #1145 | Final hosted run green for all three plans on the newest shipped branch, rp-logs reasons checked | Evidence story: see "Exit criteria". |
 | R5 | #998 | Rust only: refetch JWKS once on signature failure (+ rotated-key vector) | **Conditional:** only if a rotation module fails in R1/R4. Else `skipped` with the run link. |
 
-**The queue continues with "Phase 2" below (rows P1–P5, each a plan group): the loop is not done until phase 2 is.**
+**Phase 2 rows (same queue; details in "Phase 2" below).** The loop is not done until these are
+`shipped`, `skipped` or `blocked`. If the phase-2 gate is unmet when a phase-2 row comes up, mark it
+`blocked: harness-all-oidf-plans PR not merged` and publish `LOOP_COMPLETE` with that reason. Never
+report "complete" while a phase-2 row is still pending.
+
+| # | Plan group | Issues | Notes |
+|---|---|---|---|
+| P1 | `fapi2-rp` | #1000, #1005, #1003, #1012, #1013 | phase 2, gate first |
+| P2 | `fapi2-message-signing-rp` | #1006, #1007 | phase 2 |
+| P3 | `fapi2-mtls-rp` | #1002 | phase 2 |
+| P4 | `dynamic-rp` | #1010 | phase 2 |
+| P5 | `rpinitiated-logout-rp`, `backchannel-logout-rp` | #1008 | phase 2 |
 
 A failure that fits none of these: add a story row for the issue that covers it (search
 `gh issue list -l parity`), or file one, and record why in the ledger note. Stay inside the
