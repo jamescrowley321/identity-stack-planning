@@ -138,8 +138,10 @@ who issued it.
 The conformance harness runs the same suite against **Keycloak**, **IdentityServer**,
 **node-oidc-provider** (one compose file, `infra/docker-compose.yml`) and a hosted
 **Descope** tenant (`infra/descope/`), plus the OpenID Foundation's
-hosted suite. `identity-stack` exercises the library against Descope and Ory end to end in
-a real application rather than against test doubles.
+hosted suite. `identity-stack` exercises the library against Descope, Ory, Keycloak and
+Zitadel end to end in a real application rather than against test doubles. Its
+[provider comparison](https://github.com/jamescrowley321/identity-stack/blob/main/docs/providers.md)
+shows, cell by cell, what each provider supports and the test or fixture behind it.
 
 ---
 
