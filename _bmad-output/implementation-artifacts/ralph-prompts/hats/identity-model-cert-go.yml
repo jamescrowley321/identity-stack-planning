@@ -46,7 +46,12 @@ hats:
          Verify it is still needed: `gh issue view <n>` is OPEN, and
          `gh pr list --state all --search "<n> in:body"` shows no merged or open PR
          already doing it. If it is already done, mark `skipped` with the PR link and
-         pick again. Queue empty → publish `LOOP_COMPLETE`.
+         pick again. The queue is the PROMPT.md "Queue" table **plus the phase-2 rows P1–P5**;
+         a P row is one plan group (PROMPT.md "Phase 2": baseline → one story per issue → wire
+         → hosted). Before any P row, check the phase-2 gate; unmet → mark the P row
+         `blocked: harness-all-oidf-plans PR not merged` and publish `LOOP_COMPLETE` with that
+         reason. Never publish a "done/complete" `LOOP_COMPLETE` while any P row is pending.
+         Queue truly empty (every row shipped/skipped/blocked) → publish `LOOP_COMPLETE`.
       5. **Branch.** Parent = the branch of the newest `shipped` row, else the stack root
          (or the stack root if that branch is gone from origin). Name it `<type>/<issue>-<slug>`.
          `git checkout -B <branch> origin/<parent>` (or the local parent tip if the
