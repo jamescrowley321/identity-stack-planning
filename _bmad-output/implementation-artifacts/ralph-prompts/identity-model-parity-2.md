@@ -50,7 +50,7 @@ title has `!` are breaking: `!` in the commit type and a `BREAKING CHANGE:` foot
 
 | # | Issue | Story | Languages |
 |---|---|---|---|
-| D1 | #993 `!` | Rust typed error taxonomy | rust |
+| D1 | #993 `!` | Rust typed error taxonomy. The JWT/ID-token slice ships from `identity-model-cert-rust` (R2); build only the rest | rust |
 | D2 | #994 `!` | Injected Config with validated build; env reads banned | go, rust |
 | D3 | #995 | HTTP retry/backoff + CA bundle; never retry auth code, refresh or device poll; fresh proof/assertion per attempt | go, rust |
 | D4 | #996 `!` | Client-owned caches, Cache-Control TTL, size bounds | go, rust |
@@ -65,7 +65,7 @@ title has `!` are breaking: `!` in the commit type and a `BREAKING CHANGE:` foot
 | E3 | #1002 | mTLS client auth + certificate-bound tokens | go, rust, spec |
 | E4 | #1003 | DPoP completeness (closes #828) | go, rust, spec |
 | E5 | #1004 | Authorization URL, callback, state, RFC 9207 `iss` | go, rust, spec |
-| A5 | #1145 | Go and Rust OIDF conformance harnesses (Basic, Config, Form Post), blocking in CI | go, rust, conformance, ci |
+| A5 | #1145 | Go and Rust OIDF conformance harnesses (Basic, Config, Form Post), blocking in CI. **Owned by the `identity-model-cert-go`/`-rust` loops:** if their harness PRs are merged, only what they left (making the native legs required checks) remains; else `skipped` with their PR links | go, rust, conformance, ci |
 | E6 | #1005 | PAR | go, rust, spec |
 | E7 | #1006 | JAR | go, rust, spec |
 | E8 | #1007 | JARM (signed) | go, rust, spec |
