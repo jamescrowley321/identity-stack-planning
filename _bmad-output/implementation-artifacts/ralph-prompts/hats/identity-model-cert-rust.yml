@@ -143,8 +143,10 @@ hats:
          PROMPT.md gets one rerun (`gh run rerun --failed`) before it counts as red.
       5. Before calling it green, confirm the PR has runs from Build, Conformance, CodeQL,
          OSV-Scanner and Conformance's `conformance-harness (rust)` job
-         (`gh pr checks <pr> --json workflow`). Once this loop's harness exists, that
-         workflow's leg for this language must be success, not skipped. A missing one is not
+         (`gh pr checks <pr> --json workflow`). Once this loop's harness exists, that leg must
+         have really run: it passes with skipped steps when the compose overlay is missing, so
+         require the run's `conformance-rust-results` artifact
+         (`gh api repos/jamescrowley321/identity-model/actions/runs/<run>/artifacts`). A missing one is not
          green: wait one more watch cycle, then publish `ci.failed` naming it.
       5a. Evidence stories (PROMPT.md "Exit criteria", hosted run): dispatch the hosted run as
          PROMPT.md says, `gh run watch` it, download the rp-logs artifact, write
