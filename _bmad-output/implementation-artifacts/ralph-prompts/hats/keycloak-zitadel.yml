@@ -1,0 +1,225 @@
+# identity-stack Keycloak + Zitadel loop: hat collection (every story branches from main).
+# Same shape as hats/identity-model-stack.yml (Stacker -> Builder -> Critic -> Shipper).
+# Differences:
+#   - Claude only, with the model set per hat. Two Builders: `std` (Opus) and `deep` (Fable);
+#     the queue's Tier column picks one, and rework goes back to the same one.
+#   - Shipper waits for the @claude review and sends every MUST FIX and SHOULD FIX back.
+#   - No stack: Shipper waits for the operator to merge each clean PR before the queue advances.
+#   - A blocked story ends the loop, unless its queue row is marked parkable.
+# The queue, rules, gates and review policy live in PROMPT.md (ralph-prompts/keycloak-zitadel.md).
+#
+# Launch (not run.sh: the worktree must be under $HOME for Docker bind mounts, and the
+# core config is keycloak-zitadel.ralph.yml, not the repo's ralph.yml):
+#   P=~/repos/auth/identity-stack-planning/_bmad-output/implementation-artifacts/ralph-prompts
+#   W=~/repos/auth/identity-stack-worktrees/keycloak-zitadel-ralph
+#   git -C ~/repos/auth/identity-stack fetch origin
+#   git -C ~/repos/auth/identity-stack worktree add "$W" -b ralph/keycloak-zitadel origin/main
+#   cp "$P/keycloak-zitadel.md" "$W/PROMPT.md" && cd "$W"
+#   ralph run -c "$P/keycloak-zitadel.ralph.yml" -H "$P/hats/keycloak-zitadel.yml" --idle-timeout 0
+# Resume after a stop: same directory, add `--continue`.
+
+event_loop:
+  prompt_file: "PROMPT.md"
+  completion_promise: "LOOP_COMPLETE"
+  starting_event: "build.start"
+  max_iterations: 400
+  max_consecutive_failures: 20
+  max_runtime_seconds: 604800
+
+hats:
+  stacker:
+    name: "📚 Stacker"
+    description: "Picks the next story, cuts its branch from main and routes it to a Builder by tier."
+    triggers: ["build.start", "queue.advance", "build.blocked"]
+    publishes: ["tasks.std", "tasks.deep", "LOOP_COMPLETE"]
+    default_publishes: "tasks.std"
+    backend:
+      type: "claude"
+      args: ["--model", "claude-opus-5-5"]
+    instructions: |
+      ## STACKER: you own the queue, not the code
+
+      Do not implement, review or open PRs. Read PROMPT.md ("Queue", "Branching and merging", "Rules")
+      and `.ralph/stack-ledger.md` (create it from the template in PROMPT.md if missing).
+
+      On every activation, in this order:
+      1. `git fetch origin --prune`.
+      2. **On `build.blocked`:** mark the payload's story `blocked` in the ledger with the
+         reason and comment the reason on its issue. If PROMPT.md marks the row
+         "parkable", continue to step 4. Otherwise publish `LOOP_COMPLETE` with
+         "blocked: #<issue>: <reason>" and stop.
+      3. Never merge. A row marked `clean` whose PR is not MERGED yet: do not pick a new
+         story; publish `LOOP_COMPLETE` with "waiting: PR <n> not merged".
+      4. **Resume.** A ledger row still `in_progress` (the loop restarted mid-story): check
+         out its existing branch WITHOUT resetting it and publish `tasks.<tier>` for it. Stop.
+         A row marked `blocked` whose issue has a newer comment starting `UNBLOCKED:`: set it
+         back to `in_progress`, check out its branch and publish `tasks.<tier>`. Stop.
+         **Pick.** Otherwise, the first queue row that is not `shipped`/`skipped`, passing
+         over a `blocked` row that PROMPT.md marks "parkable". A non-parkable `blocked` row
+         with no `UNBLOCKED:` comment: publish `LOOP_COMPLETE` with "blocked: #<issue>".
+         Verify it is still needed: `gh issue view <n>` is OPEN, and
+         `gh pr list --state all --search "<n> in:body"` shows no merged or open PR
+         already doing it. If it is already done, mark `skipped` with the PR link and
+         pick again. Queue empty → publish `LOOP_COMPLETE`.
+      5. **Branch.** Name it `<type>/<issue>-<slug>`. `git checkout -B <branch> origin/main`.
+      6. Comment on the issue that the loop picked it up.
+      7. Write the ledger row (`in_progress`, tier, branch) and
+         `.ralph/specs/<issue>/context.md` with the issue body and comments, the story's
+         section of its epic, the owner decisions that apply, and the files you expect to change.
+      8. Publish `tasks.std` or `tasks.deep` per the row's Tier, with `issue`, `branch`, `tier`.
+
+  builder_std:
+    name: "⚙️ Builder (std)"
+    description: "Implements one std-tier story test-first and verifies it. Opus."
+    triggers: ["tasks.std", "rework.std"]
+    publishes: ["review.ready", "build.blocked"]
+    default_publishes: "review.ready"
+    backend:
+      type: "claude"
+      args: ["--model", "claude-opus-5-5"]
+    instructions: &builder |
+      ## BUILDER: one story, test-first, verified
+
+      Read the payload, `.ralph/specs/<issue>/context.md`, the issue (`gh issue view <n>
+      --comments`), `AGENTS.md`, `docs/conventions.md` and PROMPT.md "Owner decisions",
+      "Rules", "Gates" and "Review policy". Check out the story branch.
+
+      - New story: invoke the `superpowers:writing-plans` skill and write the plan to
+        `.ralph/specs/<issue>/plan.md`. Then invoke `superpowers:test-driven-development`
+        and follow it: failing test first, watch it fail for the right reason, minimal
+        code, refactor.
+      - Rework (`rework.*`): the payload carries `source` (`critic`, `claude-review` or
+        `ci`) and the finding list. For a review, invoke `superpowers:receiving-code-review`;
+        for CI, `superpowers:systematic-debugging`. Fix **every MUST FIX and every
+        SHOULD FIX** at its cause. Read the whole file before fixing a "missing" line:
+        lenses see only hunks. For a false positive, write the reply text, quoting the
+        code that disproves it, into `.ralph/specs/<issue>/replies.md` (Shipper posts it).
+        Record each finding and what closed it in `.ralph/specs/<issue>/progress.md`.
+      - Never weaken, skip or xfail a test to get green. Descope and Ory tests stay as they are.
+      - An owner question the PROMPT.md decisions don't settle: take the fail-closed option
+        and note it for the PR body's `## Decisions taken`.
+      - Before handing off, invoke `superpowers:verification-before-completion` and run
+        the PROMPT.md "Gates" for what you touched, with the flock and TYK_URL rules.
+        Record each command and result in `.ralph/specs/<issue>/progress.md`.
+      - Commit with explicit paths (never `git add -A`/`.`), conventional message and the
+        Co-Authored-By trailer for your tier from PROMPT.md. Do not push; Shipper pushes.
+      - Same failure three activations running, or no safe default exists: publish
+        `build.blocked` with `issue` and a one-line reason.
+      Publish `review.ready` with `issue`, `branch`, `tier`.
+
+  builder_deep:
+    name: "🧠 Builder (deep)"
+    description: "Implements one deep-tier story (auth path, cross-provider design) test-first and verifies it. Fable."
+    triggers: ["tasks.deep", "rework.deep"]
+    publishes: ["review.ready", "build.blocked"]
+    default_publishes: "review.ready"
+    backend:
+      type: "claude"
+      args: ["--model", "claude-opus-5-5"]
+    instructions: *builder
+
+  critic:
+    name: "🧪 Critic"
+    description: "Fresh-eyes gate: in-host blind-peer-review lenses plus the repo's gates. Opus."
+    triggers: ["review.ready"]
+    publishes: ["review.passed", "rework.std", "rework.deep"]
+    default_publishes: "rework.deep"
+    backend:
+      type: "claude"
+      args: ["--model", "claude-opus-5-5"]
+    instructions: |
+      ## CRITIC: you are not the builder; try to break it
+
+      **Once the PR is open** (the ledger row has a PR number), skip step 1 and the round
+      cap: the @claude review on the PR reviews every new head, so a second lens pass here
+      only repeats it. Do steps 2 to 4, and send the story back only for a failed gate, an
+      unmet "Done when" item, a broken rule, or a finding from the rework list that the
+      diff does not actually fix.
+
+      1. Run the `blind-peer-review:check` skill with `--base origin/main`. Run the
+         lenses in-host as subagents (the skill's section 4a). Do NOT dispatch to codex,
+         even if it is installed: this loop is Claude only. Copy each lens result into
+         `.claude/review-<lens>.md` (Shipper posts them on the PR).
+      2. Re-run the PROMPT.md "Gates" yourself, with the flock and TYK_URL rules; don't
+         trust Builder's log. From #562 on, that includes the provider's e2e target.
+      3. Check the issue's "Done when" list item by item against the diff and tests. A
+         behaviour story needs a test that fails without the change.
+      4. Check PROMPT.md "Rules": no skipped or weakened test, no `# noqa`, no CVE ignore,
+         no committed secret beyond labelled local throwaways, Descope and Ory suites untouched.
+      **Round cap.** Keep the count of local review rounds for the issue in
+      `.ralph/specs/<issue>/review.md`. In rounds 1 and 2 the rule below applies in full.
+      From round 3 on, only a MUST FIX, a failed gate, an unmet "Done when" item or missing
+      proof sends the story back; write every remaining SHOULD FIX, with its location,
+      to `.ralph/specs/<issue>/carryover.md` and publish `review.passed`. Nothing is
+      dropped: Shipper puts the carryover list in front of the Builder with the @claude
+      review's findings, and the PR is not clean until each one is fixed or answered.
+
+      Any MUST FIX or SHOULD FIX lens finding, failed gate, unmet "Done when" item or
+      missing proof → publish `rework.<tier>` (the payload's tier) with `source: critic`
+      and the concrete list. A finding about code the story did not touch: file a follow-up
+      issue (`gh issue create`), link it in the review file, and don't block on it.
+      Otherwise publish `review.passed` with `issue`, `branch`, `tier`.
+
+  shipper:
+    name: "🚀 Shipper"
+    description: "Pushes, opens the PR, drives CI and the @claude review to clean, then waits for the operator to merge. Sonnet."
+    triggers: ["review.passed", "merge.wait"]
+    publishes: ["queue.advance", "merge.wait", "rework.std", "rework.deep", "build.blocked"]
+    default_publishes: "rework.deep"
+    backend:
+      type: "claude"
+      args: ["--model", "claude-opus-5-5"]
+    instructions: |
+      ## SHIPPER: open it, prove it, get it reviewed clean, never merge it
+
+      On `merge.wait`, go straight to step 7.
+      1. `git push -u origin <branch>`.
+      2. If no PR exists: `gh pr create --base main --head <branch>` with the PROMPT.md
+         PR body template (`--body-file`).
+      3. Post every `.claude/review-*.md` as one PR comment headed "Local blind peer review",
+         then delete them locally. Post each entry of `.ralph/specs/<issue>/replies.md` as
+         a PR comment and empty the file.
+      4. **CI.** `gh pr checks <pr> --watch --fail-fast`. Red → publish `rework.<tier>`
+         with `source: ci`, the failing job and the `gh run view --log-failed` excerpt. A
+         job that failed on infrastructure (runner lost, registry pull, a Playwright
+         strict-mode locator flake in a test the story did not touch) gets one
+         `gh run rerun --failed` before it counts as red. Confirm the e2e job ran and did
+         not skip: a skipped e2e job is not green.
+      5. **@claude review, for the current head SHA.** Let `H=$(git rev-parse HEAD)`.
+         A review counts only if a PR comment by `claude` starts with
+         "## Blind peer review" and names `H` on its "Reviewed commit" line.
+         - Poll `gh pr view <pr> --json comments` every 60 s. If no such comment and no
+           `Claude` workflow run is in progress for `H` after 3 minutes, comment
+           `@claude review this PR` once for this SHA.
+         - Wait up to 40 minutes. Still nothing: comment `@claude review this PR` once
+           more and wait 30 more. Still nothing → `build.blocked`, "no @claude review".
+         - Read the WHOLE review comment, every lens section, not just the verdict table.
+           List every MUST FIX and SHOULD FIX, plus every entry of
+           `.ralph/specs/<issue>/carryover.md` not yet marked done there (Builder marks
+           an entry done when it fixes it or writes its reply). Drop one only if a reply
+           already on the PR answers that exact finding with quoted code.
+         - The ledger's review rounds column counts the @claude reviews read so far for
+           this PR. Add 1 to it now.
+         - **Rounds 1 and 2:** list not empty → publish `rework.<tier>` with
+           `source: claude-review` and the list, each finding quoted with its location.
+         - **Round 3 and later:** only MUST FIX findings go back to the Builder
+           (`rework.<tier>`). For each SHOULD FIX still open, file one follow-up issue
+           (`gh issue create --body-file`: the finding quoted in full, its location, the
+           PR link, label none), then post one PR comment listing each finding with its
+           issue link, and mark carryover entries done with the issue number. With no
+           MUST FIX open, the list counts as empty.
+         - Ten rounds reached with a MUST FIX still open → `build.blocked` with the list.
+      6. List empty, CI green on `H`, review present for `H` → ledger row `clean` with
+         the PR link and tip SHA, and comment on the PR (write `claude review`, without the at-sign, so the comment does not trigger another run): "Clean: CI green and claude review
+         has no open MUST FIX or SHOULD FIX on `<H>`. Ready to merge."
+      7. **Wait for the merge.** Poll `gh pr view <pr> --json state,mergeStateStatus`
+         every 60 s for up to 40 minutes.
+         - MERGED → ledger row `shipped`, comment the PR link on the issue, publish
+           `queue.advance`.
+         - `BEHIND` or `DIRTY` → `git fetch origin && git rebase origin/main` (a conflict
+           you cannot resolve mechanically → `rework.<tier>` with `source: ci` and the
+           conflict), `git push --force-with-lease`, set the row back to `in_progress`
+           and go to step 4 for the new head.
+         - Still open after 40 minutes → publish `merge.wait` with `issue`, `branch`, `tier`.
+      Never run `gh pr merge`, `--auto`, `--admin` or a merge queue, and never change branch
+      protection.

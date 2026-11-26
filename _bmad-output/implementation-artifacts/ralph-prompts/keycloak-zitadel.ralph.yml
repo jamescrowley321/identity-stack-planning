@@ -1,0 +1,14 @@
+# Core config for the keycloak-zitadel loop. Used instead of identity-stack's ralph.yml:
+# one activation can run compose e2e suites and wait on CI plus the @claude review,
+# which the repo default of 900 s cuts off.
+cli:
+  backend: "claude"
+  timeout: 5400
+
+# Limits live here as well as in the hat file: ralph 2.10.1 takes them from the core config.
+event_loop:
+  prompt_file: "PROMPT.md"
+  completion_promise: "LOOP_COMPLETE"
+  max_iterations: 400
+  max_consecutive_failures: 20
+  max_runtime_seconds: 604800
