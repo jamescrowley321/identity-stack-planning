@@ -64,6 +64,7 @@ Re-check this section against `main` before building; `main` wins.
 |---|---|---|---|
 | R1 | #1145 | Rust RP harness (`conformance/rust/`), local suite green for all three plans in CI | Rust half only. `Part of #1145`. |
 | R2 | #993 | JWT/ID-token slice of the typed error taxonomy: variants for iss, aud, sub, iat/exp, nonce, signature, alg-none; `#[non_exhaustive]`; harness `classify()` switches to matching on them | `fix(rust)!`. `Part of #993` (the rest stays in parity-2 D1). |
+| R2b | #1166 | ID Token profile requires `client_id ∈ aud` unconditionally (OIDC Core §3.1.3.7 step 3 MUST), with a new reject vector in `spec/vectors/id-token.json` (`aud:["other-client-9x"]`, `trusted_audiences:["other-client-9x"]`, `client_id:"s6BhdRkqt3"`); strict-xfail it in the Go and Python runners linked to #1166 | `fix(rust)!`. Must land before the hosted run: certifying with a missed MUST is weak evidence. |
 | R3 | #1153 | Rust only: same-`kid` keys of different `kty` → pick by `kty`/`alg`/`crv`, adding the shared vector to `spec/vectors/jwks.json` | Insurance before the hosted run (suite ≥5.3.3 publishes an OKP decoy under a kid). This loop owns the vector; Go claims it later. |
 | R4 | #1145 | Hosted run green for all three plans, rp-logs reasons checked | Evidence story: see "Exit criteria". |
 | R5 | #998 | Rust only: refetch JWKS once on signature failure (+ rotated-key vector) | **Conditional:** only if a rotation module fails in R1/R4. Else `skipped` with the run link. |
@@ -72,7 +73,7 @@ A failure that fits none of these: add a story row for the issue that covers it 
 `gh issue list -l parity`), or file one, and record why in the ledger note. Stay inside the
 three plans.
 
-Out of scope (don't build): #1151, #1152, #1137, #1000, #1162, #1165, #1166, #992, #963, #1004
+Out of scope (don't build): #1151, #1152, #1137, #1000, #1162, #1165, #992, #963, #1004
 (RFC 9207 `iss`, shared authorize-callback vectors), #1001–#1014, Dynamic/logout/FAPI plans,
 the FastAPI package, anything in `go/`.
 
@@ -109,8 +110,8 @@ documents) and `conformance/app.py` behavior. In short:
 
 This loop may create/edit only: `rust/**`, `conformance/rust/**`,
 `conformance/Dockerfile.rust`, `conformance/docker-compose.rust.yml`,
-`conformance/configs/rust-*.json`, and — for R3/R5 only — new vectors appended to
-`spec/vectors/jwks.json` plus the Rust runner claiming them (Go and Python runners must then
+`conformance/configs/rust-*.json`, and — for R2b/R3/R5 only — new vectors appended to
+`spec/vectors/id-token.json` (R2b) or `spec/vectors/jwks.json` plus the Rust runner claiming them (Go and Python runners must then
 claim or strict-xfail them; add strict xfails linked to the issue in those runners in the same
 commit set, as `test(spec)`). Everything else (`conformance/run_tests.py`,
 `conformance/expected_modules.json`, `Makefile`, `.github/workflows/`, `py/`, `go/`) is
