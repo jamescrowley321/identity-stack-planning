@@ -57,7 +57,7 @@ title has `!` are breaking: `!` in the commit type and a `BREAKING CHANGE:` foot
 | C1 | #992 | Empty = absent: Python shipped in 5.0 (#1092). Left: Rust `client_id: ""` (`fix(rust)!`), JWKS/IDT vectors in all three, `capabilities.md` rule, mistyped `key_ops` (agree with Gate B #1074) | rust, spec, tests |
 | C2 | #890 | Wrong-typed required discovery fields classified consistently | py, go, rust |
 | C3 | #575 | Duplicate-kid try-all | py, go, rust |
-| C6 | #1153 | Same-`kid` keys of different `kty`: pick the one whose `kty`/`alg`/`crv` fit (Python 5.0, #1130) | go, rust, spec |
+| C6 | #1153 | Same-`kid` keys of different `kty`: pick the one whose `kty`/`alg`/`crv` fit (Python 5.0, #1130). The Rust half and the vector ship from `identity-model-cert-rust` (R3), the Go half possibly from `identity-model-cert-go` (G4); build only what is still missing on `main` | go, rust, spec |
 | C4 | #576 | ID-token vs access-token discrimination in the shared validators | py, go, rust |
 | C5 | #867 `!` | Refuse every HTTP redirect (Go, Rust) | go, rust |
 
