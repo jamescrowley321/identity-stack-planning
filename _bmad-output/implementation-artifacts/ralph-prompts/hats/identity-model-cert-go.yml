@@ -155,9 +155,11 @@ hats:
          green: wait one more watch cycle, then publish `ci.failed` naming it.
       5a. Evidence stories (PROMPT.md "Exit criteria", hosted run): dispatch the hosted run as
          PROMPT.md says, `gh run watch` it, download the rp-logs artifact, write
-         `.ralph/specs/1145/hosted.md` (run URL, per-module verdict and logged reason) and post
+         `.ralph/specs/<plan or 1145>/hosted.md` (phase 2: `.ralph/specs/<plan>/hosted.md`) (run URL, per-module verdict and logged reason) and post
          it as a PR comment on the newest shipped PR. Any module failing or rejecting for the
-         wrong reason → publish `ci.failed` with the module and reason.
+         wrong reason → publish `ci.failed` with the module and reason. A run refused only
+         because no public RP URL was given → publish `build.blocked` ("needs public RP URL
+         (owner)"), not `ci.failed`.
       6. Green → ledger row `shipped` with the PR link, comment the PR link on the issue,
          and publish `queue.advance`.
       Never run `gh pr merge`, `--auto`, `--admin` or a merge queue, and never change branch
