@@ -63,8 +63,9 @@ this table against the stack root before building; the code wins.
 | G4 | #1153 | Go only: same-`kid` keys of different `kty` → pick by `kty`/`alg`/`crv` | **Conditional:** only if a positive module fails on key choice. Else `skipped`. |
 
 **Phase 2 rows (same queue; details in "Phase 2" below).** The loop is not done until these are
-`shipped`, `skipped` or `blocked`. If the phase-2 gate is unmet when a phase-2 row comes up, mark it
-`blocked: harness-all-oidf-plans PR not merged` and publish `LOOP_COMPLETE` with that reason. Never
+`shipped`, `skipped` or `blocked`. If the phase-2 gate is unmet when a phase-2 row comes up, leave the row
+as it is (never `blocked` for a gate miss: the gate re-opens) and publish `LOOP_COMPLETE` with
+"gated: #1213 not on the stack root". Never
 report "complete" while a phase-2 row is still pending.
 
 | # | Plan group | Issues | Notes |
@@ -132,7 +133,7 @@ exactly what its failing modules need. Do not build features no module or spec M
 
 **Gate (Stacker, before the first phase-2 row):** the shared plumbing that lets a harness run any
 plan (identity-model#1213) is on the stack root: `git show origin/<root>:conformance/run_tests.py | grep -q -- '--resolve-plans'`. Until then, after phase 1 is done, publish `LOOP_COMPLETE` with
-"blocked: harness-all-oidf-plans PR not merged".
+"gated: #1213 not on the stack root" (ledger unchanged).
 
 **Per plan group, in this order:**
 1. **Baseline.** On a branch off the parent, add `conformance/configs/go-<plan>.json`
@@ -159,7 +160,9 @@ plan (identity-model#1213) is on the stack root: `git show origin/<root>:conform
   yourself (ngrok, cloudflared, etc.). A plan that needs a public RP URL gets its hosted row
   marked `blocked: needs public RP URL (owner)`.
 - **One ledger row per issue.** A P group expands into one row per issue in its "Issues" column,
-  plus a final `wire <plan>` row per plan (P5 has two plans, so two wire rows). The wire row
+  then a `wire <plan>` row and a `hosted <plan>` evidence row per plan (P5 has two plans,
+  so two of each). The hosted row is an evidence story (Builder/Critic pass it through,
+  Shipper runs step 5a for that plan); it may end `blocked` (for example, needs a public RP URL). The wire row
   commits that plan's config even if no story was needed or a story ended `blocked`/`skipped`
   (in that case, only if the baseline shows the plan already passes; otherwise mark the wire
   row `blocked` with the failing modules).

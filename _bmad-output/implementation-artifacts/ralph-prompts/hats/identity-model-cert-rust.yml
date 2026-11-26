@@ -47,10 +47,11 @@ hats:
          `gh pr list --state all --search "<n> in:body"` shows no merged or open PR
          already doing it. If it is already done, mark `skipped` with the PR link and
          pick again. The queue is the PROMPT.md "Queue" table **plus the phase-2 rows P1–P5**;
-         a P row is one plan group (PROMPT.md "Phase 2": baseline → one story per issue → wire
-         → hosted). Before any P row, check the phase-2 gate; unmet → mark the P row
-         `blocked: harness-all-oidf-plans PR not merged` and publish `LOOP_COMPLETE` with that
-         reason. Never publish a "done/complete" `LOOP_COMPLETE` while any P row is pending.
+         a P row is one plan group, expanded into ledger rows per PROMPT.md "Phase-2 rules"
+         (one per issue, then `wire <plan>` and `hosted <plan>` per plan; `hosted` rows are
+         evidence stories). Before any P row, check the phase-2 gate; unmet → leave the ledger
+         unchanged (a gate miss is never `blocked`) and publish `LOOP_COMPLETE` with
+         "gated: #1213 not on the stack root". Never publish a "done/complete" `LOOP_COMPLETE` while any P row is pending.
          Queue truly empty (every row shipped/skipped/blocked) → publish `LOOP_COMPLETE`.
       5. **Branch.** Parent = the branch of the newest `shipped` row, else the stack root
          (or the stack root if that branch is gone from origin). Name it `<type>/<issue>-<slug>`.
