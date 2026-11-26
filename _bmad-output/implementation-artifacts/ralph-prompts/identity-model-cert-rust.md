@@ -21,11 +21,15 @@ owner's job.
   every branch operation.
 - **A sibling loop runs at the same time:** `identity-model-cert-go`, owning `go/` and
   `conformance/go/`. The two loops never edit the same file. See "File ownership".
-- **Stack root: `main`.** The loop never merges. The owner merges bottom-up.
-- **Gate (Stacker checks on `build.start`):** `origin/release/v5` is gone (py 5.0.0 final,
-  identity-model#915, has merged) **and** `origin/main` has
-  `.github/workflows/conformance-native.yml` (identity-model#1198, the shared plumbing for
-  per-language harnesses). Either missing → `LOOP_COMPLETE` with the reason.
+- **Priority: run this language against the official OIDF suite as early as possible.** The
+  harness and a first hosted run come before any library fix; real suite verdicts decide what
+  gets fixed.
+- **Stack root: `origin/release/v5` while it exists, else `origin/main`.** py 5.0.0
+  (identity-model#915) merges `release/v5` into `main` mid-run; after that, new stories root on
+  `main` and open PRs stay where they are (the owner retargets). The loop never merges.
+- **Gate (Stacker checks on `build.start`):** the root branch has the shared harness plumbing
+  (identity-model#1198, PR #1200): `git show origin/<root>:conformance/run_tests.py | grep -q
+  -- '--harness'`. Missing → `LOOP_COMPLETE` with "blocked: #1200 not merged".
 - **Discovery semantics after identity-model#1197:** discovery takes the issuer and matches
   it exactly. The Rust harness follows the same rule.
 - Rust has no users: no legacy shims, typed error variants only.
@@ -56,17 +60,18 @@ reqwest/rustls ignores `SSL_CERT_FILE`, so inject a client built with
 `secure_client_builder().add_root_certificate(..)` for the local suite's self-signed cert.
 
 The hosted suite serves a junk `P-9999` key. Rust skips unusable keys today; keep it that way.
-Re-check this section against `main` before building; `main` wins.
+Re-check this section against the stack root before building; the code wins.
 
 ## Queue
 
 | # | Issue | Story | Notes |
 |---|---|---|---|
 | R1 | #1145 | Rust RP harness (`conformance/rust/`), local suite green for all three plans in CI | Rust half only. `Part of #1145`. |
+| R1h | #1145 | First hosted run for all three plans on the R1 branch, rp-logs reasons recorded | Evidence story, right after R1: see "Exit criteria". Failures it shows are fixed by the rows below or new rows. |
 | R2 | #993 | JWT/ID-token slice of the typed error taxonomy: variants for iss, aud, sub, iat/exp, nonce, signature, alg-none; `#[non_exhaustive]`; harness `classify()` switches to matching on them | `fix(rust)!`. `Part of #993` (the rest stays in parity-2 D1). |
 | R2b | #1166 | ID Token profile requires `client_id ∈ aud` unconditionally (OIDC Core §3.1.3.7 step 3 MUST), with a new reject vector in `spec/vectors/id-token.json` (`aud:["other-client-9x"]`, `trusted_audiences:["other-client-9x"]`, `client_id:"s6BhdRkqt3"`); strict-xfail it in the Go and Python runners linked to #1166 | `fix(rust)!`. Must land before the hosted run: certifying with a missed MUST is weak evidence. |
 | R3 | #1153 | Rust only: same-`kid` keys of different `kty` → pick by `kty`/`alg`/`crv`, adding the shared vector to `spec/vectors/jwks.json` | Insurance before the hosted run (suite ≥5.3.3 publishes an OKP decoy under a kid). This loop owns the vector; Go claims it later. |
-| R4 | #1145 | Hosted run green for all three plans, rp-logs reasons checked | Evidence story: see "Exit criteria". |
+| R4 | #1145 | Final hosted run green for all three plans on the newest shipped branch, rp-logs reasons checked | Evidence story: see "Exit criteria". |
 | R5 | #998 | Rust only: refetch JWKS once on signature failure (+ rotated-key vector) | **Conditional:** only if a rotation module fails in R1/R4. Else `skipped` with the run link. |
 
 A failure that fits none of these: add a story row for the issue that covers it (search
@@ -133,9 +138,9 @@ Never press "Publish for certification" and never pass `publish` other than `non
 
 ## Stacking
 
-- Every story's branch is cut from the previous story's branch. The first PR's base is `main`.
-- **Parent** = the branch of the newest `shipped` ledger row, else `main`; `origin/main` if
-  that branch no longer exists on origin.
+- Every story's branch is cut from the previous story's branch. The first PR's base is the stack root.
+- **Parent** = the branch of the newest `shipped` ledger row, else the stack root; the stack
+  root if that branch no longer exists on origin.
 - Don't rebase, retarget or force-push shipped branches. Record each tip SHA in the ledger.
 
 ## Rules
@@ -177,7 +182,7 @@ Integration red is a hard block. Known flake, one rerun: ~22 integration failure
 - <what changed and why, with spec section / OIDF module names>
 
 Part of #<issue>
-Stacked on #<parent PR>    (omit when base = main)
+Stacked on #<parent PR>    (omit when base = the stack root)
 
 ## Breaking change         (only for `!` stories)
 <what callers must change>

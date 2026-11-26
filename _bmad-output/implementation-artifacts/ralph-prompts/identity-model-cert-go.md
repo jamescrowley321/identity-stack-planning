@@ -20,11 +20,15 @@ names. Target: submittable by Sunday 29 Nov 2026. Submission itself is the owner
   every branch operation.
 - **A sibling loop runs at the same time:** `identity-model-cert-rust`, owning `rust/` and
   `conformance/rust/`. The two loops never edit the same file. See "File ownership".
-- **Stack root: `main`.** The loop never merges. The owner merges bottom-up.
-- **Gate (Stacker checks on `build.start`):** `origin/release/v5` is gone (py 5.0.0 final,
-  identity-model#915, has merged) **and** `origin/main` has
-  `.github/workflows/conformance-native.yml` (identity-model#1198, the shared plumbing for
-  per-language harnesses). Either missing → `LOOP_COMPLETE` with the reason.
+- **Priority: run this language against the official OIDF suite as early as possible.** The
+  harness and a first hosted run come before any library fix; real suite verdicts decide what
+  gets fixed.
+- **Stack root: `origin/release/v5` while it exists, else `origin/main`.** py 5.0.0
+  (identity-model#915) merges `release/v5` into `main` mid-run; after that, new stories root on
+  `main` and open PRs stay where they are (the owner retargets). The loop never merges.
+- **Gate (Stacker checks on `build.start`):** the root branch has the shared harness plumbing
+  (identity-model#1198, PR #1200): `git show origin/<root>:conformance/run_tests.py | grep -q
+  -- '--harness'`. Missing → `LOOP_COMPLETE` with "blocked: #1200 not merged".
 - **Discovery semantics after identity-model#1197:** discovery takes the issuer and matches
   it exactly. The Go harness follows the same rule.
 
@@ -47,7 +51,7 @@ Every module in the three plans already gets the right verdict from a typed Go e
 
 The hosted suite serves a junk `P-9999` key in its JWKS. Go skips unusable keys today; keep it
 that way. So the work is the harness, then only what a real run proves is missing. Re-check
-this table against `main` before building; `main` wins.
+this table against the stack root before building; the code wins.
 
 ## Queue
 
@@ -123,9 +127,9 @@ Never press "Publish for certification" and never pass `publish` other than `non
 
 ## Stacking
 
-- Every story's branch is cut from the previous story's branch. The first PR's base is `main`.
-- **Parent** = the branch of the newest `shipped` ledger row, else `main`; `origin/main` if
-  that branch no longer exists on origin.
+- Every story's branch is cut from the previous story's branch. The first PR's base is the stack root.
+- **Parent** = the branch of the newest `shipped` ledger row, else the stack root; the stack
+  root if that branch no longer exists on origin.
 - Don't rebase, retarget or force-push shipped branches. Record each tip SHA in the ledger.
 
 ## Rules
@@ -165,7 +169,7 @@ Integration red is a hard block. Known flake, one rerun: ~22 integration failure
 - <what changed and why, with spec section / OIDF module names>
 
 Part of #<issue>
-Stacked on #<parent PR>    (omit when base = main)
+Stacked on #<parent PR>    (omit when base = the stack root)
 
 ## Conformance evidence    (G1/G2)
 <plan → module verdict table, run links>

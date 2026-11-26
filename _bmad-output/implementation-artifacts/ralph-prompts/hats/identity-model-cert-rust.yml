@@ -1,11 +1,11 @@
-# identity-model Rust certification loop (OIDF Basic/Config/Form Post RP): hat collection (stack root main).
+# identity-model Rust certification loop (OIDF Basic/Config/Form Post RP): hat collection (stack root release/v5, then main).
 # Modeled on ralph builtin:code-assist (Planner -> Builder -> Critic -> Finalizer),
 # with a Stacker that owns branches and the ledger, and a Shipper that
 # opens the PR and drives CI. Every hat leans on superpowers skills; the Critic runs
 # the blind-peer-review lenses. The queue, rules and gates live in PROMPT.md
 # (ralph-prompts/identity-model-cert-rust.md).
 #
-# Launch: RALPH_CLONE=1 ralph-prompts/run.sh identity-model-cert-rust identity-model main
+# Launch: RALPH_CLONE=1 ralph-prompts/run.sh identity-model-cert-rust identity-model release/v5
 
 event_loop:
   prompt_file: "PROMPT.md"
@@ -30,11 +30,9 @@ hats:
       and `.ralph/stack-ledger.md` (if missing, create it from the template in PROMPT.md).
 
       On every activation, in this order:
-      1. `git fetch origin --prune`. On `build.start` only, check the PROMPT.md "Gate":
-         if `origin/release/v5` still exists, publish `LOOP_COMPLETE` with
-         "blocked: 5.0.0 final not shipped"; if `git cat-file -e
-         origin/main:.github/workflows/conformance-native.yml` fails, publish `LOOP_COMPLETE`
-         with "blocked: #1198 not on main".
+      1. `git fetch origin --prune`. Stack root = `release/v5` if `origin/release/v5` exists,
+         else `main` (PROMPT.md "Context"). On `build.start` only, check the PROMPT.md "Gate"
+         against that root; if it fails, publish `LOOP_COMPLETE` with "blocked: #1200 not merged".
       2. **On `build.blocked`:** mark the payload's story `blocked` in the ledger with the
          reason, comment the reason on its issue, and continue. Later stories still stack on
          the last *shipped* branch, never on a blocked one.
@@ -49,8 +47,8 @@ hats:
          `gh pr list --state all --search "<n> in:body"` shows no merged or open PR
          already doing it. If it is already done, mark `skipped` with the PR link and
          pick again. Queue empty → publish `LOOP_COMPLETE`.
-      5. **Branch.** Parent = the branch of the newest `shipped` row, else `main` (or
-         `main` if that branch is gone from origin). Name it `<type>/<issue>-<slug>`.
+      5. **Branch.** Parent = the branch of the newest `shipped` row, else the stack root
+         (or the stack root if that branch is gone from origin). Name it `<type>/<issue>-<slug>`.
          `git checkout -B <branch> origin/<parent>` (or the local parent tip if the
          parent is unpushed; it never is, Shipper pushes before advancing).
       6. Comment on the issue that the loop picked it up, naming the parent branch.
