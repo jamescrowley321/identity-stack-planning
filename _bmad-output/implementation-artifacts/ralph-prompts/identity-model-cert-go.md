@@ -71,6 +71,16 @@ Dynamic/logout/FAPI plans, the FastAPI package, anything in `rust/`.
 Follow `conformance/adding-conformance-profiles.md` (the native-harness protocol #1198
 documents) and `conformance/app.py` behavior. In short:
 
+- **Interface fixed by #1198 (PR #1200):** port **8890**; each config is the Python config
+  plus a required `"rp_url": "http://localhost:8890"` and alias `go-identity-model-*`. Verdicts come
+  from the existing plan keys in `expected_modules.json`. The overlay mounts the `certs` volume
+  read-only, bind-mounts `./results/hosted/rp-logs/go` as `RP_LOG_DIR`, and `depends_on`
+  `cert-init`, `nginx`, `server` (as `rp-fastapi`). Hosted runs start the service with
+  `--no-deps`: trust `/certs/nginx-selfsigned.crt` in addition to system roots and tolerate it
+  being absent. `/results/{test_id}` returns 404 when nothing is recorded; record
+  `{"status":"success"}` or `{"status":"error","error":"<reason_class>: …"}`. Runner:
+  `run_tests.py --harness go`; make: `make conformance-test-native HARNESS=go [HOSTED=1]`.
+
 - Separate Go module at `conformance/go/` with a `replace` to `../../go`, so the library's
   module and release are untouched. Image `conformance/Dockerfile.go`; compose overlay
   `conformance/docker-compose.go.yml` with service `rp-go`; configs
@@ -101,8 +111,7 @@ make Go pass. If the Rust PR adding the vector is not on `main`, mark the story
 
 1. `conformance-native.yml` leg `go` is **success** (not skipped) on the G1 PR, with every
    module's verdict matching `expected_modules.json`.
-2. Hosted: `gh workflow run conformance-native.yml -r <branch> -f harness=go -f mode=hosted
-   -f publish=none` (use the exact input names #1198 defines) is green for all three plans.
+2. Hosted: `gh workflow run conformance-native.yml -r <branch> -f harness=go -f publish=none` is green for all three plans.
    Download the rp-logs artifact and confirm every negative module's log shows the expected
    reason, not some other failure (a green negative test proves only
    that *a* rejection happened). Record the run URL and per-module reasons in
